@@ -1,4 +1,6 @@
-# List Of Possible Libraries For Calendars in React
+# Developer Notes
+
+## List Of Possible Libraries For Calendars in React
 
 List of already implemented Calendars:
 
@@ -22,3 +24,7 @@ Implementing a calendar from scratch might be an option:
 - [How to Build a full page calendar with React](https://engineering.deptagency.com/how-to-build-a-full-page-calendar-with-react?ref=retool-blog).
 
 Main source: [Top React calendar component libraries](https://retool.com/blog/best-react-calendar-components)
+
+## Overall Styling
+
+Check this one: [MUI](https://mui.com/).

@@ -1,6 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {Navigate} from 'react-router-dom';
 
+// !!! This component is not being used for the moment. It was replace by "LogIn.tsx"
+// !!! Please ignore this component!
+
 function ChooseLevel() {
     const [redirect, setRedirect] = useState<string | undefined>(undefined)
     const [levelChosen, setLevelChosen] = useState<string | undefined>(undefined)

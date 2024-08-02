@@ -6,6 +6,7 @@ import {Route, Routes} from 'react-router-dom'
 import WelcomePage from './components/WelcomePage';
 import ChooseLevel from './components/ChooseLevel';
 import Calendar from './components/Calendar';
+import LogIn from './components/LogIn';
 
 function App() {
   return (
@@ -22,7 +23,10 @@ function Router() {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={
-          <WelcomePage />
+          <WelcomePage/>
+        }/>
+        <Route path='/log-in' element={
+          <LogIn/>
         }/>
         <Route path='/choose-level' element={
           <ChooseLevel/>
