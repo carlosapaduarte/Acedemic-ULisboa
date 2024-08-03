@@ -1,6 +1,8 @@
 import React, {useEffect, useState, useReducer} from "react";
 import {Navigate} from 'react-router-dom';
 
+import {Service} from '../service/service';
+
 type State =
     {
         type: "userInfo",
@@ -66,7 +68,7 @@ function reducer(state: State, action: Action): State {
  */
 
 function LogIn() {
-    const [state, dispatch] = React.useReducer(reducer, {type : 'userInfo'})
+    const [state, dispatch] = useReducer(reducer, {type : 'userInfo'})
     const [levelChosen, setLevelChosen] = useState<Level | undefined>(undefined)
     const [shareProgress, setShareProgress] = useState<boolean | undefined>(undefined)
 
@@ -98,16 +100,45 @@ function LogIn() {
         return <Navigate to={'/calendar'} replace={true}/>
 }
 
+const MAX_USER_ID = 9999
+
 function UserInfo({onAuthDone} : { onAuthDone: () => void }) {
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
 
-    return (
-        <div>
-            <h1>Redirect to Ulisboa Auth Service....</h1>
-            <button onClick={() => onAuthDone()}>Click here to simulate auth</button>
-        </div>
-    )
+    const [error, setError] = useState<boolean | undefined>(undefined)
+
+    async function createUser() {
+        const userId = Math.floor(Math.random() * MAX_USER_ID)
+        const created = await Service.createUser(userId)
+        setError(!created)
+    }
+
+
+    let domToDisplay = undefined
+    switch(error) {
+        case undefined : domToDisplay = (
+            <div>
+                <h1>Create New User</h1>
+                <button onClick={() => createUser()}>Click To Create user</button>
+            </div>    
+        )
+        break
+        case false : domToDisplay = (
+            <div>
+                <h1>User created!</h1>
+                <button onClick={() => onAuthDone()}>Click here to advance</button>
+            </div>    
+        )
+        break
+        case true : domToDisplay = (
+            <div>
+                <h1>There was an error creating the user!</h1>
+            </div>
+        )
+    }
+
+    return domToDisplay
 }
 
 function ShareProgress({onShareClick} : { onShareClick: (accepted: boolean) => void }) {
