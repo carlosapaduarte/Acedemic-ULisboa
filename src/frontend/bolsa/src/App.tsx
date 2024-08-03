@@ -28,9 +28,6 @@ function Router() {
         <Route path='/log-in' element={
           <LogIn/>
         }/>
-        <Route path='/choose-level' element={
-          <ChooseLevel/>
-        }/>
         <Route path='/calendar' element={
           <Calendar/>
         }/>

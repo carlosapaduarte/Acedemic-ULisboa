@@ -15,6 +15,10 @@ type State =
     }
     |
     {
+        type : "quiz",
+    }
+    |
+    {
         type: "redirect"
     }
 
@@ -25,6 +29,10 @@ type Action =
     |
     {
         type : "setChooseLevel",
+    }
+    |
+    {
+        type : "setQuiz",
     }
     |
     {
@@ -39,6 +47,9 @@ function reducer(state: State, action: Action): State {
         case "setChooseLevel": {
             return { type: "chooseLevel" }
         }
+        case "setQuiz": {
+            return { type: "quiz" }
+        }
         case "setRedirect": {
             return { type: "redirect" }
         }
@@ -49,13 +60,14 @@ function reducer(state: State, action: Action): State {
  * This React component:
  * - shows a dialogue to simulate authentication;
  * - asks user if can share progress;
- * - lists possible levels;
+ * - lists possible levels:
+ *  - User might choose to start quiz
  * - redirects for calendar component.
  */
 
 function LogIn() {
     const [state, dispatch] = React.useReducer(reducer, {type : 'userInfo'})
-    const [levelChosen, setLevelChosen] = useState<string | undefined>(undefined)
+    const [levelChosen, setLevelChosen] = useState<Level | undefined>(undefined)
     const [shareProgress, setShareProgress] = useState<boolean | undefined>(undefined)
 
     const onAuthDoneHandler = () => {
@@ -67,17 +79,21 @@ function LogIn() {
         dispatch({type: 'setChooseLevel'})
     };
 
-    const handleOnLevelClick = (level: string) => {
+    const handleOnSelectedLevel = (level: Level) => {
         setLevelChosen(level)
         dispatch({type: 'setRedirect'})
     };
+
+    const onStartQuizCLickHandler = () => { dispatch({type: 'setQuiz'}) }
 
     if (state.type === 'userInfo') {
         return <UserInfo onAuthDone={onAuthDoneHandler}/>
     } else if (state.type === "shareProgress") {
         return <ShareProgress onShareClick={(accepted: boolean) => handleOnShareClick(accepted)}/>
     } else if (state.type === "chooseLevel") {
-        return <ChooseLevel onLevelClick={(level: string) => handleOnLevelClick(level)}/>
+        return <ChooseLevel onLevelClick={(level: Level) => handleOnSelectedLevel(level)} onStartQuizClick={onStartQuizCLickHandler}/>
+    } else if (state.type === "quiz") {
+        return <Quiz onLevelComputed={(level: Level) => handleOnSelectedLevel(level)} />
     } else 
         return <Navigate to={'/calendar'} replace={true}/>
 }
@@ -105,18 +121,66 @@ function ShareProgress({onShareClick} : { onShareClick: (accepted: boolean) => v
     );
 }
 
-function ChooseLevel({onLevelClick} : { onLevelClick: (level: string) => void }) {
+enum Level {LEVEL_1, LEVEL_2, LEVEL_3}
+
+function ChooseLevel({onLevelClick, onStartQuizClick} : { onLevelClick: (level: Level) => void, onStartQuizClick: () => void }) {
     return (
         <div>
             <h1>Choose Desired Level!</h1>
             <br/>
-            <button onClick={() => onLevelClick('level 1')}>Nível 1: Iniciante</button>
+            <button onClick={() => onLevelClick(Level.LEVEL_1)}>Nível 1: Iniciante</button>
             <br/>
-            <button onClick={() => onLevelClick('level 2')}>Nível 2: Intermédio</button>
+            <button onClick={() => onLevelClick(Level.LEVEL_2)}>Nível 2: Intermédio</button>
             <br/>
-            <button onClick={() => onLevelClick('level 3')}>Nível 3: Avançado… já se sente com um bom nível de eficácia e está…</button>
+            <button onClick={() => onLevelClick(Level.LEVEL_3)}>Nível 3: Avançado… já se sente com um bom nível de eficácia e está…</button>
+            <br/>
+            <button onClick={() => onStartQuizClick()}>Não sei o meu nível</button>
         </div>
-        // TODO: show option for quiz
+    );
+}
+
+function Quiz({onLevelComputed} : { onLevelComputed: (level: Level) => void }) {
+    // This component will soon display a total of 10 question.
+    // Then, it will calculate a score based on the answers
+
+    const [answers, setAnswers] = useState<boolean[]>(new Array(10))
+
+    function onAnswerClick(questionNumber: number, answer: boolean) {
+        const newAnswers: boolean[] = answers.slice()
+        newAnswers[questionNumber] = answer
+        setAnswers(newAnswers)
+    }
+
+    function computeLevel() {
+        // TODO: compute level based on answers
+
+        const computedLevel: Level = Level.LEVEL_1
+        onLevelComputed(computedLevel)
+    }
+
+    Array.from(answers.keys()).forEach(element => {
+        console.log(element)
+    });
+
+    //Array.from(Array(answers).keys()).map((questionNumber) => console.log(questionNumber))
+
+    return (
+        <div>
+            <h1>10 questions to be displayed...</h1>
+            <br/>
+            {Array.from(Array(answers).keys()).map((questionNumber) => {
+                console.log(questionNumber)
+                return (
+                    <div key={questionNumber}>
+                        <button onClick={() => onAnswerClick(questionNumber, true)}>Sim!</button>
+                        <button onClick={() => onAnswerClick(questionNumber, false)}>Não!</button>
+                        <br/>
+                    </div>
+                )
+            })}
+            <br/>
+            <button onClick={() => computeLevel()}>Confirmar respostas!</button>
+        </div>
     );
 }
 
