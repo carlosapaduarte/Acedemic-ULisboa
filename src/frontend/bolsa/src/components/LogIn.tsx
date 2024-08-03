@@ -139,11 +139,24 @@ function ChooseLevel({onLevelClick, onStartQuizClick} : { onLevelClick: (level: 
     );
 }
 
+const quizQuestions = [
+    "Question 1",
+    "Question 2",
+    "Question 3",
+    "Question 4",
+    "Question 5",
+    "Question 6",
+    "Question 7",
+    "Question 8",
+    "Question 9",
+    "Question 10",
+]
+
 function Quiz({onLevelComputed} : { onLevelComputed: (level: Level) => void }) {
     // This component will soon display a total of 10 question.
     // Then, it will calculate a score based on the answers
 
-    const [answers, setAnswers] = useState<boolean[]>(new Array(10))
+    const [answers, setAnswers] = useState<boolean[]>(new Array(10).fill(undefined))
 
     function onAnswerClick(questionNumber: number, answer: boolean) {
         const newAnswers: boolean[] = answers.slice()
@@ -158,20 +171,14 @@ function Quiz({onLevelComputed} : { onLevelComputed: (level: Level) => void }) {
         onLevelComputed(computedLevel)
     }
 
-    Array.from(answers.keys()).forEach(element => {
-        console.log(element)
-    });
-
-    //Array.from(Array(answers).keys()).map((questionNumber) => console.log(questionNumber))
-
     return (
         <div>
             <h1>10 questions to be displayed...</h1>
             <br/>
-            {Array.from(Array(answers).keys()).map((questionNumber) => {
-                console.log(questionNumber)
+            {quizQuestions.map((question, questionNumber) => {
                 return (
                     <div key={questionNumber}>
+                        {question}{" "}
                         <button onClick={() => onAnswerClick(questionNumber, true)}>Sim!</button>
                         <button onClick={() => onAnswerClick(questionNumber, false)}>Não!</button>
                         <br/>
