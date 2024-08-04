@@ -41,13 +41,58 @@ function Dashboard() {
     );
 }
 
+type State =
+    {
+        type: "challengesNotLoaded",
+    }
+    |
+    {
+        type : "loading",
+    }
+    |
+    {
+        type : "error",
+    }
+    |
+    {
+        type : "challenges",
+        todaysChallenge: Challenges,
+        pastChallenges: Challenges
+    }
+
+type Action =
+    {
+        type : "setLoading",
+    }
+    |
+    {
+        type : "setError",
+    }
+    |
+    {
+        type : "setChallenges",
+        todaysChallenge: Challenges,
+        pastChallenges: Challenges
+    }
+
+function reducer(state: State, action: Action): State {
+    switch(action.type) {
+        case "setLoading": {
+            return { type: "loading" }
+        }
+        case "setError": {
+            return { type: "error" }
+        }
+        case "setChallenges": {
+            return { type: "challenges", todaysChallenge: action.todaysChallenge, pastChallenges: action.pastChallenges }
+        }
+    }
+}
+
 function Calendar({userId} : {userId: number}) {
     // Show challenges/goals and button to add new goal
 
-    // TODO: improve this later by merging both states under into a reducer
-    // For instance, have states representing the loading process
-    const [userChallenges, setUserChallenges] = useState<Challenges | undefined>(undefined)
-    const [error, setError] = useState<string | undefined>(undefined)
+    const [state, dispatch] = useReducer(reducer, {type : 'challengesNotLoaded'})
 
     // Sparks a getUserInfo API call
     useEffect(() => {
@@ -55,7 +100,7 @@ function Calendar({userId} : {userId: number}) {
             const currentUserDayAndLevel: CurrentUserDayAndLevel | undefined = await Service.fetchCurrentUserDayAndLevelFromAPi(userId)
 
             if (currentUserDayAndLevel == undefined) {
-                setError('Could not retreive user information!')
+                dispatch({type: 'setError'})
                 return
             }
 
@@ -71,28 +116,39 @@ function Calendar({userId} : {userId: number}) {
                 }
                 
 
+                // Level 1/2
                 if (currentUserDayAndLevel.level == 1 || currentUserDayAndLevel.level == 2) {
                     const todaysChallenge: Challenge = challenges.challenges[currentUserDayAndLevel.day - 1] // remember: indexes start at 0
+                    
                     // Just a single challenge for the day
-                    setUserChallenges({challenges: [todaysChallenge]})
+                    dispatch({
+                        type: 'setChallenges', 
+                        todaysChallenge: {challenges: [todaysChallenge]}, 
+                        pastChallenges: {challenges: challenges.challenges.slice(0, currentUserDayAndLevel.day - 1)}
+                    })
+                    
                 } else { // level 3
                     if (currentUserDayAndLevel.day >= 5)
-                        setUserChallenges({challenges: challenges.challenges})
+                        dispatch({
+                            type: 'setChallenges', 
+                            todaysChallenge: {challenges: challenges.challenges}, 
+                            pastChallenges: {challenges: []} // For simplification, no past challenges for level 3, for now
+                        })
                     
                     else {
                         // I think this necessary, not to remove challenges from [challenges.challenges]
                         // Starts of with all level-3 challenges
                         const todaysChallenges = [...challenges.challenges]
 
-                        console.log(currentUserDayAndLevel.day)
-                        console.log(todaysChallenges)
-                        
                         // Removes necessary challenges
                         for (let u = currentUserDayAndLevel.day; u < 5; u++) {
-                            console.log("here")
                             todaysChallenges.pop()
                         }
-                        setUserChallenges({challenges: todaysChallenges})
+                        dispatch({
+                            type: 'setChallenges', 
+                            todaysChallenge: {challenges: todaysChallenges}, 
+                            pastChallenges: {challenges: []} // For simplification, no past challenges for level 3, for now
+                        })
                     }
                 }
         }
@@ -100,30 +156,45 @@ function Calendar({userId} : {userId: number}) {
         fetchUserCurrentDayAndLoadChallenge()
     }, [])
 
-    if (error == undefined)
+    if (state.type == 'challenges')
         // This '?' is only needed because state management is not yet optimized
         return (
             <div>
                 <h1>This will soon be the Calendar...</h1>
                 <br/>
-                {userChallenges?.challenges.map((challenge, challengeNumber) => {
+                <h2>Challenges For Today:</h2> 
+                {state.todaysChallenge.challenges.map((challenge, challengeNumber) => {
                     return (
                         <div key={challengeNumber}>
-                            <h2>Challenge For Today: {challenge.title}</h2> 
-                            <h3>{challenge.description}</h3>
+                            <h2>Title: {challenge.title}</h2> 
+                            <h3>Description: {challenge.description}</h3>
+                            <br/>
+                        </div>
+                    )
+                })}
+
+                <br/>
+                <h2>Past Challenges:</h2> 
+                {state.pastChallenges.challenges.map((challenge, challengeNumber) => {
+                    return (
+                        <div key={challengeNumber}>
+                            <h2>Title: {challenge.title}</h2> 
+                            <h3>Description: {challenge.description}</h3>
                             <br/>
                         </div>
                     )
                 })}
             </div>
         )
-    else
+    else if (state.type == 'error')
         return (
             <div>
-                <h1>This will soon be the Calendar...</h1>
-                <h2>Error Loading Challenge For Today: {error}</h2>
+                <h2>Handle this error later!</h2>
             </div>
         )
+    else return (
+        <h1>Should Not Arrive Here!</h1>
+    )
 }
 
 export default Dashboard;
