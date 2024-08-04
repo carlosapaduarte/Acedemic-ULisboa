@@ -1,10 +1,7 @@
 package pt.ulisboa.backend.http
 
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import pt.ulisboa.backend.dtos.*
 import pt.ulisboa.backend.service.Service
@@ -43,10 +40,10 @@ class Controller(val service: Service) {
         service.setShareProgressPreference(inputDto.id, inputDto.shareProgress)
     }
 
-    @GetMapping("/user-info")
+    @GetMapping("/users/{id}")
     fun getUserInfo(
-        @RequestBody inputDto: GetUserInfoInputDto
-    ): UserInfo = service.getUserInfo(inputDto.id)
+        @PathVariable("id") userId: Int
+    ): UserInfo = service.getUserInfo(userId)
 
     @GetMapping("/ping")
     fun ping() = "pong"

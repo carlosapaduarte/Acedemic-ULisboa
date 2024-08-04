@@ -4,11 +4,11 @@ const base_api_url = 'http://localhost:8080/'
 const CONTENT_TYPE_JSON = 'application/json'
 
 function toFullUrl(request: Request): string {
-    return base_api_url + request.href
+    return base_api_url + request.path
 }
 
 export type Request = {
-    href: string
+    path: string
     method: string
     body?: Body
 }
@@ -30,7 +30,7 @@ function buildBody(fields: KeyValuePair[]): string {
 
 function validateRequestMethod(request: Request): boolean {
     const method = request.method.toUpperCase()
-    return request.href !== undefined && (method === 'GET' || method === 'POST' || method === 'PUT' || method === 'DELETE')
+    return request.path !== undefined && (method === 'GET' || method === 'POST' || method === 'PUT' || method === 'DELETE')
 }
 
 export async function doFetch(

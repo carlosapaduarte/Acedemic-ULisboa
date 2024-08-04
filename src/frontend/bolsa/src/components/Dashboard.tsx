@@ -1,6 +1,9 @@
 import React, {useEffect, useState, useReducer} from "react";
 import {useParams} from "react-router-dom";
-import {Service} from '../service/service';
+import {CurrentUserDayAndLevel, Service} from '../service/service';
+import { Level1 } from "../challenges/level_1";
+import { Level2 } from "../challenges/level_2";
+import { Challenge, Challenges } from "../challenges/types";
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
@@ -40,26 +43,43 @@ function Calendar({userId} : {userId: number}) {
 
     // TODO: improve this later by merging both states under into a reducer
     // For instance, have states representing the loading process
-    const [userChallenge, setUserChallenge] = useState<string | undefined>(undefined)
+    const [userChallenge, setUserChallenge] = useState<Challenge | undefined>(undefined)
     const [error, setError] = useState<string | undefined>(undefined)
 
     // Sparks a getUserInfo API call
     useEffect(() => {
         async function fetchUserCurrentDayAndLoadChallenge() {
-            const userCurrentDay: number | undefined = await Service.fetchCurrentUserDayFromAPi(userId)
-            // TODO: load respective challenge from a file
-            const currentUserChallenge = "TODO"
-            setUserChallenge(currentUserChallenge)
+            const currentUserDayAndLevel: CurrentUserDayAndLevel | undefined = await Service.fetchCurrentUserDayAndLevelFromAPi(userId)
+
+            if (currentUserDayAndLevel == undefined) {
+                setError('Could not retreive user information!')
+                return
+            }
+
+            let challenges: Challenges
+                switch(currentUserDayAndLevel.level) {
+                    case 1 : challenges = Level1.level1
+                    break
+                    case 2 : challenges = Level2.level2
+                    break
+                    default : return Promise.reject('TODO: error handling')
+                }
+                
+                const todaysChallenge: Challenge = challenges.challenges[currentUserDayAndLevel.day - 1] // remember: indexes start at 0
+                
+                setUserChallenge(todaysChallenge)
         }
 
         fetchUserCurrentDayAndLoadChallenge()
     }, [])
 
     if (error == undefined)
+        // This '?' is only needed because state management is not yet optimized
         return (
             <div>
                 <h1>This will soon be the Calendar...</h1>
-                <h2>Challenge For Today: {userChallenge}</h2>
+                <h2>Challenge For Today: {userChallenge?.title}</h2> 
+                <h3>{userChallenge?.description}</h3>
             </div>
         )
     else

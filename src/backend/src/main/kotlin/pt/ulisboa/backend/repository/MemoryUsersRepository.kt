@@ -9,7 +9,7 @@ class MemoryUsersRepository : UsersRepository {
     val users = mutableMapOf<Int, User>()
 
     override fun createUser(id: Int, username: String) {
-        users[id] = User(id, username, null, null, false)
+        users[id] = User(id, username, null, 1, false)
     }
 
     override fun existsUser(id: Int): Boolean {
