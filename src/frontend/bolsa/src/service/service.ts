@@ -38,8 +38,26 @@ async function selectShareProgressState(userId: number, shareProgress: boolean):
     return response.ok
 }
 
+async function fetchCurrentUserDayFromAPi(userId: number): Promise<number | undefined> {
+    const request = {
+        href: 'user-info',
+        method: 'POST',
+        body: toBody({id: userId}),
+    }
+    const response: Response = await doFetch(request)
+    //console.log(response)
+
+    if (response.ok) {
+        const responseObject = await response.json()
+        const userCurrentDay = responseObject.currentDay // TODO: improve error handling
+        return Number(userCurrentDay)
+    } else
+        return undefined
+}
+
 export const Service = {
     createUser,
     chooseLevel,
-    selectShareProgressState
+    selectShareProgressState,
+    fetchCurrentUserDayFromAPi
 }

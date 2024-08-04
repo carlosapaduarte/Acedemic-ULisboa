@@ -4,7 +4,7 @@ import './App.css';
 import {BrowserRouter} from "react-router-dom";
 import {Route, Routes} from 'react-router-dom'
 import WelcomePage from './components/WelcomePage';
-import Dashboard from './components/Calendar';
+import Dashboard from './components/Dashboard';
 import LogIn from './components/LogIn';
 import { RequireAuthn } from './components/auth/RequireAuthn';
 import { AuthnContainer } from './components/auth/Authn';
