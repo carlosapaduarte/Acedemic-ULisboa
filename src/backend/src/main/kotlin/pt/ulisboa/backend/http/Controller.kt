@@ -47,4 +47,11 @@ class Controller(val service: Service) {
 
     @GetMapping("/ping")
     fun ping() = "pong"
+    
+    @PostMapping("users/{id}/goals")
+    fun createNewGoal(
+        @RequestBody inputDto: NewUserGoalDto
+    ) {
+        service.createNewUserGoal(inputDto.id, inputDto.name)
+    }
 }

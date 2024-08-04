@@ -26,10 +26,21 @@ class Service(val usersRepository: UsersRepository) {
 
     fun getUserInfo(id: Int): UserInfo {
         val user = usersRepository.getUser(id)
-        return UserInfo(id = id, username = user.username, level = user.level, currentDay = user.currentDay, shareProgress = user.shareProgress)
+        return UserInfo(
+            id = id,
+            username = user.username,
+            level = user.level,
+            currentDay = user.currentDay,
+            shareProgress = user.shareProgress,
+            userGoals = user.userGoals
+        )
     }
 
     fun setShareProgressPreference(id: Int, shareProgress: Boolean) {
         usersRepository.updateShareProgressPreference(id, shareProgress)
+    }
+
+    fun createNewUserGoal(userId: Int, name: String) {
+        usersRepository.addNewUserGoal(userId, name)
     }
 }

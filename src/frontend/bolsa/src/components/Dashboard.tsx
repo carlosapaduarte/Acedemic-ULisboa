@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useReducer} from "react";
 import {useParams} from "react-router-dom";
-import {CurrentUserDayAndLevel, Service} from '../service/service';
+import {UserInfo, Service, UserGoal} from '../service/service';
 import { Level1 } from "../challenges/level_1";
 import { Level2 } from "../challenges/level_2";
 import { Challenge, Challenges } from "../challenges/types";
@@ -16,6 +16,9 @@ function Dashboard() {
     const hourOfDay = new Date().getHours();
     let helloQuote = ''
     switch(true) {
+        case hourOfDay < 5:
+            helloQuote = 'Good Night'
+            break
         case hourOfDay < 12:
             helloQuote = 'Good Morning'
             break
@@ -25,7 +28,7 @@ function Dashboard() {
         case hourOfDay < 20:
             helloQuote = 'Good Evening'
             break
-        case hourOfDay < 5:
+        default:
             helloQuote = 'Good Night'
     }
 
@@ -57,10 +60,19 @@ type State =
     {
         type : "challenges",
         todaysChallenge: Challenges,
-        pastChallenges: Challenges
+        pastChallenges: Challenges,
+        userGoals: UserGoal[]
+    }
+    |
+    {
+        type: 'addingNewUserGoal',
     }
 
 type Action =
+    {
+        type: "setChallengesNotLoaded",
+    }
+    |
     {
         type : "setLoading",
     }
@@ -72,11 +84,19 @@ type Action =
     {
         type : "setChallenges",
         todaysChallenge: Challenges,
-        pastChallenges: Challenges
+        pastChallenges: Challenges,
+        userGoals: UserGoal[]
+    }
+    |
+    {
+        type: 'setAddingNewUserGoal'
     }
 
 function reducer(state: State, action: Action): State {
     switch(action.type) {
+        case 'setChallengesNotLoaded': {
+            return { type: 'challengesNotLoaded' }
+        }
         case "setLoading": {
             return { type: "loading" }
         }
@@ -84,8 +104,11 @@ function reducer(state: State, action: Action): State {
             return { type: "error" }
         }
         case "setChallenges": {
-            return { type: "challenges", todaysChallenge: action.todaysChallenge, pastChallenges: action.pastChallenges }
+            return { type: "challenges", todaysChallenge: action.todaysChallenge, pastChallenges: action.pastChallenges, userGoals: action.userGoals }
         }
+        case "setAddingNewUserGoal": {
+            return { type: "addingNewUserGoal" }
+        }   
     }
 }
 
@@ -93,19 +116,22 @@ function Calendar({userId} : {userId: number}) {
     // Show challenges/goals and button to add new goal
 
     const [state, dispatch] = useReducer(reducer, {type : 'challengesNotLoaded'})
+    const [newGoalName, setNewGoalName] = useState("");
 
     // Sparks a getUserInfo API call
     useEffect(() => {
         async function fetchUserCurrentDayAndLoadChallenge() {
-            const currentUserDayAndLevel: CurrentUserDayAndLevel | undefined = await Service.fetchCurrentUserDayAndLevelFromAPi(userId)
+            dispatch({type: 'setLoading'})
 
-            if (currentUserDayAndLevel == undefined) {
+            const userInfo: UserInfo | undefined = await Service.fetchUserInfoFromApi(userId)
+
+            if (userInfo == undefined) {
                 dispatch({type: 'setError'})
                 return
             }
 
             let challenges: Challenges
-                switch(currentUserDayAndLevel.level) {
+                switch(userInfo.level) {
                     case 1 : challenges = Level1.level1
                     break
                     case 2 : challenges = Level2.level2
@@ -117,22 +143,24 @@ function Calendar({userId} : {userId: number}) {
                 
 
                 // Level 1/2
-                if (currentUserDayAndLevel.level == 1 || currentUserDayAndLevel.level == 2) {
-                    const todaysChallenge: Challenge = challenges.challenges[currentUserDayAndLevel.day - 1] // remember: indexes start at 0
+                if (userInfo.level == 1 || userInfo.level == 2) {
+                    const todaysChallenge: Challenge = challenges.challenges[userInfo.currentDay - 1] // remember: indexes start at 0
                     
                     // Just a single challenge for the day
                     dispatch({
                         type: 'setChallenges', 
                         todaysChallenge: {challenges: [todaysChallenge]}, 
-                        pastChallenges: {challenges: challenges.challenges.slice(0, currentUserDayAndLevel.day - 1)}
+                        pastChallenges: {challenges: challenges.challenges.slice(0, userInfo.currentDay - 1)},
+                        userGoals: userInfo.userGoals
                     })
                     
                 } else { // level 3
-                    if (currentUserDayAndLevel.day >= 5)
+                    if (userInfo.currentDay >= 5)
                         dispatch({
                             type: 'setChallenges', 
                             todaysChallenge: {challenges: challenges.challenges}, 
-                            pastChallenges: {challenges: []} // For simplification, no past challenges for level 3, for now
+                            pastChallenges: {challenges: []}, // For simplification, no past challenges for level 3, for now
+                            userGoals: userInfo.userGoals
                         })
                     
                     else {
@@ -141,20 +169,38 @@ function Calendar({userId} : {userId: number}) {
                         const todaysChallenges = [...challenges.challenges]
 
                         // Removes necessary challenges
-                        for (let u = currentUserDayAndLevel.day; u < 5; u++) {
+                        for (let u = userInfo.currentDay; u < 5; u++) {
                             todaysChallenges.pop()
                         }
                         dispatch({
                             type: 'setChallenges', 
                             todaysChallenge: {challenges: todaysChallenges}, 
-                            pastChallenges: {challenges: []} // For simplification, no past challenges for level 3, for now
+                            pastChallenges: {challenges: []}, // For simplification, no past challenges for level 3, for now
+                            userGoals: userInfo.userGoals
                         })
                     }
                 }
         }
 
-        fetchUserCurrentDayAndLoadChallenge()
-    }, [])
+        async function createNewUserGoal() {
+            await Service.createNewUserGoal(userId, newGoalName)
+            dispatch({ type: 'setChallengesNotLoaded' }) // TODO: not the best way but for now will do...
+        }
+
+        if (state.type == 'challengesNotLoaded')
+            fetchUserCurrentDayAndLoadChallenge()
+
+        else if (state.type == 'addingNewUserGoal')
+            createNewUserGoal()
+
+    }, [state])
+
+    
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        // For now, this new goal will be associated to a challenge day, for simplification
+        if (event.key === 'Enter')
+            dispatch({type: 'setAddingNewUserGoal'})
+    };
 
     if (state.type == 'challenges')
         // This '?' is only needed because state management is not yet optimized
@@ -184,12 +230,44 @@ function Calendar({userId} : {userId: number}) {
                         </div>
                     )
                 })}
+
+                <br/>
+                <h2>Created Goals:</h2> 
+                {state.userGoals.map((goal, goalNumber) => {
+                    return (
+                        <div key={goalNumber}>
+                            <h2>Goal Name: {goal.name}</h2> 
+                            <h3>Day: {goal.day}</h3>
+                            <br/>
+                        </div>
+                    )
+                })}
+
+                <input
+                    type="text"
+                    placeholder="New Goal Name"
+                    value={newGoalName}
+                    onChange={(e) => setNewGoalName(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                />
             </div>
         )
     else if (state.type == 'error')
         return (
             <div>
                 <h2>Handle this error later!</h2>
+            </div>
+        )
+    else if (state.type == 'loading')
+        return (
+            <div>
+                <h2>Loading...</h2>
+            </div>
+        )
+    else if (state.type == 'addingNewUserGoal')
+        return (
+            <div>
+                <h2>Adding New Goal!</h2>
             </div>
         )
     else return (

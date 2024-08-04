@@ -44,12 +44,22 @@ async function selectShareProgressState(userId: number, shareProgress: boolean):
     return response.ok
 }
 
-export type CurrentUserDayAndLevel = {
-    day: number;
-    level: number;
-  };
+export type UserGoal = {
+    name: String;
+    day: number
+}
 
-async function fetchCurrentUserDayAndLevelFromAPi(userId: number): Promise<CurrentUserDayAndLevel | undefined> {
+// User info
+export type UserInfo = {
+    id: number,
+    username: String,
+    level: number,
+    currentDay: number,
+    shareProgress: boolean,
+    userGoals: UserGoal[]
+};
+
+async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefined> {
     const request = {
         path: `users/${userId}`,
         method: 'GET',
@@ -57,21 +67,26 @@ async function fetchCurrentUserDayAndLevelFromAPi(userId: number): Promise<Curre
     const response: Response = await doFetch(request)
 
     if (response.ok) {
-        const responseObject = await response.json()
-        console.log(responseObject)
-        const userCurrentDay = responseObject.currentDay // TODO: improve error handling
-        const level = responseObject.level
-        return {
-            day: Number(userCurrentDay),
-            level: Number(level)
-        }
+        const responseObject: UserInfo = await response.json() // TODO: how 
+        return responseObject
     } else
         return undefined
+}
+
+async function createNewUserGoal(userId: number, name: string): Promise<boolean | undefined> {
+    const request = {
+        path: `users/${userId}/goals`,
+        method: 'POST',
+        body: toBody({id: userId, name}),
+    }
+    const response: Response = await doFetch(request)
+    return response.ok
 }
 
 export const Service = {
     createUser,
     chooseLevel,
     selectShareProgressState,
-    fetchCurrentUserDayAndLevelFromAPi
+    fetchUserInfoFromApi,
+    createNewUserGoal
 }
