@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import pt.ulisboa.backend.dtos.GetUserInfoInputDto
-import pt.ulisboa.backend.dtos.LoginInputDto
-import pt.ulisboa.backend.dtos.SetLevelInputDto
-import pt.ulisboa.backend.dtos.UserInfo
+import pt.ulisboa.backend.dtos.*
 import pt.ulisboa.backend.service.Service
 
 
@@ -37,6 +34,13 @@ class Controller(val service: Service) {
         @RequestBody inputDto: SetLevelInputDto
     ) {
         service.setLevel(inputDto.id, inputDto.level)
+    }
+
+    @PostMapping("/set-publish-state-preference")
+    fun setShareProgressPreference(
+        @RequestBody inputDto: SetShareProgressPreferenceDto
+    ) {
+        service.setShareProgressPreference(inputDto.id, inputDto.shareProgress)
     }
 
     @GetMapping("/user-info")

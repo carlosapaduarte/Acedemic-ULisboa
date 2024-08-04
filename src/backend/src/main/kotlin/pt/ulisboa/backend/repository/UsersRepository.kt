@@ -11,4 +11,6 @@ interface UsersRepository {
     fun getUser(id: Int): User
 
     fun updateUserLevel(id: Int, level: Int)
+
+    fun updateShareProgressPreference(id: Int, publishState: Boolean)
 }

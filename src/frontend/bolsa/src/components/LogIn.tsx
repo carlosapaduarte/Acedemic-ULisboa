@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useReducer} from "react";
 import {Navigate} from 'react-router-dom';
-
 import {Service} from '../service/service';
+import {useSetIsLoggedIn} from "./auth/Authn";
 
 type State =
     {
@@ -24,7 +24,8 @@ type State =
     }
     |
     {
-        type: "redirect"
+        type: "redirect",
+        userId: number
     }
 
 type Action =
@@ -45,6 +46,7 @@ type Action =
     |
     {
         type : "setRedirect",
+        userId: number
     }
 
 function reducer(state: State, action: Action): State {
@@ -59,7 +61,7 @@ function reducer(state: State, action: Action): State {
             return { type: "quiz", userId: action.userId }
         }
         case "setRedirect": {
-            return { type: "redirect" }
+            return { type: "redirect", userId: action.userId }
         }
     }
 }
@@ -86,21 +88,25 @@ function LogIn() {
 
     const onStartQuizCLickHandler = (userId: number) => { dispatch({type: 'setQuiz', userId}) }
 
-    if (state.type === 'userInfo') {
+    if (state.type === 'userInfo')
         return <UserInfo onAuthDone={onAuthDoneHandler}/>
-    } else if (state.type === "shareProgress") {
+    else if (state.type === "shareProgress")
         return <ShareProgress userId={state.userId} onShareSelected={() => handleOnShareClick(state.userId)}/>
-    } else if (state.type === "chooseLevel") {
-        return <ChooseLevel userId={state.userId} onLevelSelected={() => dispatch({type: 'setRedirect'})} onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
-    } else if (state.type === "quiz") {
-        return <Quiz userId={state.userId} onLevelSelected={() => dispatch({type: 'setRedirect'})} />
-    } else 
-        return <Navigate to={'/calendar'} replace={true}/>
+    else if (state.type === "chooseLevel")
+        return <ChooseLevel userId={state.userId} onLevelSelected={() => dispatch({type: 'setRedirect', userId: state.userId})} onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
+    else if (state.type === "quiz")
+        return <Quiz userId={state.userId} onLevelSelected={() => dispatch({type: 'setRedirect', userId: state.userId})} />
+    else if (state.type == 'redirect')
+        return <Navigate to={`/dashboard/${state.userId}`} replace={true}/>
+    else
+        return <h1>Should not have arrived here!</h1>
 }
 
 const MAX_USER_ID = 9999
 
 function UserInfo({onAuthDone} : { onAuthDone: (userId: number) => void }) {
+    const setIsLoggedIn = useSetIsLoggedIn()
+    
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
 
@@ -118,6 +124,8 @@ function UserInfo({onAuthDone} : { onAuthDone: (userId: number) => void }) {
     async function createUser() {
         const userId = Math.floor(Math.random() * MAX_USER_ID)
         const created = await Service.createUser(userId)
+        if (created)
+            setIsLoggedIn(true) // Sets - user logged in - in auth container
         setUserId(userId)
         setError(!created)
     }

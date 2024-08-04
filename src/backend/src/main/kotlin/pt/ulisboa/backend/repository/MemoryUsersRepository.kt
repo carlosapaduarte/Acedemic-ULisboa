@@ -9,7 +9,7 @@ class MemoryUsersRepository : UsersRepository {
     val users = mutableMapOf<Int, User>()
 
     override fun createUser(id: Int, username: String) {
-        users[id] = User(id, username, null, null)
+        users[id] = User(id, username, null, null, false)
     }
 
     override fun existsUser(id: Int): Boolean {
@@ -23,5 +23,10 @@ class MemoryUsersRepository : UsersRepository {
     override fun updateUserLevel(id: Int, level: Int) {
         val user = users[id] ?: throw NotFoundException("User not found")
         users[id] = user.copy(level = level)
+    }
+
+    override fun updateShareProgressPreference(id: Int, publishState: Boolean) {
+        val user = users[id] ?: throw NotFoundException("User not found")
+        users[id] = user.copy(shareProgress = publishState)
     }
 }
