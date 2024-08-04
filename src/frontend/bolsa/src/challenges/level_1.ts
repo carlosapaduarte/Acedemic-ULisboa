@@ -1,5 +1,8 @@
 import { Challenges } from "./types"
 
+// This object represents the challenges of level 1.
+// Index 0 represents first day; Index 1 represents second day; etc...
+
 const level1: Challenges  = {
     challenges: [
         {
