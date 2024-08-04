@@ -10,14 +10,17 @@ type State =
     |
     {
         type : "shareProgress",
+        userId: number
     }
     |
     {
         type : "chooseLevel",
+        userId: number
     }
     |
     {
         type : "quiz",
+        userId: number
     }
     |
     {
@@ -27,14 +30,17 @@ type State =
 type Action =
     {
         type : "setShareProgress",
+        userId: number
     }
     |
     {
         type : "setChooseLevel",
+        userId: number
     }
     |
     {
         type : "setQuiz",
+        userId: number
     }
     |
     {
@@ -44,13 +50,13 @@ type Action =
 function reducer(state: State, action: Action): State {
     switch(action.type) {
         case "setShareProgress": {
-            return { type: "shareProgress" }
+            return { type: "shareProgress", userId: action.userId }
         }
         case "setChooseLevel": {
-            return { type: "chooseLevel" }
+            return { type: "chooseLevel", userId: action.userId }
         }
         case "setQuiz": {
-            return { type: "quiz" }
+            return { type: "quiz", userId: action.userId }
         }
         case "setRedirect": {
             return { type: "redirect" }
@@ -69,101 +75,128 @@ function reducer(state: State, action: Action): State {
 
 function LogIn() {
     const [state, dispatch] = useReducer(reducer, {type : 'userInfo'})
-    const [levelChosen, setLevelChosen] = useState<Level | undefined>(undefined)
-    const [shareProgress, setShareProgress] = useState<boolean | undefined>(undefined)
 
-    const onAuthDoneHandler = () => {
-        dispatch({type: 'setShareProgress'})
+    const onAuthDoneHandler = (userId: number) => {
+        dispatch({type: 'setShareProgress', userId})
     };
 
-    const handleOnShareClick = (accepted: boolean) => {
-        setShareProgress(accepted)
-        dispatch({type: 'setChooseLevel'})
+    const handleOnShareClick = (userId: number) => {
+        dispatch({type: 'setChooseLevel', userId})
     };
 
-    const handleOnSelectedLevel = (level: Level) => {
-        setLevelChosen(level)
-        dispatch({type: 'setRedirect'})
-    };
-
-    const onStartQuizCLickHandler = () => { dispatch({type: 'setQuiz'}) }
+    const onStartQuizCLickHandler = (userId: number) => { dispatch({type: 'setQuiz', userId}) }
 
     if (state.type === 'userInfo') {
         return <UserInfo onAuthDone={onAuthDoneHandler}/>
     } else if (state.type === "shareProgress") {
-        return <ShareProgress onShareClick={(accepted: boolean) => handleOnShareClick(accepted)}/>
+        return <ShareProgress userId={state.userId} onShareSelected={() => handleOnShareClick(state.userId)}/>
     } else if (state.type === "chooseLevel") {
-        return <ChooseLevel onLevelClick={(level: Level) => handleOnSelectedLevel(level)} onStartQuizClick={onStartQuizCLickHandler}/>
+        return <ChooseLevel userId={state.userId} onLevelSelected={() => dispatch({type: 'setRedirect'})} onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
     } else if (state.type === "quiz") {
-        return <Quiz onLevelComputed={(level: Level) => handleOnSelectedLevel(level)} />
+        return <Quiz userId={state.userId} onLevelSelected={() => dispatch({type: 'setRedirect'})} />
     } else 
         return <Navigate to={'/calendar'} replace={true}/>
 }
 
 const MAX_USER_ID = 9999
 
-function UserInfo({onAuthDone} : { onAuthDone: () => void }) {
+function UserInfo({onAuthDone} : { onAuthDone: (userId: number) => void }) {
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
 
+    /* TODO: improve this by using a reducer to have only one of the following states:
+        - Not Created;
+        - Creating;
+        - Error;
+
+      (...Just a suggestion...)
+    */ 
+
     const [error, setError] = useState<boolean | undefined>(undefined)
+    const [userId, setUserId] = useState<number | undefined>(undefined)
 
     async function createUser() {
         const userId = Math.floor(Math.random() * MAX_USER_ID)
         const created = await Service.createUser(userId)
+        setUserId(userId)
         setError(!created)
     }
 
-
-    let domToDisplay = undefined
-    switch(error) {
-        case undefined : domToDisplay = (
+    if (userId != undefined)
+        return (
+            <div>
+                <h1>User created!</h1>
+                <button onClick={() => onAuthDone(userId)}>Click here to advance</button>
+            </div>    
+        )
+    
+    if (error)
+        return (
+            <div>
+                <h1>There was an error creating the user!</h1>
+            </div>
+        )
+    else
+        return (
             <div>
                 <h1>Create New User</h1>
                 <button onClick={() => createUser()}>Click To Create user</button>
             </div>    
         )
-        break
-        case false : domToDisplay = (
-            <div>
-                <h1>User created!</h1>
-                <button onClick={() => onAuthDone()}>Click here to advance</button>
-            </div>    
-        )
-        break
-        case true : domToDisplay = (
-            <div>
-                <h1>There was an error creating the user!</h1>
-            </div>
-        )
-    }
-
-    return domToDisplay
 }
 
-function ShareProgress({onShareClick} : { onShareClick: (accepted: boolean) => void }) {
+function ShareProgress({userId, onShareSelected} : { userId: number, onShareSelected: () => void }) {
+    
+    async function selectShareProgressState(shareProgress: boolean) {
+        const success = await Service.selectShareProgressState(userId, shareProgress)
+        if (success)
+            onShareSelected()
+    }
+
     return (
         <div>
             <h1>Do you want to share your progress?</h1>
             <br/>
-            <button onClick={() => onShareClick(true)}>Yes</button>
-            <button onClick={() => onShareClick(false)}>No</button>
+            <button onClick={() => selectShareProgressState(true)}>Yes</button>
+            <button onClick={() => selectShareProgressState(false)}>No</button>
         </div>
     );
 }
 
 enum Level {LEVEL_1, LEVEL_2, LEVEL_3}
 
-function ChooseLevel({onLevelClick, onStartQuizClick} : { onLevelClick: (level: Level) => void, onStartQuizClick: () => void }) {
+async function chooseLevel(userId: number, level: Level): Promise<boolean> {
+    let levelNumber = -1
+    switch (level) {
+        case Level.LEVEL_1 : levelNumber = 1
+        break
+        case Level.LEVEL_2 : levelNumber = 2
+        break
+        case Level.LEVEL_3 : levelNumber = 3
+        break
+    }
+    return await Service.chooseLevel(userId, levelNumber) // returns if was successfull or not
+}
+
+function ChooseLevel({userId, onLevelSelected, onStartQuizClick} : { userId: number, onLevelSelected: () => void, onStartQuizClick: () => void }) {
+
+    async function chooseLevelLocal(level: Level) {
+        const success = await chooseLevel(userId, level)
+
+        // TODO: handle in case of error later
+        if (success)
+            onLevelSelected()
+    }
+
     return (
         <div>
             <h1>Choose Desired Level!</h1>
             <br/>
-            <button onClick={() => onLevelClick(Level.LEVEL_1)}>Nível 1: Iniciante</button>
+            <button onClick={() => chooseLevelLocal(Level.LEVEL_1)}>Nível 1: Iniciante</button>
             <br/>
-            <button onClick={() => onLevelClick(Level.LEVEL_2)}>Nível 2: Intermédio</button>
+            <button onClick={() => chooseLevelLocal(Level.LEVEL_2)}>Nível 2: Intermédio</button>
             <br/>
-            <button onClick={() => onLevelClick(Level.LEVEL_3)}>Nível 3: Avançado… já se sente com um bom nível de eficácia e está…</button>
+            <button onClick={() => chooseLevelLocal(Level.LEVEL_3)}>Nível 3: Avançado… já se sente com um bom nível de eficácia e está…</button>
             <br/>
             <button onClick={() => onStartQuizClick()}>Não sei o meu nível</button>
         </div>
@@ -183,9 +216,10 @@ const quizQuestions = [
     "Question 10",
 ]
 
-function Quiz({onLevelComputed} : { onLevelComputed: (level: Level) => void }) {
-    // This component will soon display a total of 10 question.
+function Quiz({userId, onLevelSelected} : { userId: number, onLevelSelected: () => void }) {
+    // This component will display a total of 10 question.
     // Then, it will calculate a score based on the answers
+    // Not fully implemented yet because the requirements are not yet fully decided
 
     const [answers, setAnswers] = useState<boolean[]>(new Array(10).fill(undefined))
 
@@ -195,11 +229,14 @@ function Quiz({onLevelComputed} : { onLevelComputed: (level: Level) => void }) {
         setAnswers(newAnswers)
     }
 
-    function computeLevel() {
+    async function computeLevel() {
         // TODO: compute level based on answers
-
         const computedLevel: Level = Level.LEVEL_1
-        onLevelComputed(computedLevel)
+
+        // TODO: handle in case of error later
+        const success = await chooseLevel(userId, computedLevel)
+        if (success)
+            onLevelSelected()
     }
 
     return (

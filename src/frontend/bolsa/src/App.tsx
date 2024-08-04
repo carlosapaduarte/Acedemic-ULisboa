@@ -4,7 +4,6 @@ import './App.css';
 import {BrowserRouter} from "react-router-dom";
 import {Route, Routes} from 'react-router-dom'
 import WelcomePage from './components/WelcomePage';
-import ChooseLevel from './components/ChooseLevel';
 import Calendar from './components/Calendar';
 import LogIn from './components/LogIn';
 
