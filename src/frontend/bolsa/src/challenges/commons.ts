@@ -4,12 +4,14 @@ function getDayGoals(goals: Goal[], startDate: Date): DayGoals[] {
     // Returns DayGoals[], accounting for the start day
     
     const today = new Date()
-    const todaysGoal = (today.getTime() - startDate.getTime()) / (1000 * 3600 * 24) // corresponds to [level1Aux] goal index
-    console.log('Todays Goal: ', todaysGoal)
+    //console.log(today)
+    //console.log(startDate)
+    const todaysGoal = Math.round((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) // corresponds to [level1Aux] goal index
+    //console.log('Todays Goal: ', todaysGoal)
     const goalsShortened: Goal[] = goals.slice(0, todaysGoal + 1)
-    console.log('Goals shortedned: ', goalsShortened)
+    //console.log('Goals shortened: ', goalsShortened)
 
-    return goalsShortened.map((goal, index) => {
+    const goalsToReturn = goalsShortened.map((goal, index) => {
         const goalDate = new Date()
         goalDate.setDate(today.getDate() - (todaysGoal - index))
         return {
@@ -17,6 +19,8 @@ function getDayGoals(goals: Goal[], startDate: Date): DayGoals[] {
             date: goalDate
         }
     })
+    console.log('Goals to return: ', goalsToReturn)
+    return goalsToReturn
 }
 
 export const commons = {

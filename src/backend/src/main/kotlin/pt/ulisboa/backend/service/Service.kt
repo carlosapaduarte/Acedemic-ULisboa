@@ -30,7 +30,7 @@ class Service(val usersRepository: UsersRepository) {
             id = id,
             username = user.username,
             level = user.level,
-            currentDay = user.currentDay,
+            startDate = user.startDate.time,
             shareProgress = user.shareProgress,
             userGoals = user.userGoals
         )

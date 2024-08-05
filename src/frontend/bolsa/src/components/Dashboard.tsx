@@ -131,8 +131,7 @@ function Calendar({userId} : {userId: number}) {
                 return
             }
 
-            const startDate: Date = new Date() // TODO: change later!
-            startDate.setDate(startDate.getDate() - 18)
+            const startDate: Date = new Date(userInfo.startDate)
 
             let goals: DayGoals[]
                 switch(userInfo.level) {

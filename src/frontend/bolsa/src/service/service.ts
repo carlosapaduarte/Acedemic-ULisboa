@@ -54,7 +54,7 @@ export type UserInfo = {
     id: number,
     username: String,
     level: number,
-    currentDay: number,
+    startDate: number,
     shareProgress: boolean,
     userGoals: UserGoal[]
 };
@@ -68,6 +68,7 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefine
 
     if (response.ok) {
         const responseObject: UserInfo = await response.json() // TODO: how 
+        console.log(responseObject)
         return responseObject
     } else
         return undefined
