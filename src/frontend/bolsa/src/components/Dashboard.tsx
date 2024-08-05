@@ -5,6 +5,9 @@ import { Level1 } from "../challenges/level_1";
 import { Level2 } from "../challenges/level_2";
 import { Challenge, Challenges } from "../challenges/types";
 import { Level3 } from "../challenges/level_3";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
+import { Console } from "console";
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
@@ -59,7 +62,7 @@ type State =
     |
     {
         type : "challenges",
-        todaysChallenge: Challenges,
+        todaysChallenges: Challenges,
         pastChallenges: Challenges,
         userGoals: UserGoal[]
     }
@@ -104,7 +107,7 @@ function reducer(state: State, action: Action): State {
             return { type: "error" }
         }
         case "setChallenges": {
-            return { type: "challenges", todaysChallenge: action.todaysChallenge, pastChallenges: action.pastChallenges, userGoals: action.userGoals }
+            return { type: "challenges", todaysChallenges: action.todaysChallenge, pastChallenges: action.pastChallenges, userGoals: action.userGoals }
         }
         case "setAddingNewUserGoal": {
             return { type: "addingNewUserGoal" }
@@ -202,14 +205,73 @@ function Calendar({userId} : {userId: number}) {
             dispatch({type: 'setAddingNewUserGoal'})
     };
 
+    type FullCalendarEventsType = {
+        title: String,
+        date: String
+    }
+
+    // Builds an object to display events in FullCalendar
+    function buildEvents(todaysChallenges: Challenge[], pastChallenges: Challenge[]): any { // I wish I could return here a "FullCalendarEventsType[]"
+        const currentDate = new Date()
+
+        function getEvents(date: Date, challenges: Challenge[]): any {
+            const month = date.getMonth() + 1 // TODO: For some reason, this is necessary
+            const monthStr: String = month < 10 ? '0' + month : month.toString()
+            const day = date.getDate()
+            const dayStr: String = day < 10 ? '0' + day : day.toString()
+
+            // Deals with event for today
+            const fullCalendarEvents: FullCalendarEventsType[] = challenges.map((challenge: Challenge) => {return {
+                'title': challenge.title,
+                'date': `${date.getFullYear()}-${monthStr}-${dayStr}`
+            }})
+
+            return fullCalendarEvents
+        }
+        
+        function getPastEvents(): any {
+            let pastEventsConcatenated: FullCalendarEventsType[] = [] // Each index will hold a past event for a specific day
+            console.log(pastChallenges)
+
+            // Iterates in reversed order
+            for (let u = pastChallenges.length - 1; u >= 0; u--) {
+                const daysToSubtract = pastChallenges.length - u
+                const newDay = currentDate.getDate() - daysToSubtract // index 0 means: subtract 1 day
+                const newDate = new Date()
+                newDate.setDate(newDay)
+
+                const fullCalendarEvent = getEvents(newDate, [pastChallenges[u]]) // should return a single event!
+
+                pastEventsConcatenated = pastEventsConcatenated.concat(fullCalendarEvent)
+            }
+
+            // For now, assuming there is just one event for each past day
+            return pastEventsConcatenated
+        }
+
+        const todaysEvents: FullCalendarEventsType[] = getEvents(currentDate, todaysChallenges)
+
+        // Deals with past events (yesterday and before)
+        const pastEvents = getPastEvents()
+        
+        const fullCalendarEvents: FullCalendarEventsType[] = todaysEvents.concat(pastEvents)
+        console.log(fullCalendarEvents)
+        return fullCalendarEvents
+    }
+
     if (state.type == 'challenges')
         // This '?' is only needed because state management is not yet optimized
+
         return (
             <div>
-                <h1>This will soon be the Calendar...</h1>
+                <FullCalendar
+                    plugins={[ dayGridPlugin ]}
+                    initialView="dayGridMonth"
+                    events={buildEvents(state.todaysChallenges.challenges, state.pastChallenges.challenges)}
+                />
                 <br/>
                 <h2>Challenges For Today:</h2> 
-                {state.todaysChallenge.challenges.map((challenge, challengeNumber) => {
+                {state.todaysChallenges.challenges.map((challenge, challengeNumber) => {
                     return (
                         <div key={challengeNumber}>
                             <h2>Title: {challenge.title}</h2> 

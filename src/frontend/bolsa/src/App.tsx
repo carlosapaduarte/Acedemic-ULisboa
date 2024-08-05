@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard';
 import LogIn from './components/LogIn';
 import { RequireAuthn } from './components/auth/RequireAuthn';
 import { AuthnContainer } from './components/auth/Authn';
+import Calendar from './components/Calendar';
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function Router() {
     <BrowserRouter>
       <AuthnContainer>
         <Routes>
+          <Route path='/calendar' element={
+            <Calendar/>
+          }/>
           <Route path='/' element={
             <WelcomePage/>
           }/>
