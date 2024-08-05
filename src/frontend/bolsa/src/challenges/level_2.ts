@@ -1,10 +1,10 @@
-import { Challenges } from "./types"
+import { commons } from "./commons"
+import { DayGoals, Goal } from "./types"
 
 // This object represents the challenges of level 2.
 // Index 0 represents first day; Index 1 represents second day; etc...
 
-const level2: Challenges = {
-    challenges: [
+const level2StaticGoal: Goal[] = [
         {
             title: "Horizonte",
             description: "Bem-vindo ao primeiro desafio! Hoje é dia de estabelecer uma meta académica específica para a semana. O que queres realmente conseguir esta semana? Lembra-te: pode ser algo simbólico, o importante é que seja significativo para ti!"
@@ -90,8 +90,11 @@ const level2: Challenges = {
             description: "Acreditaste nestes 21 dias e fizeste acontecer. Agora, é hora de refletires sobre este percurso, celebrando as conquistas e traçando novos objetivos. O que levas deste desafio? Escreve “uma carta” para o teu eu do futuro e diz-lhe como gostarias de ser como estudante: quais os teus objetivos / ambições e como planeias alcançá-los. Escreve o teu compromisso contigo. Escreve esta carta no local mais fácil para ti. O bloco de notas do telemóvel também conta!"
         }
     ]
-}
+
+    function level2Goals(startDate: Date): DayGoals[] {
+        return commons.getDayGoals(level2StaticGoal, startDate)
+    }
 
 export const Level2 = {
-    level2
+    level2Goals
 }

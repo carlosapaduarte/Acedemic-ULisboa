@@ -3,8 +3,10 @@
 // From day 1 to day 5, the assigned challenges are every challenge from day 1 to the correspondent day. 
 // From day 5 and over, all challenges are assigned for the day.
 
-const level3 = {
-    challenges: [
+import { commons } from "./commons"
+import { DayGoals, Goal } from "./types"
+
+const level3StaticGoal: Goal[] = [
         {
             title: "Lista de Tarefas",
             description: "Elaborar / reajustar a minha lista de tarefas do dia, tendo em conta: os meus objetivos diários, obrigações e responsabilidade, revisões diárias de estudo, trabalhos, etc."
@@ -26,8 +28,11 @@ const level3 = {
             description: "Dormir o número de horas recomendadas para mim."
         }
     ]
+
+function level3Goals(startDate: Date): DayGoals[] {
+    return commons.getDayGoals(level3StaticGoal, startDate)
 }
 
 export const Level3 = {
-    level3
+    level3Goals
 }

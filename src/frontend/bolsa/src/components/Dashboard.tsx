@@ -3,7 +3,7 @@ import {useParams} from "react-router-dom";
 import {UserInfo, Service, UserGoal} from '../service/service';
 import { Level1 } from "../challenges/level_1";
 import { Level2 } from "../challenges/level_2";
-import { Challenge, Challenges } from "../challenges/types";
+import { Goal, DayGoals } from "../challenges/types";
 import { Level3 } from "../challenges/level_3";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
@@ -61,9 +61,8 @@ type State =
     }
     |
     {
-        type : "challenges",
-        todaysChallenges: Challenges,
-        pastChallenges: Challenges,
+        type : "goals",
+        goals: DayGoals[],
         userGoals: UserGoal[]
     }
     |
@@ -85,9 +84,8 @@ type Action =
     }
     |
     {
-        type : "setChallenges",
-        todaysChallenge: Challenges,
-        pastChallenges: Challenges,
+        type : "setGoals",
+        goals: DayGoals[],
         userGoals: UserGoal[]
     }
     |
@@ -106,8 +104,8 @@ function reducer(state: State, action: Action): State {
         case "setError": {
             return { type: "error" }
         }
-        case "setChallenges": {
-            return { type: "challenges", todaysChallenges: action.todaysChallenge, pastChallenges: action.pastChallenges, userGoals: action.userGoals }
+        case "setGoals": {
+            return { type: "goals", goals: action.goals, userGoals: action.userGoals }
         }
         case "setAddingNewUserGoal": {
             return { type: "addingNewUserGoal" }
@@ -133,56 +131,25 @@ function Calendar({userId} : {userId: number}) {
                 return
             }
 
-            let challenges: Challenges
+            const startDate: Date = new Date() // TODO: change later!
+            startDate.setDate(startDate.getDate() - 18)
+
+            let goals: DayGoals[]
                 switch(userInfo.level) {
-                    case 1 : challenges = Level1.level1
+                    case 1 : goals = Level1.level1Goals(startDate)
                     break
-                    case 2 : challenges = Level2.level2
+                    case 2 : goals = Level2.level2Goals(startDate)
                     break
-                    case 3 : challenges = Level3.level3
+                    case 3 : goals = Level3.level3Goals(startDate)
                     break
                     default : return Promise.reject('TODO: error handling')
                 }
-                
 
-                // Level 1/2
-                if (userInfo.level == 1 || userInfo.level == 2) {
-                    const todaysChallenge: Challenge = challenges.challenges[userInfo.currentDay - 1] // remember: indexes start at 0
-                    
-                    // Just a single challenge for the day
-                    dispatch({
-                        type: 'setChallenges', 
-                        todaysChallenge: {challenges: [todaysChallenge]}, 
-                        pastChallenges: {challenges: challenges.challenges.slice(0, userInfo.currentDay - 1)},
-                        userGoals: userInfo.userGoals
-                    })
-                    
-                } else { // level 3
-                    if (userInfo.currentDay >= 5)
-                        dispatch({
-                            type: 'setChallenges', 
-                            todaysChallenge: {challenges: challenges.challenges}, 
-                            pastChallenges: {challenges: []}, // For simplification, no past challenges for level 3, for now
-                            userGoals: userInfo.userGoals
-                        })
-                    
-                    else {
-                        // I think this necessary, not to remove challenges from [challenges.challenges]
-                        // Starts of with all level-3 challenges
-                        const todaysChallenges = [...challenges.challenges]
-
-                        // Removes necessary challenges
-                        for (let u = userInfo.currentDay; u < 5; u++) {
-                            todaysChallenges.pop()
-                        }
-                        dispatch({
-                            type: 'setChallenges', 
-                            todaysChallenge: {challenges: todaysChallenges}, 
-                            pastChallenges: {challenges: []}, // For simplification, no past challenges for level 3, for now
-                            userGoals: userInfo.userGoals
-                        })
-                    }
-                }
+                dispatch({
+                    type: 'setGoals', 
+                    goals: goals, 
+                    userGoals: userInfo.userGoals
+                })
         }
 
         async function createNewUserGoal() {
@@ -211,55 +178,38 @@ function Calendar({userId} : {userId: number}) {
     }
 
     // Builds an object to display events in FullCalendar
-    function buildEvents(todaysChallenges: Challenge[], pastChallenges: Challenge[]): any { // I wish I could return here a "FullCalendarEventsType[]"
-        const currentDate = new Date()
+    function buildEvents(goals: DayGoals[]): any {
 
-        function getEvents(date: Date, challenges: Challenge[]): any {
+        function buildDayEvents(date: Date, goals: Goal[]): FullCalendarEventsType[] {
             const month = date.getMonth() + 1 // TODO: For some reason, this is necessary
             const monthStr: String = month < 10 ? '0' + month : month.toString()
             const day = date.getDate()
             const dayStr: String = day < 10 ? '0' + day : day.toString()
 
             // Deals with event for today
-            const fullCalendarEvents: FullCalendarEventsType[] = challenges.map((challenge: Challenge) => {return {
+            const fullCalendarEvents: FullCalendarEventsType[] = goals.map((challenge: Goal) => { return {
                 'title': challenge.title,
                 'date': `${date.getFullYear()}-${monthStr}-${dayStr}`
             }})
 
             return fullCalendarEvents
         }
-        
-        function getPastEvents(): any {
-            let pastEventsConcatenated: FullCalendarEventsType[] = [] // Each index will hold a past event for a specific day
-            console.log(pastChallenges)
 
-            // Iterates in reversed order
-            for (let u = pastChallenges.length - 1; u >= 0; u--) {
-                const daysToSubtract = pastChallenges.length - u
-                const newDay = currentDate.getDate() - daysToSubtract // index 0 means: subtract 1 day
-                const newDate = new Date()
-                newDate.setDate(newDay)
-
-                const fullCalendarEvent = getEvents(newDate, [pastChallenges[u]]) // should return a single event!
-
-                pastEventsConcatenated = pastEventsConcatenated.concat(fullCalendarEvent)
+        function buildEvents(goals: DayGoals[]): any {
+            let events: FullCalendarEventsType[] = [] // starts empty
+            for (let u = 0; u < goals.length; u++) {
+                const dayEvents = buildDayEvents(goals[u].date, goals[u].goals) // already return an array of FullCalendarEventsType
+                events = events.concat(dayEvents)
             }
-
-            // For now, assuming there is just one event for each past day
-            return pastEventsConcatenated
+            return events
         }
 
-        const todaysEvents: FullCalendarEventsType[] = getEvents(currentDate, todaysChallenges)
-
-        // Deals with past events (yesterday and before)
-        const pastEvents = getPastEvents()
-        
-        const fullCalendarEvents: FullCalendarEventsType[] = todaysEvents.concat(pastEvents)
-        console.log(fullCalendarEvents)
-        return fullCalendarEvents
+        const events: FullCalendarEventsType[] = buildEvents(goals)
+        console.log(events)
+        return events        
     }
 
-    if (state.type == 'challenges')
+    if (state.type == 'goals')
         // This '?' is only needed because state management is not yet optimized
 
         return (
@@ -267,32 +217,8 @@ function Calendar({userId} : {userId: number}) {
                 <FullCalendar
                     plugins={[ dayGridPlugin ]}
                     initialView="dayGridMonth"
-                    events={buildEvents(state.todaysChallenges.challenges, state.pastChallenges.challenges)}
+                    events={buildEvents(state.goals)}
                 />
-                <br/>
-                <h2>Challenges For Today:</h2> 
-                {state.todaysChallenges.challenges.map((challenge, challengeNumber) => {
-                    return (
-                        <div key={challengeNumber}>
-                            <h2>Title: {challenge.title}</h2> 
-                            <h3>Description: {challenge.description}</h3>
-                            <br/>
-                        </div>
-                    )
-                })}
-
-                <br/>
-                <h2>Past Challenges:</h2> 
-                {state.pastChallenges.challenges.map((challenge, challengeNumber) => {
-                    return (
-                        <div key={challengeNumber}>
-                            <h2>Title: {challenge.title}</h2> 
-                            <h3>Description: {challenge.description}</h3>
-                            <br/>
-                        </div>
-                    )
-                })}
-
                 <br/>
                 <h2>Created Goals:</h2> 
                 {state.userGoals.map((goal, goalNumber) => {

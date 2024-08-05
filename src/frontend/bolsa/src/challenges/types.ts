@@ -1,8 +1,9 @@
-export type Challenge = {
+export type Goal = {
     title: string,
     description: string
 }
 
-export type Challenges = {
-    challenges: Challenge[],
-};
+export type DayGoals = {
+    goals: Goal[],
+    date: Date    
+}
