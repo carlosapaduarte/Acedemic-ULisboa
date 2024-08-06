@@ -1,7 +1,6 @@
 package pt.ulisboa.backend.dtos
 
 import pt.ulisboa.backend.repository.domain.UserGoal
-import java.util.*
 
 // TODO: level should be an Enum type
 data class UserInfo(

@@ -25,9 +25,6 @@ function Router() {
     <BrowserRouter>
       <AuthnContainer>
         <Routes>
-          <Route path='/calendar' element={
-            <Calendar/>
-          }/>
           <Route path='/' element={
             <WelcomePage/>
           }/>

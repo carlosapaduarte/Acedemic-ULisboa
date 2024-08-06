@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useReducer} from "react";
 import {Navigate} from 'react-router-dom';
-import {Service} from '../service/service';
+import {service} from '../service/service';
 import {useSetIsLoggedIn} from "./auth/Authn";
 
 type State =
@@ -123,9 +123,13 @@ function UserInfo({onAuthDone} : { onAuthDone: (userId: number) => void }) {
 
     async function createUser() {
         const userId = Math.floor(Math.random() * MAX_USER_ID)
-        const created = await Service.createUser(userId)
-        if (created)
+        const created = await service.createUserOrLogin(userId)
+        if (created) {
+
+            // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
+            localStorage['userId'] = userId.toString();
             setIsLoggedIn(true) // Sets - user logged in - in auth container
+        }
         setUserId(userId)
         setError(!created)
     }
@@ -156,7 +160,7 @@ function UserInfo({onAuthDone} : { onAuthDone: (userId: number) => void }) {
 function ShareProgress({userId, onShareSelected} : { userId: number, onShareSelected: () => void }) {
     
     async function selectShareProgressState(shareProgress: boolean) {
-        const success = await Service.selectShareProgressState(userId, shareProgress)
+        const success = await service.selectShareProgressState(userId, shareProgress)
         if (success)
             onShareSelected()
     }
@@ -183,7 +187,7 @@ async function chooseLevel(userId: number, level: Level): Promise<boolean> {
         case Level.LEVEL_3 : levelNumber = 3
         break
     }
-    return await Service.chooseLevel(userId, levelNumber) // returns if was successfull or not
+    return await service.chooseLevel(userId, levelNumber) // returns if was successfull or not
 }
 
 function ChooseLevel({userId, onLevelSelected, onStartQuizClick} : { userId: number, onLevelSelected: () => void, onStartQuizClick: () => void }) {

@@ -8,11 +8,23 @@ const logger = new Logger({ name: "Authn" });
 // TODO: maybe, each function of the following should just return the expected type, and thrown when something goes wrong.
 // In my opinion, this improves error handling: the caller just has to catch the exception
 
-async function createUser(userId: number): Promise<boolean> {
+// TODO: separate tasks in the future
+async function createUserOrLogin(userId: number): Promise<boolean> {
     const request = {
         path: 'login',
         method: 'POST',
         body: toBody({id: userId}),
+    }
+    const response: Response = await doFetch(request)
+    //console.log(response)
+
+    return response.ok
+}
+
+async function isLoggedIn(): Promise<boolean> {
+    const request = {
+        path: 'is-logged-in',
+        method: 'GET',
     }
     const response: Response = await doFetch(request)
     //console.log(response)
@@ -84,8 +96,8 @@ async function createNewUserGoal(userId: number, name: string): Promise<boolean 
     return response.ok
 }
 
-export const Service = {
-    createUser,
+export const service = {
+    createUserOrLogin,
     chooseLevel,
     selectShareProgressState,
     fetchUserInfoFromApi,

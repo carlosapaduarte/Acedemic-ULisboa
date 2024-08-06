@@ -3,7 +3,7 @@ package pt.ulisboa.backend.repository
 import pt.ulisboa.backend.http.exceptions.NotFoundException
 import pt.ulisboa.backend.repository.domain.User
 import pt.ulisboa.backend.repository.domain.UserGoal
-import java.util.Date
+import java.util.*
 
 @org.springframework.stereotype.Repository
 class MemoryUsersRepository : UsersRepository {

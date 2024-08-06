@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useReducer} from "react";
 import {useParams} from "react-router-dom";
-import {UserInfo, Service, UserGoal} from '../service/service';
+import {UserInfo, service, UserGoal} from '../service/service';
 import { Level1 } from "../challenges/level_1";
 import { Level2 } from "../challenges/level_2";
 import { Goal, DayGoals } from "../challenges/types";
@@ -124,7 +124,7 @@ function Calendar({userId} : {userId: number}) {
         async function fetchUserCurrentDayAndLoadChallenge() {
             dispatch({type: 'setLoading'})
 
-            const userInfo: UserInfo | undefined = await Service.fetchUserInfoFromApi(userId)
+            const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userId)
 
             if (userInfo == undefined) {
                 dispatch({type: 'setError'})
@@ -152,7 +152,7 @@ function Calendar({userId} : {userId: number}) {
         }
 
         async function createNewUserGoal() {
-            await Service.createNewUserGoal(userId, newGoalName)
+            await service.createNewUserGoal(userId, newGoalName)
             dispatch({ type: 'setChallengesNotLoaded' }) // TODO: not the best way but for now will do...
         }
 

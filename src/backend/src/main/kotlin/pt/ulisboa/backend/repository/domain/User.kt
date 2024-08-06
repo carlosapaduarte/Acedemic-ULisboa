@@ -1,6 +1,6 @@
 package pt.ulisboa.backend.repository.domain
 
-import java.util.Date
+import java.util.*
 
 data class UserGoal(
     val name: String,
