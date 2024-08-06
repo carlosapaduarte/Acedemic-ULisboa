@@ -1,8 +1,10 @@
 package pt.ulisboa.backend.service
 
 import org.springframework.stereotype.Service
+import pt.ulisboa.backend.dtos.UserGoalDto
 import pt.ulisboa.backend.dtos.UserInfo
 import pt.ulisboa.backend.repository.UsersRepository
+import java.util.Date
 
 @Service
 class Service(val usersRepository: UsersRepository) {
@@ -32,7 +34,7 @@ class Service(val usersRepository: UsersRepository) {
             level = user.level,
             startDate = user.startDate.time,
             shareProgress = user.shareProgress,
-            userGoals = user.userGoals
+            userGoals = user.userGoals.map { userGoal -> UserGoalDto(name = userGoal.name, date = userGoal.date.time) }
         )
     }
 
@@ -40,7 +42,7 @@ class Service(val usersRepository: UsersRepository) {
         usersRepository.updateShareProgressPreference(id, shareProgress)
     }
 
-    fun createNewUserGoal(userId: Int, name: String) {
-        usersRepository.addNewUserGoal(userId, name)
+    fun createNewUserGoal(userId: Int, name: String, date: Date) {
+        usersRepository.addNewUserGoal(userId, name, date)
     }
 }

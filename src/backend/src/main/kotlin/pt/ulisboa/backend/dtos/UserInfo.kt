@@ -1,7 +1,5 @@
 package pt.ulisboa.backend.dtos
 
-import pt.ulisboa.backend.repository.domain.UserGoal
-
 // TODO: level should be an Enum type
 data class UserInfo(
     val id: Int,
@@ -9,5 +7,11 @@ data class UserInfo(
     val level: Int?,
     val startDate: Long,
     val shareProgress: Boolean,
-    val userGoals: List<UserGoal>
+    val userGoals: List<UserGoalDto>
+)
+
+// For now, only difference from UserGoal is date
+data class UserGoalDto(
+    val name: String,
+    val date: Long
 )

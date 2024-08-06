@@ -11,7 +11,7 @@ class MemoryUsersRepository : UsersRepository {
     val users = mutableMapOf<Int, User>()
 
     override fun createUser(id: Int, username: String) {
-        users[id] = User(id, username, null, Date(), false)
+        users[id] = User(id, username, 1, Date(), false)
     }
 
     override fun existsUser(id: Int): Boolean {
@@ -32,8 +32,8 @@ class MemoryUsersRepository : UsersRepository {
         users[id] = user.copy(shareProgress = publishState)
     }
 
-    override fun addNewUserGoal(userId: Int, name: String) {
+    override fun addNewUserGoal(userId: Int, name: String, date: Date) {
         val user = users[userId] ?: throw NotFoundException("User not found")
-        users[userId] = user.copy(userGoals = user.userGoals.toMutableList().apply { add(UserGoal(name, user.startDate)) })
+        users[userId] = user.copy(userGoals = user.userGoals.toMutableList().apply { add(UserGoal(name, date)) })
     }
 }

@@ -5,5 +5,5 @@ export type Goal = {
 
 export type DayGoals = {
     goals: Goal[],
-    date: Date    
+    date: Date
 }

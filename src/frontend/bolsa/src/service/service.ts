@@ -16,18 +16,7 @@ async function createUserOrLogin(userId: number): Promise<boolean> {
         body: toBody({id: userId}),
     }
     const response: Response = await doFetch(request)
-    //console.log(response)
-
-    return response.ok
-}
-
-async function isLoggedIn(): Promise<boolean> {
-    const request = {
-        path: 'is-logged-in',
-        method: 'GET',
-    }
-    const response: Response = await doFetch(request)
-    //console.log(response)
+    console.log('IS logged in: ', response)
 
     return response.ok
 }
@@ -57,14 +46,14 @@ async function selectShareProgressState(userId: number, shareProgress: boolean):
 }
 
 export type UserGoal = {
-    name: String;
-    day: number
+    name: string;
+    date: number
 }
 
 // User info
 export type UserInfo = {
     id: number,
-    username: String,
+    username: string,
     level: number,
     startDate: number,
     shareProgress: boolean,
@@ -86,11 +75,13 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefine
         return undefined
 }
 
-async function createNewUserGoal(userId: number, name: string): Promise<boolean | undefined> {
+async function createNewUserGoal(userId: number, name: string, userGoalDate: Date): Promise<boolean | undefined> {
+
+    console.log(userGoalDate.getTime())
     const request = {
         path: `users/${userId}/goals`,
         method: 'POST',
-        body: toBody({id: userId, name}),
+        body: toBody({id: userId, name, date: userGoalDate.getTime()}),
     }
     const response: Response = await doFetch(request)
     return response.ok

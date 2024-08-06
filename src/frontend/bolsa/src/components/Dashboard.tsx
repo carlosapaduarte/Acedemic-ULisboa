@@ -7,7 +7,11 @@ import { Goal, DayGoals } from "../challenges/types";
 import { Level3 } from "../challenges/level_3";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
-import { Console } from "console";
+import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
+import { DateClickArg } from "@fullcalendar/interaction";
+import { Logger } from "tslog";
+
+const logger = new Logger({ name: "Dasboard" });
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
@@ -67,7 +71,13 @@ type State =
     }
     |
     {
+        type: 'addNewGoal',
+        date: Date
+    }
+    |
+    {
         type: 'addingNewUserGoal',
+        date: Date
     }
 
 type Action =
@@ -90,7 +100,13 @@ type Action =
     }
     |
     {
-        type: 'setAddingNewUserGoal'
+        type: 'setAddNewGoal',
+        date: Date
+    }
+    |
+    {
+        type: 'setAddingNewUserGoal',
+        date: Date
     }
 
 function reducer(state: State, action: Action): State {
@@ -107,8 +123,11 @@ function reducer(state: State, action: Action): State {
         case "setGoals": {
             return { type: "goals", goals: action.goals, userGoals: action.userGoals }
         }
+        case 'setAddNewGoal': {
+            return { type: "addNewGoal", date: action.date }
+        }
         case "setAddingNewUserGoal": {
-            return { type: "addingNewUserGoal" }
+            return { type: "addingNewUserGoal", date: action.date }
         }   
     }
 }
@@ -151,8 +170,8 @@ function Calendar({userId} : {userId: number}) {
                 })
         }
 
-        async function createNewUserGoal() {
-            await service.createNewUserGoal(userId, newGoalName)
+        async function createNewUserGoal(userGoalDate: Date) {
+            await service.createNewUserGoal(userId, newGoalName, userGoalDate)
             dispatch({ type: 'setChallengesNotLoaded' }) // TODO: not the best way but for now will do...
         }
 
@@ -160,15 +179,19 @@ function Calendar({userId} : {userId: number}) {
             fetchUserCurrentDayAndLoadChallenge()
 
         else if (state.type == 'addingNewUserGoal')
-            createNewUserGoal()
+            createNewUserGoal(state.date)
 
     }, [state])
 
     
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         // For now, this new goal will be associated to a challenge day, for simplification
+        
+        if (state.type !== 'addNewGoal')
+            throw new Error('Should be in addNewGoal state!')
+
         if (event.key === 'Enter')
-            dispatch({type: 'setAddingNewUserGoal'})
+            dispatch({type: 'setAddingNewUserGoal', date: state.date})
     };
 
     type FullCalendarEventsType = {
@@ -177,7 +200,7 @@ function Calendar({userId} : {userId: number}) {
     }
 
     // Builds an object to display events in FullCalendar
-    function buildEvents(goals: DayGoals[]): any {
+    function buildEvents(goals: DayGoals[], userGoals: UserGoal[]): any {
 
         function buildDayEvents(date: Date, goals: Goal[]): FullCalendarEventsType[] {
             const month = date.getMonth() + 1 // TODO: For some reason, this is necessary
@@ -194,50 +217,61 @@ function Calendar({userId} : {userId: number}) {
             return fullCalendarEvents
         }
 
-        function buildEvents(goals: DayGoals[]): any {
-            let events: FullCalendarEventsType[] = [] // starts empty
+        function buildEvents(): any {
+            let fullCalendarEvents: FullCalendarEventsType[] = [] // starts empty
+
+            // Deals with standard goals
             for (let u = 0; u < goals.length; u++) {
                 const dayEvents = buildDayEvents(goals[u].date, goals[u].goals) // already return an array of FullCalendarEventsType
-                events = events.concat(dayEvents)
+                fullCalendarEvents = fullCalendarEvents.concat(dayEvents)
             }
-            return events
+
+            // Deals with user-created goals
+            for (let u = 0; u < userGoals.length; u++) {
+                const userGoal = userGoals[u]
+                const goalDate = new Date(userGoal.date)
+
+                const userGoalFullCalendarEvent = buildDayEvents(goalDate, [{ // array with single Goal
+                    title: userGoal.name,
+                    description: 'no-description' // TODO: fix this later
+                }])
+
+                fullCalendarEvents = fullCalendarEvents.concat(userGoalFullCalendarEvent)
+            }
+
+            return fullCalendarEvents
         }
 
-        const events: FullCalendarEventsType[] = buildEvents(goals)
-        console.log(events)
+        const events: FullCalendarEventsType[] = buildEvents()
+        //console.log(events)
         return events        
     }
 
-    if (state.type == 'goals')
-        // This '?' is only needed because state management is not yet optimized
+    const handleDateClick = (arg: DateClickArg) => {
+        logger.debug('User clicked on: ', arg.date.toDateString())
+        dispatch({type: 'setAddNewGoal', date: arg.date})
+      }
 
+    if (state.type == 'goals')
         return (
             <div>
                 <FullCalendar
-                    plugins={[ dayGridPlugin ]}
+                    plugins={[ dayGridPlugin, interactionPlugin ]}
                     initialView="dayGridMonth"
-                    events={buildEvents(state.goals)}
-                />
-                <br/>
-                <h2>Created Goals:</h2> 
-                {state.userGoals.map((goal, goalNumber) => {
-                    return (
-                        <div key={goalNumber}>
-                            <h2>Goal Name: {goal.name}</h2> 
-                            <h3>Day: {goal.day}</h3>
-                            <br/>
-                        </div>
-                    )
-                })}
-
-                <input
-                    type="text"
-                    placeholder="New Goal Name"
-                    value={newGoalName}
-                    onChange={(e) => setNewGoalName(e.target.value)}
-                    onKeyDown={handleKeyPress}
+                    events={buildEvents(state.goals, state.userGoals)}
+                    dateClick={handleDateClick}
                 />
             </div>
+        )
+    else if (state.type == 'addNewGoal')
+        return (
+            <input
+                type="text"
+                placeholder="New Goal Name"
+                value={newGoalName}
+                onChange={(e) => setNewGoalName(e.target.value)}
+                onKeyDown={handleKeyPress}
+            />
         )
     else if (state.type == 'error')
         return (

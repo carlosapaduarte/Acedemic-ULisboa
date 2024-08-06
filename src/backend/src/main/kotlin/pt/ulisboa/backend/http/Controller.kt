@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import pt.ulisboa.backend.dtos.*
 import pt.ulisboa.backend.service.Service
+import java.util.Date
 
 
 @RestController
@@ -52,6 +53,7 @@ class Controller(val service: Service) {
     fun createNewGoal(
         @RequestBody inputDto: NewUserGoalDto
     ) {
-        service.createNewUserGoal(inputDto.id, inputDto.name)
+        println(Date(inputDto.date).time)
+        service.createNewUserGoal(inputDto.id, inputDto.name, Date(inputDto.date))
     }
 }

@@ -1,6 +1,7 @@
 package pt.ulisboa.backend.repository
 
 import pt.ulisboa.backend.repository.domain.User
+import java.util.*
 
 interface UsersRepository {
 
@@ -13,5 +14,5 @@ interface UsersRepository {
     fun updateUserLevel(id: Int, level: Int)
 
     fun updateShareProgressPreference(id: Int, publishState: Boolean)
-    fun addNewUserGoal(userId: Int, name: String)
+    fun addNewUserGoal(userId: Int, name: String, date: Date)
 }
