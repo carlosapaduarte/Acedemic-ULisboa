@@ -13,4 +13,5 @@ export class BackendError extends Error {
     }
 }
 
-export class InvalidRequest extends Error {}
+export class InvalidRequest extends Error {
+}

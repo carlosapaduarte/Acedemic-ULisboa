@@ -1,9 +1,9 @@
 // This component could be used to define functions that interact with the Backend and other external services.
 
-import { doFetch, toBody } from "./fetch"
+import {doFetch, toBody} from "./fetch"
 import {Logger} from "tslog";
 
-const logger = new Logger({ name: "Authn" });
+const logger = new Logger({name: "Authn"});
 
 // TODO: maybe, each function of the following should just return the expected type, and thrown when something goes wrong.
 // In my opinion, this improves error handling: the caller just has to catch the exception

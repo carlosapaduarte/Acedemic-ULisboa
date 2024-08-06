@@ -1,28 +1,27 @@
-import React, {useEffect, useState, useReducer} from "react";
+import React, {useEffect, useReducer, useState} from "react";
 import {useParams} from "react-router-dom";
-import {UserInfo, service, UserGoal} from '../service/service';
-import { Level1 } from "../challenges/level_1";
-import { Level2 } from "../challenges/level_2";
-import { Goal, DayGoals } from "../challenges/types";
-import { Level3 } from "../challenges/level_3";
+import {service, UserGoal, UserInfo} from '../service/service';
+import {Level1} from "../challenges/level_1";
+import {Level2} from "../challenges/level_2";
+import {DayGoals, Goal} from "../challenges/types";
+import {Level3} from "../challenges/level_3";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
-import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
-import { DateClickArg } from "@fullcalendar/interaction";
-import { Logger } from "tslog";
+import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction" // needed for dayClick
+import {Logger} from "tslog";
 
-const logger = new Logger({ name: "Dasboard" });
+const logger = new Logger({name: "Dasboard"});
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
     // For now, let's simplify and only display the current challenge!
 
-    const { userId } = useParams<string>()
+    const {userId} = useParams<string>()
 
     // Determines initial quote to be displayed to user!
     const hourOfDay = new Date().getHours();
     let helloQuote = ''
-    switch(true) {
+    switch (true) {
         case hourOfDay < 5:
             helloQuote = 'Good Night'
             break
@@ -57,15 +56,15 @@ type State =
     }
     |
     {
-        type : "loading",
+        type: "loading",
     }
     |
     {
-        type : "error",
+        type: "error",
     }
     |
     {
-        type : "goals",
+        type: "goals",
         goals: DayGoals[],
         userGoals: UserGoal[]
     }
@@ -86,15 +85,15 @@ type Action =
     }
     |
     {
-        type : "setLoading",
+        type: "setLoading",
     }
     |
     {
-        type : "setError",
+        type: "setError",
     }
     |
     {
-        type : "setGoals",
+        type: "setGoals",
         goals: DayGoals[],
         userGoals: UserGoal[]
     }
@@ -110,32 +109,32 @@ type Action =
     }
 
 function reducer(state: State, action: Action): State {
-    switch(action.type) {
+    switch (action.type) {
         case 'setChallengesNotLoaded': {
-            return { type: 'challengesNotLoaded' }
+            return {type: 'challengesNotLoaded'}
         }
         case "setLoading": {
-            return { type: "loading" }
+            return {type: "loading"}
         }
         case "setError": {
-            return { type: "error" }
+            return {type: "error"}
         }
         case "setGoals": {
-            return { type: "goals", goals: action.goals, userGoals: action.userGoals }
+            return {type: "goals", goals: action.goals, userGoals: action.userGoals}
         }
         case 'setAddNewGoal': {
-            return { type: "addNewGoal", date: action.date }
+            return {type: "addNewGoal", date: action.date}
         }
         case "setAddingNewUserGoal": {
-            return { type: "addingNewUserGoal", date: action.date }
-        }   
+            return {type: "addingNewUserGoal", date: action.date}
+        }
     }
 }
 
-function Calendar({userId} : {userId: number}) {
+function Calendar({userId}: { userId: number }) {
     // Show challenges/goals and button to add new goal
 
-    const [state, dispatch] = useReducer(reducer, {type : 'challengesNotLoaded'})
+    const [state, dispatch] = useReducer(reducer, {type: 'challengesNotLoaded'})
     const [newGoalName, setNewGoalName] = useState("");
 
     // Sparks a getUserInfo API call
@@ -153,26 +152,30 @@ function Calendar({userId} : {userId: number}) {
             const startDate: Date = new Date(userInfo.startDate)
 
             let goals: DayGoals[]
-                switch(userInfo.level) {
-                    case 1 : goals = Level1.level1Goals(startDate)
+            switch (userInfo.level) {
+                case 1 :
+                    goals = Level1.level1Goals(startDate)
                     break
-                    case 2 : goals = Level2.level2Goals(startDate)
+                case 2 :
+                    goals = Level2.level2Goals(startDate)
                     break
-                    case 3 : goals = Level3.level3Goals(startDate)
+                case 3 :
+                    goals = Level3.level3Goals(startDate)
                     break
-                    default : return Promise.reject('TODO: error handling')
-                }
+                default :
+                    return Promise.reject('TODO: error handling')
+            }
 
-                dispatch({
-                    type: 'setGoals', 
-                    goals: goals, 
-                    userGoals: userInfo.userGoals
-                })
+            dispatch({
+                type: 'setGoals',
+                goals: goals,
+                userGoals: userInfo.userGoals
+            })
         }
 
         async function createNewUserGoal(userGoalDate: Date) {
             await service.createNewUserGoal(userId, newGoalName, userGoalDate)
-            dispatch({ type: 'setChallengesNotLoaded' }) // TODO: not the best way but for now will do...
+            dispatch({type: 'setChallengesNotLoaded'}) // TODO: not the best way but for now will do...
         }
 
         if (state.type == 'challengesNotLoaded')
@@ -183,10 +186,10 @@ function Calendar({userId} : {userId: number}) {
 
     }, [state])
 
-    
+
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         // For now, this new goal will be associated to a challenge day, for simplification
-        
+
         if (state.type !== 'addNewGoal')
             throw new Error('Should be in addNewGoal state!')
 
@@ -209,10 +212,12 @@ function Calendar({userId} : {userId: number}) {
             const dayStr: String = day < 10 ? '0' + day : day.toString()
 
             // Deals with event for today
-            const fullCalendarEvents: FullCalendarEventsType[] = goals.map((challenge: Goal) => { return {
-                'title': challenge.title,
-                'date': `${date.getFullYear()}-${monthStr}-${dayStr}`
-            }})
+            const fullCalendarEvents: FullCalendarEventsType[] = goals.map((challenge: Goal) => {
+                return {
+                    'title': challenge.title,
+                    'date': `${date.getFullYear()}-${monthStr}-${dayStr}`
+                }
+            })
 
             return fullCalendarEvents
         }
@@ -244,19 +249,19 @@ function Calendar({userId} : {userId: number}) {
 
         const events: FullCalendarEventsType[] = buildEvents()
         //console.log(events)
-        return events        
+        return events
     }
 
     const handleDateClick = (arg: DateClickArg) => {
         logger.debug('User clicked on: ', arg.date.toDateString())
         dispatch({type: 'setAddNewGoal', date: arg.date})
-      }
+    }
 
     if (state.type == 'goals')
         return (
             <div>
                 <FullCalendar
-                    plugins={[ dayGridPlugin, interactionPlugin ]}
+                    plugins={[dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
                     events={buildEvents(state.goals, state.userGoals)}
                     dateClick={handleDateClick}
@@ -292,8 +297,8 @@ function Calendar({userId} : {userId: number}) {
             </div>
         )
     else return (
-        <h1>Should Not Arrive Here!</h1>
-    )
+            <h1>Should Not Arrive Here!</h1>
+        )
 }
 
 export default Dashboard;

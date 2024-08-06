@@ -1,8 +1,8 @@
-import { DayGoals, Goal } from "./types"
+import {DayGoals, Goal} from "./types"
 
 function getDayGoals(goals: Goal[], startDate: Date): DayGoals[] {
     // Returns DayGoals[], accounting for the start day
-    
+
     const today = new Date()
     //console.log(today)
     //console.log(startDate)

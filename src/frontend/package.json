@@ -1,5 +1,5 @@
 {
-  "name": "bolsa",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -24,7 +24,6 @@
     "@fullcalendar/timegrid": "^6.1.10"
   },
   "devDependencies": {
-    
   },
   "scripts": {
     "start": "react-scripts start",

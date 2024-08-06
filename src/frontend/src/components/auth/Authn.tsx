@@ -1,24 +1,25 @@
 import * as React from 'react'
 import {createContext, useContext, useEffect, useState} from 'react'
 import {Logger} from "tslog";
-import { service } from '../../service/service';
+import {service} from '../../service/service';
 
-const logger = new Logger({ name: "Authn" });
+const logger = new Logger({name: "Authn"});
 type ContextType = {
     logged: boolean | undefined
     setLogged: (logged: boolean) => void
 }
 const LoggedInContext = createContext<ContextType>({
     logged: false,
-    setLogged: (logged: boolean ) => {  }
+    setLogged: (logged: boolean) => {
+    }
 })
 
-export function AuthnContainer({ children }: { children: React.ReactNode }) {
+export function AuthnContainer({children}: { children: React.ReactNode }) {
     const [logged, setLogged] = useState<boolean | undefined>(undefined)
 
-    useEffect( () => {
-        async function fetchUser () {
-            
+    useEffect(() => {
+        async function fetchUser() {
+
             // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
             // For now, this will ease development...
             // After Oauth, we need to think of a new solution
@@ -37,11 +38,12 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
                 setLogged(false)
             }
         }
+
         fetchUser()
     }, [])
 
     return (
-        <LoggedInContext.Provider value={{ logged: logged, setLogged: setLogged }}>
+        <LoggedInContext.Provider value={{logged: logged, setLogged: setLogged}}>
             {children}
         </LoggedInContext.Provider>
     )

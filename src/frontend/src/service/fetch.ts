@@ -1,4 +1,4 @@
-import { InvalidRequest, NetworkError } from "./error"
+import {InvalidRequest, NetworkError} from "./error"
 
 const base_api_url = 'http://localhost:8080/'
 const CONTENT_TYPE_JSON = 'application/json'
@@ -37,7 +37,7 @@ export async function doFetch(
     request: Request,
 ): Promise<Response> {
     if (request && validateRequestMethod(request)) {
-        
+
         const headers: any = {
             'Content-Type': CONTENT_TYPE_JSON
         }
@@ -61,7 +61,7 @@ export async function doFetch(
 export function toBody(obj: any): Body {
     const body: Body = []
     for (const key in obj) {
-        body.push({ name: key, value: obj[key] })
+        body.push({name: key, value: obj[key]})
     }
     return body
 }

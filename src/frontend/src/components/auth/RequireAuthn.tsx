@@ -3,9 +3,9 @@ import {Navigate, useLocation} from 'react-router-dom'
 import {useIsLoggedIn} from './Authn'
 import {Logger} from "tslog";
 
-const logger = new Logger({ name: "RequireAuthn" });
+const logger = new Logger({name: "RequireAuthn"});
 
-export function RequireAuthn({ children }: { children: React.ReactNode }): React.ReactElement {
+export function RequireAuthn({children}: { children: React.ReactNode }): React.ReactElement {
     const isLoggedIn = useIsLoggedIn()
     const location = useLocation()
 
