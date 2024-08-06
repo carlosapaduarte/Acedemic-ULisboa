@@ -4,9 +4,11 @@ import './App.css';
 import {BrowserRouter} from "react-router-dom";
 import {Route, Routes} from 'react-router-dom'
 import WelcomePage from './components/WelcomePage';
-import ChooseLevel from './components/ChooseLevel';
-import Calendar from './components/Calendar';
+import Dashboard from './components/Dashboard';
 import LogIn from './components/LogIn';
+import { RequireAuthn } from './components/auth/RequireAuthn';
+import { AuthnContainer } from './components/auth/Authn';
+import Calendar from './components/Calendar';
 
 function App() {
   return (
@@ -21,20 +23,24 @@ function App() {
 function Router() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path='/' element={
-          <WelcomePage/>
-        }/>
-        <Route path='/log-in' element={
-          <LogIn/>
-        }/>
-        <Route path='/choose-level' element={
-          <ChooseLevel/>
-        }/>
-        <Route path='/calendar' element={
-          <Calendar/>
-        }/>
-      </Routes>
+      <AuthnContainer>
+        <Routes>
+          <Route path='/calendar' element={
+            <Calendar/>
+          }/>
+          <Route path='/' element={
+            <WelcomePage/>
+          }/>
+          <Route path='/log-in' element={
+            <LogIn/>
+          }/>
+          <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
+            <RequireAuthn children={
+              <Dashboard/>
+            }/>
+          }/>
+        </Routes>
+      </AuthnContainer>
     </BrowserRouter>
   )
 }

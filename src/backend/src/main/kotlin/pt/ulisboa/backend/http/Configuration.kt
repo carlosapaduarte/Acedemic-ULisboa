@@ -1,0 +1,25 @@
+package pt.ulisboa.backend.http
+
+import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import pt.ulisboa.backend.http.LoggerInterceptor
+
+
+@Configuration
+class PipelineConfigurer(
+    val loggerInterceptor: LoggerInterceptor,
+) : WebMvcConfigurer {
+
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**")
+            .allowedOrigins("http://localhost:3000") // TODO: review this later
+            .allowedMethods("GET", "POST", "PUT", "DELETE")
+            .allowCredentials(true)
+    }
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(loggerInterceptor)
+    }
+}
