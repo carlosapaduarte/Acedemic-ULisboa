@@ -2,7 +2,7 @@ package pt.ulisboa.backend.repository
 
 import pt.ulisboa.backend.http.exceptions.NotFoundException
 import pt.ulisboa.backend.repository.domain.User
-import pt.ulisboa.backend.repository.domain.UserGoal
+import pt.ulisboa.backend.repository.domain.UserNote
 import java.util.*
 
 @org.springframework.stereotype.Repository
@@ -32,8 +32,8 @@ class MemoryUsersRepository : UsersRepository {
         users[id] = user.copy(shareProgress = publishState)
     }
 
-    override fun addNewUserGoal(userId: Int, name: String, date: Date) {
+    override fun addNewUserNote(userId: Int, name: String, date: Date) {
         val user = users[userId] ?: throw NotFoundException("User not found")
-        users[userId] = user.copy(userGoals = user.userGoals.toMutableList().apply { add(UserGoal(name, date)) })
+        users[userId] = user.copy(userNotes = user.userNotes.toMutableList().apply { add(UserNote(name, date)) })
     }
 }

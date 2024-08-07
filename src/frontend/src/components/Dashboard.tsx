@@ -1,6 +1,6 @@
 import React, {useEffect, useReducer, useState} from "react";
 import {useParams} from "react-router-dom";
-import {service, UserGoal, UserInfo} from '../service/service';
+import {service, UserNote, UserInfo} from '../service/service';
 import {Level1} from "../challenges/level_1";
 import {Level2} from "../challenges/level_2";
 import {DayGoals, Goal} from "../challenges/types";
@@ -9,8 +9,10 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction" // needed for dayClick
 import {Logger} from "tslog";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { t } from "i18next";
 
-const logger = new Logger({name: "Dasboard"});
+const logger = new Logger({name: "Dasbhoard"});
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
@@ -45,14 +47,14 @@ function Dashboard() {
             <h1>{helloQuote} {userId}</h1>
             <h2>Best way to break a habit is to drop it.</h2>
             <br/>
-            <Calendar userId={Number(userId)}/>
+            <MainDashboardContent userId={Number(userId)}/>
         </div>
     );
 }
 
 type State =
     {
-        type: "challengesNotLoaded",
+        type: 'challengesNotLoaded'
     }
     |
     {
@@ -64,28 +66,26 @@ type State =
     }
     |
     {
-        type: "goals",
-        goals: DayGoals[],
-        userGoals: UserGoal[]
+        type: "todaysGoals",
+        goals: DayGoals,
+        notes: UserNote[]
     }
     |
     {
-        type: 'addNewGoal',
-        date: Date
+        type: 'addNewUserNote'
     }
     |
     {
-        type: 'addingNewUserGoal',
-        date: Date
+        type: 'submitNewNote'
     }
 
 type Action =
     {
-        type: "setChallengesNotLoaded",
+        type: 'setChallengesNotLoaded'
     }
     |
     {
-        type: "setLoading",
+        type: 'setLoading'
     }
     |
     {
@@ -93,19 +93,17 @@ type Action =
     }
     |
     {
-        type: "setGoals",
-        goals: DayGoals[],
-        userGoals: UserGoal[]
+        type: "setTodaysGoals",
+        goals: DayGoals,
+        notes: UserNote[]
     }
     |
     {
-        type: 'setAddNewGoal',
-        date: Date
+        type: 'setAddNewUserNote'
     }
     |
     {
-        type: 'setAddingNewUserGoal',
-        date: Date
+        type: 'setSubmitNewNote'
     }
 
 function reducer(state: State, action: Action): State {
@@ -113,35 +111,52 @@ function reducer(state: State, action: Action): State {
         case 'setChallengesNotLoaded': {
             return {type: 'challengesNotLoaded'}
         }
-        case "setLoading": {
+        case 'setLoading': {
             return {type: "loading"}
         }
         case "setError": {
             return {type: "error"}
         }
-        case "setGoals": {
-            return {type: "goals", goals: action.goals, userGoals: action.userGoals}
+        case "setTodaysGoals": {
+            return {type: "todaysGoals", goals: action.goals, notes: action.notes}
         }
-        case 'setAddNewGoal': {
-            return {type: "addNewGoal", date: action.date}
+        case "setAddNewUserNote": {
+            return {type: "addNewUserNote"}
         }
-        case "setAddingNewUserGoal": {
-            return {type: "addingNewUserGoal", date: action.date}
+        case 'setSubmitNewNote': {
+            return {type: 'submitNewNote'}
         }
     }
 }
 
-function Calendar({userId}: { userId: number }) {
-    // Show challenges/goals and button to add new goal
+function MainDashboardContent({userId}: { userId: number }) {
+    // In reality, there could be multiple Goals!!!
 
     const [state, dispatch] = useReducer(reducer, {type: 'challengesNotLoaded'})
-    const [newGoalName, setNewGoalName] = useState("");
+    const [newNoteText, setNewNoteText] = useState("");
 
     // Sparks a getUserInfo API call
     useEffect(() => {
-        async function fetchUserCurrentDayAndLoadChallenge() {
+        async function fetchUserCurrentDayAndLoadGoals() {
+
+            function sameDate(date1: Date, date2: Date) {
+                return date1.getFullYear == date2.getFullYear && date1.getMonth == date2.getMonth && date1.getDate && date2.getDate
+            }
+
+            function getTodaysGoals(allGoals: DayGoals[]): DayGoals | undefined {
+                const today = new Date()
+                console.log('All goals: ', allGoals)
+                return allGoals.find((goalsForTheDay: DayGoals) => sameDate(goalsForTheDay.date, today))
+            }
+
+            function getTodaysNotes(allNotes: UserNote[]): UserNote[] {
+                const today = new Date()
+                return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date), today))
+            }
+
             dispatch({type: 'setLoading'})
 
+            // TODO: in future, request only today's goals
             const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userId)
 
             if (userInfo == undefined) {
@@ -166,139 +181,102 @@ function Calendar({userId}: { userId: number }) {
                     return Promise.reject('TODO: error handling')
             }
 
+            // Should never be undefined!
+            // TODO: handle error when undefined later
+            const todaysGoals: DayGoals = getTodaysGoals(goals)!
+            const todaysNotes: UserNote[] = getTodaysNotes(userInfo.userNotes)
+
             dispatch({
-                type: 'setGoals',
-                goals: goals,
-                userGoals: userInfo.userGoals
+                type: 'setTodaysGoals',
+                goals: todaysGoals,
+                notes: todaysNotes
             })
         }
 
-        async function createNewUserGoal(userGoalDate: Date) {
-            await service.createNewUserGoal(userId, newGoalName, userGoalDate)
-            dispatch({type: 'setChallengesNotLoaded'}) // TODO: not the best way but for now will do...
+        async function submitNewNote() {
+            const result = service.createNewUserNote(userId, newNoteText, new Date()) // TODO: handle error later
+            dispatch({type: 'setChallengesNotLoaded'}) // this triggers a new refresh. TODO: improve later
         }
 
         if (state.type == 'challengesNotLoaded')
-            fetchUserCurrentDayAndLoadChallenge()
+            fetchUserCurrentDayAndLoadGoals()
 
-        else if (state.type == 'addingNewUserGoal')
-            createNewUserGoal(state.date)
+        if (state.type == 'submitNewNote')
+            submitNewNote()
 
     }, [state])
 
-
-    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        // For now, this new goal will be associated to a challenge day, for simplification
-
-        if (state.type !== 'addNewGoal')
-            throw new Error('Should be in addNewGoal state!')
-
-        if (event.key === 'Enter')
-            dispatch({type: 'setAddingNewUserGoal', date: state.date})
-    };
-
-    type FullCalendarEventsType = {
-        title: String,
-        date: String
+    function onAddNewNoteClickHandler() {
+        dispatch({type: 'setAddNewUserNote'})
     }
 
-    // Builds an object to display events in FullCalendar
-    function buildEvents(goals: DayGoals[], userGoals: UserGoal[]): any {
-
-        function buildDayEvents(date: Date, goals: Goal[]): FullCalendarEventsType[] {
-            const month = date.getMonth() + 1 // TODO: For some reason, this is necessary
-            const monthStr: String = month < 10 ? '0' + month : month.toString()
-            const day = date.getDate()
-            const dayStr: String = day < 10 ? '0' + day : day.toString()
-
-            // Deals with event for today
-            const fullCalendarEvents: FullCalendarEventsType[] = goals.map((challenge: Goal) => {
-                return {
-                    'title': challenge.title,
-                    'date': `${date.getFullYear()}-${monthStr}-${dayStr}`
-                }
-            })
-
-            return fullCalendarEvents
-        }
-
-        function buildEvents(): any {
-            let fullCalendarEvents: FullCalendarEventsType[] = [] // starts empty
-
-            // Deals with standard goals
-            for (let u = 0; u < goals.length; u++) {
-                const dayEvents = buildDayEvents(goals[u].date, goals[u].goals) // already return an array of FullCalendarEventsType
-                fullCalendarEvents = fullCalendarEvents.concat(dayEvents)
-            }
-
-            // Deals with user-created goals
-            for (let u = 0; u < userGoals.length; u++) {
-                const userGoal = userGoals[u]
-                const goalDate = new Date(userGoal.date)
-
-                const userGoalFullCalendarEvent = buildDayEvents(goalDate, [{ // array with single Goal
-                    title: userGoal.name,
-                    description: 'no-description' // TODO: fix this later
-                }])
-
-                fullCalendarEvents = fullCalendarEvents.concat(userGoalFullCalendarEvent)
-            }
-
-            return fullCalendarEvents
-        }
-
-        const events: FullCalendarEventsType[] = buildEvents()
-        //console.log(events)
-        return events
+    function onConfirmNewNoteSubmitClickHandler() {
+        dispatch({type: 'setSubmitNewNote'})
     }
 
-    const handleDateClick = (arg: DateClickArg) => {
-        logger.debug('User clicked on: ', arg.date.toDateString())
-        dispatch({type: 'setAddNewGoal', date: arg.date})
-    }
-
-    if (state.type == 'goals')
+    if (state.type == 'todaysGoals') {
+        console.log(state.goals)
         return (
-            <div>
-                <FullCalendar
-                    plugins={[dayGridPlugin, interactionPlugin]}
-                    initialView="dayGridMonth"
-                    events={buildEvents(state.goals, state.userGoals)}
-                    dateClick={handleDateClick}
+            <Box>
+                <Button variant="contained" onClick={onAddNewNoteClickHandler}>{t("dashboard:add_note")}</Button>
+                <Goals goals={state.goals.goals} />
+                <DisplayUserNotes notes={state.notes} />
+            </Box>
+        )
+    }
+    else if (state.type == 'addNewUserNote')
+        return (
+            <Box>
+                <TextField
+                    id="outlined-controlled"
+                    label="Controlled"
+                    value={newNoteText}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setNewNoteText(event.target.value)
+                    }}
                 />
-            </div>
+                <Button variant="contained" onClick={onConfirmNewNoteSubmitClickHandler}>{t("dashboard:confirm_new_note")}</Button>
+            </Box>
         )
-    else if (state.type == 'addNewGoal')
+    else
+        // TODO: implement later
         return (
-            <input
-                type="text"
-                placeholder="New Goal Name"
-                value={newGoalName}
-                onChange={(e) => setNewGoalName(e.target.value)}
-                onKeyDown={handleKeyPress}
-            />
+            <></>
         )
-    else if (state.type == 'error')
-        return (
-            <div>
-                <h2>Handle this error later!</h2>
-            </div>
-        )
-    else if (state.type == 'loading')
-        return (
-            <div>
-                <h2>Loading...</h2>
-            </div>
-        )
-    else if (state.type == 'addingNewUserGoal')
-        return (
-            <div>
-                <h2>Adding New Goal!</h2>
-            </div>
-        )
-    else return (
-            <h1>Should Not Arrive Here!</h1>
-        )
+    
+}
+
+function Goals({goals}: { goals: Goal[] }) {
+    return (
+        <Box>
+            <Typography variant="h4">{t("dashboard:current_challenge")}</Typography>
+            {goals.map((goal: Goal) => {
+                return (
+                    <Box>
+                        <Typography variant="h5">{goal.title}</Typography>
+                        <Typography variant="h6">{goal.description}</Typography>
+                    </Box>
+                )
+            })}
+            
+        </Box>
+    )
+}
+
+function DisplayUserNotes({notes}: { notes: UserNote[] }) {
+    return (
+        <Box>
+            <Typography variant="h4">{t("dashboard:my_notes")}</Typography>
+            {notes.map((note: UserNote) => {
+                return (
+                    <Box>
+                        <Typography variant="h5">{note.name}</Typography>
+                    </Box>
+                )
+            })}
+            
+        </Box>
+    )
 }
 
 export default Dashboard;

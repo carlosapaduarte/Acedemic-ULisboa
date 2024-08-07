@@ -24,6 +24,12 @@ i18next
                     "title": "Page not found",
                     "description": "We couldn't find the page you were looking for.",
                     "go_to_home": "Go to Home",
+                },
+                "dashboard": {
+                    "current_challenge": "Current Challenge",
+                    "my_notes": "My Notes",
+                    "add_note": "Add A Note",
+                    "confirm_new_note": "Submit"
                 }
             },
             pt: {
@@ -38,6 +44,12 @@ i18next
                     "title": "Página não encontrada",
                     "description": "Não conseguimos encontrar a página que procura.",
                     "go_to_home": "Vá para a Página Inicial",
+                },
+                "dashboard": {
+                    "current_challenge": "Objetivo Para Hoje",
+                    "my_notes": "As Minhas Notas",
+                    "add_note": "Adcionar Uma Nota",
+                    "confirm_new_note": "Adicionar Nota"
                 }
             }
         },

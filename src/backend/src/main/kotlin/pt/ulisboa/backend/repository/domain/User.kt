@@ -2,7 +2,7 @@ package pt.ulisboa.backend.repository.domain
 
 import java.util.*
 
-data class UserGoal(
+data class UserNote(
     val name: String,
     val date: Date
 )
@@ -13,5 +13,5 @@ data class User(
     val level: Int, // TODO: for development ease: When user is created, this is the default level
     val startDate: Date,
     val shareProgress: Boolean,
-    val userGoals: List<UserGoal> = emptyList()
+    val userNotes: List<UserNote> = emptyList()
 )

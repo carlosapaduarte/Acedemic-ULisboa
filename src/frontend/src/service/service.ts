@@ -3,7 +3,7 @@
 import {doFetch, toBody} from "./fetch"
 import {Logger} from "tslog";
 
-const logger = new Logger({name: "Authn"});
+const logger = new Logger({name: "service"});
 
 // TODO: maybe, each function of the following should just return the expected type, and thrown when something goes wrong.
 // In my opinion, this improves error handling: the caller just has to catch the exception
@@ -16,7 +16,7 @@ async function createUserOrLogin(userId: number): Promise<boolean> {
         body: toBody({id: userId}),
     }
     const response: Response = await doFetch(request)
-    console.log('IS logged in: ', response)
+    console.log('Is logged in: ', response)
 
     return response.ok
 }
@@ -45,7 +45,7 @@ async function selectShareProgressState(userId: number, shareProgress: boolean):
     return response.ok
 }
 
-export type UserGoal = {
+export type UserNote = {
     name: string;
     date: number
 }
@@ -57,7 +57,7 @@ export type UserInfo = {
     level: number,
     startDate: number,
     shareProgress: boolean,
-    userGoals: UserGoal[]
+    userNotes: UserNote[]
 };
 
 async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefined> {
@@ -75,11 +75,11 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefine
         return undefined
 }
 
-async function createNewUserGoal(userId: number, name: string, userGoalDate: Date): Promise<boolean | undefined> {
-
-    console.log(userGoalDate.getTime())
+async function createNewUserNote(userId: number, name: string, userGoalDate: Date): Promise<boolean | undefined> {
+    //console.log(userGoalDate.getTime())
+    
     const request = {
-        path: `users/${userId}/goals`,
+        path: `users/${userId}/notes`,
         method: 'POST',
         body: toBody({id: userId, name, date: userGoalDate.getTime()}),
     }
@@ -92,5 +92,5 @@ export const service = {
     chooseLevel,
     selectShareProgressState,
     fetchUserInfoFromApi,
-    createNewUserGoal
+    createNewUserNote
 }

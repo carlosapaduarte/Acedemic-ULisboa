@@ -8,6 +8,7 @@ import {RequireAuthn} from './components/auth/RequireAuthn';
 import {AuthnContainer} from './components/auth/Authn';
 import {NotFoundPage} from "./Pages/NotFoundPage";
 import AppDashboard from "./AppDashboard";
+import Calendar from './components/Calendar';
 
 function App() {
     return (
@@ -34,6 +35,11 @@ function Router() {
                         <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
                             <RequireAuthn children={
                                 <Dashboard/>
+                            }/>
+                        }/>
+                        <Route path='/dashboard/:userId/calendar' element={ // TODO: maybe, change path name
+                            <RequireAuthn children={
+                                <Calendar/>
                             }/>
                         }/>
                         <Route path="*" element={<NotFoundPage/>}/>

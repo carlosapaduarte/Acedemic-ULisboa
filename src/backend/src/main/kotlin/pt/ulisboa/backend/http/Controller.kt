@@ -49,11 +49,11 @@ class Controller(val service: Service) {
     @GetMapping("/ping")
     fun ping() = "pong"
     
-    @PostMapping("users/{id}/goals")
-    fun createNewGoal(
+    @PostMapping("users/{id}/notes")
+    fun createNewUserGoal(
         @RequestBody inputDto: NewUserGoalDto
     ) {
         println(Date(inputDto.date).time)
-        service.createNewUserGoal(inputDto.id, inputDto.name, Date(inputDto.date))
+        service.createNewUserNote(inputDto.id, inputDto.name, Date(inputDto.date))
     }
 }
