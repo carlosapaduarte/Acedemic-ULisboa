@@ -1,6 +1,7 @@
 import {Box, Button, Typography} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
+import {useTranslation} from "react-i18next";
 
 
 /**
@@ -8,6 +9,7 @@ import HomeIcon from "@mui/icons-material/Home";
  */
 export function NotFoundPage() {
     const navigate = useNavigate()
+    const { t } = useTranslation()
 
     return (
         <Box sx={{
@@ -29,15 +31,11 @@ export function NotFoundPage() {
                 </Typography>
 
                 <Typography variant="h2" component="h2" gutterBottom>
-                    Page not found
+                    {t("not_found_page:title")}
                 </Typography>
 
                 <Typography variant="body1" gutterBottom>
-                    We couldn't find the page you were looking for.
-                </Typography>
-
-                <Typography variant="body1" gutterBottom>
-                    Go to Home
+                    {t("not_found_page:description")}
                 </Typography>
 
                 <Button
@@ -46,7 +44,7 @@ export function NotFoundPage() {
                     onClick={() => navigate("/")}
                     sx={{width: "50%"}}
                 >
-                    Go to Home
+                    {t("not_found_page:go_to_home")}
                 </Button>
             </Box>
             {/*<Box

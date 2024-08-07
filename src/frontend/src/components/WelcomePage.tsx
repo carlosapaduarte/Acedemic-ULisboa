@@ -1,10 +1,13 @@
 import React, {useState} from "react";
 import {Navigate} from 'react-router-dom';
 import {useIsLoggedIn} from "./auth/Authn";
+import {useTranslation} from "react-i18next";
+import {Box, Button, Typography} from "@mui/material";
 
 function WelcomePage() {
     const [redirect, setRedirect] = useState<string | undefined>(undefined)
     const isLoggedIn = useIsLoggedIn()
+    const {t} = useTranslation();
 
     const handleOnChooseLevelClick = () => {
         if (!isLoggedIn)
@@ -19,17 +22,27 @@ function WelcomePage() {
         return <Navigate to={redirect} replace={true}/>
     } else {
         return (
-            <div>
-                <h1>Welcome Page</h1>
-                <p>
-                    Imagina o que seria transformares o teu desempenho académico em três semanas... Parece-te
-                    impossível? Estudos mostram que são apenas necessários 21 dias para mudar ou implementar um hábito.
-                    O “21 Days Challenge da Autoeficácia” aproveita essa ciência para te ajudar a criar hábitos de
-                    estudo mais eficazes e, com isso, mudar a tua trajetória académica. Estás pronto para aproveitar ao
-                    máximo tua experiência universitária? Começa hoje e vê a diferença que 21 dias podem fazer!
-                </p>
-                <button onClick={handleOnChooseLevelClick}>Proceed</button>
-            </div>
+            <Box sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                height: '50%',
+                width: '100%'
+            }}>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: '100%',
+                    width: '50%'
+                }}>
+                    <Typography variant="h3">{t("welcome_page:title")}</Typography>
+                    <Typography variant="body1">{t("welcome_page:description")}</Typography>
+                    <Button onClick={handleOnChooseLevelClick}>{t("welcome_page:proceed")}</Button>
+                </Box>
+            </Box>
         );
     }
 }
