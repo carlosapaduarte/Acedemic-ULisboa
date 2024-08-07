@@ -6,13 +6,15 @@ import Dashboard from './components/Dashboard';
 import LogIn from './components/LogIn';
 import {RequireAuthn} from './components/auth/RequireAuthn';
 import {AuthnContainer} from './components/auth/Authn';
+import {NotFoundPage} from "./Pages/NotFoundPage";
+import AppDashboard from "./AppDashboard";
 
 function App() {
     return (
         <div className="App">
-            <header className="App-header">
+            <div className="App-content">
                 <Router/>
-            </header>
+            </div>
         </div>
     );
 }
@@ -20,20 +22,23 @@ function App() {
 function Router() {
     return (
         <BrowserRouter>
-            <AuthnContainer>
-                <Routes>
-                    <Route path='/' element={
-                        <WelcomePage/>
-                    }/>
-                    <Route path='/log-in' element={
-                        <LogIn/>
-                    }/>
-                    <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
-                        <RequireAuthn children={
-                            <Dashboard/>
+        <AuthnContainer>
+                <AppDashboard>
+                    <Routes>
+                        <Route path='/' element={
+                            <WelcomePage/>
                         }/>
-                    }/>
-                </Routes>
+                        <Route path='/log-in' element={
+                            <LogIn/>
+                        }/>
+                        <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
+                            <RequireAuthn children={
+                                <Dashboard/>
+                            }/>
+                        }/>
+                        <Route path="*" element={<NotFoundPage/>}/>
+                    </Routes>
+                </AppDashboard>
             </AuthnContainer>
         </BrowserRouter>
     )
