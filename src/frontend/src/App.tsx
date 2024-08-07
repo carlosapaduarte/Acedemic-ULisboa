@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import WelcomePage from './components/WelcomePage';
-import Dashboard from './components/Dashboard';
-import LogIn from './components/LogIn';
-import {RequireAuthn} from './components/auth/RequireAuthn';
 import {AuthnContainer} from './components/auth/Authn';
-import {NotFoundPage} from "./Pages/NotFoundPage";
 import AppDashboard from "./AppDashboard";
+import WelcomePage from "./components/WelcomePage";
+import LogIn from "./components/LogIn";
+import {RequireAuthn} from "./components/auth/RequireAuthn";
+import {NotFoundPage} from "./Pages/NotFoundPage";
+import Dashboard from "./components/Dashboard";
 
 function App() {
     return (
@@ -22,7 +22,7 @@ function App() {
 function Router() {
     return (
         <BrowserRouter>
-        <AuthnContainer>
+            <AuthnContainer>
                 <AppDashboard>
                     <Routes>
                         <Route path='/' element={

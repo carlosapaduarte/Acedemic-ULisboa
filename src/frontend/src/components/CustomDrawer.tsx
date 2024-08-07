@@ -1,7 +1,9 @@
 import MuiDrawer from "@mui/material/Drawer";
-import {styled} from "@mui/material";
+import {Divider, List, ListItemButton, ListItemIcon, ListItemText, styled} from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import {CalendarMonth} from "@mui/icons-material";
+import React from "react";
+import {useNavigate} from "react-router-dom";
 
 /**
  * List of the main items in the sidebar.
@@ -42,13 +44,47 @@ export const secondaryListItems: { name: string, href: string, icon: JSX.Element
 
 export const drawerWidth: number = 200
 
+export const CustomDrawer = ({open}: { open: boolean }) => {
+    const navigate = useNavigate()
+
+    return (
+        <StyledDrawer variant="permanent" open={open}>
+            <List component="nav">
+                {
+                    mainListItems.map((item) => {
+                        return (
+                            <ListItemButton onClick={() => navigate(item.href)} key={item.name}>
+                                <ListItemIcon>
+                                    {item.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={item.name}/>
+                            </ListItemButton>
+                        )
+                    })
+                }
+                {secondaryListItems.length != 0 && <Divider sx={{my: 1}}/>}
+                {
+                    secondaryListItems.length != 0 && secondaryListItems.map((item) => {
+                        return (
+                            <ListItemButton onClick={() => navigate(item.href)} key={item.name}>
+                                <ListItemIcon>
+                                    {item.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={item.name}/>
+                            </ListItemButton>
+                        )
+                    })
+                }
+            </List>
+        </StyledDrawer>
+    )
+}
 /**
  * Drawer component.
  */
-export const CustomDrawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
+const StyledDrawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
     ({theme, open}) => ({
         '& .MuiDrawer-paper': {
-            marginTop: '64px',
             position: 'absolute',
             whiteSpace: 'nowrap',
             width: drawerWidth,

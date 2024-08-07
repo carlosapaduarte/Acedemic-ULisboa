@@ -10,7 +10,26 @@ import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction" // needed for dayClick
 import {Logger} from "tslog";
 
-const logger = new Logger({name: "Dasboard"});
+const logger = new Logger({name: "Dashboard"});
+
+/**
+ * Determines initial quote to be displayed to user, based on current time of day.
+ */
+function getHelloQuote(): string {
+    const hourOfDay = new Date().getHours();
+    switch (true) {
+        case hourOfDay < 5:
+            return 'Good Night'
+        case hourOfDay < 12:
+            return 'Good Morning'
+        case hourOfDay < 17:
+            return 'Good Afternoon'
+        case hourOfDay < 20:
+            return 'Good Evening'
+        default:
+            return 'Good Night'
+    }
+}
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
@@ -18,25 +37,7 @@ function Dashboard() {
 
     const {userId} = useParams<string>()
 
-    // Determines initial quote to be displayed to user!
-    const hourOfDay = new Date().getHours();
-    let helloQuote = ''
-    switch (true) {
-        case hourOfDay < 5:
-            helloQuote = 'Good Night'
-            break
-        case hourOfDay < 12:
-            helloQuote = 'Good Morning'
-            break
-        case hourOfDay < 17:
-            helloQuote = 'Good Afternoon'
-            break
-        case hourOfDay < 20:
-            helloQuote = 'Good Evening'
-            break
-        default:
-            helloQuote = 'Good Night'
-    }
+    let helloQuote = getHelloQuote()
 
     // TODO: improve error handling if [userId] is not a Number
 
