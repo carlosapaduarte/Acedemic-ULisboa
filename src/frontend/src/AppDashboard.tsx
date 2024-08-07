@@ -72,7 +72,7 @@ export default function AppDashboard({children}: DashboardProps) {
                     }*/}
                 </Toolbar>
             </AppBar>
-            <Box sx={{position: 'relative', height: '100%'}}>
+            <Box sx={{position: 'relative', height: '100%', overflow: 'auto'}}>
                 <CustomDrawer open={open}/>
                 <Box component="main" sx={{
                     backgroundColor: "#F5F5F5",/*(theme) =>

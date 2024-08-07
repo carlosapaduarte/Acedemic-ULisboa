@@ -9,6 +9,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction" // needed for dayClick
 import {Logger} from "tslog";
+import {Box} from "@mui/material";
 
 const logger = new Logger({name: "Dashboard"});
 
@@ -42,12 +43,12 @@ function Dashboard() {
     // TODO: improve error handling if [userId] is not a Number
 
     return (
-        <div>
+        <Box>
             <h1>{helloQuote} {userId}</h1>
             <h2>Best way to break a habit is to drop it.</h2>
             <br/>
             <Calendar userId={Number(userId)}/>
-        </div>
+        </Box>
     );
 }
 
@@ -260,14 +261,16 @@ function Calendar({userId}: { userId: number }) {
 
     if (state.type == 'goals')
         return (
-            <div>
-                <FullCalendar
-                    plugins={[dayGridPlugin, interactionPlugin]}
-                    initialView="dayGridMonth"
-                    events={buildEvents(state.goals, state.userGoals)}
-                    dateClick={handleDateClick}
-                />
-            </div>
+            <Box width='100%' height='50%' display='flex' alignItems="center" justifyContent="center">
+                <Box width='50%'>
+                    <FullCalendar
+                        plugins={[dayGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        events={buildEvents(state.goals, state.userGoals)}
+                        dateClick={handleDateClick}
+                    />
+                </Box>
+            </Box>
         )
     else if (state.type == 'addNewGoal')
         return (
