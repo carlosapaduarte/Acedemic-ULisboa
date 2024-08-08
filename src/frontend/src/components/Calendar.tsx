@@ -225,8 +225,8 @@ export default function Calendar() {
 
     if (state.type == 'goals')
         return (
-            <Box>
-                <Box>
+            <Box width='100%' height='50%' display='flex' alignItems="center" justifyContent="center">
+                <Box width='50%'>
                     <FullCalendar
                         plugins={[dayGridPlugin, interactionPlugin]}
                         initialView="dayGridMonth"

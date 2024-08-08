@@ -1,21 +1,8 @@
-import {
-    AppBar,
-    Box,
-    ButtonBase,
-    CssBaseline,
-    Divider,
-    IconButton,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Toolbar,
-    Typography
-} from "@mui/material";
+import {AppBar, Box, ButtonBase, CssBaseline, IconButton, Toolbar, Typography} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import MenuIcon from '@mui/icons-material/Menu'
 import React, {useState} from "react";
-import {CustomDrawer, mainListItems, secondaryListItems} from "./components/CustomDrawer";
+import {CustomDrawer} from "./components/CustomDrawer";
 
 /**
  * Props of the Dashboard component.
@@ -40,9 +27,9 @@ export default function AppDashboard({children}: DashboardProps) {
     }
 
     return (
-        <Box sx={{display: 'flex'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
             <CssBaseline/>
-            <AppBar position="absolute">
+            <AppBar position="static">
                 <Toolbar sx={{pr: '24px'}}>
                     <IconButton
                         edge="start"
@@ -89,59 +76,20 @@ export default function AppDashboard({children}: DashboardProps) {
                     }*/}
                 </Toolbar>
             </AppBar>
-            <CustomDrawer variant="permanent" open={open}>
-                <List component="nav">
-                    {
-                        mainListItems.map((item) => {
-
-                            if (item.href.includes(':userId')) {
-
-                                // Remember: later we won't user cache. This is a solution just for the moment
-                                const userId = localStorage['userId']
-                                if (userId == undefined) {
-                                    item.href = '/log-in'
-                                    return
-                                }
-                                item.href = item.href.replace(':userId', userId)
-                            }
-
-                            return (
-                                <ListItemButton onClick={() => navigate(item.href)} key={item.name}>
-                                    <ListItemIcon>
-                                        {item.icon}
-                                    </ListItemIcon>
-                                    <ListItemText primary={item.name}/>
-                                </ListItemButton>
-                            )
-                        })
-                    }
-                    {secondaryListItems.length != 0 && <Divider sx={{my: 1}}/>}
-                    {
-                        secondaryListItems.length != 0 && secondaryListItems.map((item) => {
-                            return (
-                                <ListItemButton onClick={() => navigate(item.href)} key={item.name}>
-                                    <ListItemIcon>
-                                        {item.icon}
-                                    </ListItemIcon>
-                                    <ListItemText primary={item.name}/>
-                                </ListItemButton>
-                            )
-                        })
-                    }
-                </List>
-            </CustomDrawer>
-            <Box component="main" sx={{
-                backgroundColor: "#F5F5F5",/*(theme) =>
-                    theme.palette.mode === 'light'
-                        ? theme.palette.grey[100]
-                        : theme.palette.grey[900],*/
-                flexGrow: 1,
-                marginLeft: '64px',
-                height: '100vh',
-                overflow: 'auto',
-            }}>
-                <Toolbar/>
-                {children}
+            <Box sx={{position: 'relative', height: '100%', overflow: 'auto'}}>
+                <CustomDrawer open={open}/>
+                <Box component="main" sx={{
+                    backgroundColor: "#F5F5F5",/*(theme) =>
+                        theme.palette.mode === 'light'
+                            ? theme.palette.grey[100]
+                            : theme.palette.grey[900],*/
+                    flexGrow: 1,
+                    marginLeft: '64px',
+                    height: '100%',
+                    overflow: 'auto',
+                }}>
+                    {children}
+                </Box>
             </Box>
         </Box>
     )
