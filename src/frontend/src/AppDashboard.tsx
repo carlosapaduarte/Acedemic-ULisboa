@@ -31,6 +31,10 @@ export default function AppDashboard({children}: DashboardProps) {
 
     const [open, setOpen] = useState(false);
 
+    // If this value changes, this all component is re-executed, allowing to update
+    // the primary hrefs
+    const [logged, setLogged] = useState<boolean | undefined>(undefined)
+
     const toggleDrawer = () => {
         setOpen(!open)
     }
@@ -89,6 +93,18 @@ export default function AppDashboard({children}: DashboardProps) {
                 <List component="nav">
                     {
                         mainListItems.map((item) => {
+
+                            if (item.href.includes(':userId')) {
+
+                                // Remember: later we won't user cache. This is a solution just for the moment
+                                const userId = localStorage['userId']
+                                if (userId == undefined) {
+                                    item.href = '/log-in'
+                                    return
+                                }
+                                item.href = item.href.replace(':userId', userId)
+                            }
+
                             return (
                                 <ListItemButton onClick={() => navigate(item.href)} key={item.name}>
                                     <ListItemIcon>

@@ -27,4 +27,8 @@ Main source: [Top React calendar component libraries](https://retool.com/blog/be
 
 ## Overall Styling
 
-Check this one: [MUI](https://mui.com/).
+Check this one: [MUI](https://mui.com/);
+
+## TODO
+
+- Add "Mark challenge completed!" button;

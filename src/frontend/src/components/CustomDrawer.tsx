@@ -19,7 +19,7 @@ export const mainListItems = [
     },*/
     {
         name: 'Calendar',
-        href: "/calendar",
+        href: "/calendar/:userId",
         icon: <CalendarMonth/>,
     }
 ]

@@ -23,7 +23,7 @@ function App() {
 function Router() {
     return (
         <BrowserRouter>
-        <AuthnContainer>
+            <AuthnContainer>
                 <AppDashboard>
                     <Routes>
                         <Route path='/' element={
@@ -37,7 +37,7 @@ function Router() {
                                 <Dashboard/>
                             }/>
                         }/>
-                        <Route path='/dashboard/:userId/calendar' element={ // TODO: maybe, change path name
+                        <Route path='/calendar/:userId' element={ // TODO: maybe, change path name
                             <RequireAuthn children={
                                 <Calendar/>
                             }/>

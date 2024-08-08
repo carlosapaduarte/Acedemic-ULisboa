@@ -5,14 +5,11 @@ import {Level1} from "../challenges/level_1";
 import {Level2} from "../challenges/level_2";
 import {DayGoals, Goal} from "../challenges/types";
 import {Level3} from "../challenges/level_3";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
-import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction" // needed for dayClick
 import {Logger} from "tslog";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { t } from "i18next";
 
-const logger = new Logger({name: "Dasbhoard"});
+const logger = new Logger({name: "Dashboard"});
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
