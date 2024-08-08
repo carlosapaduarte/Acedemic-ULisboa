@@ -31,6 +31,9 @@ i18next
                     "add_note": "Add A Note",
                     "confirm_new_note": "Submit",
                     "mark_complete": "Mark Complete"
+                },
+                "error": {
+                    "title": "An Error Occurred"
                 }
             },
             pt: {
@@ -52,6 +55,9 @@ i18next
                     "add_note": "Adcionar Uma Nota",
                     "confirm_new_note": "Adicionar Nota",
                     "mark_complete": "Marcar Como Completo"
+                },
+                "error": {
+                    "title": "Ocorreu um erro"
                 }
             }
         },

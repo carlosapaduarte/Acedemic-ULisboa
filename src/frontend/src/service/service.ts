@@ -6,35 +6,35 @@ import {Logger} from "tslog";
 
 const logger = new Logger({name: "service"});
 
-// TODO: maybe, each function of the following should just return the expected type, and thrown when something goes wrong.
-// In my opinion, this improves error handling: the caller just has to catch the exception
+// For now, all of these functions will return the expected response.
+// If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
+// In my opinion, this eases error handling in the caller.
 
-// TODO: separate tasks in the future
-async function createUserOrLogin(userId: number): Promise<boolean> {
+// TODO: separate create-user and login tasks in the future
+async function createUserOrLogin(userId: number) {
     const request = {
         path: 'login',
         method: 'POST',
         body: toBody({id: userId}),
     }
     const response: Response = await doFetch(request)
-    console.log('Is logged in: ', response)
-
-    return response.ok
+    //console.log('Is logged in: ', response)
+    if (!response.ok)
+        return Promise.reject(new Error('User creation was not possible'))
 }
 
-async function chooseLevel(userId: number, level: number): Promise<boolean> {
+async function chooseLevel(userId: number, level: number) {
     const request = {
         path: 'set-level',
         method: 'POST',
         body: toBody({id: userId, level: level}),
     }
     const response: Response = await doFetch(request)
-    //console.log(response)
-
-    return response.ok
+    if (!response.ok)
+        return Promise.reject(new Error('Level selection failed!'))
 }
 
-async function selectShareProgressState(userId: number, shareProgress: boolean): Promise<boolean> {
+async function selectShareProgressState(userId: number, shareProgress: boolean) {
     const request = {
         path: 'set-publish-state-preference',
         method: 'POST',
@@ -42,8 +42,8 @@ async function selectShareProgressState(userId: number, shareProgress: boolean):
     }
     const response: Response = await doFetch(request)
     //console.log(response)
-
-    return response.ok
+    if (!response.ok)
+        return Promise.reject(new Error('Progress share preference selection failed!'))
 }
 
 export type UserNote = {
@@ -68,7 +68,7 @@ export type UserInfo = {
     completedGoals: GoalAndDate[]
 };
 
-async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefined> {
+async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
     const request = {
         path: `users/${userId}`,
         method: 'GET',
@@ -77,13 +77,13 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefine
 
     if (response.ok) {
         const responseObject: UserInfo = await response.json() // TODO: how 
-        console.log(responseObject)
+        //console.log(responseObject)
         return responseObject
     } else
-        return undefined
+        return Promise.reject(new Error('User info could not be obtained!'))
 }
 
-async function createNewUserNote(userId: number, name: string, userGoalDate: Date): Promise<boolean | undefined> {
+async function createNewUserNote(userId: number, name: string, userGoalDate: Date) {
     //console.log(userGoalDate.getTime())
     
     const request = {
@@ -92,7 +92,8 @@ async function createNewUserNote(userId: number, name: string, userGoalDate: Dat
         body: toBody({id: userId, name, date: userGoalDate.getTime()}),
     }
     const response: Response = await doFetch(request)
-    return response.ok
+    if (!response.ok)
+        return Promise.reject(new Error('Note creation failed!'))
 }
 
 async function markGoalAsCompleted(userId: number, goalName: String, date: Date) {
@@ -102,7 +103,8 @@ async function markGoalAsCompleted(userId: number, goalName: String, date: Date)
         body: toBody({id: userId, goalName, date: date.getTime()}),
     }
     const response: Response = await doFetch(request)
-    return response.ok
+    if (!response.ok)
+        return Promise.reject(new Error('Goal finalized selection failed!'))
 }
 
 export const service = {

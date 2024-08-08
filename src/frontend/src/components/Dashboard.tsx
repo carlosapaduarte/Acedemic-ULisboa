@@ -9,6 +9,7 @@ import {Logger} from "tslog";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { t } from "i18next";
 import { ifError } from "assert";
+import { useSetError } from "./error/ErrorContainer";
 
 const logger = new Logger({name: "Dashboard"});
 
@@ -63,10 +64,6 @@ type State =
     }
     |
     {
-        type: "error",
-    }
-    |
-    {
         type: "todaysGoals",
         goals: DayGoals,
         notes: UserNote[],
@@ -93,10 +90,6 @@ type Action =
     |
     {
         type: 'setLoading'
-    }
-    |
-    {
-        type: "setError",
     }
     |
     {
@@ -127,9 +120,6 @@ function reducer(state: State, action: Action): State {
         case 'setLoading': {
             return {type: "loading"}
         }
-        case "setError": {
-            return {type: "error"}
-        }
         case "setTodaysGoals": {
             return {type: "todaysGoals", goals: action.goals, notes: action.notes, todayCompletedGoals: action.todaysCompletedGoals}
         }
@@ -149,6 +139,7 @@ function MainDashboardContent({userId}: { userId: number }) {
     // In reality, there could be multiple Goals per day!!!
 
     const [state, dispatch] = useReducer(reducer, {type: 'challengesNotLoaded'})
+    const setError = useSetError()
     const [newNoteText, setNewNoteText] = useState("");
 
     // Sparks a getUserInfo API call
@@ -184,7 +175,7 @@ function MainDashboardContent({userId}: { userId: number }) {
             console.log('User Info: ', userInfo)
 
             if (userInfo == undefined) {
-                dispatch({type: 'setError'})
+                setError(new Error('User information could not be obtained!'))
                 return
             }
 
@@ -220,14 +211,15 @@ function MainDashboardContent({userId}: { userId: number }) {
         }
 
         async function submitNewNote() {
-            const result = await service.createNewUserNote(userId, newNoteText, new Date()) // TODO: handle error later
-            dispatch({type: 'setChallengesNotLoaded'}) // this triggers a new refresh. TODO: improve later
+            await service.createNewUserNote(userId, newNoteText, new Date()) // TODO: handle error later
+            .then(() => dispatch({type: 'setChallengesNotLoaded'})) // this triggers a new refresh. TODO: improve later)
+            .catch((error) => setError(error))
         }
 
         async function submitGoalCompleted(goal: Goal) {
-            const result = await service.markGoalAsCompleted(userId, goal.title, new Date()) // TODO: handle error later
-            //console.log('After Goal completed!')
-            dispatch({type: 'setChallengesNotLoaded'}) // this triggers a new refresh. TODO: improve later
+            await service.markGoalAsCompleted(userId, goal.title, new Date()) // TODO: handle error later
+            .then(() => dispatch({type: 'setChallengesNotLoaded'})) // this triggers a new refresh. TODO: improve later
+            .catch((error) => setError(error))
         }
 
         if (state.type == 'challengesNotLoaded')
@@ -317,7 +309,7 @@ function DisplayUserNotes({notes}: { notes: UserNote[] }) {
             <Typography variant="h4">{t("dashboard:my_notes")}</Typography>
             {notes.map((note: UserNote) => {
                 return (
-                    <Box>
+                    <Box key={note.name}>
                         <Typography variant="h5">{note.name}</Typography>
                     </Box>
                 )

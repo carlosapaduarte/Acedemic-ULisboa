@@ -2,6 +2,7 @@ import React, {useReducer, useState} from "react";
 import {Navigate} from 'react-router-dom';
 import {service} from '../service/service';
 import {useSetIsLoggedIn} from "./auth/Authn";
+import { useSetError } from "./error/ErrorContainer";
 
 type State =
     {
@@ -111,6 +112,7 @@ const MAX_USER_ID = 9999
 
 function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
     const setIsLoggedIn = useSetIsLoggedIn()
+    const setError = useSetError()
 
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
@@ -123,20 +125,18 @@ function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
       (...Just a suggestion...)
     */
 
-    const [error, setError] = useState<boolean | undefined>(undefined)
     const [userId, setUserId] = useState<number | undefined>(undefined)
 
     async function createUser() {
         const userId = Math.floor(Math.random() * MAX_USER_ID)
-        const created = await service.createUserOrLogin(userId)
-        if (created) {
-
+        await service.createUserOrLogin(userId)
+        .then(() => {
             // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
             localStorage['userId'] = userId.toString();
             setIsLoggedIn(true) // Sets - user logged in - in auth container
-        }
-        setUserId(userId)
-        setError(!created)
+            setUserId(userId)            
+        })
+        .catch((error) => setError(error))
     }
 
     if (userId != undefined)
@@ -144,13 +144,6 @@ function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
             <div>
                 <h1>User created!</h1>
                 <button onClick={() => onAuthDone(userId)}>Click here to advance</button>
-            </div>
-        )
-
-    if (error)
-        return (
-            <div>
-                <h1>There was an error creating the user!</h1>
             </div>
         )
     else
@@ -163,11 +156,12 @@ function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
 }
 
 function ShareProgress({userId, onShareSelected}: { userId: number, onShareSelected: () => void }) {
+    const setError = useSetError()
 
     async function selectShareProgressState(shareProgress: boolean) {
-        const success = await service.selectShareProgressState(userId, shareProgress)
-        if (success)
-            onShareSelected()
+        await service.selectShareProgressState(userId, shareProgress)
+            .then(() => onShareSelected())
+            .catch((error) => setError(error))
     }
 
     return (
@@ -182,7 +176,7 @@ function ShareProgress({userId, onShareSelected}: { userId: number, onShareSelec
 
 enum Level {LEVEL_1, LEVEL_2, LEVEL_3}
 
-async function chooseLevel(userId: number, level: Level): Promise<boolean> {
+async function chooseLevel(userId: number, level: Level) {
     let levelNumber = -1
     switch (level) {
         case Level.LEVEL_1 :
@@ -195,7 +189,7 @@ async function chooseLevel(userId: number, level: Level): Promise<boolean> {
             levelNumber = 3
             break
     }
-    return await service.chooseLevel(userId, levelNumber) // returns if was successfull or not
+    await service.chooseLevel(userId, levelNumber) // returns if was successfull or not
 }
 
 function ChooseLevel({userId, onLevelSelected, onStartQuizClick}: {
@@ -203,13 +197,12 @@ function ChooseLevel({userId, onLevelSelected, onStartQuizClick}: {
     onLevelSelected: () => void,
     onStartQuizClick: () => void
 }) {
+    const setError = useSetError()
 
     async function chooseLevelLocal(level: Level) {
-        const success = await chooseLevel(userId, level)
-
-        // TODO: handle in case of error later
-        if (success)
-            onLevelSelected()
+        chooseLevel(userId, level)
+        .then(() => onLevelSelected())
+        .catch((error) => setError(error))
     }
 
     return (
@@ -248,6 +241,7 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
     // Not fully implemented yet because the requirements are not yet fully decided
 
     const [answers, setAnswers] = useState<boolean[]>(new Array(10).fill(undefined))
+    const setError = useSetError()
 
     function onAnswerClick(questionNumber: number, answer: boolean) {
         const newAnswers: boolean[] = answers.slice()
@@ -260,9 +254,9 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
         const computedLevel: Level = Level.LEVEL_1
 
         // TODO: handle in case of error later
-        const success = await chooseLevel(userId, computedLevel)
-        if (success)
-            onLevelSelected()
+        await chooseLevel(userId, computedLevel)
+        .then(() => onLevelSelected())
+        .catch((error) => setError(error))
     }
 
     return (

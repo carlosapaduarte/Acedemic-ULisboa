@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom'
 import { Level1 } from '../challenges/level_1'
 import { Level2 } from '../challenges/level_2'
 import { Level3 } from '../challenges/level_3'
+import { useSetError } from './error/ErrorContainer'
 
 const logger = new Logger({name: "Calendar"});
 
@@ -20,10 +21,6 @@ type State =
     |
     {
         type: "loading",
-    }
-    |
-    {
-        type: "error",
     }
     |
     {
@@ -52,10 +49,6 @@ type Action =
     }
     |
     {
-        type: "setError",
-    }
-    |
-    {
         type: "setGoals",
         goals: DayGoals[],
         userNotes: UserNote[]
@@ -79,9 +72,6 @@ function reducer(state: State, action: Action): State {
         case "setLoading": {
             return {type: "loading"}
         }
-        case "setError": {
-            return {type: "error"}
-        }
         case "setGoals": {
             return {type: "goals", goals: action.goals, userNotes: action.userNotes}
         }
@@ -95,6 +85,8 @@ function reducer(state: State, action: Action): State {
 }
 
 export default function Calendar() {
+    const setError = useSetError()
+
     const {userId} = useParams<string>()
     const userIdAsNumber = Number(userId) // TODO: 'userIdStr' could be undefined
 
@@ -106,7 +98,7 @@ export default function Calendar() {
         date: String
     }
 
-    console.log('State: ', state)
+    //console.log('State: ', state)
 
     // Sparks a getUserInfo API call
     useEffect(() => {
@@ -114,40 +106,40 @@ export default function Calendar() {
             dispatch({type: 'setLoading'})
 
             // TODO: in future, request only today's goals
-            const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userIdAsNumber)
+            try {
+                const userInfo: UserInfo = await service.fetchUserInfoFromApi(userIdAsNumber)
 
-            if (userInfo == undefined) {
-                dispatch({type: 'setError'})
-                return
+                const startDate: Date = new Date(userInfo.startDate)
+
+                let goals: DayGoals[]
+                switch (userInfo.level) {
+                    case 1 :
+                        goals = Level1.level1Goals(startDate)
+                        break
+                    case 2 :
+                        goals = Level2.level2Goals(startDate)
+                        break
+                    case 3 :
+                        goals = Level3.level3Goals(startDate)
+                        break
+                    default :
+                        return Promise.reject('TODO: handle this error')
+                }
+
+                dispatch({
+                    type: 'setGoals',
+                    goals: goals,
+                    userNotes: userInfo.userNotes
+                })
+            } catch(error: any) {
+                setError(error)
             }
-
-            const startDate: Date = new Date(userInfo.startDate)
-
-            let goals: DayGoals[]
-            switch (userInfo.level) {
-                case 1 :
-                    goals = Level1.level1Goals(startDate)
-                    break
-                case 2 :
-                    goals = Level2.level2Goals(startDate)
-                    break
-                case 3 :
-                    goals = Level3.level3Goals(startDate)
-                    break
-                default :
-                    return Promise.reject('TODO: handle this error')
-            }
-
-            dispatch({
-                type: 'setGoals',
-                goals: goals,
-                userNotes: userInfo.userNotes
-            })
         }
 
         async function submitNewNote(date: Date) {
-            const result = service.createNewUserNote(userIdAsNumber, newNoteText, date) // TODO: handle error later
-            dispatch({type: 'setChallengesNotLoaded'}) // this triggers a new refresh. TODO: improve later
+            service.createNewUserNote(userIdAsNumber, newNoteText, date) // TODO: handle error later
+            .then(() => dispatch({type: 'setChallengesNotLoaded'}) ) // this triggers a new refresh. TODO: improve later
+            .catch((error) => setError(error))
         }
 
         if (state.type == 'challengesNotLoaded')

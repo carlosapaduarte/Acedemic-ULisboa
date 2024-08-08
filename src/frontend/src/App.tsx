@@ -9,6 +9,8 @@ import {NotFoundPage} from "./Pages/NotFoundPage";
 import AppDashboard from "./AppDashboard";
 import Calendar from './components/Calendar';
 import Dashboard from './components/Dashboard';
+import { ErrorController } from './components/error/ErrorController';
+import { ErrorContainer } from './components/error/ErrorContainer';
 
 function App() {
     return (
@@ -23,29 +25,33 @@ function App() {
 function Router() {
     return (
         <BrowserRouter>
-            <AuthnContainer>
-                <AppDashboard>
-                    <Routes>
-                        <Route path='/' element={
-                            <WelcomePage/>
-                        }/>
-                        <Route path='/log-in' element={
-                            <LogIn/>
-                        }/>
-                        <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
-                            <RequireAuthn children={
-                                <Dashboard/>
-                            }/>
-                        }/>
-                        <Route path='/calendar/:userId' element={ // TODO: maybe, change path name
-                            <RequireAuthn children={
-                                <Calendar/>
-                            }/>
-                        }/>
-                        <Route path="*" element={<NotFoundPage/>}/>
-                    </Routes>
-                </AppDashboard>
-            </AuthnContainer>
+            <ErrorContainer>
+                <AuthnContainer>
+                    <AppDashboard>
+                        <ErrorController>
+                            <Routes>
+                                <Route path='/' element={
+                                    <WelcomePage/>
+                                }/>
+                                <Route path='/log-in' element={
+                                    <LogIn/>
+                                }/>
+                                <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
+                                    <RequireAuthn children={
+                                        <Dashboard/>
+                                    }/>
+                                }/>
+                                <Route path='/calendar/:userId' element={ // TODO: maybe, change path name
+                                    <RequireAuthn children={
+                                        <Calendar/>
+                                    }/>
+                                }/>
+                                <Route path="*" element={<NotFoundPage/>}/>
+                            </Routes>
+                        </ErrorController>
+                    </AppDashboard>
+                </AuthnContainer>
+            </ErrorContainer>
         </BrowserRouter>
     )
 }
