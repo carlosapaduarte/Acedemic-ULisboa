@@ -8,7 +8,7 @@ import {AuthnContainer} from './components/auth/Authn';
 import {NotFoundPage} from "./Pages/NotFoundPage";
 import AppDashboard from "./AppDashboard";
 import Calendar from './components/Calendar';
-import { Dashboard } from '@mui/icons-material';
+import Dashboard from './components/Dashboard';
 
 function App() {
     return (

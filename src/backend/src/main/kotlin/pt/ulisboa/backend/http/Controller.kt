@@ -48,12 +48,22 @@ class Controller(val service: Service) {
 
     @GetMapping("/ping")
     fun ping() = "pong"
-    
+
+    // TODO: later use {id} param
     @PostMapping("users/{id}/notes")
-    fun createNewUserGoal(
-        @RequestBody inputDto: NewUserGoalDto
+    fun createNewUserNote(
+        @RequestBody inputDto: NewUserNoteDto
     ) {
         println(Date(inputDto.date).time)
         service.createNewUserNote(inputDto.id, inputDto.name, Date(inputDto.date))
+    }
+
+    // TODO: later use {id} param
+    @PostMapping("users/{id}/completed-goals")
+    fun addCompletedGoal(
+        @RequestBody inputDto: GoalCompletedDto
+    ) {
+        println(Date(inputDto.date).time)
+        service.addCompletedGoal(inputDto.id, inputDto.goalName, Date(inputDto.date))
     }
 }

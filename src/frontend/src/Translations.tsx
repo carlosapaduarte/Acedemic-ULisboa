@@ -29,7 +29,8 @@ i18next
                     "current_challenge": "Current Challenge",
                     "my_notes": "My Notes",
                     "add_note": "Add A Note",
-                    "confirm_new_note": "Submit"
+                    "confirm_new_note": "Submit",
+                    "mark_complete": "Mark Complete"
                 }
             },
             pt: {
@@ -49,7 +50,8 @@ i18next
                     "current_challenge": "Objetivo Para Hoje",
                     "my_notes": "As Minhas Notas",
                     "add_note": "Adcionar Uma Nota",
-                    "confirm_new_note": "Adicionar Nota"
+                    "confirm_new_note": "Adicionar Nota",
+                    "mark_complete": "Marcar Como Completo"
                 }
             }
         },

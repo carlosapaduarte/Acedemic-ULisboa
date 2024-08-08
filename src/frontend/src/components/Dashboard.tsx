@@ -1,6 +1,6 @@
 import React, {useEffect, useReducer, useState} from "react";
 import {useParams} from "react-router-dom";
-import {service, UserNote, UserInfo} from '../service/service';
+import {service, UserNote, UserInfo, GoalAndDate} from '../service/service';
 import {Level1} from "../challenges/level_1";
 import {Level2} from "../challenges/level_2";
 import {DayGoals, Goal} from "../challenges/types";
@@ -8,12 +8,15 @@ import {Level3} from "../challenges/level_3";
 import {Logger} from "tslog";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { t } from "i18next";
+import { ifError } from "assert";
 
 const logger = new Logger({name: "Dashboard"});
 
 function Dashboard() {
     // This component should later display a Calendar with the challenges...
     // For now, let's simplify and only display the current challenge!
+
+    const {userId} = useParams<string>()
 
     /**
      * Determines initial quote to be displayed to user, based on current time of day.
@@ -34,7 +37,7 @@ function Dashboard() {
         }
     }
 
-    const {userId} = useParams<string>()
+    console.log('HEerre')
 
     let helloQuote = getHelloQuote()
 
@@ -66,7 +69,8 @@ type State =
     {
         type: "todaysGoals",
         goals: DayGoals,
-        notes: UserNote[]
+        notes: UserNote[],
+        todayCompletedGoals: string[] // just the goal name
     }
     |
     {
@@ -75,6 +79,11 @@ type State =
     |
     {
         type: 'submitNewNote'
+    }
+    |
+    {
+        type: 'submitGoalCompleted',
+        goal: Goal
     }
 
 type Action =
@@ -93,7 +102,8 @@ type Action =
     {
         type: "setTodaysGoals",
         goals: DayGoals,
-        notes: UserNote[]
+        notes: UserNote[],
+        todaysCompletedGoals: string[]
     }
     |
     {
@@ -102,6 +112,11 @@ type Action =
     |
     {
         type: 'setSubmitNewNote'
+    }
+    |
+    {
+        type: 'setSubmitGoalCompleted',
+        goal: Goal
     }
 
 function reducer(state: State, action: Action): State {
@@ -116,7 +131,7 @@ function reducer(state: State, action: Action): State {
             return {type: "error"}
         }
         case "setTodaysGoals": {
-            return {type: "todaysGoals", goals: action.goals, notes: action.notes}
+            return {type: "todaysGoals", goals: action.goals, notes: action.notes, todayCompletedGoals: action.todaysCompletedGoals}
         }
         case "setAddNewUserNote": {
             return {type: "addNewUserNote"}
@@ -124,11 +139,14 @@ function reducer(state: State, action: Action): State {
         case 'setSubmitNewNote': {
             return {type: 'submitNewNote'}
         }
+        case 'setSubmitGoalCompleted': {
+            return {type: 'submitGoalCompleted', goal: action.goal}
+        }
     }
 }
 
 function MainDashboardContent({userId}: { userId: number }) {
-    // In reality, there could be multiple Goals!!!
+    // In reality, there could be multiple Goals per day!!!
 
     const [state, dispatch] = useReducer(reducer, {type: 'challengesNotLoaded'})
     const [newNoteText, setNewNoteText] = useState("");
@@ -141,21 +159,29 @@ function MainDashboardContent({userId}: { userId: number }) {
                 return date1.getFullYear == date2.getFullYear && date1.getMonth == date2.getMonth && date1.getDate && date2.getDate
             }
 
-            function getTodaysGoals(allGoals: DayGoals[]): DayGoals | undefined {
+            function getTodayGoals(allGoals: DayGoals[]): DayGoals | undefined {
                 const today = new Date()
-                console.log('All goals: ', allGoals)
+                //console.log('All goals: ', allGoals)
                 return allGoals.find((goalsForTheDay: DayGoals) => sameDate(goalsForTheDay.date, today))
             }
 
-            function getTodaysNotes(allNotes: UserNote[]): UserNote[] {
+            function getTodayNotes(allNotes: UserNote[]): UserNote[] {
                 const today = new Date()
                 return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date), today))
+            }
+
+            function getTodayCompletedGoals(completedGoals: GoalAndDate[]): string[] {
+                const today = new Date()
+                return completedGoals
+                    .filter((completedGoal: GoalAndDate) => sameDate(new Date(completedGoal.date), today))
+                    .map((v) => v.name)
             }
 
             dispatch({type: 'setLoading'})
 
             // TODO: in future, request only today's goals
             const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userId)
+            console.log('User Info: ', userInfo)
 
             if (userInfo == undefined) {
                 dispatch({type: 'setError'})
@@ -181,18 +207,26 @@ function MainDashboardContent({userId}: { userId: number }) {
 
             // Should never be undefined!
             // TODO: handle error when undefined later
-            const todaysGoals: DayGoals = getTodaysGoals(goals)!
-            const todaysNotes: UserNote[] = getTodaysNotes(userInfo.userNotes)
+            const todaysGoals: DayGoals = getTodayGoals(goals)!
+            const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes)
+            const todaysCompletedGoals: string[] = getTodayCompletedGoals(userInfo.completedGoals)
 
             dispatch({
                 type: 'setTodaysGoals',
                 goals: todaysGoals,
-                notes: todaysNotes
+                notes: todaysNotes,
+                todaysCompletedGoals: todaysCompletedGoals
             })
         }
 
         async function submitNewNote() {
-            const result = service.createNewUserNote(userId, newNoteText, new Date()) // TODO: handle error later
+            const result = await service.createNewUserNote(userId, newNoteText, new Date()) // TODO: handle error later
+            dispatch({type: 'setChallengesNotLoaded'}) // this triggers a new refresh. TODO: improve later
+        }
+
+        async function submitGoalCompleted(goal: Goal) {
+            const result = await service.markGoalAsCompleted(userId, goal.title, new Date()) // TODO: handle error later
+            //console.log('After Goal completed!')
             dispatch({type: 'setChallengesNotLoaded'}) // this triggers a new refresh. TODO: improve later
         }
 
@@ -201,6 +235,10 @@ function MainDashboardContent({userId}: { userId: number }) {
 
         if (state.type == 'submitNewNote')
             submitNewNote()
+
+        if (state.type == 'submitGoalCompleted')
+            submitGoalCompleted(state.goal)
+            
 
     }, [state])
 
@@ -212,12 +250,16 @@ function MainDashboardContent({userId}: { userId: number }) {
         dispatch({type: 'setSubmitNewNote'})
     }
 
+    function onMarkCompleteClickHandler(goal: Goal) {
+        dispatch({type: 'setSubmitGoalCompleted', goal: goal})
+    }
+
     if (state.type == 'todaysGoals') {
-        console.log(state.goals)
+        //console.log(state.goals)
         return (
             <Box>
                 <Button variant="contained" onClick={onAddNewNoteClickHandler}>{t("dashboard:add_note")}</Button>
-                <Goals goals={state.goals.goals} />
+                <Goals goals={state.goals.goals} completedGoals={state.todayCompletedGoals} onMarkComplete={onMarkCompleteClickHandler} />
                 <DisplayUserNotes notes={state.notes} />
             </Box>
         )
@@ -244,19 +286,27 @@ function MainDashboardContent({userId}: { userId: number }) {
     
 }
 
-function Goals({goals}: { goals: Goal[] }) {
+function Goals({goals, completedGoals, onMarkComplete}: { goals: Goal[], completedGoals: string[], onMarkComplete: (goal: Goal) => void }) {
+
+    // Per goal, there is a "Mark Complete" button
     return (
         <Box>
             <Typography variant="h4">{t("dashboard:current_challenge")}</Typography>
             {goals.map((goal: Goal) => {
                 return (
-                    <Box>
+                    <Box key={goal.title}>
                         <Typography variant="h5">{goal.title}</Typography>
                         <Typography variant="h6">{goal.description}</Typography>
+                        {
+                            // Depends if goal is or not completed
+                            completedGoals.find((completedGoalName) => goal.title == completedGoalName) ?
+                                <></>
+                                :
+                                <Button variant="contained" onClick={() => onMarkComplete(goal)}>{t("dashboard:mark_complete")}</Button>
+                        }
                     </Box>
                 )
             })}
-            
         </Box>
     )
 }

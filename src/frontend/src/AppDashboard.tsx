@@ -18,10 +18,6 @@ export default function AppDashboard({children}: DashboardProps) {
 
     const [open, setOpen] = useState(false);
 
-    // If this value changes, this all component is re-executed, allowing to update
-    // the primary hrefs
-    const [logged, setLogged] = useState<boolean | undefined>(undefined)
-
     const toggleDrawer = () => {
         setOpen(!open)
     }

@@ -2,7 +2,7 @@ import MuiDrawer from "@mui/material/Drawer";
 import {Divider, List, ListItemButton, ListItemIcon, ListItemText, styled} from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import {CalendarMonth} from "@mui/icons-material";
-import React from "react";
+import React, { useState } from "react";
 import {useNavigate} from "react-router-dom";
 
 /**
@@ -47,11 +47,30 @@ export const drawerWidth: number = 200
 export const CustomDrawer = ({open}: { open: boolean }) => {
     const navigate = useNavigate()
 
+    // If this value changes, this component is re-executed, allowing to update
+    // the primary hrefs. For instance, if the user re-logs with another user,
+    // his user ID changes. Therefore, the routes in the side bar should change as well!
+    // TODO: confirm this later!
+    const [logged, setLogged] = useState<boolean | undefined>(undefined)
+
     return (
         <StyledDrawer variant="permanent" open={open}>
             <List component="nav">
                 {
                     mainListItems.map((item) => {
+                        
+                        // Checks if href has a param, which needs to be replaced
+                        if (item.href.includes(':userId')) {
+                            
+                            // Remember: later we won't user cache. This is a solution just for the moment
+                            const userId = localStorage['userId']
+                            if (userId == undefined) {
+                                item.href = '/log-in'
+                                return
+                            }
+                            item.href = item.href.replace(':userId', userId)
+                        }
+
                         return (
                             <ListItemButton onClick={() => navigate(item.href)} key={item.name}>
                                 <ListItemIcon>

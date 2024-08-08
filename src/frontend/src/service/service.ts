@@ -1,5 +1,6 @@
 // This component could be used to define functions that interact with the Backend and other external services.
 
+import { Goal } from "../challenges/types";
 import {doFetch, toBody} from "./fetch"
 import {Logger} from "tslog";
 
@@ -50,6 +51,12 @@ export type UserNote = {
     date: number
 }
 
+// Almost like DayAndGoal but without goal description
+export type GoalAndDate = {
+    name: string;
+    date: number
+}
+
 // User info
 export type UserInfo = {
     id: number,
@@ -57,7 +64,8 @@ export type UserInfo = {
     level: number,
     startDate: number,
     shareProgress: boolean,
-    userNotes: UserNote[]
+    userNotes: UserNote[],
+    completedGoals: GoalAndDate[]
 };
 
 async function fetchUserInfoFromApi(userId: number): Promise<UserInfo | undefined> {
@@ -87,10 +95,21 @@ async function createNewUserNote(userId: number, name: string, userGoalDate: Dat
     return response.ok
 }
 
+async function markGoalAsCompleted(userId: number, goalName: String, date: Date) {
+    const request = {
+        path: `users/${userId}/completed-goals`,
+        method: 'POST',
+        body: toBody({id: userId, goalName, date: date.getTime()}),
+    }
+    const response: Response = await doFetch(request)
+    return response.ok
+}
+
 export const service = {
     createUserOrLogin,
     chooseLevel,
     selectShareProgressState,
     fetchUserInfoFromApi,
-    createNewUserNote
+    createNewUserNote,
+    markGoalAsCompleted
 }

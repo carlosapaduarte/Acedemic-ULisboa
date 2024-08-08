@@ -1,6 +1,7 @@
 package pt.ulisboa.backend.service
 
 import org.springframework.stereotype.Service
+import pt.ulisboa.backend.dtos.GoalDto
 import pt.ulisboa.backend.dtos.UserNoteDto
 import pt.ulisboa.backend.dtos.UserInfo
 import pt.ulisboa.backend.repository.UsersRepository
@@ -34,7 +35,8 @@ class Service(val usersRepository: UsersRepository) {
             level = user.level,
             startDate = user.startDate.time,
             shareProgress = user.shareProgress,
-            userNotes = user.userNotes.map { userGoal -> UserNoteDto(name = userGoal.name, date = userGoal.date.time) }
+            userNotes = user.userNotes.map { userGoal -> UserNoteDto(name = userGoal.name, date = userGoal.date.time) },
+            completedGoals = user.completedGoals.map { completedGoal -> GoalDto(name = completedGoal.name, date = completedGoal.date.time) }.toSet(),
         )
     }
 
@@ -44,5 +46,9 @@ class Service(val usersRepository: UsersRepository) {
 
     fun createNewUserNote(userId: Int, name: String, date: Date) {
         usersRepository.addNewUserNote(userId, name, date)
+    }
+
+    fun addCompletedGoal(userId: Int, goalName: String, date: Date) {
+        usersRepository.addCompletedGoal(userId, goalName, date)
     }
 }
