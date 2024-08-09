@@ -52,7 +52,7 @@ i18next
                 "dashboard": {
                     "current_challenge": "Objetivo Para Hoje",
                     "my_notes": "As Minhas Notas",
-                    "add_note": "Adcionar Uma Nota",
+                    "add_note": "Adicionar Uma Nota",
                     "confirm_new_note": "Adicionar Nota",
                     "mark_complete": "Marcar Como Completo"
                 },
