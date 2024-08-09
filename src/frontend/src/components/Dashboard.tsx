@@ -1,15 +1,14 @@
 import React, {useEffect, useReducer, useState} from "react";
 import {useParams} from "react-router-dom";
-import {service, UserNote, UserInfo, GoalAndDate} from '../service/service';
+import {GoalAndDate, service, UserInfo, UserNote} from '../service/service';
 import {Level1} from "../challenges/level_1";
 import {Level2} from "../challenges/level_2";
 import {DayGoals, Goal} from "../challenges/types";
 import {Level3} from "../challenges/level_3";
 import {Logger} from "tslog";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { t } from "i18next";
-import { ifError } from "assert";
-import { useSetError } from "./error/ErrorContainer";
+import {Box, Button, TextField, Typography} from "@mui/material";
+import {t} from "i18next";
+import {useSetError} from "./error/ErrorContainer";
 
 const logger = new Logger({name: "Dashboard"});
 
@@ -119,7 +118,12 @@ function reducer(state: State, action: Action): State {
             return {type: "loading"}
         }
         case "setTodaysGoals": {
-            return {type: "todaysGoals", goals: action.goals, notes: action.notes, todayCompletedGoals: action.todaysCompletedGoals}
+            return {
+                type: "todaysGoals",
+                goals: action.goals,
+                notes: action.notes,
+                todayCompletedGoals: action.todaysCompletedGoals
+            }
         }
         case "setAddNewUserNote": {
             return {type: "addNewUserNote"}
@@ -144,8 +148,8 @@ function MainDashboardContent({userId}: { userId: number }) {
     useEffect(() => {
         async function fetchUserCurrentDayAndLoadGoals() {
 
-            function sameDate(date1: Date, date2: Date) {
-                return date1.getFullYear == date2.getFullYear && date1.getMonth == date2.getMonth && date1.getDate && date2.getDate
+            function sameDate(date1: Date, date2: Date): boolean {
+                return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate()
             }
 
             function getTodayGoals(allGoals: DayGoals[]): DayGoals | undefined {
@@ -177,18 +181,18 @@ function MainDashboardContent({userId}: { userId: number }) {
                 return
             }
 
-            const startDate: Date = new Date(userInfo.startDate)
+            const fetchedStartDate = new Date(2024, 7, 5, 22, 22, 22, 22) //new Date(userInfo.startDate) // Feel free to change for testing
 
             let goals: DayGoals[]
             switch (userInfo.level) {
                 case 1 :
-                    goals = Level1.level1Goals(startDate)
+                    goals = Level1.level1Goals(fetchedStartDate)
                     break
                 case 2 :
-                    goals = Level2.level2Goals(startDate)
+                    goals = Level2.level2Goals(fetchedStartDate)
                     break
                 case 3 :
-                    goals = Level3.level3Goals(startDate)
+                    goals = Level3.level3Goals(fetchedStartDate)
                     break
                 default :
                     return Promise.reject('TODO: error handling')
@@ -210,14 +214,14 @@ function MainDashboardContent({userId}: { userId: number }) {
 
         async function submitNewNote() {
             await service.createNewUserNote(userId, newNoteText, new Date()) // TODO: handle error later
-            .then(() => dispatch({type: 'setChallengesNotLoaded'})) // this triggers a new refresh. TODO: improve later)
-            .catch((error) => setError(error))
+                .then(() => dispatch({type: 'setChallengesNotLoaded'})) // this triggers a new refresh. TODO: improve later)
+                .catch((error) => setError(error))
         }
 
         async function submitGoalCompleted(goal: Goal) {
             await service.markGoalAsCompleted(userId, goal.title, new Date()) // TODO: handle error later
-            .then(() => dispatch({type: 'setChallengesNotLoaded'})) // this triggers a new refresh. TODO: improve later
-            .catch((error) => setError(error))
+                .then(() => dispatch({type: 'setChallengesNotLoaded'})) // this triggers a new refresh. TODO: improve later
+                .catch((error) => setError(error))
         }
 
         if (state.type == 'challengesNotLoaded')
@@ -228,7 +232,7 @@ function MainDashboardContent({userId}: { userId: number }) {
 
         if (state.type == 'submitGoalCompleted')
             submitGoalCompleted(state.goal)
-            
+
 
     }, [state])
 
@@ -249,14 +253,16 @@ function MainDashboardContent({userId}: { userId: number }) {
         return (
             <Box>
                 <Box display='flex' justifyContent={'right'}>
-                    <Button variant="contained" size="large" sx={{fontSize: "150%"}} onClick={onAddNewNoteClickHandler}>{t("dashboard:add_note")}</Button>
+                    <Button variant="contained" size="large" sx={{fontSize: "150%"}} onClick={onAddNewNoteClickHandler}>
+                        {t("dashboard:add_note")}
+                    </Button>
                 </Box>
-                <Goals goals={state.goals.goals} completedGoals={state.todayCompletedGoals} onMarkComplete={onMarkCompleteClickHandler} />
-                <DisplayUserNotes notes={state.notes} />
+                <Goals goals={state.goals.goals} completedGoals={state.todayCompletedGoals}
+                       onMarkComplete={onMarkCompleteClickHandler}/>
+                <DisplayUserNotes notes={state.notes}/>
             </Box>
         )
-    }
-    else if (state.type == 'addNewUserNote')
+    } else if (state.type == 'addNewUserNote')
         return (
             <Box display='flex' flexDirection='column'>
                 <TextField
@@ -268,7 +274,9 @@ function MainDashboardContent({userId}: { userId: number }) {
                         setNewNoteText(event.target.value)
                     }}
                 />
-                <Button variant="contained" sx={{width: '15%'}} onClick={onConfirmNewNoteSubmitClickHandler}>{t("dashboard:confirm_new_note")}</Button>
+                <Button variant="contained" sx={{width: '15%'}} onClick={onConfirmNewNoteSubmitClickHandler}>
+                    {t("dashboard:confirm_new_note")}
+                </Button>
             </Box>
         )
     else
@@ -276,10 +284,14 @@ function MainDashboardContent({userId}: { userId: number }) {
         return (
             <></>
         )
-    
+
 }
 
-function Goals({goals, completedGoals, onMarkComplete}: { goals: Goal[], completedGoals: string[], onMarkComplete: (goal: Goal) => void }) {
+function Goals({goals, completedGoals, onMarkComplete}: {
+    goals: Goal[],
+    completedGoals: string[],
+    onMarkComplete: (goal: Goal) => void
+}) {
 
     // Per goal, there is a "Mark Complete" button
     return (
@@ -290,13 +302,17 @@ function Goals({goals, completedGoals, onMarkComplete}: { goals: Goal[], complet
                 return (
                     <Box key={goal.title} display="flex" flexDirection="column" justifyContent="start">
                         <Typography variant="h5" align="left" width="20%" marginBottom="1%">{goal.title}</Typography>
-                        <Typography fontSize="110%" align="left" width="100%" marginBottom="1%">{goal.description}</Typography>
+                        <Typography fontSize="110%" align="left" width="100%" marginBottom="1%">
+                            {goal.description}
+                        </Typography>
                         {
                             // Depends if goal is or not completed
                             completedGoals.find((completedGoalName) => goal.title == completedGoalName) ?
                                 <></>
                                 :
-                                <Button variant="contained" sx={{width: "20%", marginBottom: "3%"}} onClick={() => onMarkComplete(goal)}>{t("dashboard:mark_complete")}</Button>
+                                <Button variant="contained" sx={{width: "20%", marginBottom: "3%"}}
+                                        onClick={() => onMarkComplete(goal)}>{t("dashboard:mark_complete")}
+                                </Button>
                         }
                     </Box>
                 )
@@ -317,7 +333,7 @@ function DisplayUserNotes({notes}: { notes: UserNote[] }) {
                     </Box>
                 )
             })}
-            
+
         </Box>
     )
 }
