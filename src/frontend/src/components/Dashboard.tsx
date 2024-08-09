@@ -25,15 +25,15 @@ function Dashboard() {
         const hourOfDay = new Date().getHours();
         switch (true) {
             case hourOfDay < 5:
-                return 'Good Night'
+                return t("hello_quote:night")
             case hourOfDay < 12:
-                return 'Good Morning'
+                return t("hello_quote:morning")
             case hourOfDay < 17:
-                return 'Good Afternoon'
+                return t("hello_quote:afternoon")
             case hourOfDay < 20:
-                return 'Good Evening'
+                return t("hello_quote:evening")
             default:
-                return 'Good Night'
+                return t("hello_quote:night")
         }
     }
 
@@ -43,8 +43,8 @@ function Dashboard() {
 
     return (
         <Box padding="3%">
-            <Typography variant="h3" align="left" marginBottom="0.5%">{helloQuote} {userId}</Typography>
-            <Typography variant="h5" align="left">Best way to break a habit is to drop it</Typography>
+            <Typography variant="h3" align="left" marginBottom="0.5%">{helloQuote}, {userId}</Typography>
+            <Typography variant="h5" align="left">{t("dashboard:main_message")}</Typography>
             <br/>
             <MainDashboardContent userId={Number(userId)}/>
         </Box>
