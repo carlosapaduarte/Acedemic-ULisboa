@@ -38,16 +38,14 @@ function Dashboard() {
         }
     }
 
-    console.log('HEerre')
-
     let helloQuote = getHelloQuote()
 
     // TODO: improve error handling if [userId] is not a Number
 
     return (
-        <Box>
-            <h1>{helloQuote} {userId}</h1>
-            <h2>Best way to break a habit is to drop it.</h2>
+        <Box padding="3%">
+            <Typography variant="h3" align="left" marginBottom="0.5%">{helloQuote} {userId}</Typography>
+            <Typography variant="h5" align="left">Best way to break a habit is to drop it</Typography>
             <br/>
             <MainDashboardContent userId={Number(userId)}/>
         </Box>
@@ -250,7 +248,9 @@ function MainDashboardContent({userId}: { userId: number }) {
         //console.log(state.goals)
         return (
             <Box>
-                <Button variant="contained" onClick={onAddNewNoteClickHandler}>{t("dashboard:add_note")}</Button>
+                <Box display='flex' justifyContent={'right'}>
+                    <Button variant="contained" size="large" sx={{fontSize: "150%"}} onClick={onAddNewNoteClickHandler}>{t("dashboard:add_note")}</Button>
+                </Box>
                 <Goals goals={state.goals.goals} completedGoals={state.todayCompletedGoals} onMarkComplete={onMarkCompleteClickHandler} />
                 <DisplayUserNotes notes={state.notes} />
             </Box>
@@ -258,16 +258,17 @@ function MainDashboardContent({userId}: { userId: number }) {
     }
     else if (state.type == 'addNewUserNote')
         return (
-            <Box>
+            <Box display='flex' flexDirection='column'>
                 <TextField
+                    sx={{marginBottom: '2%', width: "60%"}}
                     id="outlined-controlled"
-                    label="Controlled"
+                    label="Note Description"
                     value={newNoteText}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setNewNoteText(event.target.value)
                     }}
                 />
-                <Button variant="contained" onClick={onConfirmNewNoteSubmitClickHandler}>{t("dashboard:confirm_new_note")}</Button>
+                <Button variant="contained" sx={{width: '15%'}} onClick={onConfirmNewNoteSubmitClickHandler}>{t("dashboard:confirm_new_note")}</Button>
             </Box>
         )
     else
@@ -283,18 +284,19 @@ function Goals({goals, completedGoals, onMarkComplete}: { goals: Goal[], complet
     // Per goal, there is a "Mark Complete" button
     return (
         <Box>
-            <Typography variant="h4">{t("dashboard:current_challenge")}</Typography>
+            <Typography variant="h4" align="left" width="50%">{t("dashboard:current_challenge")}</Typography>
+            <br/>
             {goals.map((goal: Goal) => {
                 return (
-                    <Box key={goal.title}>
-                        <Typography variant="h5">{goal.title}</Typography>
-                        <Typography variant="h6">{goal.description}</Typography>
+                    <Box key={goal.title} display="flex" flexDirection="column" justifyContent="start">
+                        <Typography variant="h5" align="left" width="20%" marginBottom="1%">{goal.title}</Typography>
+                        <Typography fontSize="110%" align="left" width="100%" marginBottom="1%">{goal.description}</Typography>
                         {
                             // Depends if goal is or not completed
                             completedGoals.find((completedGoalName) => goal.title == completedGoalName) ?
                                 <></>
                                 :
-                                <Button variant="contained" onClick={() => onMarkComplete(goal)}>{t("dashboard:mark_complete")}</Button>
+                                <Button variant="contained" sx={{width: "20%", marginBottom: "3%"}} onClick={() => onMarkComplete(goal)}>{t("dashboard:mark_complete")}</Button>
                         }
                     </Box>
                 )
@@ -306,11 +308,12 @@ function Goals({goals, completedGoals, onMarkComplete}: { goals: Goal[], complet
 function DisplayUserNotes({notes}: { notes: UserNote[] }) {
     return (
         <Box>
-            <Typography variant="h4">{t("dashboard:my_notes")}</Typography>
+            <Typography variant="h6" align="left">{t("dashboard:my_notes")}</Typography>
+            <br/>
             {notes.map((note: UserNote) => {
                 return (
                     <Box key={note.name}>
-                        <Typography variant="h5">{note.name}</Typography>
+                        <Typography fontSize="110%" align="left" fontStyle='italic'>{note.name}</Typography>
                     </Box>
                 )
             })}
