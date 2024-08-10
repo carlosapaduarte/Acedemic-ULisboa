@@ -33,11 +33,12 @@ i18next
                 },
                 "dashboard": {
                     "main_message": "Best way to break a habit is to drop it",
-                    "current_challenge": "Current Challenge",
+                    "current_challenge": "Today's Challenges",
                     "my_notes": "My Notes",
                     "add_note": "Add A Note",
                     "confirm_new_note": "Submit",
-                    "mark_complete": "Mark Complete"
+                    "mark_complete": "Mark Complete",
+                    "goal_completed": "Objective Complete!"
                 },
                 "error": {
                     "title": "An Error Occurred"
@@ -64,11 +65,12 @@ i18next
                 },
                 "dashboard": {
                     "main_message": "A melhor maneira de quebrar um hábito é largá-lo",
-                    "current_challenge": "Objetivo Para Hoje",
+                    "current_challenge": "Objetivos Para Hoje",
                     "my_notes": "As Minhas Notas",
                     "add_note": "Adicionar Uma Nota",
                     "confirm_new_note": "Adicionar Nota",
-                    "mark_complete": "Marcar Como Completo"
+                    "mark_complete": "Marcar Como Completo",
+                    "goal_completed": "Objetivo Completo!"
                 },
                 "error": {
                     "title": "Ocorreu um erro"
