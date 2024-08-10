@@ -11,6 +11,7 @@ import Calendar from './components/Calendar';
 import Dashboard from './components/Dashboard';
 import { ErrorController } from './components/error/ErrorController';
 import { ErrorContainer } from './components/error/ErrorContainer';
+import { NewCalendar } from './components/NewCalendar';
 
 function App() {
     return (
@@ -45,6 +46,9 @@ function Router() {
                                     <RequireAuthn children={
                                         <Calendar/>
                                     }/>
+                                }/>
+                                <Route path='/c' element={ // TODO: maybe, change path name
+                                    <NewCalendar/>
                                 }/>
                                 <Route path="*" element={<NotFoundPage/>}/>
                             </Routes>
