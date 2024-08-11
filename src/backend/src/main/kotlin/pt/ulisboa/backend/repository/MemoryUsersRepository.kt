@@ -1,8 +1,9 @@
 package pt.ulisboa.backend.repository
 
 import pt.ulisboa.backend.http.exceptions.NotFoundException
+import pt.ulisboa.backend.repository.domain.Goal
 import pt.ulisboa.backend.repository.domain.User
-import pt.ulisboa.backend.repository.domain.UserGoal
+import pt.ulisboa.backend.repository.domain.UserNote
 import java.util.*
 
 @org.springframework.stereotype.Repository
@@ -11,7 +12,7 @@ class MemoryUsersRepository : UsersRepository {
     val users = mutableMapOf<Int, User>()
 
     override fun createUser(id: Int, username: String) {
-        users[id] = User(id, username, 1, Date(), false)
+        users[id] = User(id, username, 1, avatarFilename = null, Date(), false)
     }
 
     override fun existsUser(id: Int): Boolean {
@@ -32,8 +33,18 @@ class MemoryUsersRepository : UsersRepository {
         users[id] = user.copy(shareProgress = publishState)
     }
 
-    override fun addNewUserGoal(userId: Int, name: String, date: Date) {
+    override fun addNewUserNote(userId: Int, name: String, date: Date) {
         val user = users[userId] ?: throw NotFoundException("User not found")
-        users[userId] = user.copy(userGoals = user.userGoals.toMutableList().apply { add(UserGoal(name, date)) })
+        users[userId] = user.copy(userNotes = user.userNotes.toMutableList().apply { add(UserNote(name, date)) })
+    }
+
+    override fun addCompletedGoal(userId: Int, goalName: String, date: Date) {
+        val user = users[userId] ?: throw NotFoundException("User not found")
+        users[userId] = user.copy(completedGoals = user.completedGoals.toMutableSet().apply { add(Goal(goalName, date)) })
+    }
+
+    override fun setUserAvatar(userId: Int, avatarFilename: String) {
+        val user = users[userId] ?: throw NotFoundException("User not found")
+        users[userId] = user.copy(avatarFilename = avatarFilename)
     }
 }

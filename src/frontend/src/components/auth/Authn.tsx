@@ -2,6 +2,7 @@ import * as React from 'react'
 import {createContext, useContext, useEffect, useState} from 'react'
 import {Logger} from "tslog";
 import {service} from '../../service/service';
+import { useSetError } from '../error/ErrorContainer';
 
 const logger = new Logger({name: "Authn"});
 type ContextType = {
@@ -16,6 +17,7 @@ const LoggedInContext = createContext<ContextType>({
 
 export function AuthnContainer({children}: { children: React.ReactNode }) {
     const [logged, setLogged] = useState<boolean | undefined>(undefined)
+    const setError = useSetError()
 
     useEffect(() => {
         async function fetchUser() {
@@ -29,14 +31,12 @@ export function AuthnContainer({children}: { children: React.ReactNode }) {
                 setLogged(false)
                 return
             }
-            const isLogged = await service.createUserOrLogin(cachedUserId) // if user ID is invalid, returns false
-            if (isLogged) {
+            await service.createUserOrLogin(cachedUserId) // if user ID is invalid, returns false
+            .then(() => {
                 logger.debug("User is logged in")
                 setLogged(true)
-            } else {
-                logger.debug("User is not logged in")
-                setLogged(false)
-            }
+            })
+            .catch((error) => setError(error))
         }
 
         fetchUser()

@@ -2,6 +2,12 @@ import React, {useReducer, useState} from "react";
 import {Navigate} from 'react-router-dom';
 import {service} from '../service/service';
 import {useSetIsLoggedIn} from "./auth/Authn";
+import { useSetError } from "./error/ErrorContainer";
+import { Box, Typography } from "@mui/material";
+import { t } from "i18next";
+import { LevelType, SelectLevelComponent } from "../SelectLevel";
+import { LanguageVariant } from "typescript";
+import AvatarSelection from "./Avatar";
 
 type State =
     {
@@ -20,6 +26,11 @@ type State =
     |
     {
         type: "quiz",
+        userId: number
+    }
+    |
+    {
+        type: "selectAvatar",
         userId: number
     }
     |
@@ -45,6 +56,11 @@ type Action =
     }
     |
     {
+        type: "setSelectAvatar",
+        userId: number
+    }
+    |
+    {
         type: "setRedirect",
         userId: number
     }
@@ -59,6 +75,9 @@ function reducer(state: State, action: Action): State {
         }
         case "setQuiz": {
             return {type: "quiz", userId: action.userId}
+        }
+        case "setSelectAvatar": {
+            return {type: "selectAvatar", userId: action.userId}
         }
         case "setRedirect": {
             return {type: "redirect", userId: action.userId}
@@ -95,12 +114,14 @@ function LogIn() {
     else if (state.type === "shareProgress")
         return <ShareProgress userId={state.userId} onShareSelected={() => handleOnShareClick(state.userId)}/>
     else if (state.type === "chooseLevel")
-        return <ChooseLevel userId={state.userId}
-                            onLevelSelected={() => dispatch({type: 'setRedirect', userId: state.userId})}
-                            onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
+        return <SelectLevel userId={state.userId}
+                    onLevelSelected={() => dispatch({type: 'setSelectAvatar', userId: state.userId})}
+                    onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
     else if (state.type === "quiz")
         return <Quiz userId={state.userId}
-                     onLevelSelected={() => dispatch({type: 'setRedirect', userId: state.userId})}/>
+            onLevelSelected={() => dispatch({type: 'setSelectAvatar', userId: state.userId})}/>
+    else if (state.type === "selectAvatar")
+        return <Avatar userId={state.userId} onComplete={() => dispatch({type: 'setRedirect', userId: state.userId})}/>
     else if (state.type == 'redirect')
         return <Navigate to={`/dashboard/${state.userId}`} replace={true}/>
     else
@@ -111,6 +132,7 @@ const MAX_USER_ID = 9999
 
 function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
     const setIsLoggedIn = useSetIsLoggedIn()
+    const setError = useSetError()
 
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
@@ -123,20 +145,18 @@ function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
       (...Just a suggestion...)
     */
 
-    const [error, setError] = useState<boolean | undefined>(undefined)
     const [userId, setUserId] = useState<number | undefined>(undefined)
 
     async function createUser() {
         const userId = Math.floor(Math.random() * MAX_USER_ID)
-        const created = await service.createUserOrLogin(userId)
-        if (created) {
-
+        await service.createUserOrLogin(userId)
+        .then(() => {
             // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
             localStorage['userId'] = userId.toString();
             setIsLoggedIn(true) // Sets - user logged in - in auth container
-        }
-        setUserId(userId)
-        setError(!created)
+            setUserId(userId)            
+        })
+        .catch((error) => setError(error))
     }
 
     if (userId != undefined)
@@ -144,13 +164,6 @@ function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
             <div>
                 <h1>User created!</h1>
                 <button onClick={() => onAuthDone(userId)}>Click here to advance</button>
-            </div>
-        )
-
-    if (error)
-        return (
-            <div>
-                <h1>There was an error creating the user!</h1>
             </div>
         )
     else
@@ -163,11 +176,12 @@ function UserInfo({onAuthDone}: { onAuthDone: (userId: number) => void }) {
 }
 
 function ShareProgress({userId, onShareSelected}: { userId: number, onShareSelected: () => void }) {
+    const setError = useSetError()
 
     async function selectShareProgressState(shareProgress: boolean) {
-        const success = await service.selectShareProgressState(userId, shareProgress)
-        if (success)
-            onShareSelected()
+        await service.selectShareProgressState(userId, shareProgress)
+            .then(() => onShareSelected())
+            .catch((error) => setError(error))
     }
 
     return (
@@ -180,52 +194,25 @@ function ShareProgress({userId, onShareSelected}: { userId: number, onShareSelec
     );
 }
 
-enum Level {LEVEL_1, LEVEL_2, LEVEL_3}
-
-async function chooseLevel(userId: number, level: Level): Promise<boolean> {
-    let levelNumber = -1
-    switch (level) {
-        case Level.LEVEL_1 :
-            levelNumber = 1
-            break
-        case Level.LEVEL_2 :
-            levelNumber = 2
-            break
-        case Level.LEVEL_3 :
-            levelNumber = 3
-            break
-    }
-    return await service.chooseLevel(userId, levelNumber) // returns if was successfull or not
-}
-
-function ChooseLevel({userId, onLevelSelected, onStartQuizClick}: {
+function SelectLevel({userId, onLevelSelected, onStartQuizClick}: {
     userId: number,
     onLevelSelected: () => void,
     onStartQuizClick: () => void
 }) {
+    const setError = useSetError()
 
-    async function chooseLevelLocal(level: Level) {
-        const success = await chooseLevel(userId, level)
-
-        // TODO: handle in case of error later
-        if (success)
-            onLevelSelected()
+    async function chooseLevelLocal(level: LevelType) {
+        await service.chooseLevel(userId, level) // returns if was successfull or not
+        .then(() => onLevelSelected())
+        .catch((error) => setError(error))
     }
 
+    // For now, no confirm button...
+    // For now, no quiz button...
+    // TODO
+
     return (
-        <div>
-            <h1>Choose Desired Level!</h1>
-            <br/>
-            <button onClick={() => chooseLevelLocal(Level.LEVEL_1)}>Nível 1: Iniciante</button>
-            <br/>
-            <button onClick={() => chooseLevelLocal(Level.LEVEL_2)}>Nível 2: Intermédio</button>
-            <br/>
-            <button onClick={() => chooseLevelLocal(Level.LEVEL_3)}>Nível 3: Avançado… já se sente com um bom nível de
-                eficácia e está…
-            </button>
-            <br/>
-            <button onClick={() => onStartQuizClick()}>Não sei o meu nível</button>
-        </div>
+        <SelectLevelComponent.SelectLevel onLevelClick={chooseLevelLocal} />
     );
 }
 
@@ -248,6 +235,7 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
     // Not fully implemented yet because the requirements are not yet fully decided
 
     const [answers, setAnswers] = useState<boolean[]>(new Array(10).fill(undefined))
+    const setError = useSetError()
 
     function onAnswerClick(questionNumber: number, answer: boolean) {
         const newAnswers: boolean[] = answers.slice()
@@ -257,12 +245,12 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
 
     async function computeLevel() {
         // TODO: compute level based on answers
-        const computedLevel: Level = Level.LEVEL_1
+        const computedLevel: LevelType = LevelType.LEVEL_1
 
         // TODO: handle in case of error later
-        const success = await chooseLevel(userId, computedLevel)
-        if (success)
-            onLevelSelected()
+        await service.chooseLevel(userId, computedLevel) // returns if was successfull or not
+        .then(() => onLevelSelected())
+        .catch((error) => setError(error))
     }
 
     return (
@@ -283,6 +271,18 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
             <button onClick={() => computeLevel()}>Confirmar respostas!</button>
         </div>
     );
+}
+
+function Avatar({userId, onComplete} : {userId: number, onComplete: () => void}) {
+    const setError = useSetError()
+
+    async function onAvatarClickHandler(avatarFilename: string) {
+        await service.selectAvatar(userId, avatarFilename)
+            .then(() => onComplete())
+            .catch((error) => setError(error))
+    }
+
+    return <AvatarSelection onAvatarClick={onAvatarClickHandler}/>
 }
 
 export default LogIn;

@@ -41,6 +41,13 @@ class Controller(val service: Service) {
         service.setShareProgressPreference(inputDto.id, inputDto.shareProgress)
     }
 
+    @PostMapping("/set-user-avatar")
+    fun setUserAvatar(
+        @RequestBody inputDto: SetUserAvatarDto
+    ) {
+        service.setUserAvatar(inputDto.id, inputDto.avatarFilename)
+    }
+
     @GetMapping("/users/{id}")
     fun getUserInfo(
         @PathVariable("id") userId: Int
@@ -48,12 +55,22 @@ class Controller(val service: Service) {
 
     @GetMapping("/ping")
     fun ping() = "pong"
-    
-    @PostMapping("users/{id}/goals")
-    fun createNewGoal(
-        @RequestBody inputDto: NewUserGoalDto
+
+    // TODO: later use {id} param
+    @PostMapping("users/{id}/notes")
+    fun createNewUserNote(
+        @RequestBody inputDto: NewUserNoteDto
     ) {
         println(Date(inputDto.date).time)
-        service.createNewUserGoal(inputDto.id, inputDto.name, Date(inputDto.date))
+        service.createNewUserNote(inputDto.id, inputDto.name, Date(inputDto.date))
+    }
+
+    // TODO: later use {id} param
+    @PostMapping("users/{id}/completed-goals")
+    fun addCompletedGoal(
+        @RequestBody inputDto: GoalCompletedDto
+    ) {
+        println(Date(inputDto.date).time)
+        service.addCompletedGoal(inputDto.id, inputDto.goalName, Date(inputDto.date))
     }
 }

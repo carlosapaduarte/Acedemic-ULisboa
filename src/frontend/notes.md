@@ -27,4 +27,14 @@ Main source: [Top React calendar component libraries](https://retool.com/blog/be
 
 ## Overall Styling
 
-Check this one: [MUI](https://mui.com/).
+Check this one: [MUI](https://mui.com/);
+
+## Future Optimizations
+
+- Use useCallback()'s in Frontend.
+
+## TODO
+
+- Um user pode marcar um desafiu nao completado mais tarde como completado. Mas se marcarmos como completado noutro dia, essa info vai ter de ser guardada (que foi realizado noutro dia);
+- Os challenges nao podem ser atrasados. Se nao forem completados, o dia seguinte vai sempre ficar com o prox desafio;
+- Fazer ecra dos Badges (talvez esperar pelo design...)

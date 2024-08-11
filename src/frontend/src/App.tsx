@@ -1,13 +1,18 @@
 import React from 'react';
 import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
+import WelcomePage from './components/WelcomePage';
+import LogIn from './components/LogIn';
+import {RequireAuthn} from './components/auth/RequireAuthn';
 import {AuthnContainer} from './components/auth/Authn';
-import AppDashboard from "./AppDashboard";
-import WelcomePage from "./components/WelcomePage";
-import LogIn from "./components/LogIn";
-import {RequireAuthn} from "./components/auth/RequireAuthn";
 import {NotFoundPage} from "./Pages/NotFoundPage";
-import Dashboard from "./components/Dashboard";
+import AppDashboard from "./AppDashboard";
+import Calendar from './components/Calendar';
+import Dashboard from './components/Dashboard';
+import { ErrorController } from './components/error/ErrorController';
+import { ErrorContainer } from './components/error/ErrorContainer';
+import { NewCalendar } from './components/NewCalendar';
+import AvatarSelection from './components/Avatar';
 
 function App() {
     return (
@@ -22,24 +27,39 @@ function App() {
 function Router() {
     return (
         <BrowserRouter>
-            <AuthnContainer>
-                <AppDashboard>
-                    <Routes>
-                        <Route path='/' element={
-                            <WelcomePage/>
-                        }/>
-                        <Route path='/log-in' element={
-                            <LogIn/>
-                        }/>
-                        <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
-                            <RequireAuthn children={
-                                <Dashboard/>
-                            }/>
-                        }/>
-                        <Route path="*" element={<NotFoundPage/>}/>
-                    </Routes>
-                </AppDashboard>
-            </AuthnContainer>
+            <ErrorContainer>
+                <AuthnContainer>
+                    <AppDashboard>
+                        <ErrorController>
+                            <Routes>
+                                <Route path='/' element={
+                                    <WelcomePage/>
+                                }/>
+                                <Route path='/log-in' element={
+                                    <LogIn/>
+                                }/>
+                                <Route path='/dashboard/:userId' element={ // TODO: maybe, change path name
+                                    <RequireAuthn children={
+                                        <Dashboard/>
+                                    }/>
+                                }/>
+                                <Route path='/calendar/:userId' element={ // TODO: maybe, change path name
+                                    <RequireAuthn children={
+                                        <Calendar/>
+                                    }/>
+                                }/>
+                                <Route path='/c' element={ // TODO: maybe, change path name
+                                    <NewCalendar/>
+                                }/>
+                                <Route path='/a' element={ // TODO: maybe, change path name
+                                    <AvatarSelection onAvatarClick={() => console.log()}/>
+                                }/>
+                                <Route path="*" element={<NotFoundPage/>}/>
+                            </Routes>
+                        </ErrorController>
+                    </AppDashboard>
+                </AuthnContainer>
+            </ErrorContainer>
         </BrowserRouter>
     )
 }
