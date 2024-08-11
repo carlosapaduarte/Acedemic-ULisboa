@@ -41,6 +41,13 @@ class Controller(val service: Service) {
         service.setShareProgressPreference(inputDto.id, inputDto.shareProgress)
     }
 
+    @PostMapping("/set-user-avatar")
+    fun setUserAvatar(
+        @RequestBody inputDto: SetUserAvatarDto
+    ) {
+        service.setUserAvatar(inputDto.id, inputDto.avatarFilename)
+    }
+
     @GetMapping("/users/{id}")
     fun getUserInfo(
         @PathVariable("id") userId: Int

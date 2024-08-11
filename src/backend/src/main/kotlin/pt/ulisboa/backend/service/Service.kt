@@ -36,7 +36,11 @@ class Service(val usersRepository: UsersRepository) {
             startDate = user.startDate.time,
             shareProgress = user.shareProgress,
             userNotes = user.userNotes.map { userGoal -> UserNoteDto(name = userGoal.name, date = userGoal.date.time) },
-            completedGoals = user.completedGoals.map { completedGoal -> GoalDto(name = completedGoal.name, date = completedGoal.date.time) }.toSet(),
+            completedGoals = user.completedGoals.map { completedGoal -> GoalDto(
+                name = completedGoal.name,
+                date = completedGoal.date.time
+            ) }.toSet(),
+            avatarFilename = user.avatarFilename
         )
     }
 
@@ -50,5 +54,9 @@ class Service(val usersRepository: UsersRepository) {
 
     fun addCompletedGoal(userId: Int, goalName: String, date: Date) {
         usersRepository.addCompletedGoal(userId, goalName, date)
+    }
+
+    fun setUserAvatar(userId: Int, userAvatar: String) {
+        usersRepository.setUserAvatar(userId, userAvatar)
     }
 }

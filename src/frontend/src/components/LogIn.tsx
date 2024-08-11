@@ -7,6 +7,7 @@ import { Box, Typography } from "@mui/material";
 import { t } from "i18next";
 import { LevelType, SelectLevelComponent } from "../SelectLevel";
 import { LanguageVariant } from "typescript";
+import AvatarSelection from "./Avatar";
 
 type State =
     {
@@ -25,6 +26,11 @@ type State =
     |
     {
         type: "quiz",
+        userId: number
+    }
+    |
+    {
+        type: "selectAvatar",
         userId: number
     }
     |
@@ -50,6 +56,11 @@ type Action =
     }
     |
     {
+        type: "setSelectAvatar",
+        userId: number
+    }
+    |
+    {
         type: "setRedirect",
         userId: number
     }
@@ -64,6 +75,9 @@ function reducer(state: State, action: Action): State {
         }
         case "setQuiz": {
             return {type: "quiz", userId: action.userId}
+        }
+        case "setSelectAvatar": {
+            return {type: "selectAvatar", userId: action.userId}
         }
         case "setRedirect": {
             return {type: "redirect", userId: action.userId}
@@ -101,11 +115,13 @@ function LogIn() {
         return <ShareProgress userId={state.userId} onShareSelected={() => handleOnShareClick(state.userId)}/>
     else if (state.type === "chooseLevel")
         return <SelectLevel userId={state.userId}
-                            onLevelSelected={() => dispatch({type: 'setRedirect', userId: state.userId})}
-                            onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
+                    onLevelSelected={() => dispatch({type: 'setSelectAvatar', userId: state.userId})}
+                    onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
     else if (state.type === "quiz")
         return <Quiz userId={state.userId}
-                     onLevelSelected={() => dispatch({type: 'setRedirect', userId: state.userId})}/>
+            onLevelSelected={() => dispatch({type: 'setSelectAvatar', userId: state.userId})}/>
+    else if (state.type === "selectAvatar")
+        return <Avatar userId={state.userId} onComplete={() => dispatch({type: 'setRedirect', userId: state.userId})}/>
     else if (state.type == 'redirect')
         return <Navigate to={`/dashboard/${state.userId}`} replace={true}/>
     else
@@ -178,22 +194,6 @@ function ShareProgress({userId, onShareSelected}: { userId: number, onShareSelec
     );
 }
 
-async function chooseLevel(userId: number, level: LevelType) {
-    let levelNumber = -1
-    switch (level) {
-        case LevelType.LEVEL_1 :
-            levelNumber = 1
-            break
-        case LevelType.LEVEL_2 :
-            levelNumber = 2
-            break
-        case LevelType.LEVEL_3 :
-            levelNumber = 3
-            break
-    }
-    await service.chooseLevel(userId, levelNumber) // returns if was successfull or not
-}
-
 function SelectLevel({userId, onLevelSelected, onStartQuizClick}: {
     userId: number,
     onLevelSelected: () => void,
@@ -202,7 +202,7 @@ function SelectLevel({userId, onLevelSelected, onStartQuizClick}: {
     const setError = useSetError()
 
     async function chooseLevelLocal(level: LevelType) {
-        chooseLevel(userId, level)
+        await service.chooseLevel(userId, level) // returns if was successfull or not
         .then(() => onLevelSelected())
         .catch((error) => setError(error))
     }
@@ -248,7 +248,7 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
         const computedLevel: LevelType = LevelType.LEVEL_1
 
         // TODO: handle in case of error later
-        await chooseLevel(userId, computedLevel)
+        await service.chooseLevel(userId, computedLevel) // returns if was successfull or not
         .then(() => onLevelSelected())
         .catch((error) => setError(error))
     }
@@ -271,6 +271,18 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
             <button onClick={() => computeLevel()}>Confirmar respostas!</button>
         </div>
     );
+}
+
+function Avatar({userId, onComplete} : {userId: number, onComplete: () => void}) {
+    const setError = useSetError()
+
+    async function onAvatarClickHandler(avatarFilename: string) {
+        await service.selectAvatar(userId, avatarFilename)
+            .then(() => onComplete())
+            .catch((error) => setError(error))
+    }
+
+    return <AvatarSelection onAvatarClick={onAvatarClickHandler}/>
 }
 
 export default LogIn;

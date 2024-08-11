@@ -1,6 +1,7 @@
 // This component could be used to define functions that interact with the Backend and other external services.
 
 import { Goal } from "../challenges/types";
+import { LevelType } from "../SelectLevel";
 import {doFetch, toBody} from "./fetch"
 import {Logger} from "tslog";
 
@@ -23,7 +24,7 @@ async function createUserOrLogin(userId: number) {
         return Promise.reject(new Error('User creation was not possible'))
 }
 
-async function chooseLevel(userId: number, level: number) {
+async function chooseLevel(userId: number, level: LevelType) {
     const request = {
         path: 'set-level',
         method: 'POST',
@@ -46,6 +47,18 @@ async function selectShareProgressState(userId: number, shareProgress: boolean) 
         return Promise.reject(new Error('Progress share preference selection failed!'))
 }
 
+async function selectAvatar(userId: number, avatarFilename: string) {
+    const request = {
+        path: 'set-user-avatar',
+        method: 'POST',
+        body: toBody({id: userId, avatarFilename}),
+    }
+    const response: Response = await doFetch(request)
+    //console.log(response)
+    if (!response.ok)
+        return Promise.reject(new Error('Avatar selection failed!'))
+}
+
 export type UserNote = {
     name: string;
     date: number
@@ -64,6 +77,7 @@ export type UserInfo = {
     level: number,
     startDate: number,
     shareProgress: boolean,
+    avatarFilename: string, // TODO: this could be undefined
     userNotes: UserNote[],
     completedGoals: GoalAndDate[]
 };
@@ -77,7 +91,7 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
 
     if (response.ok) {
         const responseObject: UserInfo = await response.json() // TODO: how 
-        //console.log(responseObject)
+        console.log("Here: ", responseObject)
         return responseObject
     } else
         return Promise.reject(new Error('User info could not be obtained!'))
@@ -111,6 +125,7 @@ export const service = {
     createUserOrLogin,
     chooseLevel,
     selectShareProgressState,
+    selectAvatar,
     fetchUserInfoFromApi,
     createNewUserNote,
     markGoalAsCompleted

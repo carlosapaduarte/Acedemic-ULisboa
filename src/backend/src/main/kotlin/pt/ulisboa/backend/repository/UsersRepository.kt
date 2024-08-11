@@ -16,4 +16,5 @@ interface UsersRepository {
     fun updateShareProgressPreference(id: Int, publishState: Boolean)
     fun addNewUserNote(userId: Int, name: String, date: Date)
     fun addCompletedGoal(userId: Int, goalName: String, date: Date)
+    fun setUserAvatar(userId: Int, avatarFilename: String)
 }

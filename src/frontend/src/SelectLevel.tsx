@@ -22,7 +22,7 @@ function Title() {
     )
 }
 
-export enum LevelType { LEVEL_1, LEVEL_2, LEVEL_3 }
+export enum LevelType { LEVEL_1 = 1, LEVEL_2 = 2, LEVEL_3 = 3 }
 
 function getLevelTypes(): LevelType[] {
     const toReturn: LevelType[] =  []

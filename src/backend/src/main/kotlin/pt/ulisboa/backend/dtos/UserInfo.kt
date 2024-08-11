@@ -19,6 +19,7 @@ data class UserInfo(
     val id: Int,
     val username: String,
     val level: Int?,
+    val avatarFilename: String?,
     val startDate: Long,
     val shareProgress: Boolean,
     val userNotes: List<UserNoteDto>,

@@ -17,6 +17,7 @@ data class User(
     val id: Int,
     val username: String,
     val level: Int, // TODO: for development ease: When user is created, this is the default level
+    val avatarFilename: String?,
     val startDate: Date,
     val shareProgress: Boolean,
     val userNotes: List<UserNote> = emptyList(),

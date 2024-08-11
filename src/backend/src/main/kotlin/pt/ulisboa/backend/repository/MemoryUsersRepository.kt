@@ -12,7 +12,7 @@ class MemoryUsersRepository : UsersRepository {
     val users = mutableMapOf<Int, User>()
 
     override fun createUser(id: Int, username: String) {
-        users[id] = User(id, username, 1, Date(), false)
+        users[id] = User(id, username, 1, avatarFilename = null, Date(), false)
     }
 
     override fun existsUser(id: Int): Boolean {
@@ -41,5 +41,10 @@ class MemoryUsersRepository : UsersRepository {
     override fun addCompletedGoal(userId: Int, goalName: String, date: Date) {
         val user = users[userId] ?: throw NotFoundException("User not found")
         users[userId] = user.copy(completedGoals = user.completedGoals.toMutableSet().apply { add(Goal(goalName, date)) })
+    }
+
+    override fun setUserAvatar(userId: Int, avatarFilename: String) {
+        val user = users[userId] ?: throw NotFoundException("User not found")
+        users[userId] = user.copy(avatarFilename = avatarFilename)
     }
 }

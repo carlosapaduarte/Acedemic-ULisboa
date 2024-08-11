@@ -12,77 +12,6 @@ import {useSetError} from "./error/ErrorContainer";
 
 const logger = new Logger({name: "Dashboard"});
 
-async function fetchUserCurrentDayAndLoadGoals(
-    userId: number,
-    setLoadingGoalsAndNotes: (loading: boolean) => void,
-    setError: (error: Error) => void,
-    setTodayGoals: (goals: DayGoals) => void,
-    setTodayCompletedGoals: (goals: string[]) => void,
-    setTodayNotes: (notes: UserNote[]) => void
-) {
-    function sameDate(date1: Date, date2: Date): boolean {
-        return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate()
-    }
-
-    function getTodayGoals(allGoals: DayGoals[]): DayGoals | undefined {
-        const today = new Date()
-        //console.log('All goals: ', allGoals)
-        return allGoals.find((goalsForTheDay: DayGoals) => sameDate(goalsForTheDay.date, today))
-    }
-
-    function getTodayNotes(allNotes: UserNote[]): UserNote[] {
-        const today = new Date()
-        return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date), today))
-    }
-
-    function getTodayCompletedGoals(completedGoals: GoalAndDate[]): string[] {
-        const today = new Date()
-        return completedGoals
-            .filter((completedGoal: GoalAndDate) => sameDate(new Date(completedGoal.date), today))
-            .map((v) => v.name)
-    }
-
-    setLoadingGoalsAndNotes(true)
-
-    // TODO: in future, request only today's goals
-    const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userId)
-    //console.log('User Info: ', userInfo)
-    
-    setLoadingGoalsAndNotes(false)
-
-    if (userInfo == undefined) {
-        setError(new Error('User information could not be obtained!'))
-        return
-    }
-
-    const fetchedStartDate = new Date(2024, 7, 5, 22, 22, 22, 22) //new Date(userInfo.startDate) // Feel free to change for testing
-
-    let goals: DayGoals[]
-    switch (userInfo.level) {
-        case 1 :
-            goals = Level1.level1Goals(fetchedStartDate)
-            break
-        case 2 :
-            goals = Level2.level2Goals(fetchedStartDate)
-            break
-        case 3 :
-            goals = Level3.level3Goals(fetchedStartDate)
-            break
-        default :
-            return Promise.reject('TODO: error handling')
-    }
-
-    // Should never be undefined!
-    // TODO: handle error when undefined later
-    const todaysGoals: DayGoals = getTodayGoals(goals)!
-    const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes)
-    const todaysCompletedGoals: string[] = getTodayCompletedGoals(userInfo.completedGoals)
-
-    setTodayGoals(todaysGoals)
-    setTodayCompletedGoals(todaysCompletedGoals)
-    setTodayNotes(todaysNotes)
-}
-
 function DisplayUserNotes({notes}: { notes: UserNote[] }) {
     return (
         <Box>
@@ -111,18 +40,95 @@ function MainDashboardContent({userId}: { userId: number }) {
     const setError = useSetError()
     const [newNoteText, setNewNoteText] = useState("");
 
-    const [todayGoals, setTodayGoals] = useState<DayGoals>()
-    const [todayCompletedGoals, setTodayCompletedGoals] = useState<string[]>()
-    const [todayNotes, setTodayNotes] = useState<UserNote[]>()
-    const [loadingGoalsAndNotes, setLoadingGoalsAndNotes] = useState(false)
-
     const [view, setView] = useState<View>(View.Default)
 
+    const [userInfo, setUserInfo] = useState<UserInfo>()
+    
+    const [todayCompletedGoals, setTodayCompletedGoals] = useState<string[]>()
+    const [todayNotes, setTodayNotes] = useState<UserNote[]>()
+    const [todayGoals, setTodayGoals] = useState<DayGoals>()
+
+    const [loadingGoalsAndNotes, setLoadingGoalsAndNotes] = useState(false)
 
     // Sparks a getUserInfo API call
     useEffect(() => {
-        fetchUserCurrentDayAndLoadGoals(userId, setLoadingGoalsAndNotes, setError, setTodayGoals, setTodayCompletedGoals, setTodayNotes)
+        fetchUserInfo()
     }, []) // Executed only once
+
+    useEffect(() => {
+        async function processUserInfo(userInfo: UserInfo) {
+            function sameDate(date1: Date, date2: Date): boolean {
+                return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate()
+            }
+        
+            function getTodayGoals(allGoals: DayGoals[]): DayGoals | undefined {
+                const today = new Date()
+                //console.log('All goals: ', allGoals)
+                return allGoals.find((goalsForTheDay: DayGoals) => sameDate(goalsForTheDay.date, today))
+            }
+        
+            function getTodayNotes(allNotes: UserNote[]): UserNote[] {
+                const today = new Date()
+                return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date), today))
+            }
+        
+            function getTodayCompletedGoals(completedGoals: GoalAndDate[]): string[] {
+                const today = new Date()
+                return completedGoals
+                    .filter((completedGoal: GoalAndDate) => sameDate(new Date(completedGoal.date), today))
+                    .map((v) => v.name)
+            }
+    
+            const fetchedStartDate = new Date(userInfo.startDate) // Feel free to change for testing
+
+            let goals: DayGoals[]
+            switch (userInfo.level) {
+                case 1 :
+                    goals = Level1.level1Goals(fetchedStartDate)
+                    break
+                case 2 :
+                    goals = Level2.level2Goals(fetchedStartDate)
+                    break
+                case 3 :
+                    goals = Level3.level3Goals(fetchedStartDate)
+                    break
+                default :
+                    return Promise.reject('TODO: error handling')
+            }
+        
+            // Should never be undefined!
+            // TODO: handle error when undefined later
+            const todayGoalsAux: DayGoals | undefined = getTodayGoals(goals)
+            const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes)
+            const todaysCompletedGoals: string[] = getTodayCompletedGoals(userInfo.completedGoals)
+            
+            setTodayGoals(todayGoalsAux)
+            setTodayCompletedGoals(todaysCompletedGoals)
+            setTodayNotes(todaysNotes)
+        }
+        
+        // Calculate and set todayGoals, todaysCompletedGoals and todaysNotes
+        if (userInfo != undefined)
+            processUserInfo(userInfo)
+
+    }, [userInfo])
+
+    async function fetchUserInfo() {
+        setLoadingGoalsAndNotes(true)
+    
+        // TODO: in future, request only today's goals
+        const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userId)
+        //console.log('User Info: ', userInfo)
+        
+        setLoadingGoalsAndNotes(false)
+    
+        if (userInfo == undefined) {
+            setError(new Error('User information could not be obtained!'))
+            return
+        }
+        
+        setUserInfo(userInfo)
+    }
 
     function onAddNewNoteClickHandler() {
         setView(View.CreateNewNote)
@@ -131,7 +137,7 @@ function MainDashboardContent({userId}: { userId: number }) {
     async function onConfirmNewNoteSubmitClickHandler() {
         await service.createNewUserNote(userId, newNoteText, new Date())
             .then(() => {
-                fetchUserCurrentDayAndLoadGoals(userId, setLoadingGoalsAndNotes, setError, setTodayGoals, setTodayCompletedGoals, setTodayNotes) // Updates state again
+                fetchUserInfo() // Updates state again
                 setView(View.Default)
             }) // this triggers a new refresh. TODO: improve later)
             .catch((error) => setError(error))
@@ -140,16 +146,23 @@ function MainDashboardContent({userId}: { userId: number }) {
     async function onMarkCompleteClickHandler(goal: Goal) {
         await service.markGoalAsCompleted(userId, goal.title, new Date()) // TODO: handle error later
             .then(() => {
-                fetchUserCurrentDayAndLoadGoals(userId, setLoadingGoalsAndNotes, setError, setTodayGoals, setTodayCompletedGoals, setTodayNotes) // Updates state again
+                fetchUserInfo() // Updates state again
             }) // this triggers a new refresh. TODO: improve later
             .catch((error) => setError(error))
     }
 
+    console.log(userInfo?.avatarFilename)
+
     if (view == View.Default) {
-        if (todayGoals && todayCompletedGoals && todayNotes)
+        if (userInfo && todayGoals && todayCompletedGoals && todayNotes)
             return (
                 <Box>
                     <Box display='flex' justifyContent={'right'}>
+                        <img
+                            src={userInfo.avatarFilename}
+                            height="100px"
+                            loading="lazy"
+                        />
                         <Button variant="contained" size="large" sx={{fontSize: "150%"}} onClick={onAddNewNoteClickHandler}>
                             {t("dashboard:add_note")}
                         </Button>
