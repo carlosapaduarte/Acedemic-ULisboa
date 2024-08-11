@@ -3,12 +3,7 @@ import { t } from "i18next";
 import { useSetError } from "./components/error/ErrorContainer";
 import { Level1 } from "./challenges/level_1";
 
-export default function SelectLevel() {
-
-    function onLevelClick() {
-
-    }
-
+function SelectLevel({onLevelClick} : {onLevelClick: (levelType: LevelType) => void}) {
     return (
         <Box display="flex" flexDirection="column">
             <Title/>
@@ -27,7 +22,7 @@ function Title() {
     )
 }
 
-enum LevelType { LEVEL_1, LEVEL_2, LEVEL_3 }
+export enum LevelType { LEVEL_1, LEVEL_2, LEVEL_3 }
 
 function getLevelTypes(): LevelType[] {
     const toReturn: LevelType[] =  []
@@ -53,41 +48,47 @@ function Level({levelType, onLevelClick} : {levelType: LevelType, onLevelClick: 
     let description
     switch(levelType) {
         case LevelType.LEVEL_1: {
-            title = "Level 1"
-            description = "Blablabla"
+            title = t("login:level_1_title")
+            description = t("login:level_1_description")
         }
         break
         case LevelType.LEVEL_2: {
-            title = "Level 2"
-            description = "Blablabla"
+            title = t("login:level_2_title")
+            description = t("login:level_2_description")
         }
         break
         case LevelType.LEVEL_3: {
-            title = "Level 3"
-            description = "Blablabla"
+            title = t("login:level_3_title")
+            description = t("login:level_3_description")
         }
         break
     }
     return (
-        <Box display="flex" flexDirection="column" justifyContent="center">
-            <Box marginBottom="15%">
+        <Box display="flex" flexDirection="column" justifyContent="center" width="30%">
+            <Box marginBottom="10%">
                 <img
                     src={"./test.webp"}
-                    height="300"
+                    height="150px"
                     loading="lazy"
                 />
             </Box>
             <Button 
                 variant="contained" 
-                size="large" 
+                size="medium"
                 onClick={() => onLevelClick(levelType)} 
                 sx={{marginBottom: "15%", fontSize: "120%"}}
             >
                 {title}
             </Button>
-            <Typography>
-                {description}
-            </Typography>
+            <Box height="100%" display="flex" justifyContent="center">
+                <Typography width="80%">
+                    {description}
+                </Typography>
+            </Box>
         </Box>
     )
+}
+
+export const SelectLevelComponent = {
+    SelectLevel
 }

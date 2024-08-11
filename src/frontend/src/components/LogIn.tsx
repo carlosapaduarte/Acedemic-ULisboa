@@ -5,6 +5,8 @@ import {useSetIsLoggedIn} from "./auth/Authn";
 import { useSetError } from "./error/ErrorContainer";
 import { Box, Typography } from "@mui/material";
 import { t } from "i18next";
+import { LevelType, SelectLevelComponent } from "../SelectLevel";
+import { LanguageVariant } from "typescript";
 
 type State =
     {
@@ -176,18 +178,16 @@ function ShareProgress({userId, onShareSelected}: { userId: number, onShareSelec
     );
 }
 
-enum Level {LEVEL_1, LEVEL_2, LEVEL_3}
-
-async function chooseLevel(userId: number, level: Level) {
+async function chooseLevel(userId: number, level: LevelType) {
     let levelNumber = -1
     switch (level) {
-        case Level.LEVEL_1 :
+        case LevelType.LEVEL_1 :
             levelNumber = 1
             break
-        case Level.LEVEL_2 :
+        case LevelType.LEVEL_2 :
             levelNumber = 2
             break
-        case Level.LEVEL_3 :
+        case LevelType.LEVEL_3 :
             levelNumber = 3
             break
     }
@@ -201,31 +201,18 @@ function SelectLevel({userId, onLevelSelected, onStartQuizClick}: {
 }) {
     const setError = useSetError()
 
-    async function chooseLevelLocal(level: Level) {
+    async function chooseLevelLocal(level: LevelType) {
         chooseLevel(userId, level)
         .then(() => onLevelSelected())
         .catch((error) => setError(error))
     }
 
+    // For now, no confirm button...
+    // For now, no quiz button...
+    // TODO
+
     return (
-        <Box>
-            <Box display="flex" justifyContent="center">
-                <Typography>
-                    ({t("login:initial_question")})    
-                </Typography>
-            </Box>
-            <h1>Choose Desired Level!</h1>
-            <br/>
-            <button onClick={() => chooseLevelLocal(Level.LEVEL_1)}>Nível 1: Iniciante</button>
-            <br/>
-            <button onClick={() => chooseLevelLocal(Level.LEVEL_2)}>Nível 2: Intermédio</button>
-            <br/>
-            <button onClick={() => chooseLevelLocal(Level.LEVEL_3)}>Nível 3: Avançado… já se sente com um bom nível de
-                eficácia e está…
-            </button>
-            <br/>
-            <button onClick={() => onStartQuizClick()}>Não sei o meu nível</button>
-        </Box>
+        <SelectLevelComponent.SelectLevel onLevelClick={chooseLevelLocal} />
     );
 }
 
@@ -258,7 +245,7 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
 
     async function computeLevel() {
         // TODO: compute level based on answers
-        const computedLevel: Level = Level.LEVEL_1
+        const computedLevel: LevelType = LevelType.LEVEL_1
 
         // TODO: handle in case of error later
         await chooseLevel(userId, computedLevel)
