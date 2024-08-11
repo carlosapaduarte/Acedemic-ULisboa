@@ -3,6 +3,8 @@ import {Navigate} from 'react-router-dom';
 import {service} from '../service/service';
 import {useSetIsLoggedIn} from "./auth/Authn";
 import { useSetError } from "./error/ErrorContainer";
+import { Box, Typography } from "@mui/material";
+import { t } from "i18next";
 
 type State =
     {
@@ -96,7 +98,7 @@ function LogIn() {
     else if (state.type === "shareProgress")
         return <ShareProgress userId={state.userId} onShareSelected={() => handleOnShareClick(state.userId)}/>
     else if (state.type === "chooseLevel")
-        return <ChooseLevel userId={state.userId}
+        return <SelectLevel userId={state.userId}
                             onLevelSelected={() => dispatch({type: 'setRedirect', userId: state.userId})}
                             onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
     else if (state.type === "quiz")
@@ -192,7 +194,7 @@ async function chooseLevel(userId: number, level: Level) {
     await service.chooseLevel(userId, levelNumber) // returns if was successfull or not
 }
 
-function ChooseLevel({userId, onLevelSelected, onStartQuizClick}: {
+function SelectLevel({userId, onLevelSelected, onStartQuizClick}: {
     userId: number,
     onLevelSelected: () => void,
     onStartQuizClick: () => void
@@ -206,7 +208,12 @@ function ChooseLevel({userId, onLevelSelected, onStartQuizClick}: {
     }
 
     return (
-        <div>
+        <Box>
+            <Box display="flex" justifyContent="center">
+                <Typography>
+                    ({t("login:initial_question")})    
+                </Typography>
+            </Box>
             <h1>Choose Desired Level!</h1>
             <br/>
             <button onClick={() => chooseLevelLocal(Level.LEVEL_1)}>Nível 1: Iniciante</button>
@@ -218,7 +225,7 @@ function ChooseLevel({userId, onLevelSelected, onStartQuizClick}: {
             </button>
             <br/>
             <button onClick={() => onStartQuizClick()}>Não sei o meu nível</button>
-        </div>
+        </Box>
     );
 }
 

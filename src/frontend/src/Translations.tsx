@@ -31,6 +31,9 @@ i18next
                     "description": "We couldn't find the page you were looking for.",
                     "go_to_home": "Go to Home",
                 },
+                "login": {
+                    "initial_question": "How effective has been your study habits lately?"
+                },
                 "dashboard": {
                     "main_message": "Best way to break a habit is to drop it",
                     "current_challenge": "Today's Challenges",
@@ -62,6 +65,9 @@ i18next
                     "title": "Página não encontrada",
                     "description": "Não conseguimos encontrar a página que procura.",
                     "go_to_home": "Vá para a Página Inicial",
+                },
+                "login": {
+                    "initial_question": "O quão eficaz têm sido os teus hábitos de estudo ultimamente?"
                 },
                 "dashboard": {
                     "main_message": "A melhor maneira de quebrar um hábito é largá-lo",
