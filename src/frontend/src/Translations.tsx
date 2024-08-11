@@ -32,13 +32,14 @@ i18next
                     "go_to_home": "Go to Home",
                 },
                 "login": {
-                    "initial_question": "How effective has been your study habits lately?",
+                    "select_level_initial_question": "How effective has been your study habits lately?",
                     "level_1_title": "Not Effective",
                     "level_2_title": "Effective",
                     "level_3_title": "Highly Effective",
                     "level_1_description": "I lose focus and have disorganized study habits, resulting in low school performance",
                     "level_2_description": "I struggle to keep a study routine, achieving solid but average grades",
-                    "level_3_description": "I study consistently, focus easily, and achieve top grades"
+                    "level_3_description": "I study consistently, focus easily, and achieve top grades",
+                    "select_avatar_initial_question": "Select your avatar"
                 },
                 "dashboard": {
                     "main_message": "Best way to break a habit is to drop it",
@@ -79,7 +80,8 @@ i18next
                     "level_3_title": "Altamente Eficaz",
                     "level_1_description": "Perco o foco e tenho hábitos de estudo desorganizados, o que resulta em baixo desempenho escolar",
                     "level_2_description": "Tenho dificuldade em manter uma rotina de estudo, alcançando notas sólidas, mas médias",
-                    "level_3_description": "Estudo de forma consistente, foco-me facilmente e obtenho as melhores notas"                    
+                    "level_3_description": "Estudo de forma consistente, foco-me facilmente e obtenho as melhores notas",
+                    "select_avatar_initial_question": "Escolhe o teu avatar"
                 },
                 "dashboard": {
                     "main_message": "A melhor maneira de quebrar um hábito é largá-lo",

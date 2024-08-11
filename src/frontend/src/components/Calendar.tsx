@@ -103,8 +103,6 @@ export default function Calendar() {
         date: String
     }
 
-    //console.log('State: ', state)
-
     // Sparks a getUserInfo API call
     useEffect(() => {
         async function fetchUserCurrentDayAndLoadGoals() {

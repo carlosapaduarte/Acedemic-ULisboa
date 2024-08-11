@@ -16,7 +16,7 @@ function Title() {
     return (
         <Box display="flex" justifyContent="center" marginBottom="5%" marginTop="3%">
             <Typography variant="h5">
-                {t("login:initial_question")}
+                {t("login:select_level_initial_question")}
             </Typography>
         </Box>
     )

@@ -12,6 +12,7 @@ import Dashboard from './components/Dashboard';
 import { ErrorController } from './components/error/ErrorController';
 import { ErrorContainer } from './components/error/ErrorContainer';
 import { NewCalendar } from './components/NewCalendar';
+import AvatarSelection from './components/Avatar';
 
 function App() {
     return (
@@ -49,6 +50,9 @@ function Router() {
                                 }/>
                                 <Route path='/c' element={ // TODO: maybe, change path name
                                     <NewCalendar/>
+                                }/>
+                                <Route path='/a' element={ // TODO: maybe, change path name
+                                    <AvatarSelection onAvatarClick={() => console.log()}/>
                                 }/>
                                 <Route path="*" element={<NotFoundPage/>}/>
                             </Routes>
