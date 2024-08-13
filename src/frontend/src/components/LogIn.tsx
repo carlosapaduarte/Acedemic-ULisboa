@@ -5,7 +5,7 @@ import {useSetIsLoggedIn} from "./auth/Authn";
 import { useSetError } from "./error/ErrorContainer";
 import { Box, Typography } from "@mui/material";
 import { t } from "i18next";
-import { LevelType, SelectLevelComponent } from "../SelectLevel";
+import { LevelType, SelectLevelComponent } from "./SelectLevel";
 import { LanguageVariant } from "typescript";
 import AvatarSelection from "./Avatar";
 

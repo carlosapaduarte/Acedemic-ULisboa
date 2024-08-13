@@ -245,9 +245,6 @@ function Goals({goals, completedGoals, onMarkComplete}: {
 }
 
 export default function Dashboard() {
-    // This component should later display a Calendar with the challenges...
-    // For now, let's simplify and only display the current challenge!
-
     const {userId} = useParams<string>()
 
     /**

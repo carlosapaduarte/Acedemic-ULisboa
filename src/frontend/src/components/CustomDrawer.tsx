@@ -23,6 +23,11 @@ export const mainListItems = [
         name: 'Calendar',
         href: "/calendar/:userId",
         icon: <CalendarMonth/>,
+    },
+    {
+        name: 'Goal Overview',
+        href: "goal-overview/:userId",
+        icon: <CalendarMonth/>,
     }
 ]
 

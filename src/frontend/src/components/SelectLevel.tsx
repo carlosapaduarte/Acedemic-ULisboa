@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { t } from "i18next";
-import { useSetError } from "./components/error/ErrorContainer";
-import { Level1 } from "./challenges/level_1";
+import { useSetError } from "./error/ErrorContainer";
+import { Level1 } from "../challenges/level_1";
 
 function SelectLevel({onLevelClick} : {onLevelClick: (levelType: LevelType) => void}) {
     return (

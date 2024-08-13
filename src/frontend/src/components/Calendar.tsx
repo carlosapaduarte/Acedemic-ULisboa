@@ -1,6 +1,3 @@
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
-import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction" // needed for dayClick
 import {Box, Button, TextField, Typography} from '@mui/material'
 import {DayGoals, Goal} from '../challenges/types'
 import {service, UserInfo, UserNote} from '../service/service'
@@ -13,6 +10,8 @@ import {Level3} from '../challenges/level_3'
 import {useSetError} from './error/ErrorContainer'
 import LoadingSpinner from "./LoadingSpinner";
 import {t} from "i18next";
+import { CalendarDay, MyCalendar } from './MyCalendar'
+import { utils } from '../utils'
 
 const logger = new Logger({name: "Calendar"});
 
@@ -22,14 +21,12 @@ export default function Calendar() {
     const {userId} = useParams<string>()
     const userIdAsNumber = Number(userId) // TODO: 'userIdStr' could be undefined
 
-    const [newNoteText, setNewNoteText] = useState("");
-
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-    const [storedGoals, setStoredGoals] = useState<DayGoals[] | undefined>(undefined);
-    const [storedUserNotes, setStoredNotes] = useState<UserNote[] | undefined>(undefined);
+    const [goals, setGoals] = useState<DayGoals[] | undefined>(undefined);
+    const [userNotes, setUserNotes] = useState<UserNote[] | undefined>(undefined);
     const [loadingGoals, setLoadingGoals] = useState<boolean>(false)
 
-    const [selectedDay, setSelectedDay] = useState<number>(0);
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
     type FullCalendarEventsType = {
         title: String,
@@ -45,7 +42,7 @@ export default function Calendar() {
         try {
             const userInfo: UserInfo = await service.fetchUserInfoFromApi(userIdAsNumber)
 
-            const fetchedStartDate = new Date(2024, 6, 22, 22, 22, 22, 22) //new Date(userInfo.startDate) // Feel free to change for testing
+            const fetchedStartDate = new Date(2024, 6, 31, 22, 22, 22, 22) //new Date(userInfo.startDate) // Feel free to change for testing
             setStartDate(fetchedStartDate)
 
             let calculatedGoals: DayGoals[]
@@ -63,8 +60,8 @@ export default function Calendar() {
                     return Promise.reject('TODO: handle this error')
             }
 
-            setStoredGoals(calculatedGoals)
-            setStoredNotes(userInfo.userNotes)
+            setGoals(calculatedGoals)
+            setUserNotes(userInfo.userNotes)
 
             setLoadingGoals(false)
         } catch (error: any) {
@@ -75,12 +72,6 @@ export default function Calendar() {
     useEffect(() => {
         fetchUserCurrentDayAndLoadGoals()
     }, []);
-
-    async function submitNewNote(date: Date) {
-        service.createNewUserNote(userIdAsNumber, newNoteText, date) // TODO: handle error later
-            .then(() => fetchUserCurrentDayAndLoadGoals()) // TODO: improve later
-            .catch((error) => setError(error))
-    }
 
     // Builds an object to display events in FullCalendar
     function buildEvents(goals: DayGoals[], userGoals: UserNote[]): any {
@@ -132,90 +123,163 @@ export default function Calendar() {
         return events
     }
 
-    const handleDateClick = (arg: DateClickArg) => {
-        logger.debug('User clicked on: ', arg.date.toDateString())
+    const handleDateClick = (clickedDay: CalendarDay) => {
+        setSelectedDate(clickedDay.date)
+        
+        // TODO: I don't see any reason for this anymore
+        /*
+        if (startDate != undefined && goals != undefined) {
 
-        if (startDate != undefined && storedGoals != undefined) {
-            const day = arg.date.getDate() - startDate.getDate()
-            if (arg.date.getMonth() == startDate.getMonth() && day >= 0 && day < storedGoals.length)
-                setSelectedDay(day)
+            //calculate time difference  
+            var time_difference = clickedDay.date.getTime() - startDate.getTime();  
+            //calculate days difference by dividing total milliseconds in a day
+            var daysDifference = time_difference / (1000 * 60 * 60 * 24);
+
+            if (daysDifference >= 0 && daysDifference < goals.length) {
+                setSelectedDate(clickedDay.date)
+            }
         }
+        */
     }
 
-    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        // For now, this new goal will be associated to a challenge day, for simplification
-
-        if (event.key === 'Enter') {
-            onConfirmNewNoteSubmitClickHandler()
-        }
-    };
-
-    const onConfirmNewNoteSubmitClickHandler = () => {
-        let date = new Date()
-        date.setDate(date.getDate() + selectedDay)
-        submitNewNote(date)
+    const onConfirmNewNoteSubmitClickHandler = (noteText: string) => {
+        service.createNewUserNote(userIdAsNumber, noteText, selectedDate) // TODO: handle error later
+            .then(() => fetchUserCurrentDayAndLoadGoals()) // TODO: improve later
+            .catch((error) => setError(error))
     }
 
 
-    return storedGoals == undefined || storedUserNotes == undefined ?
-        <LoadingSpinner text={`Loading Goals and Calendar... ${storedGoals}, ${storedUserNotes}`}></LoadingSpinner>
+    return goals == undefined || userNotes == undefined ?
+        <LoadingSpinner text={`Loading Goals and Calendar... ${goals}, ${userNotes}`}></LoadingSpinner>
         :
         (
             <Box width='100%' height='100%' display='flex' flexDirection={"row"} alignItems="center"
                  justifyContent="space-evenly">
                 <Box width='45%'>
-                    <FullCalendar
-                        plugins={[dayGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        events={buildEvents(storedGoals, storedUserNotes)}
-                        dateClick={handleDateClick}
-                    />
+                    <MyCalendar onDayClickHandler={handleDateClick}/>
                 </Box>
-                <Box width='35%' height={"100%"}>
-                    <Box height="50%" display="flex" flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
-                        <Typography variant='h6'>
-                            {storedGoals[selectedDay].goals[0].title}
-                        </Typography>
-                        <Typography>
-                            {storedGoals[selectedDay].goals[0].description}
-                        </Typography>
-                        <Box display='flex' flexDirection='column'>
-                            <TextField
-                                sx={{marginBottom: '2%', width: "100%"}}
-                                id="outlined-controlled"
-                                label="New Note"
-                                value={newNoteText}
-                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                    setNewNoteText(event.target.value)
-                                }}
-                                onKeyDown={handleKeyPress}
-                            />
-                            <Button variant="contained" sx={{width: '100%'}}
-                                    onClick={onConfirmNewNoteSubmitClickHandler}>
-                                {t("dashboard:confirm_new_note")}
-                            </Button>
-                        </Box>
-                    </Box>
-                    <Box>
-                        <Typography variant='h6'>
-                            {t("dashboard:notes")}
-                        </Typography>
-                        <Box display='flex' flexDirection='column'>
-                            {storedUserNotes.map((note: UserNote, index: number) => {
-                                return (
-                                    <Box key={index} sx={{border: '1px solid black', padding: '1%'}}>
-                                        <Typography>
-                                            {note.name}
-                                        </Typography>
-                                        <Typography>
-                                            {note.date}
-                                        </Typography>
-                                    </Box>
-                                )
-                            })}
-                        </Box>
-                    </Box>
-                </Box>
+                <RightContent 
+                    goals={goals} 
+                    selectedDate={selectedDate} 
+                    userNotes={userNotes} 
+                    onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler}
+                />
             </Box>
         )
+}
+
+function RightContent({goals, selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler} : {
+    goals: DayGoals[], 
+    selectedDate: Date,
+    userNotes: UserNote[]
+    onConfirmNewNoteSubmitClickHandler: (noteText: string) => void
+}) {
+    return (
+        <Box width='35%' height={"100%"}>
+            <Box height="100%" display="flex" flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <SelectedDayGoalInfo goals={goals} selectedDay={selectedDate} />
+                <SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes} onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler} />
+            </Box>
+        </Box>
+    )
+}
+
+function SelectedDayGoalInfo({goals, selectedDay} : {goals: DayGoals[], selectedDay: Date}) {
+    // TODO: only displaying one Goal!!! There could be more
+
+    function getSelectedDayGoals(goals: DayGoals[]): Goal[] {
+        const goalsToReturn: Goal[] = []
+        
+        const goalsForTheDay = goals.filter((goal: DayGoals) => {
+            const date = goal.date
+            return utils.sameDay(date, selectedDay)
+        }).map((goal: DayGoals) => goal.goals)
+
+        goalsForTheDay.forEach((goalsExterior: Goal[]) => goalsExterior.forEach((goal: Goal) => goalsToReturn.push(goal)))
+
+        return goalsToReturn
+    }
+
+    const goalsToDisplay = getSelectedDayGoals(goals) // Filters today's goals
+
+    if (goalsToDisplay.length != 0)
+        // Showing a single goal, for now
+        return (
+            <Box marginBottom="3%">
+                <Typography variant='h6'>
+                    {goalsToDisplay[0].title}
+                </Typography>
+                <Typography>
+                    {goalsToDisplay[0].description}
+                </Typography>
+            </Box>
+        )
+    else
+        return (
+            <Box marginBottom="3%">
+                <Typography variant='h6'>
+                    {t("calendar:no_goals_title")}
+                </Typography>
+            </Box>
+        )
+}
+
+function SelectedDayNotes({selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler} : {
+    selectedDate: Date,
+    userNotes: UserNote[]
+    onConfirmNewNoteSubmitClickHandler: (noteText: string) => void}
+) {
+    const [newNoteText, setNewNoteText] = useState("");
+
+    // Filters today's notes
+    const userNotesToDisplay: UserNote[] = userNotes.filter((note: UserNote) => utils.sameDay(new Date(note.date), selectedDate))
+
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        // For now, this new goal will be associated to a challenge day, for simplification
+
+        if (event.key === 'Enter') {
+            onConfirmNewNoteSubmitClickHandler(newNoteText)
+        }
+    };
+
+    function onNewNoteSubmitClickHandler() {
+        onConfirmNewNoteSubmitClickHandler(newNoteText)
+    }
+
+    return (
+        <Box>
+            <TextField
+                sx={{marginBottom: '2%', width: "100%"}}
+                id="outlined-controlled"
+                label={t("calendar:new_note_label")}
+                value={newNoteText}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setNewNoteText(event.target.value)
+                }}
+                onKeyDown={handleKeyPress}
+            />
+            <Button variant="contained" sx={{width: '100%'}}
+                    onClick={onNewNoteSubmitClickHandler}>
+                {t("dashboard:confirm_new_note")}
+            </Button>
+
+            <Box height="20%" />
+
+            <Typography variant='h6'>
+                    {t("dashboard:notes")}
+                </Typography>
+                <Box display='flex' flexDirection='column'>
+                    {userNotesToDisplay.map((note: UserNote, index: number) =>
+                        <Box key={index} sx={{border: '1px solid black', padding: '1%'}}>
+                            <Typography>
+                                {note.name}
+                            </Typography>
+                            <Typography>
+                                {note.date}
+                            </Typography>
+                        </Box>
+                    )}
+                </Box>
+        </Box>
+    )
 }

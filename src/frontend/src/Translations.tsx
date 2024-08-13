@@ -50,6 +50,13 @@ i18next
                     "mark_complete": "Mark Complete",
                     "goal_completed": "Objective Complete!"
                 },
+                "calendar": {
+                    "prev_month_but": "Previous Month",
+                    "today": "Today",
+                    "next_month_but": "Next Month",
+                    "no_goals_title": "There are no goals for today...",
+                    "new_note_label": "Note"
+                },
                 "error": {
                     "title": "An Error Occurred"
                 }
@@ -82,6 +89,13 @@ i18next
                     "level_2_description": "Tenho dificuldade em manter uma rotina de estudo, alcançando notas sólidas, mas médias",
                     "level_3_description": "Estudo de forma consistente, foco-me facilmente e obtenho as melhores notas",
                     "select_avatar_initial_question": "Escolhe o teu avatar"
+                },
+                "calendar": {
+                    "prev_month_but": "Anterior",
+                    "today": "Hoje",
+                    "next_month_but": "Próximo",
+                    "no_goals_title": "Não há desafios para hoje...",
+                    "new_note_label": "Note"
                 },
                 "dashboard": {
                     "main_message": "A melhor maneira de quebrar um hábito é largá-lo",

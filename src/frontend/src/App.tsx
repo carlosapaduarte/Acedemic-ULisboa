@@ -11,8 +11,9 @@ import Calendar from './components/Calendar';
 import Dashboard from './components/Dashboard';
 import { ErrorController } from './components/error/ErrorController';
 import { ErrorContainer } from './components/error/ErrorContainer';
-import { NewCalendar } from './components/NewCalendar';
+import { MyCalendar } from './components/MyCalendar';
 import AvatarSelection from './components/Avatar';
+import { GoalOverview } from './components/GoalOverview';
 
 function App() {
     return (
@@ -48,11 +49,8 @@ function Router() {
                                         <Calendar/>
                                     }/>
                                 }/>
-                                <Route path='/c' element={ // TODO: maybe, change path name
-                                    <NewCalendar/>
-                                }/>
-                                <Route path='/a' element={ // TODO: maybe, change path name
-                                    <AvatarSelection onAvatarClick={() => console.log()}/>
+                                <Route path='/goal-overview/:userId' element={ // TODO: maybe, change path name
+                                    <GoalOverview onGoalClick={() => console.log()} />
                                 }/>
                                 <Route path="*" element={<NotFoundPage/>}/>
                             </Routes>

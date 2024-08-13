@@ -1,7 +1,7 @@
 // This component could be used to define functions that interact with the Backend and other external services.
 
 import { Goal } from "../challenges/types";
-import { LevelType } from "../SelectLevel";
+import { LevelType } from "../components/SelectLevel";
 import {doFetch, toBody} from "./fetch"
 import {Logger} from "tslog";
 
@@ -91,7 +91,6 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
 
     if (response.ok) {
         const responseObject: UserInfo = await response.json() // TODO: how 
-        console.log("Here: ", responseObject)
         return responseObject
     } else
         return Promise.reject(new Error('User info could not be obtained!'))
