@@ -57,6 +57,10 @@ i18next
                     "no_goals_title": "There are no goals for today...",
                     "new_note_label": "Note"
                 },
+                "goal_overview": {
+                    "title": "Goal Overview",
+                    "no_reached_message": "Goal unlocked!"
+                },
                 "error": {
                     "title": "An Error Occurred"
                 }
@@ -105,6 +109,10 @@ i18next
                     "confirm_new_note": "Adicionar Nota",
                     "mark_complete": "Marcar Como Completo",
                     "goal_completed": "Objetivo Completo!"
+                },
+                "goal_overview": {
+                    "title": "Desafios",
+                    "no_reached_message": "Desafio bloqueado!"
                 },
                 "error": {
                     "title": "Ocorreu um erro"

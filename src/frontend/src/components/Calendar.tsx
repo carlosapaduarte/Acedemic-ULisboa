@@ -41,26 +41,13 @@ export default function Calendar() {
         // TODO: in future, request only today's goals
         try {
             const userInfo: UserInfo = await service.fetchUserInfoFromApi(userIdAsNumber)
+            const startDate = new Date(2024, 6, 31, 22, 22, 22, 22) //new Date(userInfo.startDate) // Feel free to change for testing
 
-            const fetchedStartDate = new Date(2024, 6, 31, 22, 22, 22, 22) //new Date(userInfo.startDate) // Feel free to change for testing
-            setStartDate(fetchedStartDate)
+            const userGoals = utils.getUserGoals(userInfo.level, startDate)
 
-            let calculatedGoals: DayGoals[]
-            switch (userInfo.level) {
-                case 1 :
-                    calculatedGoals = Level1.level1Goals(fetchedStartDate)
-                    break
-                case 2 :
-                    calculatedGoals = Level2.level2Goals(fetchedStartDate)
-                    break
-                case 3 :
-                    calculatedGoals = Level3.level3Goals(fetchedStartDate)
-                    break
-                default :
-                    return Promise.reject('TODO: handle this error')
-            }
+            setStartDate(startDate)
 
-            setGoals(calculatedGoals)
+            setGoals(userGoals)
             setUserNotes(userInfo.userNotes)
 
             setLoadingGoals(false)

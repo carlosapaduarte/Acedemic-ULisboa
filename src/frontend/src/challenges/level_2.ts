@@ -95,6 +95,11 @@ function level2Goals(startDate: Date): DayGoals[] {
     return commons.getDayGoals(level2StaticGoal, startDate)
 }
 
+function getLevel2GoalList(): Goal[] {
+    return level2StaticGoal
+}
+
 export const Level2 = {
-    level2Goals
+    level2Goals,
+    getLevel2GoalList
 }

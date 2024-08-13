@@ -1,6 +1,7 @@
 import {DayGoals, Goal} from "./types"
 
 function getDayGoals(goals: Goal[], startDate: Date): DayGoals[] {
+    
     // Returns DayGoals[], accounting for the start day
 
     const today = new Date()
@@ -19,9 +20,11 @@ function getDayGoals(goals: Goal[], startDate: Date): DayGoals[] {
             date: goalDate
         }
     })
-    console.log('Goals to return: ', goalsToReturn)
+    //console.log('Goals to return: ', goalsToReturn)
     return goalsToReturn
 }
+
+
 
 export const commons = {
     getDayGoals

@@ -50,7 +50,7 @@ function Router() {
                                     }/>
                                 }/>
                                 <Route path='/goal-overview/:userId' element={ // TODO: maybe, change path name
-                                    <GoalOverview onGoalClick={() => console.log()} />
+                                    <GoalOverview />
                                 }/>
                                 <Route path="*" element={<NotFoundPage/>}/>
                             </Routes>

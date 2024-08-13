@@ -1,7 +1,7 @@
 import MuiDrawer from "@mui/material/Drawer";
 import {Divider, List, ListItemButton, ListItemIcon, ListItemText, styled} from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
-import {CalendarMonth} from "@mui/icons-material";
+import {CalendarMonth, Flag} from "@mui/icons-material";
 import React, { useState } from "react";
 import {useNavigate} from "react-router-dom";
 
@@ -27,7 +27,7 @@ export const mainListItems = [
     {
         name: 'Goal Overview',
         href: "goal-overview/:userId",
-        icon: <CalendarMonth/>,
+        icon: <Flag/>,
     }
 ]
 
