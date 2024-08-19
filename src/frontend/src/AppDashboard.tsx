@@ -26,13 +26,12 @@ export default function AppDashboard({children}: DashboardProps) {
         <Box sx={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
             <CssBaseline/>
             <AppBar position="static">
-                <Toolbar sx={{pr: '24px'}}>
+                <Toolbar sx={{display: "flex", flexDirection: "row", width: "100%"}}>
                     <IconButton
-                        edge="start"
                         color="inherit"
                         aria-label="open drawer"
                         onClick={toggleDrawer}
-                        sx={{mr: '36px'/*, ...(open && {display: 'none'})*/}}
+                        sx={{ml: {xs: -1, sm: -2}}}
                     >
                         <MenuIcon/>
                     </IconButton>

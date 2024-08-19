@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {GoalAndDate, service, UserInfo, UserNote} from '../service/service';
 import {Level1} from "../challenges/level_1";
@@ -12,18 +12,31 @@ import {useSetError} from "./error/ErrorContainer";
 
 const logger = new Logger({name: "Dashboard"});
 
-function DisplayUserNotes({notes}: { notes: UserNote[] }) {
+export function DisplayUserNotes({notes, alignTitleLeft}: { notes: UserNote[], alignTitleLeft: boolean }) {
+    // TODO: make this flex component have its own scroll bar instead of overflowing the main page
     return (
-        <Box>
-            <Typography variant="h6" align="left">{t("dashboard:my_notes")}</Typography>
-            <br/>
-            {notes.map((note: UserNote) => {
-                return (
-                    <Box key={note.name}>
-                        <Typography fontSize="110%" align="left" fontStyle='italic'>{note.name}</Typography>
-                    </Box>
-                )
-            })}
+        <Box display='flex' flexDirection='column' sx={{width: "100%", height: "100%"}}>
+            <Typography variant="h6" align={alignTitleLeft ? "left" : "center"}>
+                {t("dashboard:my_notes")}
+            </Typography>
+            <Box display='flex' flexDirection='column' sx={{overflow: "auto", height: "100%"}}>
+                {notes.length == 0 ?
+                    <Typography align={alignTitleLeft ? "left" : "center"}>
+                        {t("dashboard:no_notes")}
+                    </Typography>
+                    :
+                    notes.map((note: UserNote, index: number) => {
+                        const date = new Date(note.date)
+                        return (
+                            <Box key={index} width={"100%"} sx={{overflowWrap: "break-word"}}>
+                                <Typography fontSize="110%" align="left" fontStyle='italic'>
+                                    {date.getDate() + "/" + (date.getMonth() + 1 + "/" + date.getFullYear())} - {note.name}
+                                </Typography>
+                            </Box>
+                        )
+                    })
+                }
+            </Box>
         </Box>
     )
 }
@@ -43,7 +56,7 @@ function MainDashboardContent({userId}: { userId: number }) {
     const [view, setView] = useState<View>(View.Default)
 
     const [userInfo, setUserInfo] = useState<UserInfo>()
-    
+
     const [todayCompletedGoals, setTodayCompletedGoals] = useState<string[]>()
     const [todayNotes, setTodayNotes] = useState<UserNote[]>()
     const [todayGoals, setTodayGoals] = useState<DayGoals>()
@@ -60,25 +73,25 @@ function MainDashboardContent({userId}: { userId: number }) {
             function sameDate(date1: Date, date2: Date): boolean {
                 return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate()
             }
-        
+
             function getTodayGoals(allGoals: DayGoals[]): DayGoals | undefined {
                 const today = new Date()
                 //console.log('All goals: ', allGoals)
                 return allGoals.find((goalsForTheDay: DayGoals) => sameDate(goalsForTheDay.date, today))
             }
-        
+
             function getTodayNotes(allNotes: UserNote[]): UserNote[] {
                 const today = new Date()
                 return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date), today))
             }
-        
+
             function getTodayCompletedGoals(completedGoals: GoalAndDate[]): string[] {
                 const today = new Date()
                 return completedGoals
                     .filter((completedGoal: GoalAndDate) => sameDate(new Date(completedGoal.date), today))
                     .map((v) => v.name)
             }
-    
+
             const fetchedStartDate = new Date(userInfo.startDate) // Feel free to change for testing
 
             let goals: DayGoals[]
@@ -95,18 +108,18 @@ function MainDashboardContent({userId}: { userId: number }) {
                 default :
                     return Promise.reject('TODO: error handling')
             }
-        
+
             // Should never be undefined!
             // TODO: handle error when undefined later
             const todayGoalsAux: DayGoals | undefined = getTodayGoals(goals)
             const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes)
             const todaysCompletedGoals: string[] = getTodayCompletedGoals(userInfo.completedGoals)
-            
+
             setTodayGoals(todayGoalsAux)
             setTodayCompletedGoals(todaysCompletedGoals)
             setTodayNotes(todaysNotes)
         }
-        
+
         // Calculate and set todayGoals, todaysCompletedGoals and todaysNotes
         if (userInfo != undefined)
             processUserInfo(userInfo)
@@ -115,18 +128,18 @@ function MainDashboardContent({userId}: { userId: number }) {
 
     async function fetchUserInfo() {
         setLoadingGoalsAndNotes(true)
-    
+
         // TODO: in future, request only today's goals
         const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userId)
         //console.log('User Info: ', userInfo)
-        
+
         setLoadingGoalsAndNotes(false)
-    
+
         if (userInfo == undefined) {
             setError(new Error('User information could not be obtained!'))
             return
         }
-        
+
         setUserInfo(userInfo)
     }
 
@@ -156,28 +169,30 @@ function MainDashboardContent({userId}: { userId: number }) {
     if (view == View.Default) {
         if (userInfo && todayGoals && todayCompletedGoals && todayNotes)
             return (
-                <Box>
-                    <Box display='flex' justifyContent={'right'}>
+                <Box sx={{display: 'flex', flexDirection: "column", width: "100%", height: "100%"}}>
+                    <Box sx={{display: 'flex', justifyContent: 'right'}}>
                         <img
-                            src={userInfo.avatarFilename}
+                            src={`./${userInfo.avatarFilename}`}
                             height="100px"
                             loading="lazy"
                         />
-                        <Button variant="contained" size="large" sx={{fontSize: "150%"}} onClick={onAddNewNoteClickHandler}>
+                        <Button variant="contained" size="large" sx={{fontSize: "150%"}}
+                                onClick={onAddNewNoteClickHandler}>
                             {t("dashboard:add_note")}
                         </Button>
                     </Box>
                     <Goals goals={todayGoals.goals} completedGoals={todayCompletedGoals}
                            onMarkComplete={onMarkCompleteClickHandler}/>
-                    <DisplayUserNotes notes={todayNotes}/>
+                    <Box sx={{flexGrow: 1}}>
+                        <DisplayUserNotes notes={todayNotes} alignTitleLeft={true}/>
+                    </Box>
                 </Box>
             )
         else
             return <></>
-    } 
-    else if (view == View.CreateNewNote)
+    } else if (view == View.CreateNewNote)
         return (
-            <Box display='flex' flexDirection='column'>
+            <Box sx={{display: 'flex', flexDirection: "column"}}>
                 <TextField
                     sx={{marginBottom: '2%', width: "60%"}}
                     id="outlined-controlled"
@@ -214,16 +229,18 @@ function Goals({goals, completedGoals, onMarkComplete}: {
                 return (
                     <Box key={goal.title} display="flex" flexDirection="column" justifyContent="start">
                         <Box display="flex" flexDirection="row" alignItems='center'>
-                            <Typography variant="h5" align="left" width="20%" marginBottom="1%">{goal.title}</Typography>
+                            <Typography variant="h5" align="left" width="20%"
+                                        marginBottom="1%">{goal.title}</Typography>
                             {
-                                completed ? 
-                                <Typography align="left" width="100%" marginBottom="1%" sx={{textDecoration: "underline"}}>
-                                    ({t("dashboard:goal_completed")})
-                                </Typography>
-                                :
-                                <></>
+                                completed ?
+                                    <Typography align="left" width="100%" marginBottom="1%"
+                                                sx={{textDecoration: "underline"}}>
+                                        ({t("dashboard:goal_completed")})
+                                    </Typography>
+                                    :
+                                    <></>
                             }
-                            
+
                         </Box>
                         <Typography fontSize="110%" align="left" width="100%" marginBottom="1%">
                             {goal.description}
@@ -271,7 +288,7 @@ export default function Dashboard() {
     // TODO: improve error handling if [userId] is not a Number
 
     return (
-        <Box padding="3%">
+        <Box sx={{display: "flex", flexDirection: "column", width: "100%", height: "100%", padding: "3%"}}>
             <Typography variant="h3" align="left" marginBottom="0.5%">{helloQuote}, {userId}</Typography>
             <Typography variant="h5" align="left">{t("dashboard:main_message")}</Typography>
             <br/>

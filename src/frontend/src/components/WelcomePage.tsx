@@ -27,16 +27,16 @@ function WelcomePage() {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
-                height: '50%',
+                height: {xs: "100%", sm: "50%", md: '50%', lg: '50%'},
                 width: '100%'
             }}>
                 <Box sx={{
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "center",
                     justifyContent: "center",
+                    alignItems: "center",
                     height: '100%',
-                    width: '50%'
+                    width: {xs: "100%", md: '75%', lg: '50%'}
                 }}>
                     <Typography variant="h3">{t("welcome_page:title")}</Typography>
                     <Typography variant="body1">{t("welcome_page:description")}</Typography>

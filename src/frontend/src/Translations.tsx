@@ -13,8 +13,7 @@ i18next
         // or even better, manage them via a UI: https://react.i18next.com/guides/multiple-translation-files#manage-your-translations-with-a-management-gui)
         resources: {
             en: {
-                translation: {
-                },
+                translation: {},
                 "hello_quote": {
                     "night": "Good Night",
                     "morning": "Good Morning",
@@ -45,6 +44,7 @@ i18next
                     "main_message": "Best way to break a habit is to drop it",
                     "current_challenge": "Today's Challenges",
                     "my_notes": "My Notes",
+                    "no_notes": "No notes yet...",
                     "add_note": "Add A Note",
                     "confirm_new_note": "Submit",
                     "mark_complete": "Mark Complete",
@@ -66,8 +66,7 @@ i18next
                 }
             },
             pt: {
-                translation: {
-                },
+                translation: {},
                 "hello_quote": {
                     "night": "Boa Noite",
                     "morning": "Bom Dia",
@@ -105,6 +104,7 @@ i18next
                     "main_message": "A melhor maneira de quebrar um hábito é largá-lo",
                     "current_challenge": "Objetivos Para Hoje",
                     "my_notes": "As Minhas Notas",
+                    "no_notes": "Não há notas ainda...",
                     "add_note": "Adicionar Uma Nota",
                     "confirm_new_note": "Adicionar Nota",
                     "mark_complete": "Marcar Como Completo",

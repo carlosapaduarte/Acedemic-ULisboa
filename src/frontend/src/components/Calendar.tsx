@@ -1,17 +1,15 @@
-import {Box, Button, TextField, Typography} from '@mui/material'
+import {Box, Typography} from '@mui/material'
 import {DayGoals, Goal} from '../challenges/types'
 import {service, UserInfo, UserNote} from '../service/service'
 import React, {useEffect, useState} from 'react'
 import {Logger} from 'tslog'
 import {useParams} from 'react-router-dom'
-import {Level1} from '../challenges/level_1'
-import {Level2} from '../challenges/level_2'
-import {Level3} from '../challenges/level_3'
 import {useSetError} from './error/ErrorContainer'
 import LoadingSpinner from "./LoadingSpinner";
 import {t} from "i18next";
-import { CalendarDay, MyCalendar } from './MyCalendar'
-import { utils } from '../utils'
+import {CalendarDay, MyCalendar} from './MyCalendar'
+import {utils} from '../utils'
+import {DisplayUserNotes} from "./Dashboard";
 
 const logger = new Logger({name: "Calendar"});
 
@@ -112,7 +110,7 @@ export default function Calendar() {
 
     const handleDateClick = (clickedDay: CalendarDay) => {
         setSelectedDate(clickedDay.date)
-        
+
         // TODO: I don't see any reason for this anymore
         /*
         if (startDate != undefined && goals != undefined) {
@@ -140,43 +138,55 @@ export default function Calendar() {
         <LoadingSpinner text={`Loading Goals and Calendar... ${goals}, ${userNotes}`}></LoadingSpinner>
         :
         (
-            <Box width='100%' height='100%' display='flex' flexDirection={"row"} alignItems="center"
-                 justifyContent="space-evenly">
-                <Box width='45%'>
+            <Box sx={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: {xs: "column", md: 'row'},
+                alignItems: 'center',
+                justifyContent: 'space-evenly'
+            }}>
+                <Box sx={{width: "45%"}}>
                     <MyCalendar onDayClickHandler={handleDateClick}/>
                 </Box>
-                <RightContent 
-                    goals={goals} 
-                    selectedDate={selectedDate} 
-                    userNotes={userNotes} 
+                <RightContent
+                    goals={goals}
+                    selectedDate={selectedDate}
+                    userNotes={userNotes}
                     onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler}
                 />
             </Box>
         )
 }
 
-function RightContent({goals, selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler} : {
-    goals: DayGoals[], 
+function RightContent({goals, selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler}: {
+    goals: DayGoals[],
     selectedDate: Date,
     userNotes: UserNote[]
     onConfirmNewNoteSubmitClickHandler: (noteText: string) => void
 }) {
     return (
-        <Box width='35%' height={"100%"}>
-            <Box height="100%" display="flex" flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
-                <SelectedDayGoalInfo goals={goals} selectedDay={selectedDate} />
-                <SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes} onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler} />
-            </Box>
+        <Box sx={{
+            width: {xs: '100%', md: '35%'},
+            height: {xs: '35%', md: '100%'},
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+        }}
+             justifyContent={"center"}>
+            <SelectedDayGoalInfo goals={goals} selectedDay={selectedDate}/>
+            <SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes}
+                              onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler}/>
         </Box>
     )
 }
 
-function SelectedDayGoalInfo({goals, selectedDay} : {goals: DayGoals[], selectedDay: Date}) {
+function SelectedDayGoalInfo({goals, selectedDay}: { goals: DayGoals[], selectedDay: Date }) {
     // TODO: only displaying one Goal!!! There could be more
 
     function getSelectedDayGoals(goals: DayGoals[]): Goal[] {
         const goalsToReturn: Goal[] = []
-        
+
         const goalsForTheDay = goals.filter((goal: DayGoals) => {
             const date = goal.date
             return utils.sameDay(date, selectedDay)
@@ -192,7 +202,7 @@ function SelectedDayGoalInfo({goals, selectedDay} : {goals: DayGoals[], selected
     if (goalsToDisplay.length != 0)
         // Showing a single goal, for now
         return (
-            <Box marginBottom="3%">
+            <Box marginBottom="3%" sx={{overflow: "hidden"}}>
                 <Typography variant='h6'>
                     {goalsToDisplay[0].title}
                 </Typography>
@@ -211,10 +221,11 @@ function SelectedDayGoalInfo({goals, selectedDay} : {goals: DayGoals[], selected
         )
 }
 
-function SelectedDayNotes({selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler} : {
-    selectedDate: Date,
-    userNotes: UserNote[]
-    onConfirmNewNoteSubmitClickHandler: (noteText: string) => void}
+function SelectedDayNotes({selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler}: {
+                              selectedDate: Date,
+                              userNotes: UserNote[]
+                              onConfirmNewNoteSubmitClickHandler: (noteText: string) => void
+                          }
 ) {
     const [newNoteText, setNewNoteText] = useState("");
 
@@ -233,9 +244,10 @@ function SelectedDayNotes({selectedDate, userNotes, onConfirmNewNoteSubmitClickH
         onConfirmNewNoteSubmitClickHandler(newNoteText)
     }
 
+
     return (
-        <Box>
-            <TextField
+        <Box sx={{width: "100%"}}>
+            {/*<TextField
                 sx={{marginBottom: '2%', width: "100%"}}
                 id="outlined-controlled"
                 label={t("calendar:new_note_label")}
@@ -248,25 +260,9 @@ function SelectedDayNotes({selectedDate, userNotes, onConfirmNewNoteSubmitClickH
             <Button variant="contained" sx={{width: '100%'}}
                     onClick={onNewNoteSubmitClickHandler}>
                 {t("dashboard:confirm_new_note")}
-            </Button>
+            </Button>*/}
 
-            <Box height="20%" />
-
-            <Typography variant='h6'>
-                    {t("dashboard:notes")}
-                </Typography>
-                <Box display='flex' flexDirection='column'>
-                    {userNotesToDisplay.map((note: UserNote, index: number) =>
-                        <Box key={index} sx={{border: '1px solid black', padding: '1%'}}>
-                            <Typography>
-                                {note.name}
-                            </Typography>
-                            <Typography>
-                                {note.date}
-                            </Typography>
-                        </Box>
-                    )}
-                </Box>
+            <DisplayUserNotes notes={userNotesToDisplay} alignTitleLeft={false}/>
         </Box>
     )
 }
