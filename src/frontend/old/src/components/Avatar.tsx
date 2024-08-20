@@ -1,5 +1,5 @@
-import { Avatar, Box, Typography } from "@mui/material"
-import { t } from "i18next"
+import {Box, Typography} from "@mui/material"
+import {t} from "i18next"
 
 function Title() {
     return (
@@ -11,7 +11,10 @@ function Title() {
     )
 }
 
-function AvatarsInRow({avatars, onAvatarClick} : {avatars: string[], onAvatarClick: (avatarFilename: string) => void}) {
+function AvatarsInRow({avatars, onAvatarClick}: {
+    avatars: string[],
+    onAvatarClick: (avatarFilename: string) => void
+}) {
 
     // TODO: later, use array string
 
@@ -30,7 +33,7 @@ function AvatarsInRow({avatars, onAvatarClick} : {avatars: string[], onAvatarCli
     )
 }
 
-function AvatarList({onAvatarClick}: {onAvatarClick: (avatarFilename: string) => void}) {
+function AvatarList({onAvatarClick}: { onAvatarClick: (avatarFilename: string) => void }) {
 
     // TODO: just for testing...
     function createAvatars(): string[] {
@@ -45,14 +48,14 @@ function AvatarList({onAvatarClick}: {onAvatarClick: (avatarFilename: string) =>
 
     // TODO: this function is very similar to NewCalendar.tsx: parsePerWeek()
     function separatePerRow(avatars: string[]): string[][] {
-        const avatarsPerRow: string[][] = []	
+        const avatarsPerRow: string[][] = []
 
-		const chunkSize = 12 // from David's Avatar page design
-		while(avatars.length > 0) {
-			avatarsPerRow.push(avatars.splice(0, chunkSize))
-		}
-		
-		return avatarsPerRow
+        const chunkSize = 12 // from David's Avatar page design
+        while (avatars.length > 0) {
+            avatarsPerRow.push(avatars.splice(0, chunkSize))
+        }
+
+        return avatarsPerRow
     }
 
     return (
@@ -65,9 +68,9 @@ function AvatarList({onAvatarClick}: {onAvatarClick: (avatarFilename: string) =>
 }
 
 
-export default function AvatarSelection({onAvatarClick}: {onAvatarClick: (avatarFilename: string) => void}) {
+export default function AvatarSelection({onAvatarClick}: { onAvatarClick: (avatarFilename: string) => void }) {
     return (
-        <Box display="flex" flexDirection="column">
+        <Box sx={{class: "flex-col"}}>
             <Title/>
             <AvatarList onAvatarClick={onAvatarClick}/>
         </Box>
