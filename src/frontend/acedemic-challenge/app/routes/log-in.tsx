@@ -10,7 +10,6 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   return (
     <div className="font-sans p-4">
-        In Maintenance
     </div>
   );
 }
