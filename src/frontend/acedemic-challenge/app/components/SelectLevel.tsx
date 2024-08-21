@@ -1,94 +1,116 @@
-import { Box, Button, Typography } from "@mui/material";
 import { t } from "i18next";
-import { useSetError } from "./error/ErrorContainer";
-import { Level1 } from "../challenges/level_1";
 
-function SelectLevel({onLevelClick} : {onLevelClick: (levelType: LevelType) => void}) {
+function SelectLevel({
+    onLevelClick,
+}: {
+    onLevelClick: (levelType: LevelType) => void;
+}) {
     return (
-        <Box display="flex" flexDirection="column">
-            <Title/>
-            <Levels onLevelClick={onLevelClick} />
-        </Box>
+        <div className="flex h-full w-full flex-row items-center justify-center">
+            <div className="mx-[5%] my-[10%] flex h-full w-full flex-col items-center md:w-3/4">
+                <Title />
+                <Levels onLevelClick={onLevelClick} />
+            </div>
+        </div>
     );
 }
 
 function Title() {
     return (
-        <Box display="flex" justifyContent="center" marginBottom="5%" marginTop="3%">
-            <Typography variant="h5">
+        <div className="mb-[5%] mt-[3%] flex justify-center">
+            <h1 className="text-2xl text-white">
                 {t("login:select_level_initial_question")}
-            </Typography>
-        </Box>
-    )
+            </h1>
+        </div>
+    );
 }
 
-export enum LevelType { LEVEL_1 = 1, LEVEL_2 = 2, LEVEL_3 = 3 }
+function Levels({
+    onLevelClick,
+}: {
+    onLevelClick: (levelType: LevelType) => void;
+}) {
+    return (
+        <div className="flex flex-row justify-center">
+            {getLevelTypes().map((levelType: LevelType) => (
+                <Level levelType={levelType} onLevelClick={onLevelClick} />
+            ))}
+        </div>
+    );
+}
+
+export enum LevelType {
+    LEVEL_1 = 1,
+    LEVEL_2 = 2,
+    LEVEL_3 = 3,
+}
 
 function getLevelTypes(): LevelType[] {
-    const toReturn: LevelType[] =  []
-    toReturn.push(LevelType.LEVEL_1)
-    toReturn.push(LevelType.LEVEL_2)
-    toReturn.push(LevelType.LEVEL_3)
-    return toReturn
+    return [LevelType.LEVEL_3, LevelType.LEVEL_2, LevelType.LEVEL_1];
 }
 
-function Levels({onLevelClick} : {onLevelClick: (levelType: LevelType) => void}) {
-    return (
-        <Box display="flex" flexDirection="row" justifyContent="space-evenly">
-            {getLevelTypes().map((levelType: LevelType) =>
-                <Level levelType={levelType} onLevelClick={onLevelClick} />
-            )}
-        </Box>
-    )
-}
+function Level({
+    levelType,
+    onLevelClick,
+}: {
+    levelType: LevelType;
+    onLevelClick: (levelType: LevelType) => void;
+}) {
+    const { title, description } = getLevelTitleAndDescription(levelType);
 
-
-function Level({levelType, onLevelClick} : {levelType: LevelType, onLevelClick: (levelType: LevelType) => void}) {
-    let title
-    let description
-    switch(levelType) {
-        case LevelType.LEVEL_1: {
-            title = t("login:level_1_title")
-            description = t("login:level_1_description")
-        }
-        break
-        case LevelType.LEVEL_2: {
-            title = t("login:level_2_title")
-            description = t("login:level_2_description")
-        }
-        break
-        case LevelType.LEVEL_3: {
-            title = t("login:level_3_title")
-            description = t("login:level_3_description")
-        }
-        break
-    }
     return (
-        <Box display="flex" flexDirection="column" justifyContent="center" width="30%">
-            <Box marginBottom="10%">
+        <div className={"flex w-[30%] flex-col items-center"}>
+            <div className="mb-[10%]">
                 <img
-                    src={"./test.webp"}
-                    height="150px"
+                    src="public/test.webp"
+                    width="200px"
                     loading="lazy"
+                    alt={`Level ${levelType.valueOf()} Image`}
                 />
-            </Box>
-            <Button 
-                variant="contained" 
-                size="medium"
-                onClick={() => onLevelClick(levelType)} 
-                sx={{marginBottom: "15%", fontSize: "120%"}}
+            </div>
+
+            <button
+                className="cut-button mb-[15%] h-16 w-[80%] text-3xl hover:bg-yellow"
+                onClick={() => onLevelClick(levelType)}
             >
                 {title}
-            </Button>
-            <Box height="100%" display="flex" justifyContent="center">
-                <Typography width="80%">
-                    {description}
-                </Typography>
-            </Box>
-        </Box>
-    )
+            </button>
+
+            <div className="flex justify-center text-xl text-white">
+                <h1 className="w-4/5">{description}</h1>
+            </div>
+        </div>
+    );
+}
+
+function getLevelTitleAndDescription(levelType: LevelType) {
+    let title;
+    let description;
+
+    switch (levelType) {
+        case LevelType.LEVEL_1:
+            {
+                title = t("login:level_1_title");
+                description = t("login:level_1_description");
+            }
+            break;
+        case LevelType.LEVEL_2:
+            {
+                title = t("login:level_2_title");
+                description = t("login:level_2_description");
+            }
+            break;
+        case LevelType.LEVEL_3:
+            {
+                title = t("login:level_3_title");
+                description = t("login:level_3_description");
+            }
+            break;
+    }
+
+    return { title, description };
 }
 
 export const SelectLevelComponent = {
-    SelectLevel
-}
+    SelectLevel,
+};

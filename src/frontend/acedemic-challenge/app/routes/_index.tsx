@@ -9,7 +9,7 @@ export default function WelcomePage() {
 
     return (
         <div className="flex h-full w-full flex-row items-center justify-center sm:h-1/2">
-            <div className="flex h-full w-full flex-col items-center justify-center md:w-3/4 lg:w-1/2">
+            <div className="mx-[5%] my-[10%] flex h-full w-full flex-col items-center justify-center md:w-3/4 lg:w-1/2">
                 <h1 className="text-4xl font-bold text-secondary">
                     {t("welcome_page:title")}
                 </h1>
@@ -17,7 +17,7 @@ export default function WelcomePage() {
                     {t("welcome_page:description")}
                 </h5>
                 <button
-                    className="h-16 w-40 rounded bg-secondary text-xl font-medium hover:bg-secondary/85"
+                    className="rnd-button h-16 w-40"
                     onClick={handleOnProceedClick}
                 >
                     {t("welcome_page:proceed")}

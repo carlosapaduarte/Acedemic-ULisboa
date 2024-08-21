@@ -12,7 +12,9 @@ interface DashboardProps {
 export default function AppDashboard({ children }: DashboardProps) {
     return (
         <div className="h-full w-full">
-            <div className="bg-purple-dark flex h-1/4 w-full">{children}</div>
+            {/*<div className="flex h-1/4 w-full bg-purple-dark"></div>*/
+            /* For dark purple AppBar*/}
+            {children}
         </div>
     );
 }
