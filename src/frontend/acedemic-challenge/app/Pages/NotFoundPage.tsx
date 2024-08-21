@@ -1,63 +1,33 @@
-import {Box, Button, Typography} from "@mui/material";
-import {useNavigate} from "react-router-dom";
-import HomeIcon from "@mui/icons-material/Home";
-import {useTranslation} from "react-i18next";
-
+import { useNavigate } from "@remix-run/react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Page not found component.
  */
 export function NotFoundPage() {
-    const navigate = useNavigate()
-    const { t } = useTranslation()
+    const navigate = useNavigate();
+    const { t } = useTranslation();
 
     return (
-        <Box sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            width: '100%'
-        }}>
-            <Box sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                height: '100%',
-                width: '50%'
-            }}>
-                <Typography variant="h1" component="h1" sx={{fontSize: 200, fontWeight: 700}}>
-                    404
-                </Typography>
-
-                <Typography variant="h2" component="h2" gutterBottom>
+        <div className="flex h-full w-full flex-row items-center justify-center sm:h-1/2">
+            <div className="flex h-full w-full flex-col items-center justify-center md:w-3/4 lg:w-1/2">
+                <h1 className="text-4xl font-bold text-secondary">404</h1>
+                <h4 className="text-2xl text-white">
                     {t("not_found_page:title")}
-                </Typography>
+                </h4>
 
-                <Typography variant="body1" gutterBottom>
+                <h4 className="text-xl text-white">
                     {t("not_found_page:description")}
-                </Typography>
+                </h4>
 
-                <Button
-                    variant="contained"
-                    startIcon={<HomeIcon/>}
+                <button
+                    className="h-16 w-40 rounded bg-secondary text-xl font-medium hover:bg-secondary/85"
+                    //startIcon={<HomeIcon/>}
                     onClick={() => navigate("/")}
-                    sx={{width: "50%"}}
                 >
                     {t("not_found_page:go_to_home")}
-                </Button>
-            </Box>
-            {/*<Box
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: '50%'
-                }}
-            >
-                <img src={Logo} alt="Logo" width="40%"/>
-            </Box>*/}
-        </Box>
-    )
+                </button>
+            </div>
+        </div>
+    );
 }

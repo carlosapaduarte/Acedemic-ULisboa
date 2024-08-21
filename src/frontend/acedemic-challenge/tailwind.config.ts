@@ -7,6 +7,8 @@ export default {
             colors: {
                 primary: "#771480",
                 secondary: "#7DF4BE",
+                'purple-dark': "#491351",
+                'yellow': "#FFE600"
             },
         }
     },
