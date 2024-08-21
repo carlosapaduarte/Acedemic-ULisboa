@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from dtos.input_dtos import *
 from exception import NotFoundException
 import service
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -39,9 +39,9 @@ def login(input_dto: LoginInputDto) -> Response:
     service.login(input_dto.id)
     return Response() # Just for now...
 
-@app.post("/batches")
-def create_batch(input_dto: CreateBatchInputDto):
-    return service.create_batch(input_dto.user_id, input_dto.level)
+@app.post("/users/{user_id}/batches")
+def create_batch(user_id: int, input_dto: CreateBatchInputDto):
+    return service.create_batch(user_id, input_dto.level)
 
 @app.put("/users/{user_id}/publish-state")
 def set_share_progress_preference(user_id: int, input_dto: SetShareProgressPreferenceDto):
@@ -53,6 +53,7 @@ def set_user_avatar(user_id: int, input_dto: SetUserAvatarDto):
 
 @app.get("/users/{user_id}")
 def get_user_info(user_id: int):
+    #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
     return service.get_user_info(user_id)
 
 @app.post("/users/{user_id}/notes")
@@ -66,6 +67,6 @@ def add_completed_goal(user_id: int, batch_id: int, input_dto: GoalCompletedDto)
         batch_id, 
         input_dto.goalName,
         input_dto.goalDay, 
-        datetime.fromtimestamp(input_dto.conclusionDate)
+        datetime.now()
     )
     return Response()

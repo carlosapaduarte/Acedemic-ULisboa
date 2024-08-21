@@ -16,7 +16,7 @@ function GoalsAccordion({goals} : {goals: Goal[]}) {
     return (
         <Box display="flex" flexDirection="column" justifyContent="center">
             {goals.map((goal: Goal) => 
-                <Accordion>
+                <Accordion key={goal.title}>
                     <AccordionSummary
                     expandIcon={<ArrowDownward />}
                     aria-controls="panel1-content"
@@ -99,8 +99,11 @@ export function GoalOverview() {
             .then((userInfo: UserInfo) => {
                 const testStartDate = new Date()
                 testStartDate.setDate(testStartDate.getDate() - 10)
+
+                const batchToDisplay = userInfo.batches[0]
+                const level = batchToDisplay.level
                 
-                const goals = utils.getGoalsPerDayByStartDate(userInfo.level, testStartDate)
+                const goals = utils.getGoalsPerDayByStartDate(level, testStartDate)
                 setGoals(goals)
             })
         

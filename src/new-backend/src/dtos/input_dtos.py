@@ -4,7 +4,6 @@ class LoginInputDto(BaseModel):
     id: int
 
 class CreateBatchInputDto(BaseModel):
-    user_id: int
     level: int
     # For simplicity, assume that start-date is NOW
 
@@ -26,4 +25,3 @@ class SetUserAvatarDto(BaseModel):
 class GoalCompletedDto(BaseModel):
     goalName: str
     goalDay: int # [1,21]
-    conclusionDate: int

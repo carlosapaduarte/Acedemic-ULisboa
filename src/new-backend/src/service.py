@@ -27,19 +27,20 @@ def get_user_info(user_id: int) -> UserDto:
     return UserDto(
         id=user.id,
         username=user.username,
-        avatar_filename=user.avatar_filename,
-        share_progress=user.share_progress,
-        user_notes=map(lambda note: UserNoteDto(
+        avatarFilename=user.avatar_filename,
+        shareProgress=user.share_progress,
+        userNotes=map(lambda note: UserNoteDto(
             name=note.name,
-            created=get_datetime_utc(note.created)
+            date=get_datetime_utc(note.created)
         ), user.user_notes),
         batches=map(lambda batch: BatchDto(
-            start_date=get_datetime_utc(batch.start_date),
+            id=batch.id,
+            startDate=get_datetime_utc(batch.start_date),
             level=batch.level,
-            completed=map(lambda completed_goal: CompletedGoalDto(
-                goal_day=completed_goal.goal_day,
+            completedGoals=map(lambda completed_goal: CompletedGoalDto(
+                goalDay=completed_goal.goal_day,
                 name=completed_goal.name,
-                conclusion_date=get_datetime_utc(completed_goal.conclusion_date)
+                conclusionDate=get_datetime_utc(completed_goal.conclusion_date)
             ), batch.completed)
         ), user.batches)
     )

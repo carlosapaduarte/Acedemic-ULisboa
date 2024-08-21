@@ -3,22 +3,23 @@ from pydantic import BaseModel
 
 class UserNoteDto(BaseModel):
     name: str
-    created: int
+    date: int
     
 class CompletedGoalDto(BaseModel):
-    goal_day: int
+    goalDay: int
     name: str
-    conclusion_date: int
+    conclusionDate: int
     
 class BatchDto(BaseModel):
-    start_date: int
+    id: int
+    startDate: int
     level: int
-    completed: list[CompletedGoalDto]
+    completedGoals: list[CompletedGoalDto]
     
 class UserDto(BaseModel):
     id: int
     username: str
-    avatar_filename: str | None
-    share_progress: bool | None
-    user_notes: list[UserNoteDto] | None
+    avatarFilename: str | None
+    shareProgress: bool | None
+    userNotes: list[UserNoteDto] | None
     batches: list[BatchDto] | None

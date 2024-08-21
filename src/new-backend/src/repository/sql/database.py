@@ -11,7 +11,7 @@ SQLALCHEMY_DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOSTNAME}/{DATABASE}
 # Create just once and use everywhere!
 # Echo=True to print executed SQL statements
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=False)
 
 SQLModel.metadata.create_all(engine)
 

@@ -51,6 +51,7 @@ class UserRepoSql(UserRepo):
                 user_model.share_progress,
                 user_notes=map(lambda note: UserNote(note.text, note.date), user_notes_model),
                 batches=map(lambda batch: Batch(
+                    id=batch.id,
                     start_date=batch.start_date,
                     level=batch.level,
                     completed=map(lambda completed_goal: CompletedGoal(

@@ -114,7 +114,7 @@ function LogIn() {
     else if (state.type === "shareProgress")
         return <ShareProgress userId={state.userId} onShareSelected={() => handleOnShareClick(state.userId)}/>
     else if (state.type === "chooseLevel")
-        return <SelectLevel userId={state.userId}
+        return <CreateBatch userId={state.userId}
                     onLevelSelected={() => dispatch({type: 'setSelectAvatar', userId: state.userId})}
                     onStartQuizClick={() => onStartQuizCLickHandler(state.userId)}/>
     else if (state.type === "quiz")
@@ -194,17 +194,17 @@ function ShareProgress({userId, onShareSelected}: { userId: number, onShareSelec
     );
 }
 
-function SelectLevel({userId, onLevelSelected, onStartQuizClick}: {
+function CreateBatch({userId, onLevelSelected, onStartQuizClick}: {
     userId: number,
     onLevelSelected: () => void,
     onStartQuizClick: () => void
 }) {
     const setError = useSetError()
 
-    async function chooseLevelLocal(level: LevelType) {
-        await service.chooseLevel(userId, level) // returns if was successfull or not
-        .then(() => onLevelSelected())
-        .catch((error) => setError(error))
+    async function createBatchLocal(level: LevelType) {
+        await service.createBatch(userId, level) // returns if was successfull or not
+            .then(() => onLevelSelected())
+            .catch((error) => setError(error))
     }
 
     // For now, no confirm button...
@@ -212,7 +212,7 @@ function SelectLevel({userId, onLevelSelected, onStartQuizClick}: {
     // TODO
 
     return (
-        <SelectLevelComponent.SelectLevel onLevelClick={chooseLevelLocal} />
+        <SelectLevelComponent.SelectLevel onLevelClick={createBatchLocal} />
     );
 }
 
@@ -248,7 +248,7 @@ function Quiz({userId, onLevelSelected}: { userId: number, onLevelSelected: () =
         const computedLevel: LevelType = LevelType.LEVEL_1
 
         // TODO: handle in case of error later
-        await service.chooseLevel(userId, computedLevel) // returns if was successfull or not
+        await service.createBatch(userId, computedLevel) // returns if was successfull or not
         .then(() => onLevelSelected())
         .catch((error) => setError(error))
     }

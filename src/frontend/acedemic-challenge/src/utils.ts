@@ -27,7 +27,6 @@ function getUserGoals(level: LevelType, startDate: Date): DayGoals[] {
 }
 
 function getGoalsPerDay(level: LevelType): Goal[][] {
-
     // Each index is a list of goals for the day
 
     const toReturn: Goal[][] = []

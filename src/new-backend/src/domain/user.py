@@ -12,7 +12,8 @@ class CompletedGoal:
         self.conclusion_date = conclusion_date
 
 class Batch:
-    def __init__(self, start_date: datetime, level: int, completed: list[CompletedGoal]) -> None:
+    def __init__(self, id: int, start_date: datetime, level: int, completed: list[CompletedGoal]) -> None:
+        self.id = id
         self.start_date = start_date
         self.level = level
         self.completed = completed
