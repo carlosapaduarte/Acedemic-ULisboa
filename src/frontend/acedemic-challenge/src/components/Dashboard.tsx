@@ -106,6 +106,8 @@ function MainDashboardContent({userId}: { userId: number }) {
             setTodayCompletedGoals(todaysCompletedGoals)
             setTodayNotes(todaysNotes)
         }
+
+        //console.log(userInfo)
         
         // Calculate and set todayGoals, todaysCompletedGoals and todaysNotes
         if (userInfo != undefined)
@@ -151,7 +153,7 @@ function MainDashboardContent({userId}: { userId: number }) {
             .catch((error) => setError(error))
     }
 
-    console.log(userInfo?.avatarFilename)
+    //console.log(userInfo?.avatarFilename)
 
     if (view == View.Default) {
         if (userInfo && todayGoals && todayCompletedGoals && todayNotes)

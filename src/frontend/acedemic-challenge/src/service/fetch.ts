@@ -1,6 +1,6 @@
 import {InvalidRequest, NetworkError} from "./error"
 
-const base_api_url = 'http://localhost:8080/'
+const base_api_url = 'http://localhost:8000/'
 const CONTENT_TYPE_JSON = 'application/json'
 
 function toFullUrl(request: Request): string {
