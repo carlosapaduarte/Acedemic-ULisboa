@@ -3,24 +3,27 @@ from pydantic import BaseModel
 class LoginInputDto(BaseModel):
     id: int
 
+class CreateBatchInputDto(BaseModel):
+    user_id: int
+    level: int
+    # For simplicity, assume that start-date is NOW
+
 class SetLevelInputDto(BaseModel):
-    id: int
+    user_id: int
+    batch: int # Batch ID (user can have multiple batches)
     level: int
 
 class SetShareProgressPreferenceDto(BaseModel):
-    id: int
     shareProgress: bool
 
 class NewUserNoteDto(BaseModel):
-    id: int
-    name: str
+    text: str
     date: int
 
 class SetUserAvatarDto(BaseModel):
-    id: int
     avatarFilename: str
 
 class GoalCompletedDto(BaseModel):
-    id: int
     goalName: str
-    date: int
+    goalDay: int # [1,21]
+    conclusionDate: int

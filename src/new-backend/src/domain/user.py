@@ -1,32 +1,35 @@
-import datetime
+from datetime import datetime
 
 class UserNote:
     def __init__(self, name: str, created: datetime) -> None:
         self.name = name
         self.created = created
 
-class Goal:
-    def __init__(self, name: str, concluded: datetime) -> None:
+class CompletedGoal:
+    def __init__(self, goal_day: datetime, name: str, conclusion_date: datetime) -> None:    
+        self.goal_day = goal_day
         self.name = name
-        self.concluded = concluded
+        self.conclusion_date = conclusion_date
+
+class Batch:
+    def __init__(self, start_date: datetime, level: int, completed: list[CompletedGoal]) -> None:
+        self.start_date = start_date
+        self.level = level
+        self.completed = completed
 
 class User:
     def __init__(
             self,
             id: int, 
             username: str, 
-            level: int, 
             avatar_filename: str, 
-            start_date: datetime,
             share_progress: bool,
             user_notes: list[UserNote],
-            completed_goals: list[Goal]
+            batches: list[Batch]
     ) -> None:
         self.id = id
         self.username = username
-        self.level = level
         self.avatar_filename = avatar_filename
-        self.start_date = start_date
         self.share_progress = share_progress
         self.user_notes = user_notes
-        self.completed_goals = completed_goals
+        self.batches = batches
