@@ -4,7 +4,8 @@
 
 @layer components {
     .rnd-button {
-        @apply h-16 w-40 rounded bg-secondary text-xl font-medium hover:bg-secondary/85
+        @apply h-16 w-40 rounded bg-secondary text-xl font-medium
+        /*hover:bg-secondary/85*/
     }
 
     .cut-button {
@@ -23,5 +24,11 @@
         text-transform: uppercase;
 
         @apply rnd-button
+    }
+
+    .avatar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
+        gap: 1rem;
     }
 }

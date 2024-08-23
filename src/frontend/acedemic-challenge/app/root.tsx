@@ -35,7 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Meta />
                 <Links />
             </head>
-            <body>
+            <body className="h-screen w-screen bg-primary">
                 {children}
                 <ScrollRestoration />
                 <Scripts />
@@ -54,7 +54,7 @@ export default function Root() {
 
 export function App() {
     return (
-        <div className="h-screen w-screen bg-primary">
+        <div className="size-full">
             <>
                 {useIsLoggedIn() ? (
                     <AppDashboard>

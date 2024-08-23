@@ -21,7 +21,7 @@ export function NotFoundPage() {
                 </h4>
 
                 <button
-                    className="h-16 w-40 rounded bg-secondary text-xl font-medium hover:bg-secondary/85"
+                    className="h-16 w-40 rounded bg-secondary text-xl font-medium" /*hover:bg-secondary/85*/
                     //startIcon={<HomeIcon/>}
                     onClick={() => navigate("/")}
                 >
