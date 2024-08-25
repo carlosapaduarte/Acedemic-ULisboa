@@ -88,6 +88,8 @@
     font-size: 0.75rem;
     font-weight: 200;
     color: white;
+    margin-top: 0.375rem;
+    text-align: center;
 }
 
 .levelContentTextContainer p {
@@ -115,7 +117,6 @@
     }
 
     .levelButton {
-        margin-bottom: 1rem;
         height: 4rem;
         font-size: 1.5rem;
     }
