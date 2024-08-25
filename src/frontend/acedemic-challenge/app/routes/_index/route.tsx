@@ -1,27 +1,26 @@
 import { useTranslation } from "react-i18next";
-import { useIsLoggedIn } from "~/components/auth/Authn";
+import { useIsLoggedIn, useSetIsLoggedIn } from "~/components/auth/Authn";
 import { useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
+import styles from "./index.module.css";
+import { Button } from "~/components/Button";
 
 export default function WelcomePage() {
     const { t } = useTranslation();
     const { handleOnProceedClick } = useWelcomePage();
 
     return (
-        <div className="flex h-full w-full flex-row items-center justify-center sm:h-1/2">
-            <div className="mx-4 my-8 flex h-[100%] w-full flex-col items-center justify-center md:w-3/4 lg:w-1/2">
-                <h1 className="text-4xl font-bold text-secondary">
+        <div className={styles.pageContainer}>
+            <div className={styles.pageInnerContainer}>
+                <h1>
                     {t("welcome_page:title")}
                 </h1>
-                <h5 className="text-xl text-white">
+                <p>
                     {t("welcome_page:description")}
-                </h5>
-                <button
-                    className="rnd-button h-16 w-40"
-                    onClick={handleOnProceedClick}
-                >
+                </p>
+                <Button variant={"round"} className={styles.proceedButton} onClick={handleOnProceedClick}>
                     {t("welcome_page:proceed")}
-                </button>
+                </Button>
             </div>
         </div>
     );
@@ -29,12 +28,17 @@ export default function WelcomePage() {
 
 function useWelcomePage() {
     const isLoggedIn = useIsLoggedIn();
+    const setLoggedIn = useSetIsLoggedIn();
     const navigate = useNavigate();
 
     useEffect(() => {
         if (isLoggedIn) {
-            const cachedUserId = localStorage["userId"]; // TODO: use cache just for now
-            navigate(`/dashboard/${cachedUserId}`);
+            if (localStorage["userId"]) {
+                const cachedUserId = localStorage["userId"]; // TODO: use cache just for now
+                navigate(`/dashboard/${cachedUserId}`);
+            } else {
+                setLoggedIn(false);
+            }
         }
     }, []);
 

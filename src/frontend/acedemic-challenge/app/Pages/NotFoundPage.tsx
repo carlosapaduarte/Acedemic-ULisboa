@@ -1,5 +1,7 @@
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
+import styles from "./notFoundPage.module.css";
+import { Button } from "~/components/Button";
 
 /**
  * Page not found component.
@@ -9,24 +11,22 @@ export function NotFoundPage() {
     const { t } = useTranslation();
 
     return (
-        <div className="flex h-full w-full flex-row items-center justify-center sm:h-1/2">
-            <div className="flex h-full w-full flex-col items-center justify-center md:w-3/4 lg:w-1/2">
-                <h1 className="text-4xl font-bold text-secondary">404</h1>
-                <h4 className="text-2xl text-white">
+        <div className={styles.pageContainer}>
+            <div className={styles.pageInnerContainer}>
+                <h1>404</h1>
+                <h2>
                     {t("not_found_page:title")}
-                </h4>
-
-                <h4 className="text-xl text-white">
+                </h2>
+                <h3>
                     {t("not_found_page:description")}
-                </h4>
-
-                <button
-                    className="h-16 w-40 rounded bg-secondary text-xl font-medium" /*hover:bg-secondary/85*/
-                    //startIcon={<HomeIcon/>}
-                    onClick={() => navigate("/")}
+                </h3>
+                <Button variant={"round"} className={styles.goHomeButton}
+                        onClick={() => navigate("/")
+                            //startIcon={<HomeIcon/>}
+                        }
                 >
                     {t("not_found_page:go_to_home")}
-                </button>
+                </Button>
             </div>
         </div>
     );

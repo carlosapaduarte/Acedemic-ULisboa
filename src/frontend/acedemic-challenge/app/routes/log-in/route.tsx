@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import UserInfo from "~/routes/log-in/UserInfo";
-import ShareProgress from "~/routes/log-in/ShareProgress";
-import Quiz from "~/routes/log-in/Quiz";
-import SelectLevelPage from "~/routes/log-in/SelectLevelPage";
-import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage";
+import UserInfoPage from "~/routes/log-in/UserInfoPage/UserInfoPage";
+import ShareProgressPage from "~/routes/log-in/ShareProgressPage/ShareProgressPage";
+import QuizPage from "~/routes/log-in/QuizPage/QuizPage";
+import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
+import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelectionPage";
 import { useNavigate } from "@remix-run/react";
 
 type Views =
@@ -34,7 +34,7 @@ export default function LoginPage() {
     switch (currentView) {
         case "userInfo":
             return (
-                <UserInfo
+                <UserInfoPage
                     onAuthDone={(userId) => {
                         setCurrentView("shareProgress");
                         setUserId(userId);
@@ -43,7 +43,7 @@ export default function LoginPage() {
             );
         case "shareProgress":
             return (
-                <ShareProgress
+                <ShareProgressPage
                     userId={userId!}
                     onShareSelected={() => setCurrentView("chooseLevel")}
                 />
@@ -58,7 +58,7 @@ export default function LoginPage() {
             );
         case "quiz":
             return (
-                <Quiz
+                <QuizPage
                     userId={userId!}
                     onLevelSelected={() => setCurrentView("selectAvatar")}
                 />

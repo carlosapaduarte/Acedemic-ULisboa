@@ -2,42 +2,40 @@ import { useSetIsLoggedIn } from "~/components/auth/Authn";
 import { useSetError } from "~/components/error/ErrorContainer";
 import React, { useState } from "react";
 import { service } from "~/service/service";
+import styles from "./userInfoPage.module.css";
+import { Button } from "~/components/Button";
 
 const MAX_USER_ID = 9999;
 
-export default function UserInfo({
-    onAuthDone,
-}: {
-    onAuthDone: (userId: number) => void;
-}) {
-    const { userId, createUser } = useUserInfo();
+export default function UserInfoPage(
+    {
+        onAuthDone
+    }: {
+        onAuthDone: (userId: number) => void;
+    }) {
+    const { userId, createUser } = useUserInfoPage();
 
     return (
-        <div className="flex h-full w-full flex-row items-center justify-center sm:h-1/2">
-            <div className="mx-[5%] my-[10%] flex h-full w-full flex-col items-center justify-center md:w-3/4 lg:w-1/2">
+        <div className={styles.pageContainer}>
+            <div className={styles.pageInnerContainer}>
                 {userId != undefined ? (
                     <>
-                        <h1 className="text-4xl font-bold text-secondary">
+                        <h1>
                             User created!
                         </h1>
-                        <button
-                            className="rnd-button"
-                            onClick={() => onAuthDone(userId)}
-                        >
+                        <Button variant={"round"} onClick={() => onAuthDone(userId)
+                        }>
                             Click here to advance
-                        </button>
+                        </Button>
                     </>
                 ) : (
                     <>
-                        <h1 className="text-4xl font-bold text-secondary">
+                        <h1>
                             Create New User
                         </h1>
-                        <button
-                            className="rnd-button"
-                            onClick={() => createUser()}
-                        >
+                        <Button variant={"round"} onClick={() => createUser()}>
                             Click To Create user
-                        </button>
+                        </Button>
                     </>
                 )}
             </div>
@@ -45,7 +43,7 @@ export default function UserInfo({
     );
 }
 
-function useUserInfo() {
+function useUserInfoPage() {
     const setIsLoggedIn = useSetIsLoggedIn();
     const setError = useSetError();
 

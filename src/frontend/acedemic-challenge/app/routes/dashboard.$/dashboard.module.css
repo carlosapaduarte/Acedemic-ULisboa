@@ -1,0 +1,7 @@
+@import "../log-in/login.module.css";
+
+.logoutButton {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    height: 4rem;
+}

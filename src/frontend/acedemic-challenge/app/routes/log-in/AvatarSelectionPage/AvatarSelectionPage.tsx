@@ -2,52 +2,53 @@ import { t } from "i18next";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
 import React, { useEffect } from "react";
+import styles from "./avatarSelectionPage.module.css";
+import { ConfirmButton } from "~/components/Button";
 
-export default function AvatarSelectionPage({
-    userId,
-    onComplete,
-}: {
-    userId: number;
-    onComplete: () => void;
-}) {
+export default function AvatarSelectionPage(
+    {
+        userId,
+        onComplete
+    }: {
+        userId: number;
+        onComplete: () => void;
+    }) {
     const { onConfirmClick, selectedAvatar, setSelectedAvatar, avatars } =
         useAvatarSelection({
             userId: userId,
-            onComplete: onComplete,
+            onComplete: onComplete
         });
 
     return (
-        <div className="flex h-full w-full flex-row items-center justify-center">
-            <div className="flex h-full w-full flex-col items-center">
+        <div className={styles.avatarSelectionPageContainer}>
+            <div className={styles.avatarSelectionPageInnerContainer}>
                 <Title />
                 <AvatarList
                     selectedAvatar={selectedAvatar}
                     setSelectedAvatar={setSelectedAvatar}
                     avatars={avatars}
                 />
-                <div className="flex w-full flex-grow items-center justify-center">
-                    <button
-                        className="cut-button h-16 w-64 bg-yellow text-2xl" /*hover:bg-yellow/85*/
-                        onClick={() => {
-                            if (selectedAvatar !== null)
-                                onConfirmClick(avatars[selectedAvatar]);
-                        }}
-                    >
+                <div className={styles.confirmButtonContainer}>
+                    <ConfirmButton onClick={() => {
+                        if (selectedAvatar !== null)
+                            onConfirmClick(avatars[selectedAvatar]);
+                    }}>
                         {t("login:confirm_level")}
-                    </button>
+                    </ConfirmButton>
                 </div>
             </div>
         </div>
     );
 }
 
-function useAvatarSelection({
-    userId,
-    onComplete,
-}: {
-    userId: number;
-    onComplete: () => void;
-}) {
+function useAvatarSelection(
+    {
+        userId,
+        onComplete
+    }: {
+        userId: number;
+        onComplete: () => void;
+    }) {
     const setError = useSetError();
     const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
     const [avatars, setAvatars] = React.useState<string[]>([]);
@@ -67,35 +68,36 @@ function useAvatarSelection({
         onConfirmClick: onConfirmClickHandler,
         selectedAvatar,
         setSelectedAvatar,
-        avatars,
+        avatars
     };
 }
 
 function Title() {
     return (
-        <div className="my-8 flex justify-center">
-            <h5 className="text-3xl font-medium text-secondary">
+        <div className={styles.titleContainer}>
+            <h1 className={styles.titleHeading}>
                 {t("login:select_avatar_initial_question")}
-            </h5>
+            </h1>
         </div>
     );
 }
 
-function AvatarList({
-    selectedAvatar,
-    setSelectedAvatar,
-    avatars,
-}: {
-    selectedAvatar: number;
-    setSelectedAvatar: (index: number) => void;
-    avatars: string[];
-}) {
+function AvatarList(
+    {
+        selectedAvatar,
+        setSelectedAvatar,
+        avatars
+    }: {
+        selectedAvatar: number;
+        setSelectedAvatar: (index: number) => void;
+        avatars: string[];
+    }) {
     return (
-        <div className="h-2/5 overflow-auto">
-            <div className="avatar-grid gap-2">
+        <div className={styles.avatarListContainer}>
+            <div className={styles.avatarGrid}>
                 {avatars.map((avatar: string, index: number) => (
                     <div
-                        className={`min-h-8 min-w-8 ${selectedAvatar === index ? "border-4 border-yellow" : ""}`} /*max-h-24 max-w-24*/
+                        className={`${styles.avatarContainer} ${selectedAvatar === index ? styles.selected : ""}`}
                         onClick={() => setSelectedAvatar(index)}
                     >
                         <img

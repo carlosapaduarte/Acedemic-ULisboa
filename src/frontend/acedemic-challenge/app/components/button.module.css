@@ -1,0 +1,8 @@
+
+.confirmButton {
+    height: 4rem;
+    width: 12rem;
+    background-color: var(--yellow);
+    font-weight: bold;
+    font-size: 1.5rem;
+}

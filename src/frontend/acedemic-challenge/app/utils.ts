@@ -2,7 +2,7 @@ import { Level1 } from "./challenges/level_1";
 import { Level2 } from "./challenges/level_2";
 import { Level3 } from "./challenges/level_3";
 import { DayGoals, Goal } from "./challenges/types";
-import { LevelType } from "./routes/log-in/SelectLevelPage";
+import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 
 function sameDay(date1: Date, date2: Date): boolean {
     return (
@@ -72,12 +72,12 @@ function getGoalsPerDay(level: LevelType): Goal[][] {
 
 function getGoalsPerDayByStartDate(
     level: LevelType,
-    startDate: Date,
+    startDate: Date
 ): Goal[][] {
     const allGoals: Goal[][] = getGoalsPerDay(level);
     //console.log("All goals: ", allGoals)
     const numberOfPassedDays = Math.round(
-        (new Date().getTime() - startDate.getTime()) / (1000 * 3600 * 24),
+        (new Date().getTime() - startDate.getTime()) / (1000 * 3600 * 24)
     );
     //console.log("Number of passed days: ", numberOfPassedDays)
     return allGoals.slice(0, numberOfPassedDays + 1);
@@ -87,5 +87,5 @@ export const utils = {
     sameDay,
     getUserGoals,
     getGoalsPerDay,
-    getGoalsPerDayByStartDate,
+    getGoalsPerDayByStartDate
 };

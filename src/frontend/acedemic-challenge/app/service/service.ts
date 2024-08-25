@@ -1,7 +1,6 @@
 // This component could be used to define functions that interact with the Backend and other external services.
 
-import { Goal } from "../challenges/types";
-import { LevelType } from "~/routes/log-in/SelectLevelPage";
+import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import { doFetch, toBody } from "./fetch";
 import { Logger } from "tslog";
 
@@ -16,7 +15,7 @@ async function createUserOrLogin(userId: number) {
     const request = {
         path: "login",
         method: "POST",
-        body: toBody({ id: userId }),
+        body: toBody({ id: userId })
     };
     const response: Response = await doFetch(request);
     //console.log('Is logged in: ', response)
@@ -28,7 +27,7 @@ async function chooseLevel(userId: number, level: LevelType) {
     const request = {
         path: "set-level",
         method: "POST",
-        body: toBody({ id: userId, level: level }),
+        body: toBody({ id: userId, level: level })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -37,18 +36,18 @@ async function chooseLevel(userId: number, level: LevelType) {
 
 async function selectShareProgressState(
     userId: number,
-    shareProgress: boolean,
+    shareProgress: boolean
 ) {
     const request = {
         path: "set-publish-state-preference",
         method: "POST",
-        body: toBody({ id: userId, shareProgress }),
+        body: toBody({ id: userId, shareProgress })
     };
     const response: Response = await doFetch(request);
     //console.log(response)
     if (!response.ok)
         return Promise.reject(
-            new Error("Progress share preference selection failed!"),
+            new Error("Progress share preference selection failed!")
         );
 }
 
@@ -56,7 +55,7 @@ async function selectAvatar(userId: number, avatarFilename: string) {
     const request = {
         path: "set-user-avatar",
         method: "POST",
-        body: toBody({ id: userId, avatarFilename }),
+        body: toBody({ id: userId, avatarFilename })
     };
     const response: Response = await doFetch(request);
     //console.log(response)
@@ -90,7 +89,7 @@ export type UserInfo = {
 async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
     const request = {
         path: `users/${userId}`,
-        method: "GET",
+        method: "GET"
     };
     const response: Response = await doFetch(request);
 
@@ -103,14 +102,14 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
 async function createNewUserNote(
     userId: number,
     name: string,
-    userGoalDate: Date,
+    userGoalDate: Date
 ) {
     //console.log(userGoalDate.getTime())
 
     const request = {
         path: `users/${userId}/notes`,
         method: "POST",
-        body: toBody({ id: userId, name, date: userGoalDate.getTime() }),
+        body: toBody({ id: userId, name, date: userGoalDate.getTime() })
     };
     const response: Response = await doFetch(request);
     if (!response.ok) return Promise.reject(new Error("Note creation failed!"));
@@ -119,12 +118,12 @@ async function createNewUserNote(
 async function markGoalAsCompleted(
     userId: number,
     goalName: String,
-    date: Date,
+    date: Date
 ) {
     const request = {
         path: `users/${userId}/completed-goals`,
         method: "POST",
-        body: toBody({ id: userId, goalName, date: date.getTime() }),
+        body: toBody({ id: userId, goalName, date: date.getTime() })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -138,5 +137,5 @@ export const service = {
     selectAvatar,
     fetchUserInfoFromApi,
     createNewUserNote,
-    markGoalAsCompleted,
+    markGoalAsCompleted
 };

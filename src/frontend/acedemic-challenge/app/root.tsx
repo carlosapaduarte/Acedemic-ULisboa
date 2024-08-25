@@ -1,15 +1,6 @@
-import {
-    isRouteErrorResponse,
-    Links,
-    Meta,
-    Outlet,
-    Scripts,
-    ScrollRestoration,
-    useRouteError,
-} from "@remix-run/react";
-import "./tailwind.css";
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from "@remix-run/react";
+import "./global.css";
 import "./Translations";
-
 import type { MetaFunction } from "@remix-run/node";
 import AppDashboard from "~/AppDashboard";
 import { AuthnContainer, useIsLoggedIn } from "~/components/auth/Authn";
@@ -18,28 +9,28 @@ import { NotFoundPage } from "~/Pages/NotFoundPage";
 export const meta: MetaFunction = () => {
     return [
         { title: "Acedemic Challenge" },
-        { name: "Acedemic Challenge", content: "Acedemic Challenge" },
+        { name: "Acedemic Challenge", content: "Acedemic Challenge" }
     ];
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
-            <head>
-                <meta charSet="utf-8" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1"
-                />
-                <title>Acedemic Challenge</title>
-                <Meta />
-                <Links />
-            </head>
-            <body className="h-screen w-screen bg-primary">
-                {children}
-                <ScrollRestoration />
-                <Scripts />
-            </body>
+        <head>
+            <meta charSet="utf-8" />
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1"
+            />
+            <title>Acedemic Challenge</title>
+            <Meta />
+            <Links />
+        </head>
+        <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+        </body>
         </html>
     );
 }
@@ -54,7 +45,7 @@ export default function Root() {
 
 export function App() {
     return (
-        <div className="size-full">
+        <div className="app">
             <>
                 {useIsLoggedIn() ? (
                     <AppDashboard>
@@ -74,9 +65,7 @@ export function ErrorBoundary() {
     if (isRouteErrorResponse(error)) {
         if (error.status === 404) {
             return (
-                <div className="h-screen w-screen bg-primary">
-                    <NotFoundPage />
-                </div>
+                <NotFoundPage />
             );
         }
         return (
