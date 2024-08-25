@@ -122,7 +122,7 @@ function Level({
         <div className={styles.levelContainer}>
             <div className={styles.levelImageContainer}>
                 <img
-                    src={`../../../public/lvl${levelType.valueOf()}.png`}
+                    src={`/lvl${levelType.valueOf()}.png`}
                     loading="lazy"
                     alt={`Level ${levelType.valueOf()} Image`}
                 />
