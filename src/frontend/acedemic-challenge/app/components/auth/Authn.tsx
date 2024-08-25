@@ -6,16 +6,18 @@ import { useSetError } from "../error/ErrorContainer";
 
 const logger = new Logger({ name: "Authn" });
 type ContextType = {
-    logged: boolean | undefined;
-    setLogged: (logged: boolean) => void;
+    isLoggedIn: boolean | undefined;
+    logIn: (userId: number) => void;
+    logOut: () => void;
 };
 const LoggedInContext = createContext<ContextType>({
-    logged: false,
-    setLogged: (logged: boolean) => {},
+    isLoggedIn: false,
+    logIn: (userId: number) => {},
+    logOut: () => {},
 });
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
-    const [logged, setLogged] = useState<boolean | undefined>(undefined);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>(undefined);
     const setError = useSetError();
 
     useEffect(() => {
@@ -26,7 +28,7 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
             const cachedUserId = localStorage["userId"];
             if (cachedUserId == undefined) {
                 logger.debug("User is not logged in");
-                setLogged(false);
+                setIsLoggedIn(false);
                 return;
             }
             logger.debug("User has id stored");
@@ -34,7 +36,7 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
                 .createUserOrLogin(cachedUserId) // if user ID is invalid, returns false
                 .then(() => {
                     logger.debug("User is logged in");
-                    setLogged(true);
+                    setIsLoggedIn(true);
                 })
                 .catch((error) => setError(error));
         }
@@ -42,9 +44,20 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
         fetchUser();
     }, []);
 
+    function logIn(userId: number) {
+        localStorage["userId"] = userId;
+        setIsLoggedIn(true);
+    }
+
+    function logOut() {
+        console.log("Logging out...");
+        localStorage.removeItem("userId");
+        setIsLoggedIn(false);
+    }
+
     return (
         <LoggedInContext.Provider
-            value={{ logged: logged, setLogged: setLogged }}
+            value={{ isLoggedIn: isLoggedIn, logIn: logIn, logOut: logOut }}
         >
             {children}
         </LoggedInContext.Provider>
@@ -52,9 +65,13 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
 }
 
 export function useIsLoggedIn() {
-    return useContext(LoggedInContext).logged;
+    return useContext(LoggedInContext).isLoggedIn;
 }
 
-export function useSetIsLoggedIn() {
-    return useContext(LoggedInContext).setLogged;
+export function useLogIn() {
+    return useContext(LoggedInContext).logIn;
+}
+
+export function useLogOut() {
+    return useContext(LoggedInContext).logOut;
 }

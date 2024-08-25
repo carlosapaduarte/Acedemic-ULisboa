@@ -2,8 +2,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, 
 import "./global.css";
 import "./Translations";
 import type { MetaFunction } from "@remix-run/node";
-import AppDashboard from "~/AppDashboard";
-import { AuthnContainer, useIsLoggedIn } from "~/components/auth/Authn";
+import { AuthnContainer } from "~/components/auth/Authn";
 import { NotFoundPage } from "~/Pages/NotFoundPage";
 
 export const meta: MetaFunction = () => {
@@ -46,15 +45,7 @@ export default function Root() {
 export function App() {
     return (
         <div className="app">
-            <>
-                {useIsLoggedIn() ? (
-                    <AppDashboard>
-                        <Outlet />
-                    </AppDashboard>
-                ) : (
-                    <Outlet />
-                )}
-            </>
+            <Outlet />
         </div>
     );
 }

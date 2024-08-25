@@ -1,4 +1,4 @@
-import { useSetIsLoggedIn } from "~/components/auth/Authn";
+import { useLogIn } from "~/components/auth/Authn";
 import { useSetError } from "~/components/error/ErrorContainer";
 import React, { useState } from "react";
 import { service } from "~/service/service";
@@ -44,7 +44,7 @@ export default function UserInfoPage(
 }
 
 function useUserInfoPage() {
-    const setIsLoggedIn = useSetIsLoggedIn();
+    const logIn = useLogIn();
     const setError = useSetError();
 
     // This function should redirect user to ULisboa authentication page,
@@ -53,14 +53,13 @@ function useUserInfoPage() {
     const [userId, setUserId] = useState<number | undefined>(undefined);
 
     async function createUser() {
-        const userId = Math.floor(Math.random() * MAX_USER_ID);
+        const generatedUserId = Math.floor(Math.random() * MAX_USER_ID);
         await service
-            .createUserOrLogin(userId)
+            .createUserOrLogin(generatedUserId)
             .then(() => {
                 // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
-                localStorage["userId"] = userId.toString();
-                /*setIsLoggedIn(true);*/ // Sets - user logged in - in auth container
-                setUserId(userId);
+                logIn(generatedUserId);
+                setUserId(generatedUserId);
             })
             .catch((error) => setError(error));
     }

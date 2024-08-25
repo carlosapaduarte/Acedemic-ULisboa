@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useIsLoggedIn, useSetIsLoggedIn } from "~/components/auth/Authn";
+import { useIsLoggedIn } from "~/components/auth/Authn";
 import { useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 import styles from "./index.module.css";
@@ -28,19 +28,13 @@ export default function WelcomePage() {
 
 function useWelcomePage() {
     const isLoggedIn = useIsLoggedIn();
-    const setLoggedIn = useSetIsLoggedIn();
     const navigate = useNavigate();
 
     useEffect(() => {
         if (isLoggedIn) {
-            if (localStorage["userId"]) {
-                const cachedUserId = localStorage["userId"]; // TODO: use cache just for now
-                navigate(`/dashboard/${cachedUserId}`);
-            } else {
-                setLoggedIn(false);
-            }
+            navigate(`/dashboard/`);
         }
-    }, []);
+    }, [isLoggedIn]);
 
     const handleOnProceedClick = () => {
         if (!isLoggedIn) {

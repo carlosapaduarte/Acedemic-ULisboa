@@ -1,11 +1,11 @@
 import styles from "./dashboard.module.css";
 import { Button } from "~/components/Button";
 import { useNavigate } from "@remix-run/react";
-import { useSetIsLoggedIn } from "~/components/auth/Authn";
+import { useLogOut } from "~/components/auth/Authn";
 
 export default function DashboardPage() {
     const navigate = useNavigate();
-    const setLoggedIn = useSetIsLoggedIn();
+    const logOut = useLogOut();
 
     return (
         <div className={`${styles.pageContainer}`}>
@@ -15,8 +15,7 @@ export default function DashboardPage() {
                 <Button variant={"round"}
                         className={styles.logoutButton}
                         onClick={() => {
-                            localStorage.removeItem("userId");
-                            setLoggedIn(false);
+                            logOut();
                             navigate("/");
                         }}
                 >Log out</Button>

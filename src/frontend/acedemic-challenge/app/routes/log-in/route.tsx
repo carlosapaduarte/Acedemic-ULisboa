@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UserInfoPage from "~/routes/log-in/UserInfoPage/UserInfoPage";
 import ShareProgressPage from "~/routes/log-in/ShareProgressPage/ShareProgressPage";
 import QuizPage from "~/routes/log-in/QuizPage/QuizPage";
@@ -27,9 +27,11 @@ export default function LoginPage() {
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const navigate = useNavigate();
 
-    if (currentView == "redirect") {
-        navigate(`/dashboard/${userId}`);
-    }
+    useEffect(() => {
+        if (currentView === "redirect") {
+            navigate(`/dashboard/`);
+        }
+    }, [currentView, navigate]);
 
     switch (currentView) {
         case "userInfo":
@@ -70,6 +72,8 @@ export default function LoginPage() {
                     onComplete={() => setCurrentView("redirect")}
                 />
             );
+        case "redirect":
+            return <></>;
         default:
             return <h1>Should not have arrived here!</h1>;
     }
