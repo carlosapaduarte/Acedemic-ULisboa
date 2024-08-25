@@ -97,6 +97,7 @@ function Levels(
         <div className={styles.levelListContainer}>
             {getLevelTypes().map((levelType: LevelType) => (
                 <Level
+                    key={levelType.valueOf()}
                     selected={selectedLevel === levelType}
                     levelType={levelType}
                     onLevelClick={onLevelClick}

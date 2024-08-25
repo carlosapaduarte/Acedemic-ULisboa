@@ -97,6 +97,7 @@ function AvatarList(
             <div className={styles.avatarGrid}>
                 {avatars.map((avatar: string, index: number) => (
                     <div
+                        key={index}
                         className={`${styles.avatarContainer} ${selectedAvatar === index ? styles.selected : ""}`}
                         onClick={() => setSelectedAvatar(index)}
                     >
