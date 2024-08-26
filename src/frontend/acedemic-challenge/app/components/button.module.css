@@ -1,4 +1,31 @@
 
+.roundButton {
+    height: 4rem;
+    width: 16rem;
+    background-color: var(--secondary);
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.75rem;
+    border-radius: 0.25rem;
+}
+
+.cutButton {
+    --edge-size: .5em;
+    clip-path: polygon(
+            var(--edge-size) 0,
+            calc(100% - var(--edge-size)) 0,
+            100% var(--edge-size),
+            100% calc(100% - var(--edge-size)),
+            calc(100% - var(--edge-size)) 100%,
+            var(--edge-size) 100%,
+            0 calc(100% - var(--edge-size)),
+            0 var(--edge-size)
+    );
+
+    text-transform: uppercase;
+    font-family: 'Chakra Petch', sans-serif;
+}
+
 .confirmButton {
     height: 4rem;
     width: 12rem;
