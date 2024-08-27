@@ -1,6 +1,6 @@
-@import "../../page.module.css";
+@import "../../../page.module.css";
 
-.logoutButton {
+.proceedButton {
     margin-bottom: 1rem;
     margin-top: 1rem;
     height: 4rem;

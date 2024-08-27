@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import UserInfoPage from "~/routes/log-in/UserInfoPage/UserInfoPage";
 import ShareProgressPage from "~/routes/log-in/ShareProgressPage/ShareProgressPage";
 import QuizPage from "~/routes/log-in/QuizPage/QuizPage";
@@ -11,8 +11,7 @@ type Views =
     | "shareProgress"
     | "chooseLevel"
     | "quiz"
-    | "selectAvatar"
-    | "redirect";
+    | "selectAvatar";
 
 /**
  * This React component:
@@ -26,12 +25,6 @@ export default function LoginPage() {
     const [currentView, setCurrentView] = useState<Views>("userInfo");
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (currentView === "redirect") {
-            navigate(`/dashboard/`);
-        }
-    }, [currentView, navigate]);
 
     switch (currentView) {
         case "userInfo":
@@ -69,11 +62,9 @@ export default function LoginPage() {
             return (
                 <AvatarSelectionPage
                     userId={userId!}
-                    onComplete={() => setCurrentView("redirect")}
+                    onComplete={() => navigate(`/`)}
                 />
             );
-        case "redirect":
-            return <></>;
         default:
             return <h1>Should not have arrived here!</h1>;
     }

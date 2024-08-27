@@ -1,50 +1,17 @@
-import { useTranslation } from "react-i18next";
 import { useIsLoggedIn } from "~/components/auth/Authn";
-import { useNavigate } from "@remix-run/react";
-import { useEffect } from "react";
-import styles from "./index.module.css";
-import { Button } from "~/components/Button";
+import WelcomePage from "~/routes/_index/WelcomePage/WelcomePage";
+import HomePage from "~/routes/_index/Home/HomePage";
 
-export default function WelcomePage() {
-    const { t } = useTranslation();
-    const { isLoggedIn, handleOnProceedClick } = useWelcomePage();
+export default function IndexPage() {
+    const isLoggedIn = useIsLoggedIn();
 
-    if (isLoggedIn == true || isLoggedIn == undefined) {
-        return null;
+    if (isLoggedIn == undefined) {
+        return <h1 style={{ color: "white" }}>Loading...</h1>;
     }
 
-    return (
-        <div className={styles.pageContainer}>
-            <div className={styles.pageInnerContainer}>
-                <h1>
-                    {t("welcome_page:title")}
-                </h1>
-                <p>
-                    {t("welcome_page:description")}
-                </p>
-                <Button variant={"round"} className={styles.proceedButton} onClick={handleOnProceedClick}>
-                    {t("welcome_page:proceed")}
-                </Button>
-            </div>
-        </div>
-    );
-}
+    if (!isLoggedIn) {
+        return <WelcomePage />;
+    }
 
-function useWelcomePage() {
-    const isLoggedIn = useIsLoggedIn();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate(`/dashboard/`);
-        }
-    }, [isLoggedIn]);
-
-    const handleOnProceedClick = () => {
-        if (!isLoggedIn) {
-            navigate("/log-in");
-        }
-    };
-
-    return { isLoggedIn, handleOnProceedClick };
+    return <HomePage />;
 }

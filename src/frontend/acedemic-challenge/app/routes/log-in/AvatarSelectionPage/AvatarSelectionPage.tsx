@@ -5,40 +5,12 @@ import React, { useEffect } from "react";
 import styles from "./avatarSelectionPage.module.css";
 import { ConfirmButton } from "~/components/Button";
 
-export default function AvatarSelectionPage(
-    {
-        userId,
-        onComplete
-    }: {
-        userId: number;
-        onComplete: () => void;
-    }) {
-    const { onConfirmClick, selectedAvatar, setSelectedAvatar, avatars } =
-        useAvatarSelection({
-            userId: userId,
-            onComplete: onComplete
-        });
-
-    return (
-        <div className={styles.avatarSelectionPageContainer}>
-            <div className={styles.avatarSelectionPageInnerContainer}>
-                <Title />
-                <AvatarList
-                    selectedAvatar={selectedAvatar}
-                    setSelectedAvatar={setSelectedAvatar}
-                    avatars={avatars}
-                />
-                <div className={styles.confirmButtonContainer}>
-                    <ConfirmButton onClick={() => {
-                        if (selectedAvatar !== null)
-                            onConfirmClick(avatars[selectedAvatar]);
-                    }}>
-                        {t("login:confirm_level")}
-                    </ConfirmButton>
-                </div>
-            </div>
-        </div>
-    );
+function createAvatars(): string[] {
+    const avatars: string[] = [];
+    for (let u = 0; u < 30; u++) {
+        avatars.push("./test.webp"); // filename
+    }
+    return avatars;
 }
 
 function useAvatarSelection(
@@ -112,10 +84,38 @@ function AvatarList(
     );
 }
 
-function createAvatars(): string[] {
-    const avatars: string[] = [];
-    for (let u = 0; u < 30; u++) {
-        avatars.push("./test.webp"); // filename
-    }
-    return avatars;
+export default function AvatarSelectionPage(
+    {
+        userId,
+        onComplete
+    }: {
+        userId: number;
+        onComplete: () => void;
+    }) {
+    const { onConfirmClick, selectedAvatar, setSelectedAvatar, avatars } =
+        useAvatarSelection({
+            userId: userId,
+            onComplete: onComplete
+        });
+
+    return (
+        <div className={styles.avatarSelectionPageContainer}>
+            <div className={styles.avatarSelectionPageInnerContainer}>
+                <Title />
+                <AvatarList
+                    selectedAvatar={selectedAvatar}
+                    setSelectedAvatar={setSelectedAvatar}
+                    avatars={avatars}
+                />
+                <div className={styles.confirmButtonContainer}>
+                    <ConfirmButton onClick={() => {
+                        if (selectedAvatar !== null)
+                            onConfirmClick(avatars[selectedAvatar]);
+                    }}>
+                        {t("login:confirm_level")}
+                    </ConfirmButton>
+                </div>
+            </div>
+        </div>
+    );
 }

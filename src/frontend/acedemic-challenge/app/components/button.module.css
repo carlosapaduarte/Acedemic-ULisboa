@@ -34,6 +34,18 @@
     font-size: 1.5rem;
 }
 
+/*
+Something like this could be very interesting for animating.
+
+.roundButton {
+    position: relative;
+    top: 0;
+    transition: all ease 0.3s;
+}
+.roundButton:active {
+    top: 3px;
+}*/
+
 @media (hover: hover) {
     .roundButton:hover {
         background-color: var(--secondary-85);

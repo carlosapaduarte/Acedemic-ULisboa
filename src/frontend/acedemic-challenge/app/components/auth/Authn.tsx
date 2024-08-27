@@ -7,33 +7,55 @@ import { useSetError } from "../error/ErrorContainer";
 const logger = new Logger({ name: "Authn" });
 type ContextType = {
     isLoggedIn: boolean | undefined;
+    userId: number | undefined;
     logIn: (userId: number) => void;
     logOut: () => void;
 };
 const LoggedInContext = createContext<ContextType>({
     isLoggedIn: false,
-    logIn: (userId: number) => {},
-    logOut: () => {},
+    userId: undefined,
+    logIn: (userId: number) => {
+    },
+    logOut: () => {
+    }
 });
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>(undefined);
+    const [userId, setUserId] = useState<number | undefined>(undefined);
     const setError = useSetError();
+
+    function logIn(newUserId: number) {
+        setUserId(newUserId);
+        setIsLoggedIn(true);
+        localStorage["userId"] = newUserId;
+    }
+
+    function logOut() {
+        console.log("Logging out...");
+        setUserId(undefined);
+        setIsLoggedIn(false);
+        localStorage.removeItem("userId");
+    }
 
     useEffect(() => {
         async function fetchUser() {
             // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
             // For now, this will ease development...
             // After Oauth, we need to think of a new solution
-            const cachedUserId = localStorage["userId"];
-            if (cachedUserId == undefined) {
+            const storedUserId = localStorage["userId"];
+
+            if (storedUserId == undefined) {
                 logger.debug("User is not logged in");
                 setIsLoggedIn(false);
                 return;
             }
+
             logger.debug("User has id stored");
+            setUserId(Number(storedUserId));
+
             await service
-                .createUserOrLogin(cachedUserId) // if user ID is invalid, returns false
+                .createUserOrLogin(storedUserId) // if user ID is invalid, returns false
                 .then(() => {
                     logger.debug("User is logged in");
                     setIsLoggedIn(true);
@@ -44,20 +66,9 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
         fetchUser();
     }, []);
 
-    function logIn(userId: number) {
-        localStorage["userId"] = userId;
-        setIsLoggedIn(true);
-    }
-
-    function logOut() {
-        console.log("Logging out...");
-        localStorage.removeItem("userId");
-        setIsLoggedIn(false);
-    }
-
     return (
         <LoggedInContext.Provider
-            value={{ isLoggedIn: isLoggedIn, logIn: logIn, logOut: logOut }}
+            value={{ isLoggedIn: isLoggedIn, userId: userId, logIn: logIn, logOut: logOut }}
         >
             {children}
         </LoggedInContext.Provider>
@@ -66,6 +77,10 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
 
 export function useIsLoggedIn() {
     return useContext(LoggedInContext).isLoggedIn;
+}
+
+export function useUserId() {
+    return useContext(LoggedInContext).userId;
 }
 
 export function useLogIn() {
