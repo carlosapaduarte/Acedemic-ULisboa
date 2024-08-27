@@ -7,7 +7,11 @@ import { Button } from "~/components/Button";
 
 export default function WelcomePage() {
     const { t } = useTranslation();
-    const { handleOnProceedClick } = useWelcomePage();
+    const { isLoggedIn, handleOnProceedClick } = useWelcomePage();
+
+    if (isLoggedIn == true || isLoggedIn == undefined) {
+        return null;
+    }
 
     return (
         <div className={styles.pageContainer}>
@@ -42,5 +46,5 @@ function useWelcomePage() {
         }
     };
 
-    return { handleOnProceedClick };
+    return { isLoggedIn, handleOnProceedClick };
 }

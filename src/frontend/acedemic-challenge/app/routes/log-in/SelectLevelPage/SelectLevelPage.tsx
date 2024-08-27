@@ -123,7 +123,6 @@ function Level({
             <div className={styles.levelImageContainer}>
                 <img
                     src={`/lvl${levelType.valueOf()}.png`}
-                    loading="lazy"
                     alt={`Level ${levelType.valueOf()} Image`}
                 />
             </div>

@@ -103,7 +103,6 @@ function AvatarList(
                     >
                         <img
                             src={avatar}
-                            loading="lazy"
                             alt={`Avatar ${index}`}
                         />
                     </div>
