@@ -1,0 +1,49 @@
+.calendar {
+    margin-top: 2%;
+}
+
+.title {
+    font-size: 170%;
+}
+
+.changeViewButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 2%;
+}
+
+.calendarItems {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+.calendarItems.singleCol {
+    grid-template-columns: auto;
+    width: 20%;
+}
+
+.calendarItem {
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    font-size: 150%;
+    padding: 10%;
+}
+
+.calendarItem.hour {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: small;
+    opacity: 35%;
+}
+
+.calendarItemText.today {
+    color: red;
+}
+
+.calendarItemText.lowOpacity {
+    opacity: 35%;
+}
+

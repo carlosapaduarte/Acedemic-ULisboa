@@ -52,3 +52,12 @@ class UserRepoMem(UserRepo):
     def update_user_avatar(self, user_id: int, avatar_filename: str):
         user: User = self.get_user(user_id)
         user.avatar_filename = avatar_filename
+
+    def update_receive_notifications_pref(self, user_id: int, receive: bool):
+        pass
+
+    def update_study_tracker_app_planning_day(self, user_id: int, day: int, hour: int):
+        pass
+
+    def create_new_study_tracker_task(self, user_id: int, title: str, date: datetime, tag: str):
+        pass

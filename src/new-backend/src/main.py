@@ -17,6 +17,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
@@ -51,6 +52,18 @@ def set_share_progress_preference(user_id: int, input_dto: SetShareProgressPrefe
 def set_user_avatar(user_id: int, input_dto: SetUserAvatarDto):
     service.set_user_avatar(user_id, input_dto.avatarFilename)
 
+@app.put("/users/{user_id}/study-tracker-app/use-goals")
+def update_study_tracker_app_use_goals(user_id: int, input_dto: SetStudyTrackerAppUseGoalsInputDto):
+    service.update_user_study_tracker_use_goals(user_id, input_dto.uses)
+
+@app.put("/users/{user_id}/study-tracker-app/receive-notifications-pref")
+def update_study_tracker_receive_notifications_pref(user_id: int, input_dto: UpdateStudyTrackerReceiveNotificationsPrefInputDto):
+    service.update_receive_notifications_pref(user_id, input_dto.receive)
+
+@app.put("/users/{user_id}/study-tracker-app/week-planning-day")
+def update_study_tracker_week_planning_day(user_id: int, input_dto: UpdateStudyTrackerWeekPlanningDayInputDto):
+    service.update_study_tracker_app_planning_day(user_id, input_dto.day, input_dto.hour)
+
 @app.get("/users/{user_id}")
 def get_user_info(user_id: int):
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
@@ -69,4 +82,9 @@ def add_completed_goal(user_id: int, batch_id: int, input_dto: GoalCompletedDto)
         input_dto.goalDay, 
         datetime.now()
     )
+    return Response()
+
+@app.post("/users/{user_id}/study-tracker-app/tasks")
+def create_new_study_tracker_task(user_id: int, input_dto: CreateNewStudyTrackerAppInputDto) -> Response:
+    service.create_new_study_tracker_task(user_id, input_dto.title, datetime.fromtimestamp(input_dto.date), input_dto.tag)
     return Response()

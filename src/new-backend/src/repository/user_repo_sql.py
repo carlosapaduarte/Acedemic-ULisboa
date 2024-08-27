@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 
-from repository.sql.models import BatchModel, GoalModel, NoteModel, UserModel
+from repository.sql.models import BatchModel, GoalModel, NoteModel, StudyTrackerAppUseModel, StudyTrackerTask, StudyTrackerWeekDayPlanningModel, UserModel
 from repository.user_repo import UserRepo
 from domain.user import Batch, CompletedGoal, User, UserNote
 from datetime import datetime
@@ -114,6 +114,79 @@ class UserRepoSql(UserRepo):
             
             user_model: UserModel = result.one()
             user_model.share_progress = share_progress
+            session.add(user_model)
+            session.commit()
+            session.refresh(user_model)
+
+    def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set):
+        with Session(engine) as session:
+            statement = select(UserModel).where(UserModel.id == user_id)
+            result = session.exec(statement)
+            
+            user_model: UserModel = result.one()
+
+            new_user_study_tracker_app_uses = []
+            for use_goal in use_goals:
+                new_user_study_tracker_app_uses.append(
+                    StudyTrackerAppUseModel(
+                        id=use_goal,
+                        user_id=user_id,
+                        user=user_model
+                    )
+                )
+
+            user_model.user_study_tracker_app_uses = new_user_study_tracker_app_uses
+            session.add(user_model)
+            session.commit()
+            session.refresh(user_model)
+
+    def update_receive_notifications_pref(self, user_id: int, receive: bool):
+        with Session(engine) as session:
+            statement = select(UserModel).where(UserModel.id == user_id)
+            result = session.exec(statement)
+            
+            user_model: UserModel = result.one()
+            user_model.receive_study_tracker_app_notifications = receive            
+
+            session.add(user_model)
+            session.commit()
+            session.refresh(user_model)
+
+    def update_study_tracker_app_planning_day(self, user_id: int, day: int, hour: int):
+        with Session(engine) as session:
+            statement = select(UserModel).where(UserModel.id == user_id)
+            result = session.exec(statement)
+            
+            user_model: UserModel = result.one()
+
+            user_model.study_tracker_planning_day = StudyTrackerWeekDayPlanningModel(
+                week_planning_day=day,
+                hour=hour,
+                user_id=user_id,
+                user=user_model
+            )
+
+            session.add(user_model)
+            session.commit()
+            session.refresh(user_model)
+
+    def create_new_study_tracker_task(self, user_id: int, title: str, date: datetime, tag: str):
+        with Session(engine) as session:
+            statement = select(UserModel).where(UserModel.id == user_id)
+            result = session.exec(statement)
+
+            user_model: UserModel = result.one()
+
+            user_model.study_tracker_tasks.append(
+                StudyTrackerTask(
+                    title=title,
+                    date=date,
+                    tag=tag,
+                    user_id=user_id,
+                    user=user_model
+                )
+            )
+
             session.add(user_model)
             session.commit()
             session.refresh(user_model)

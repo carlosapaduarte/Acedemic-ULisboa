@@ -56,3 +56,15 @@ def create_completed_goal(user_id: int, batch_id: int, goal_name: str, goal_day:
 
 def set_user_avatar(user_id: int, avatar_filename: str):
     user_repo.update_user_avatar(user_id, avatar_filename)
+
+def update_user_study_tracker_use_goals(user_id: int, use_goals: set):
+    user_repo.update_user_study_tracker_use_goals(user_id, use_goals)
+
+def update_receive_notifications_pref(user_id: int, receive: bool):
+    user_repo.update_receive_notifications_pref(user_id, receive)
+
+def update_study_tracker_app_planning_day(user_id: int, day: int, hour: int):
+    user_repo.update_study_tracker_app_planning_day(user_id, day, hour)
+
+def create_new_study_tracker_task(user_id: int, title: str, date: datetime, tag: str):
+    user_repo.create_new_study_tracker_task(user_id, title, date, tag)

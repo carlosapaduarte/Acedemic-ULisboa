@@ -4,8 +4,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useNavigate,
 } from "@remix-run/react";
 import "./tailwind.css";
+import { AuthnContainer } from "./components/auth/Authn";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -27,5 +29,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <AuthnContainer>
+      <Outlet />
+    </AuthnContainer>
+  )
 }
