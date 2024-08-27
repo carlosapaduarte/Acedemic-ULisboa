@@ -19,18 +19,6 @@
     justify-content: center;
 }
 
-.confirmButtonContainer {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-}
-
-.confirmLevelButton {
-    width: 16rem;
-}
-
 .titleContainer {
     margin-bottom: 5%;
     margin-top: 3%;
@@ -94,6 +82,27 @@
 
 .levelContentTextContainer p {
     width: 100%;
+}
+
+.confirmButtonContainer {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirmLevelButton {
+    width: 16rem;
+}
+
+@media (hover: hover) {
+    .levelButton.selected:hover {
+        background-color: var(--yellow-85);
+    }
+    .levelButton:hover {
+        background-color: var(--secondary-85);
+    }
 }
 
 @media (min-width: 768px) {

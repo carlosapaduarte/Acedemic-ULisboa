@@ -7,8 +7,10 @@
     --primary: #771480;
     --secondary: #7DF4BE;
     --purple-dark: #491351;
-    --yellow: #FFE600;
+    --yellow: #ffe600;
     --blue: #2e3192;
+    --yellow-85: rgba(255, 230, 0, 0.85);
+    --secondary-85: rgba(125, 244, 190, 0.85);
 }
 
 html, body {
