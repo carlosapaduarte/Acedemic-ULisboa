@@ -66,5 +66,5 @@ def update_receive_notifications_pref(user_id: int, receive: bool):
 def update_study_tracker_app_planning_day(user_id: int, day: int, hour: int):
     user_repo.update_study_tracker_app_planning_day(user_id, day, hour)
 
-def create_new_study_tracker_task(user_id: int, title: str, date: datetime, tag: str):
-    user_repo.create_new_study_tracker_task(user_id, title, date, tag)
+def create_new_study_tracker_task(user_id: int, title: str, start_date: datetime, end_date: datetime, tag: str):
+    user_repo.create_new_study_tracker_task(user_id, title, start_date, end_date, tag)

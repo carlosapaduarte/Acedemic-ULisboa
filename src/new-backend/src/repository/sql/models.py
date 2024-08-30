@@ -66,7 +66,9 @@ class StudyTrackerWeekDayPlanningModel(SQLModel, table=True):
     user: UserModel = Relationship(back_populates="study_tracker_planning_day")
 
 class StudyTrackerTask(SQLModel, table=True):
-    date: datetime = Field(primary_key=True)
+    id: int = Field(primary_key=True)
+    start_date: datetime
+    end_date: datetime
     title: str
     tag: str
 

@@ -49,5 +49,5 @@ class UserRepo(ABC):
         pass
 
     @abstractmethod
-    def create_new_study_tracker_task(self, user_id: int, title: str, date: datetime, tag: str):
+    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime, tag: str):
         pass

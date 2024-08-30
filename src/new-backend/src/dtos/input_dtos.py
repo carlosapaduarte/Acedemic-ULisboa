@@ -18,7 +18,7 @@ class SetShareProgressPreferenceDto(BaseModel):
 
 class NewUserNoteDto(BaseModel):
     text: str
-    date: int
+    date: float
 
 class SetUserAvatarDto(BaseModel):
     avatarFilename: str
@@ -37,7 +37,8 @@ class UpdateStudyTrackerWeekPlanningDayInputDto(BaseModel):
     day: int
     hour: int
 
-class CreateNewStudyTrackerAppInputDto(BaseModel):
+class CreateNewStudyTrackerTaskInputDto(BaseModel):
+    start_date: float
+    end_date: float
     title: str
-    date: int
     tag: str

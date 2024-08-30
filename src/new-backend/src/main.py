@@ -85,6 +85,12 @@ def add_completed_goal(user_id: int, batch_id: int, input_dto: GoalCompletedDto)
     return Response()
 
 @app.post("/users/{user_id}/study-tracker-app/tasks")
-def create_new_study_tracker_task(user_id: int, input_dto: CreateNewStudyTrackerAppInputDto) -> Response:
-    service.create_new_study_tracker_task(user_id, input_dto.title, datetime.fromtimestamp(input_dto.date), input_dto.tag)
+def create_new_study_tracker_task(user_id: int, input_dto: CreateNewStudyTrackerTaskInputDto) -> Response:
+    service.create_new_study_tracker_task(
+        user_id, 
+        input_dto.title, 
+        datetime.fromtimestamp(input_dto.start_date),
+        datetime.fromtimestamp(input_dto.end_date),
+        input_dto.tag
+    )
     return Response()

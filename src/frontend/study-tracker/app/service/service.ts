@@ -114,17 +114,23 @@ async function updateWeekPlanningDay(userId: number, day: number, hour: number) 
 
 export type NewTaskInfo = {
     title: string,
-    date: Date,
+    startDate: Date,
+    endDate: Date,
     tag: string
 }
 
 async function createNewTask(userId: number, newTaskInfo: NewTaskInfo) {
+    console.log("New Task Info: ", newTaskInfo)
+    console.log(newTaskInfo.startDate.getTime() / 1000)
+    console.log(newTaskInfo.endDate.getTime() / 1000)
+
     const request = {
         path: `users/${userId}/study-tracker-app/tasks`,
         method: 'POST',
         body: toBody({
             title: newTaskInfo.title,
-            date: newTaskInfo.date.getTime() / 1000,
+            start_date: newTaskInfo.startDate.getTime() / 1000,
+            end_date: newTaskInfo.endDate.getTime() / 1000,
             tag: newTaskInfo.tag
         }),
     }

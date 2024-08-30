@@ -1,14 +1,14 @@
 import { buildHours, CalendarDay, Day, WeekHeader } from "./commons"
 import styles from "./calendar.module.css";
 
-export function CalendarWeekView({onHourClick} : {onHourClick: (date: Date) => void}) {
-	const weekDays: CalendarDay[] = buildDates()
+export function CalendarWeekView({baseDate, onHourClick} : {baseDate: Date, onHourClick: (date: Date) => void}) {
+	const weekDays: CalendarDay[] = buildDates(baseDate)
 	return (
 		<div>
 			<WeekHeader/>
 			<div className={`${styles.calendarItems}`}>
-				{weekDays.map((day: CalendarDay) => 
-					<Day day={day} onDayClick={() => {}} />
+				{weekDays.map((day: CalendarDay, index: number) => 
+					<Day key={index} day={day} onDayClick={() => {}} />
 				)}
 			</div>
 			<Hours onHourClick={onHourClick}/>
@@ -16,13 +16,12 @@ export function CalendarWeekView({onHourClick} : {onHourClick: (date: Date) => v
 	)
 }
 
-function buildDates(): CalendarDay[] {
-	const weekDay = new Date().getDay()
-	const today = new Date()
+function buildDates(baseDate: Date): CalendarDay[] {
+	const weekDay = baseDate.getDay()
 	
 	// Offsets to first day of week
 	const tmp = new Date()
-	tmp.setDate(today.getDate() - weekDay)
+	tmp.setDate(baseDate.getDate() - weekDay)
 	
 	const storedDays: CalendarDay[] = []
 	for (let u = 0; u < 7; u++) {
@@ -51,9 +50,9 @@ function Hours({onHourClick} : {onHourClick: ((date: Date) => void)}) {
 	const hours = buildHours(7)
 	return (
 		<div className={`${styles.calendarItems}`}>
-			{hours.map((date: Date) => 
-				<div className={`${styles.calendarItem} ${styles.hour}`} onClick={() => onHourClick(date)}>
-					{date.getHours()}
+			{hours.map((date: Date, index: number) => 
+				<div key={index} className={`${styles.calendarItem} ${styles.hour}`} onClick={() => onHourClick(date)}>
+					{date.getHours()}	
 				</div>
 			)}
 		</div>

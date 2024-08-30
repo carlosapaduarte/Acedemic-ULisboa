@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import { useSetError } from "~/components/error/ErrorContainer"
-import { service } from "~/service/service"
+import { NewTaskInfo, service } from "~/service/service"
 
 type Category = {
     name: string,
@@ -26,18 +26,13 @@ const categories: Category[] = [
     }
 ]
 
-export type AddNewTaskInfo = {
-	date: Date,
-	hour: number | undefined
-}
-
-export function AddTask({addNewTaskInfo, onNewTaskCreated} : {addNewTaskInfo: AddNewTaskInfo, onNewTaskCreated: () => void}) {
-	const { title, hour, tag, setTitle, setHour, setTag, createNewTask } = useAddTask(addNewTaskInfo, onNewTaskCreated)
+export function AddTask({startDate, onNewTaskCreated} : {startDate: Date, onNewTaskCreated: () => void}) {
+	const { title, endDate, tag, setTitle, setEndDate, setTag, createNewTask } = useAddTask(startDate, onNewTaskCreated)
 
     let confirmButtonDom = <></>
-    if (title.length > 0  && hour != undefined && tag != undefined)
+    if (title.length > 0  && endDate != undefined && tag != undefined)
         confirmButtonDom = 
-            <button onClick={() => createNewTask(title, hour, tag)}>
+            <button onClick={() => createNewTask(title, endDate, tag)}>
                 Confirm!
             </button>
 
@@ -46,47 +41,68 @@ export function AddTask({addNewTaskInfo, onNewTaskCreated} : {addNewTaskInfo: Ad
 			<label>Title</label>
 			<br/>
 			<input value={title} placeholder="New task..." onChange={e => setTitle(e.target.value)} />
-			<HourPicker hour={hour} onHourChange={setHour}/>
+			<EndDatePicker selectedDate={endDate ? endDate : new Date()} onEndDateChange={setEndDate} />
             <CategoryAndTagPicker onTagClick={setTag}/>
             {confirmButtonDom}
 		</div>
 	)
 }
 
-function useAddTask(addNewTaskInfo: AddNewTaskInfo, onNewTaskCreated: () => void) {
+function useAddTask(startDate: Date, onNewTaskCreated: () => void) {
     const setError = useSetError();    
     
     const [title, setTitle] = useState<string>("")
-	
-    const receivedHour = addNewTaskInfo.hour
-    const [hour, setHour] = useState<number | undefined>(receivedHour != undefined ? receivedHour : 0)
+    const [endDate, setEndDate] = useState<Date | undefined>(undefined)
     const [tag, setTag] = useState<string | undefined>(undefined)
 
-    function createNewTask(title: string, hour: number, tag: string) {
+    function createNewTask(title: string, endDate: Date, tag: string) {
         const userIdStr = localStorage["userId"]
         const userId = Number(userIdStr)
-        
-        const date = addNewTaskInfo.date
-        date.setHours(hour)
-        
+                
         service.createNewTask(userId, {
-            title: title,
-            date: date,
+            title,
+            startDate,
+            endDate,
             tag: tag
         })
         .then(() => onNewTaskCreated()  )
         .catch((error) => setError(error));
     }
 
-    return { title, hour, tag, setTitle, setHour, setTag, createNewTask }
+    return { title, endDate, tag, setTitle, setEndDate, setTag, createNewTask }
 }
 
-function HourPicker({hour, onHourChange} : {hour: number | undefined, onHourChange: (hour: number) => void}) {
+function EndDatePicker({selectedDate, onEndDateChange} : {selectedDate: Date, onEndDateChange: (date: Date) => void}) {
+    
+    function onEndDateChangeHandler(e: ChangeEvent<HTMLInputElement>) {
+        const selectedEndDate = new Date(e.target.value)
+        onEndDateChange(selectedEndDate)
+    }
+
+    function toInputDateValueStr(date: Date) {
+        const month = date.getMonth()
+        const monthStr = month < 10 ? `0${month}` : month.toString()
+        const day = date.getDate()
+        const dayStr = day < 10 ? `0${day}` : day.toString()
+        const hour = date.getHours()
+        const hourStr = hour < 10 ? `0${hour}` : hour.toString()
+        const minute = date.getMinutes()
+        const minuteStr = minute < 10 ? `0${minute}` : minute.toString()
+        
+        return `${date.getFullYear()}-${monthStr}-${dayStr}T${hourStr}:${minuteStr}`
+    }
+
+    const todayStr = toInputDateValueStr(selectedDate)
     return (
         <div>
             <label>Hour</label>
             <br/>
-            <input type="number" min={0} max={23} value={hour} onChange={(e) => onHourChange(Number(e.target.value))} />
+            <input
+                type="datetime-local"
+                value={todayStr}
+                min={todayStr}
+                onChange={onEndDateChangeHandler}
+            />
         </div>
     )
 }

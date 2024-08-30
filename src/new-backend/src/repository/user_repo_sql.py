@@ -170,7 +170,7 @@ class UserRepoSql(UserRepo):
             session.commit()
             session.refresh(user_model)
 
-    def create_new_study_tracker_task(self, user_id: int, title: str, date: datetime, tag: str):
+    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime, tag: str):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
@@ -180,7 +180,8 @@ class UserRepoSql(UserRepo):
             user_model.study_tracker_tasks.append(
                 StudyTrackerTask(
                     title=title,
-                    date=date,
+                    start_date=start_date,
+                    end_date=end_date,
                     tag=tag,
                     user_id=user_id,
                     user=user_model

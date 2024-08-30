@@ -4,26 +4,26 @@ import styles from "./calendar.module.css";
 import { CalendarMonthView } from "./MonthView";
 import { CalendarWeekView } from "./WeekView";
 import { CalendarDayView } from "./DayView";
-import { AddNewTaskInfo, AddTask } from "./AddNewTask";
+import { AddTask } from "./AddNewTask";
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 
     'July', 'August', 'September', 'October', 'November', 'December'];
 
-enum CalendarViewType {
+enum TimeGranularity {
 	MONTH, WEEK, DAY
 }
 
 export default function CalendarPage() {
-	const { addNewTaskInfo, setAddNewTaskInfo, clearAddNewTaskInfo } = useCalendarPage()
+	const { startDate, setStartDate, clearStartDate } = useCalendarPage()
 	
-	const isAddNewTaskViewTypeSelected = addNewTaskInfo != undefined
+	const isAddNewTaskViewTypeSelected = startDate != undefined
 	
 	const domToDisplay = isAddNewTaskViewTypeSelected ?
-		<AddTask addNewTaskInfo={addNewTaskInfo} onNewTaskCreated={clearAddNewTaskInfo}/>
+		<AddTask startDate={startDate} onNewTaskCreated={clearStartDate}/>
 		:
 		(
 			<div>
-				<Calendar onAddNewTaskClick={setAddNewTaskInfo}/>
+				<Calendar onAddNewTaskClick={setStartDate}/>
 				<br/>
 				<DailyTasks />
 				<br/>
@@ -34,13 +34,13 @@ export default function CalendarPage() {
 }
 
 function useCalendarPage() {
-	const [addNewTaskInfo, setAddNewTaskInfo] = useState<AddNewTaskInfo | undefined>(undefined)
+	const [startDate, setStartDate] = useState<Date | undefined>(undefined)
 
-	function clearAddNewTaskInfo() {
-		setAddNewTaskInfo(undefined)
+	function clearStartDate() {
+		setStartDate(undefined)
 	}
 
-	return { addNewTaskInfo, setAddNewTaskInfo, clearAddNewTaskInfo }
+	return { startDate, setStartDate, clearStartDate }
 }
 
 function DailyTasks() {
@@ -51,9 +51,9 @@ function DailyTasks() {
 	)
 }
 
-function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (addNewTaskInfo: AddNewTaskInfo) => void}) {
+function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (startDate: Date) => void}) {
 	const {
-		calendarViewType,
+		selectedTimeGranularity,
 		baseDate,
 		onButtonClickHandler,
 		setCalendarViewType,
@@ -61,21 +61,23 @@ function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (addNewTaskInfo: Add
 
 	// Decides based on selected calendar view
 	let calendarComponent
-	switch(calendarViewType) {
-		case CalendarViewType.MONTH: {
+	switch(selectedTimeGranularity) {
+		case TimeGranularity.MONTH: {
 			calendarComponent =
-				<CalendarMonthView dayProp={baseDate} onDayClick={(date: Date) => onAddNewTaskClick({date, hour: undefined})}/>
+				<CalendarMonthView dayProp={baseDate} onDayClick={(date: Date) => onAddNewTaskClick(date)}/>
 		}
 		break
-		case CalendarViewType.WEEK: calendarComponent = (
-			<CalendarWeekView onHourClick={(date: Date) => onAddNewTaskClick({date, hour: date.getHours()})} />
+		case TimeGranularity.WEEK: calendarComponent = (
+			<CalendarWeekView baseDate={baseDate} onHourClick={(date: Date) => onAddNewTaskClick(date)} />
 		)
 		break
-		case CalendarViewType.DAY: {
-			const today = new Date()
+		case TimeGranularity.DAY: {
 			calendarComponent = (
 				<div>
-					<CalendarDayView date={today} onHourClick={(hour: number) => onAddNewTaskClick({date: today, hour})} />
+					<CalendarDayView date={baseDate} onHourClick={(hour: number) => {
+						baseDate.setHours(hour)
+						onAddNewTaskClick(baseDate)
+					}} />
 				</div>
 			)
 		} 
@@ -83,53 +85,84 @@ function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (addNewTaskInfo: Add
 
     return (
 		<div className={`${styles.calendar}`}>
-			<CalendarViewChangeButtons onCalendarViewChangeClick={setCalendarViewType} />
+			<TimeGranularityChangeButtons onCalendarViewChangeClick={setCalendarViewType} />
 			<br/>
-			<ChangeViewButtons onButtonClick={onButtonClickHandler} />
+			<NavigateButtons onButtonClick={onButtonClickHandler} />
 			<Title date={baseDate} />
 			{calendarComponent}
 		</div>
     )
 }
 
-function useMyCalendar() {
-	const [calendarViewType, setCalendarViewTypeInternal] = useState<CalendarViewType>(CalendarViewType.MONTH)
-	const [baseDate, setBaseDate] = useState(new Date()) // Starts as Today
+function navigateOnMonth(oldDate: Date, action: Navigate): number {
+	console.log("Hello1")
+	switch (action) {
+		case Navigate.PREVIOUS : return oldDate.getMonth() - 1
+		case Navigate.NEXT : return oldDate.getMonth() + 1
+	}
+	throw new Error("Action not defined!")
+}
 
-	function onButtonClickHandler(action: Action) {
-		const newDate = new Date()
-		
-		let newMonth = -1
-		const currentSelectedMonth = baseDate.getMonth()
-		switch (action) {
-			case Action.PREV_MONTH : newMonth = currentSelectedMonth - 1
-			break
-			case Action.NEXT_MONTH : newMonth = currentSelectedMonth + 1
-			break
-			case Action.TODAY : newMonth = new Date().getMonth()
+function navigateOnWeek(oldDate: Date, action: Navigate): number {
+	console.log("Hello2")
+	switch (action) {
+		case Navigate.PREVIOUS : return oldDate.getDate() - 7
+		case Navigate.NEXT : return oldDate.getDate() + 7
+	}
+	throw new Error("Action not defined!")
+}
+
+function navigateOnDay(oldDate: Date, action: Navigate): number {
+	console.log("Hello3")
+	switch (action) {
+		case Navigate.PREVIOUS : return oldDate.getDate() - 1
+		case Navigate.NEXT : return oldDate.getDate() + 1
+	}
+	throw new Error("Action not defined!")
+}
+
+function useMyCalendar() {
+	const [selectedTimeGranularity, setSelectedTimeGranularity] = useState<TimeGranularity>(TimeGranularity.MONTH)
+	const [baseDate, setBaseDate] = useState<Date>(new Date()) // Starts as Today
+
+	function onButtonClickHandler(action: Navigate) {
+		let newDate = undefined
+
+		if (action != Navigate.TODAY) {
+			newDate = new Date(baseDate)
+			
+			switch(selectedTimeGranularity) {
+				case TimeGranularity.MONTH : newDate.setMonth(navigateOnMonth(baseDate, action))
+				break;
+				case TimeGranularity.WEEK : newDate.setDate(navigateOnWeek(baseDate, action))
+				break;
+				case TimeGranularity.DAY : newDate.setDate(navigateOnDay(baseDate, action))
+			}
+		} else {
+			newDate = new Date()
 		}
-		newDate.setMonth(newMonth)
+		
 		setBaseDate(newDate)
 	}
 
-	function setCalendarViewType(viewType: CalendarViewType) {
-		setCalendarViewTypeInternal(viewType)
+	function setCalendarViewType(viewType: TimeGranularity) {
+		setSelectedTimeGranularity(viewType)
 	}
 
 	return {
-		calendarViewType,
+		selectedTimeGranularity,
 		baseDate,
 		onButtonClickHandler,
 		setCalendarViewType,
 	}
 }
 
-function CalendarViewChangeButtons({onCalendarViewChangeClick} : {onCalendarViewChangeClick: (type: CalendarViewType) => void}) {
+function TimeGranularityChangeButtons({onCalendarViewChangeClick} : {onCalendarViewChangeClick: (type: TimeGranularity) => void}) {
 	return (
 		<div>
-			<button onClick={() => onCalendarViewChangeClick(CalendarViewType.MONTH)}>Monthly</button>
-			<button onClick={() => onCalendarViewChangeClick(CalendarViewType.WEEK)}>Weekly</button>
-			<button onClick={() => onCalendarViewChangeClick(CalendarViewType.DAY)}>Daily</button>
+			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.MONTH)}>Monthly</button>
+			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.WEEK)}>Weekly</button>
+			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.DAY)}>Daily</button>
 		</div>
 	)
 }
@@ -140,19 +173,19 @@ function Title({date} : {date: Date}) {
 	)
 }
 
-enum Action { PREV_MONTH, NEXT_MONTH, TODAY }
+enum Navigate { PREVIOUS, TODAY, NEXT }
 
-function ChangeViewButtons({onButtonClick} : {onButtonClick: (action: Action) => void}) {
+function NavigateButtons({onButtonClick} : {onButtonClick: (action: Navigate) => void}) {
 	return (
 		<div className={`${styles.changeViewButtons}`}>
-			<button onClick={() => onButtonClick(Action.PREV_MONTH)}>
-				{t("calendar:prev_month_but")}
+			<button onClick={() => onButtonClick(Navigate.PREVIOUS)}>
+				Previous
 			</button>
-			<button onClick={() => onButtonClick(Action.TODAY)}>
-				{t("calendar:today")}
+			<button onClick={() => onButtonClick(Navigate.TODAY)}>
+				Today
 			</button>
-			<button onClick={() => onButtonClick(Action.NEXT_MONTH)}>
-				{t("calendar:next_month_but")}
+			<button onClick={() => onButtonClick(Navigate.NEXT)}>
+				Next
 			</button>
 		</div>
 	)
