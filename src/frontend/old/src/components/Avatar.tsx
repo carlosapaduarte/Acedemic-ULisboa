@@ -20,8 +20,8 @@ function AvatarsInRow({avatars, onAvatarClick}: {
 
     return (
         <Box display="flex" flexDirection="row" justifyContent="center">
-            {avatars.map((avatar: string) =>
-                <Box padding="0.5%" onClick={() => onAvatarClick(avatar)}>
+            {avatars.map((avatar: string, index: number) =>
+                <Box key={index} padding="0.5%" onClick={() => onAvatarClick(avatar)}>
                     <img
                         src={avatar}
                         height="100px"
@@ -60,8 +60,8 @@ function AvatarList({onAvatarClick}: { onAvatarClick: (avatarFilename: string) =
 
     return (
         <Box>
-            {separatePerRow(avatars).map((avatarsInRow: string[]) =>
-                <AvatarsInRow avatars={avatarsInRow} onAvatarClick={onAvatarClick}/>
+            {separatePerRow(avatars).map((avatarsInRow: string[], index: number) =>
+                <AvatarsInRow key={index} avatars={avatarsInRow} onAvatarClick={onAvatarClick}/>
             )}
         </Box>
     )

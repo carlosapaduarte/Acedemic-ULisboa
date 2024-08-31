@@ -7,9 +7,15 @@ import {useParams} from 'react-router-dom'
 import {useSetError} from './error/ErrorContainer'
 import LoadingSpinner from "./LoadingSpinner";
 import {t} from "i18next";
+<<<<<<<< HEAD:src/frontend/old/src/components/Calendar.tsx
 import {CalendarDay, MyCalendar} from './MyCalendar'
 import {utils} from '../utils'
 import {DisplayUserNotes} from "./Dashboard";
+========
+import { CalendarDay, MyCalendar } from './MyCalendar'
+import { utils } from '../utils'
+import { Console } from 'console'
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Calendar.tsx
 
 const logger = new Logger({name: "Calendar"});
 
@@ -39,15 +45,19 @@ export default function Calendar() {
         // TODO: in future, request only today's goals
         try {
             const userInfo: UserInfo = await service.fetchUserInfoFromApi(userIdAsNumber)
-            const startDate = new Date(2024, 6, 31, 22, 22, 22, 22) //new Date(userInfo.startDate) // Feel free to change for testing
 
-            const userGoals = utils.getUserGoals(userInfo.level, startDate)
+            // For simplification, use the first one
+            const batchToDisplay = userInfo.batches[0]
+            const level = batchToDisplay.level
+            const startDate = new Date(2024, 7, 10, 12, 22, 22, 22) 
+            //const startDate = new Date(batchToDisplay.startDate * 1000) // Feel free to change for testing
+            const userGoals = utils.getUserGoals(level, startDate)
+
+            //console.log("User Goals: ", userGoals)
 
             setStartDate(startDate)
-
             setGoals(userGoals)
             setUserNotes(userInfo.userNotes)
-
             setLoadingGoals(false)
         } catch (error: any) {
             setError(error)
@@ -199,9 +209,12 @@ function SelectedDayGoalInfo({goals, selectedDay}: { goals: DayGoals[], selected
 
     const goalsToDisplay = getSelectedDayGoals(goals) // Filters today's goals
 
+    //console.log(goalsToDisplay)
+
     if (goalsToDisplay.length != 0)
         // Showing a single goal, for now
         return (
+<<<<<<<< HEAD:src/frontend/old/src/components/Calendar.tsx
             <Box marginBottom="3%" sx={{overflow: "hidden"}}>
                 <Typography variant='h6'>
                     {goalsToDisplay[0].title}
@@ -209,6 +222,19 @@ function SelectedDayGoalInfo({goals, selectedDay}: { goals: DayGoals[], selected
                 <Typography>
                     {goalsToDisplay[0].description}
                 </Typography>
+========
+            <Box>
+                {goalsToDisplay.map((goal: Goal, index: number) => 
+                    <Box key={index} marginBottom="3%">
+                        <Typography variant='h6'>
+                            {goal.title}
+                        </Typography>
+                        <Typography>
+                            {goal.description}
+                        </Typography>
+                    </Box>
+                )}
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Calendar.tsx
             </Box>
         )
     else
@@ -230,7 +256,7 @@ function SelectedDayNotes({selectedDate, userNotes, onConfirmNewNoteSubmitClickH
     const [newNoteText, setNewNoteText] = useState("");
 
     // Filters today's notes
-    const userNotesToDisplay: UserNote[] = userNotes.filter((note: UserNote) => utils.sameDay(new Date(note.date), selectedDate))
+    const userNotesToDisplay: UserNote[] = userNotes.filter((note: UserNote) => utils.sameDay(new Date(note.date * 1000), selectedDate))
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         // For now, this new goal will be associated to a challenge day, for simplification

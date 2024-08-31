@@ -30,7 +30,7 @@ const level3StaticGoal: Goal[] = [
 ]
 
 function level3Goals(startDate: Date): DayGoals[] {
-    return commons.getDayGoals(level3StaticGoal, startDate)
+    return commons.getDayGoals(level3StaticGoal, startDate, 3)
 }
 
 function getLevel3GoalList(): Goal[] {

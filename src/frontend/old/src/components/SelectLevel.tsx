@@ -36,7 +36,7 @@ function Levels({onLevelClick} : {onLevelClick: (levelType: LevelType) => void})
     return (
         <Box display="flex" flexDirection="row" justifyContent="space-evenly">
             {getLevelTypes().map((levelType: LevelType) =>
-                <Level levelType={levelType} onLevelClick={onLevelClick} />
+                <Level key={levelType} levelType={levelType} onLevelClick={onLevelClick} />
             )}
         </Box>
     )

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import {GoalAndDate, service, UserInfo, UserNote} from '../service/service';
+import {Batch, CompletedGoal, GoalAndDate, service, UserInfo, UserNote} from '../service/service';
 import {Level1} from "../challenges/level_1";
 import {Level2} from "../challenges/level_2";
 import {DayGoals, Goal} from "../challenges/types";
@@ -60,6 +60,7 @@ function MainDashboardContent({userId}: { userId: number }) {
     const [todayCompletedGoals, setTodayCompletedGoals] = useState<string[]>()
     const [todayNotes, setTodayNotes] = useState<UserNote[]>()
     const [todayGoals, setTodayGoals] = useState<DayGoals>()
+    const [batchToDisplay, setBatchToDisplay] = useState<Batch | undefined>(undefined)
 
     const [loadingGoalsAndNotes, setLoadingGoalsAndNotes] = useState(false)
 
@@ -82,44 +83,87 @@ function MainDashboardContent({userId}: { userId: number }) {
 
             function getTodayNotes(allNotes: UserNote[]): UserNote[] {
                 const today = new Date()
-                return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date), today))
+                return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date * 1000), today))
             }
+<<<<<<<< HEAD:src/frontend/old/src/components/Dashboard.tsx
 
             function getTodayCompletedGoals(completedGoals: GoalAndDate[]): string[] {
+========
+        
+            function getTodayCompletedGoals(batch: Batch): string[] {
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Dashboard.tsx
                 const today = new Date()
-                return completedGoals
-                    .filter((completedGoal: GoalAndDate) => sameDate(new Date(completedGoal.date), today))
-                    .map((v) => v.name)
+                const batchStartDate = new Date(batch.startDate * 1000)
+                //const batchStartDate = new Date(2024, 7, 21, 12) // For testing...
+                return batch.completedGoals
+                    .filter((completedGoal: CompletedGoal) => {
+                        
+                        // To obtain the date of the goal: batch-start-date + (goal day index - 1)
+                        const goalDate = batchStartDate
+                        goalDate.setDate(goalDate.getDate() + (completedGoal.goalDay-1))
+                        
+                        return sameDate(new Date(goalDate), today)
+                    }).map((v) => v.name)
             }
+<<<<<<<< HEAD:src/frontend/old/src/components/Dashboard.tsx
 
             const fetchedStartDate = new Date(userInfo.startDate) // Feel free to change for testing
+========
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Dashboard.tsx
 
+            // For debugging
+            console.log('UserInfo: ', userInfo)
+
+            // For simplification, use the first one
+            const batchToDisplay = userInfo.batches[0]
+            setBatchToDisplay(batchToDisplay)
+            const batchStartDate = new Date(batchToDisplay.startDate * 1000) // Feel free to change for testing
+            //const batchStartDate = new Date(2024, 7, 21, 12) // For testing...
+
+            const level = batchToDisplay.level
             let goals: DayGoals[]
-            switch (userInfo.level) {
+            switch (level) {
                 case 1 :
-                    goals = Level1.level1Goals(fetchedStartDate)
+                    goals = Level1.level1Goals(batchStartDate)
                     break
                 case 2 :
-                    goals = Level2.level2Goals(fetchedStartDate)
+                    goals = Level2.level2Goals(batchStartDate)
                     break
                 case 3 :
-                    goals = Level3.level3Goals(fetchedStartDate)
+                    goals = Level3.level3Goals(batchStartDate)
                     break
                 default :
                     return Promise.reject('TODO: error handling')
             }
 
+<<<<<<<< HEAD:src/frontend/old/src/components/Dashboard.tsx
+========
+            console.log(goals)
+        
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Dashboard.tsx
             // Should never be undefined!
             // TODO: handle error when undefined later
             const todayGoalsAux: DayGoals | undefined = getTodayGoals(goals)
+            //console.log(todayGoalsAux)
             const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes)
+<<<<<<<< HEAD:src/frontend/old/src/components/Dashboard.tsx
             const todaysCompletedGoals: string[] = getTodayCompletedGoals(userInfo.completedGoals)
 
+========
+            const todaysCompletedGoals: string[] = getTodayCompletedGoals(batchToDisplay)
+            console.log(todayCompletedGoals)
+            
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Dashboard.tsx
             setTodayGoals(todayGoalsAux)
             setTodayCompletedGoals(todaysCompletedGoals)
             setTodayNotes(todaysNotes)
         }
 
+<<<<<<<< HEAD:src/frontend/old/src/components/Dashboard.tsx
+========
+        //console.log(userInfo)
+        
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Dashboard.tsx
         // Calculate and set todayGoals, todaysCompletedGoals and todaysNotes
         if (userInfo != undefined)
             processUserInfo(userInfo)
@@ -156,18 +200,24 @@ function MainDashboardContent({userId}: { userId: number }) {
             .catch((error) => setError(error))
     }
 
-    async function onMarkCompleteClickHandler(goal: Goal) {
-        await service.markGoalAsCompleted(userId, goal.title, new Date()) // TODO: handle error later
+    async function onMarkCompleteClickHandler(goal: Goal, batch: Batch) {
+        const today = new Date()
+        const startDate = new Date(batch.startDate * 1000)
+        //const startDate = new Date(2024, 7, 21, 12) // For testing...
+        const elapsedDays = Math.round((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24))
+        const goalIndex = elapsedDays + 1
+
+        await service.markGoalAsCompleted(userId, batch.id, goal.title, goalIndex)
             .then(() => {
                 fetchUserInfo() // Updates state again
             }) // this triggers a new refresh. TODO: improve later
             .catch((error) => setError(error))
     }
 
-    console.log(userInfo?.avatarFilename)
+    //console.log(userInfo?.avatarFilename)
 
     if (view == View.Default) {
-        if (userInfo && todayGoals && todayCompletedGoals && todayNotes)
+        if (userInfo && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay)
             return (
                 <Box sx={{display: 'flex', flexDirection: "column", width: "100%", height: "100%"}}>
                     <Box sx={{display: 'flex', justifyContent: 'right'}}>
@@ -182,10 +232,15 @@ function MainDashboardContent({userId}: { userId: number }) {
                         </Button>
                     </Box>
                     <Goals goals={todayGoals.goals} completedGoals={todayCompletedGoals}
+<<<<<<<< HEAD:src/frontend/old/src/components/Dashboard.tsx
                            onMarkComplete={onMarkCompleteClickHandler}/>
                     <Box sx={{flexGrow: 1}}>
                         <DisplayUserNotes notes={todayNotes} alignTitleLeft={true}/>
                     </Box>
+========
+                           onMarkComplete={(goal: Goal) => onMarkCompleteClickHandler(goal, batchToDisplay)}/>
+                    <DisplayUserNotes notes={todayNotes}/>
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/Dashboard.tsx
                 </Box>
             )
         else

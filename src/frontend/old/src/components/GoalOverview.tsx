@@ -15,8 +15,13 @@ const GOAL_WITH = 100 / GOALS_PER_ROW
 function GoalsAccordion({goals}: { goals: Goal[] }) {
     return (
         <Box display="flex" flexDirection="column" justifyContent="center">
+<<<<<<<< HEAD:src/frontend/old/src/components/GoalOverview.tsx
             {goals.map((goal: Goal) =>
                 <Accordion>
+========
+            {goals.map((goal: Goal) => 
+                <Accordion key={goal.title}>
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/GoalOverview.tsx
                     <AccordionSummary
                         expandIcon={<ArrowDownward/>}
                         aria-controls="panel1-content"
@@ -110,7 +115,14 @@ export function GoalOverview() {
                 const testStartDate = new Date()
                 testStartDate.setDate(testStartDate.getDate() - 10)
 
+<<<<<<<< HEAD:src/frontend/old/src/components/GoalOverview.tsx
                 const goals = utils.getGoalsPerDayByStartDate(userInfo.level, testStartDate)
+========
+                const batchToDisplay = userInfo.batches[0]
+                const level = batchToDisplay.level
+                
+                const goals = utils.getGoalsPerDayByStartDate(level, testStartDate)
+>>>>>>>> main:src/frontend/acedemic-challenge/src/components/GoalOverview.tsx
                 setGoals(goals)
             })
 

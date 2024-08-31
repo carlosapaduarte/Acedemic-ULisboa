@@ -38,3 +38,4 @@ Check this one: [MUI](https://mui.com/);
 - Um user pode marcar um desafiu nao completado mais tarde como completado. Mas se marcarmos como completado noutro dia, essa info vai ter de ser guardada (que foi realizado noutro dia);
 - Os challenges nao podem ser atrasados. Se nao forem completados, o dia seguinte vai sempre ficar com o prox desafio;
 - Fazer ecra dos Badges (talvez esperar pelo design...)
+- Marcar um goal antigo (de um dia anterior) cm concluido;

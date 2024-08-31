@@ -92,7 +92,7 @@ const level2StaticGoal: Goal[] = [
 ]
 
 function level2Goals(startDate: Date): DayGoals[] {
-    return commons.getDayGoals(level2StaticGoal, startDate)
+    return commons.getDayGoals(level2StaticGoal, startDate, 2)
 }
 
 function getLevel2GoalList(): Goal[] {
@@ -101,5 +101,5 @@ function getLevel2GoalList(): Goal[] {
 
 export const Level2 = {
     level2Goals,
-    getLevel2GoalList
+    getLevel2GoalList,
 }
