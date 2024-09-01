@@ -6,9 +6,9 @@ class UserNote:
         self.created = created
 
 class CompletedGoal:
-    def __init__(self, goal_day: datetime, name: str, conclusion_date: datetime) -> None:    
+    def __init__(self, goal_day: int, id: int, conclusion_date: datetime) -> None:
         self.goal_day = goal_day
-        self.name = name
+        self.id = id
         self.conclusion_date = conclusion_date
 
 class Batch:
