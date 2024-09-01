@@ -1,23 +1,26 @@
+from datetime import datetime
+
+from domain.user import Batch, CompletedGoal, User, UserNote
+from repository.sql import database
+from repository.sql.models import BatchModel, GoalModel, NoteModel, StudyTrackerAppUseModel, StudyTrackerTask, \
+    StudyTrackerWeekDayPlanningModel, UserModel
 from sqlmodel import Session, select
 
-from repository.sql.models import BatchModel, GoalModel, NoteModel, StudyTrackerAppUseModel, StudyTrackerTask, StudyTrackerWeekDayPlanningModel, UserModel
-from repository.user_repo import UserRepo
-from domain.user import Batch, CompletedGoal, User, UserNote
-from datetime import datetime
-from repository.sql import database
+from user_repo import UserRepo
 
 engine = database.get_engine()
 
+
 class UserRepoSql(UserRepo):
-    
+
     def create_user(self, id: int, username: str):
         "Creates a user without avatar, notes and goals, in level 1, and share_progress set to false"
 
         with Session(engine) as session:
             db_user = UserModel(
-                id=id, 
-                username=username, 
-                avatar_filename=None, 
+                id=id,
+                username=username,
+                avatar_filename=None,
                 share_progress=None
             )
             session.add(db_user)
@@ -33,11 +36,11 @@ class UserRepoSql(UserRepo):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == id)
             result = session.exec(statement)
-            
+
             user_model: UserModel = result.one()
             user_notes_model: list[NoteModel] = user_model.user_notes
             batches_model: list[BatchModel] = user_model.user_batches
-            
+
             # map() in Python is lazy, not eager!
             # Therefore, this forces the session to retrieve all completed_goals, for each batch
             # Better solutions are appreciated!
@@ -56,7 +59,7 @@ class UserRepoSql(UserRepo):
                     level=batch.level,
                     completed=map(lambda completed_goal: CompletedGoal(
                         goal_day=completed_goal.goal_day,
-                        id=completed_goal.name,
+                        id=completed_goal.id,
                         conclusion_date=completed_goal.conclusion_date
                     ), batch.completed_goals)
                 ), batches_model)
@@ -73,7 +76,7 @@ class UserRepoSql(UserRepo):
             session.commit()
 
             return new_batch.id
-        
+
     def create_completed_goal(self, user_id: int, batch_id: int, goal_id: int, goal_day: int, conclusion_date: datetime):
         with Session(engine) as session:
             completed_goal = GoalModel(
@@ -100,7 +103,7 @@ class UserRepoSql(UserRepo):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
-            
+
             user_model: UserModel = result.one()
             user_model.avatar_filename = avatar_filename
             session.add(user_model)
@@ -111,7 +114,7 @@ class UserRepoSql(UserRepo):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
-            
+
             user_model: UserModel = result.one()
             user_model.share_progress = share_progress
             session.add(user_model)
@@ -122,7 +125,7 @@ class UserRepoSql(UserRepo):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
-            
+
             user_model: UserModel = result.one()
 
             new_user_study_tracker_app_uses = []
@@ -144,9 +147,9 @@ class UserRepoSql(UserRepo):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
-            
+
             user_model: UserModel = result.one()
-            user_model.receive_study_tracker_app_notifications = receive            
+            user_model.receive_study_tracker_app_notifications = receive
 
             session.add(user_model)
             session.commit()
@@ -156,7 +159,7 @@ class UserRepoSql(UserRepo):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
-            
+
             user_model: UserModel = result.one()
 
             user_model.study_tracker_planning_day = StudyTrackerWeekDayPlanningModel(
@@ -170,7 +173,8 @@ class UserRepoSql(UserRepo):
             session.commit()
             session.refresh(user_model)
 
-    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime, tag: str):
+    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime,
+                                      tag: str):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)

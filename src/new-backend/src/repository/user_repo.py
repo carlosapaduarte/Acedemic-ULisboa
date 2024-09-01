@@ -29,7 +29,7 @@ class UserRepo(ABC):
         pass
 
     @abstractmethod
-    def create_completed_goal(self, user_id: int, batch_id: int, goal_name: str, goal_day: int, conclusion_date: datetime):
+    def create_completed_goal(self, user_id: int, batch_id: int, goal_id: int, goal_day: int, conclusion_date: datetime):
         pass
 
     @abstractmethod

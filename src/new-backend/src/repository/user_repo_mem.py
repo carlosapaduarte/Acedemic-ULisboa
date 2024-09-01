@@ -1,7 +1,10 @@
-from domain.user import User, UserNote, CompletedGoal
 from datetime import datetime
+
+from domain.user import User, UserNote, CompletedGoal
 from exception import NotFoundException
+
 from .user_repo import UserRepo
+
 
 class UserRepoMem(UserRepo):
 
@@ -14,8 +17,8 @@ class UserRepoMem(UserRepo):
     def create_user(self, id: int, username: str):
         "Creates a user without avatar, notes and goals, in level 1, and share_progress set to false"
         self.users[id] = User(
-            id, 
-            username, 
+            id,
+            username,
             level=1,
             avatar_filename=None,
             start_date=datetime.now(),
@@ -45,9 +48,9 @@ class UserRepoMem(UserRepo):
         user: User = self.get_user(user_id)
         user.user_notes.append(UserNote(note, created))
 
-    def create_completed_goal(self, user_id: int, goal_name: str, concluded: datetime):
+    def create_completed_goal(self, user_id: int, batch_id: int, goal_id: int, goal_day: int, concluded: datetime):
         user: User = self.get_user(user_id)
-        user.completed_goals.append(CompletedGoal(goal_name, concluded))
+        user.completed_goals.append(CompletedGoal(goal_day=goal_day, id=goal_id, conclusion_date=concluded))
 
     def update_user_avatar(self, user_id: int, avatar_filename: str):
         user: User = self.get_user(user_id)
@@ -59,5 +62,6 @@ class UserRepoMem(UserRepo):
     def update_study_tracker_app_planning_day(self, user_id: int, day: int, hour: int):
         pass
 
-    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime, tag: str):
+    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime,
+                                      tag: str):
         pass
