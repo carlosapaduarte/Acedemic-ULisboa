@@ -2,9 +2,7 @@
 
 import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import { doFetch, toBody } from "./fetch";
-import { Logger } from "tslog";
 
-const logger = new Logger({ name: "service" });
 
 // For now, all of these functions will return the expected response.
 // If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
@@ -23,39 +21,34 @@ async function createUserOrLogin(userId: number) {
         return Promise.reject(new Error("User creation was not possible"));
 }
 
-async function chooseLevel(userId: number, level: LevelType) {
+async function createBatch(userId: number, level: LevelType) {
     const request = {
-        path: "set-level",
+        path: `users/${userId}/batches`,
         method: "POST",
-        body: toBody({ id: userId, level: level })
+        body: toBody({ level: level })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
         return Promise.reject(new Error("Level selection failed!"));
 }
 
-async function selectShareProgressState(
-    userId: number,
-    shareProgress: boolean
-) {
+async function selectShareProgressState(userId: number, shareProgress: boolean) {
     const request = {
-        path: "set-publish-state-preference",
-        method: "POST",
-        body: toBody({ id: userId, shareProgress })
+        path: `users/${userId}/publish-state`,
+        method: "PUT",
+        body: toBody({ shareProgress })
     };
     const response: Response = await doFetch(request);
     //console.log(response)
     if (!response.ok)
-        return Promise.reject(
-            new Error("Progress share preference selection failed!")
-        );
+        return Promise.reject(new Error("Progress share preference selection failed!"));
 }
 
 async function selectAvatar(userId: number, avatarFilename: string) {
     const request = {
-        path: "set-user-avatar",
-        method: "POST",
-        body: toBody({ id: userId, avatarFilename })
+        path: `users/${userId}/avatar`,
+        method: "PUT",
+        body: toBody({ avatarFilename })
     };
     const response: Response = await doFetch(request);
     //console.log(response)
@@ -65,25 +58,36 @@ async function selectAvatar(userId: number, avatarFilename: string) {
 
 export type UserNote = {
     name: string;
-    date: number;
-};
+    date: number
+}
 
 // Almost like DayAndGoal but without goal description
 export type GoalAndDate = {
     name: string;
-    date: number;
-};
+    date: number
+}
+
+export type CompletedGoal = {
+    goalDay: number
+    name: string
+    conclusionDate: number
+}
+
+export type Batch = {
+    id: number,
+    startDate: number,
+    level: number,
+    completedGoals: CompletedGoal[]
+}
 
 // User info
 export type UserInfo = {
-    id: number;
-    username: string;
-    level: number;
-    startDate: number;
-    shareProgress: boolean;
-    avatarFilename: string; // TODO: this could be undefined
-    userNotes: UserNote[];
-    completedGoals: GoalAndDate[];
+    id: number,
+    username: string,
+    shareProgress: boolean,
+    avatarFilename: string, // TODO: this could be undefined
+    userNotes: UserNote[],
+    batches: Batch[]
 };
 
 async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
@@ -96,34 +100,28 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
     if (response.ok) {
         const responseObject: UserInfo = await response.json(); // TODO: how
         return responseObject;
-    } else return Promise.reject(new Error("User info could not be obtained!"));
+    } else
+        return Promise.reject(new Error("User info could not be obtained!"));
 }
 
-async function createNewUserNote(
-    userId: number,
-    name: string,
-    userGoalDate: Date
-) {
-    //console.log(userGoalDate.getTime())
-
+async function createNewUserNote(userId: number, text: string, userGoalDate: Date) {
     const request = {
         path: `users/${userId}/notes`,
         method: "POST",
-        body: toBody({ id: userId, name, date: userGoalDate.getTime() })
+        body: toBody({ text, date: Math.trunc(userGoalDate.getTime() / 1000) }) // Send seconds from 1970
     };
+
+    //console.log(request)
     const response: Response = await doFetch(request);
-    if (!response.ok) return Promise.reject(new Error("Note creation failed!"));
+    if (!response.ok)
+        return Promise.reject(new Error("Note creation failed!"));
 }
 
-async function markGoalAsCompleted(
-    userId: number,
-    goalName: String,
-    date: Date
-) {
+async function markGoalAsCompleted(userId: number, batchId: number, goalId: number, goalDay: number) {
     const request = {
-        path: `users/${userId}/completed-goals`,
+        path: `users/${userId}/batches/${batchId}/completed-goals`,
         method: "POST",
-        body: toBody({ id: userId, goalName, date: date.getTime() })
+        body: toBody({ goalId, goalDay })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -132,7 +130,7 @@ async function markGoalAsCompleted(
 
 export const service = {
     createUserOrLogin,
-    chooseLevel,
+    createBatch,
     selectShareProgressState,
     selectAvatar,
     fetchUserInfoFromApi,

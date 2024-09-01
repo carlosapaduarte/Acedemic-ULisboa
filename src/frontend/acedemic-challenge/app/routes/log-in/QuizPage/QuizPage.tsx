@@ -84,7 +84,7 @@ function useQuizPage(
 
         // TODO: handle in case of error later
         await service
-            .chooseLevel(userId, computedLevel) // returns if was successful or not
+            .createBatch(userId, computedLevel) // returns if was successful or not
             .then(() => onLevelSelected())
             .catch((error) => setError(error));
     }

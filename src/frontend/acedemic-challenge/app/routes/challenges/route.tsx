@@ -14,14 +14,14 @@ function GoalsAccordion({ goals }: { goals: Goal[] }) {
     return (
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
             {goals.map((goal: Goal) =>
-                <>
+                <div key={goal.title}>
                     <h1>
                         {goal.title}
                     </h1>
                     <p>
                         {goal.description}
                     </p>
-                </>
+                </div>
             )}
             {/*<Accordion>
                     <AccordionSummary
@@ -126,7 +126,10 @@ function useChallenges() {
                     const testStartDate = new Date();
                     testStartDate.setDate(testStartDate.getDate() - 10);
 
-                    const goals = utils.getGoalsPerDayByStartDate(userInfo.level, testStartDate);
+                    const batchToDisplay = userInfo.batches[0]
+                    const level = batchToDisplay.level
+
+                    const goals = utils.getGoalsPerDayByStartDate(level, testStartDate)
                     setGoals(goals);
                 });
         }

@@ -7,7 +7,7 @@ class UserNoteDto(BaseModel):
     
 class CompletedGoalDto(BaseModel):
     goalDay: int
-    name: str
+    id: int
     conclusionDate: int
     
 class BatchDto(BaseModel):

@@ -61,7 +61,7 @@ function useSelectLevelPage(
 
     async function onConfirmClickHandler(level: LevelType) {
         await service
-            .chooseLevel(userId, level) // returns if was successful or not
+            .createBatch(userId, level) // returns if was successful or not
             .then(() => onLevelSelected())
             .catch((error) => setError(error));
     }

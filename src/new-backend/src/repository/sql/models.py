@@ -34,7 +34,7 @@ class BatchModel(SQLModel, table=True):
 
 class GoalModel(SQLModel, table=True):
     goal_day: int = Field(primary_key=True)
-    name: int = Field(primary_key=True)
+    id: int = Field(primary_key=True)
     conclusion_date: datetime
 
     user_id: int = Field(foreign_key="usermodel.id", primary_key=True)  # Assuming this should be foreign_key="usermodel.id"

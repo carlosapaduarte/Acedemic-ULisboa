@@ -25,9 +25,15 @@ export function useCalendar() {
         try {
             if (userId != undefined) {
                 const userInfo: UserInfo = await service.fetchUserInfoFromApi(userId);
-                const startDate = new Date(2024, 7, 22, 22, 22, 22, 22); //new Date(userInfo.startDate) // Feel free to change for testing
 
-                const userGoals = utils.getUserGoals(userInfo.level, startDate);
+                // For simplification, use the first one
+                const batchToDisplay = userInfo.batches[0]
+                const level = batchToDisplay.level
+                const startDate = new Date(2024, 7, 10, 12, 22, 22, 22)
+                //const startDate = new Date(batchToDisplay.startDate * 1000) // Feel free to change for testing
+                const userGoals = utils.getUserGoals(level, startDate)
+
+                //console.log("User Goals: ", userGoals)
 
                 console.log("User goals: ", userGoals, "Start date: ", startDate, "User notes ", userInfo.userNotes);
 
@@ -47,7 +53,7 @@ export function useCalendar() {
     // Builds an object to display events in FullCalendar
     function buildEvents(goals: DayGoals[], userGoals: UserNote[]): any {
 
-        function buildDayEvents(date: Date, goals: Goal[]): FullCalendarEventsType[] {
+       /* function buildDayEvents(date: Date, goals: Goal[]): FullCalendarEventsType[] {
             const month = date.getMonth() + 1; // TODO: For some reason, this is necessary
             const monthStr: String = month < 10 ? "0" + month : month.toString();
             const day = date.getDate();
@@ -79,6 +85,7 @@ export function useCalendar() {
                 const goalDate = new Date(userGoal.date);
 
                 const userGoalFullCalendarEvent = buildDayEvents(goalDate, [{ // array with single Goal
+                    id: userGoal.id;
                     title: userGoal.name,
                     description: "no-description" // TODO: fix this later
                 }]);
@@ -91,7 +98,7 @@ export function useCalendar() {
 
         const events: FullCalendarEventsType[] = buildEvents();
         //console.log(events)
-        return events;
+        return events;*/
     }
 
     const handleDateClick = (clickedDay: CalendarDay) => {

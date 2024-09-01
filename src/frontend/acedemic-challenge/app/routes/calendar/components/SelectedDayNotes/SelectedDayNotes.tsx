@@ -11,7 +11,7 @@ function useSelectedDayNotes({ selectedDate, userNotes, onConfirmNewNoteSubmitCl
     const [newNoteText, setNewNoteText] = useState("");
 
     // Filters today's notes
-    const userNotesToDisplay: UserNote[] = userNotes.filter((note: UserNote) => utils.sameDay(new Date(note.date), selectedDate));
+    const userNotesToDisplay: UserNote[] = userNotes.filter((note: UserNote) => utils.sameDay(new Date(note.date * 1000), selectedDate));
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         // For now, this new goal will be associated to a challenge day, for simplification

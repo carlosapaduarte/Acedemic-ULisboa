@@ -56,7 +56,7 @@ class UserRepoSql(UserRepo):
                     level=batch.level,
                     completed=map(lambda completed_goal: CompletedGoal(
                         goal_day=completed_goal.goal_day,
-                        name=completed_goal.name,
+                        id=completed_goal.name,
                         conclusion_date=completed_goal.conclusion_date
                     ), batch.completed_goals)
                 ), batches_model)
@@ -74,13 +74,13 @@ class UserRepoSql(UserRepo):
 
             return new_batch.id
         
-    def create_completed_goal(self, user_id: int, batch_id: int, goal_name: str, goal_day: int, conclusion_date: datetime):
+    def create_completed_goal(self, user_id: int, batch_id: int, goal_id: int, goal_day: int, conclusion_date: datetime):
         with Session(engine) as session:
             completed_goal = GoalModel(
                 batch_id=batch_id,
                 user_id=user_id,
+                id=goal_id,
                 goal_day=goal_day,
-                name=goal_name,
                 conclusion_date=conclusion_date,
             )
             session.add(completed_goal)

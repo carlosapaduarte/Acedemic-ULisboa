@@ -24,8 +24,8 @@ class SetUserAvatarDto(BaseModel):
     avatarFilename: str
 
 class GoalCompletedDto(BaseModel):
-    goalName: str
-    goalDay: int # [1,21]
+    goalId: int
+    goalDay: int
 
 class SetStudyTrackerAppUseGoalsInputDto(BaseModel):
     uses: set # Why can't I just write Set<int>?

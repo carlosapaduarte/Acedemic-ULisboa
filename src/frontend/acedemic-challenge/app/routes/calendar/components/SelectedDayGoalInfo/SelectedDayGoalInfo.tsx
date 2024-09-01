@@ -30,13 +30,19 @@ export default function SelectedDayGoalInfo({ goals, selectedDay }: { goals: Day
     if (goalsToDisplay.length != 0)
         // Showing a single goal, for now
         return (
-            <div style={{ overflow: "hidden", marginBottom: "3%" }}>
-                <h6>
-                    {goalsToDisplay[0].title}
-                </h6>
-                <p>
-                    {goalsToDisplay[0].description}
-                </p>
+            <div>
+                {
+                    goalsToDisplay.map((goal: Goal, index: number) =>
+                        <div key={index} style={{ overflow: "hidden", marginBottom: "3%" }}>
+                            <h6>
+                                {goal.title}
+                            </h6>
+                            <p>
+                                {goal.description}
+                            </p>
+                        </div>
+                    )
+                }
             </div>
         );
     else
