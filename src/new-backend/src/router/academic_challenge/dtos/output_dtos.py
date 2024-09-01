@@ -15,11 +15,3 @@ class BatchDto(BaseModel):
     startDate: int
     level: int
     completedGoals: list[CompletedGoalDto]
-    
-class UserDto(BaseModel):
-    id: int
-    username: str
-    avatarFilename: str | None
-    shareProgress: bool | None
-    userNotes: list[UserNoteDto] | None
-    batches: list[BatchDto] | None

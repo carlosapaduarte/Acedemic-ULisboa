@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
-import { useSetError } from "../error/ErrorContainer";
 
 const questions = [
     "Melhorar as minhas notas/classificações",

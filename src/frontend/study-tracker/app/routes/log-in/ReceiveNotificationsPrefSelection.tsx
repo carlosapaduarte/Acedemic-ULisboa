@@ -1,6 +1,6 @@
 import { useEffect } from "react"
-import { BinaryAnswer, service } from "~/service/service"
-import { useSetError } from "../error/ErrorContainer";
+import { useSetError } from "~/components/error/ErrorContainer";
+import { BinaryAnswer, service } from "~/service/service";
 
 export function ReceiveNotificationsPreferenceSelection({onProceed} : {onProceed: () => void}) {
     const setError = useSetError();

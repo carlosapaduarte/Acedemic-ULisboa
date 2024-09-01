@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlmodel import SQLModel
-from repository.sql import models
+from repository.sql.models import models
 
 USER = "kali"
 PASSWORD = "password"

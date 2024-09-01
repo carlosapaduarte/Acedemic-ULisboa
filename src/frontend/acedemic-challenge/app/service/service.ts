@@ -11,7 +11,7 @@ import { doFetch, toBody } from "./fetch";
 // TODO: separate create-user and login tasks in the future
 async function createUserOrLogin(userId: number) {
     const request = {
-        path: "login",
+        path: "commons/login",
         method: "POST",
         body: toBody({ id: userId })
     };
@@ -23,7 +23,7 @@ async function createUserOrLogin(userId: number) {
 
 async function createBatch(userId: number, level: LevelType) {
     const request = {
-        path: `users/${userId}/batches`,
+        path: `academic-challenge/users/${userId}/batches`,
         method: "POST",
         body: toBody({ level: level })
     };
@@ -34,7 +34,7 @@ async function createBatch(userId: number, level: LevelType) {
 
 async function selectShareProgressState(userId: number, shareProgress: boolean) {
     const request = {
-        path: `users/${userId}/publish-state`,
+        path: `commons/users/${userId}/publish-state`,
         method: "PUT",
         body: toBody({ shareProgress })
     };
@@ -46,7 +46,7 @@ async function selectShareProgressState(userId: number, shareProgress: boolean) 
 
 async function selectAvatar(userId: number, avatarFilename: string) {
     const request = {
-        path: `users/${userId}/avatar`,
+        path: `commons/users/${userId}/avatar`,
         method: "PUT",
         body: toBody({ avatarFilename })
     };
@@ -92,7 +92,7 @@ export type UserInfo = {
 
 async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
     const request = {
-        path: `users/${userId}`,
+        path: `commons/users/${userId}`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
@@ -106,7 +106,7 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
 
 async function createNewUserNote(userId: number, text: string, userGoalDate: Date) {
     const request = {
-        path: `users/${userId}/notes`,
+        path: `academic-challenge/users/${userId}/notes`,
         method: "POST",
         body: toBody({ text, date: Math.trunc(userGoalDate.getTime() / 1000) }) // Send seconds from 1970
     };
@@ -119,7 +119,7 @@ async function createNewUserNote(userId: number, text: string, userGoalDate: Dat
 
 async function markGoalAsCompleted(userId: number, batchId: number, goalId: number, goalDay: number) {
     const request = {
-        path: `users/${userId}/batches/${batchId}/completed-goals`,
+        path: `academic-challenge/users/${userId}/batches/${batchId}/completed-goals`,
         method: "POST",
         body: toBody({ goalId, goalDay })
     };

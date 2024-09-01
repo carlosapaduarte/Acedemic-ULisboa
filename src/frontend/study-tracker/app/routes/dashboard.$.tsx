@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { service, Task } from "~/service/service";
+import { utils } from "~/utils";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -24,15 +27,29 @@ function WeekGoal() {
     )
 }
 
-function DailyGoals() {
-    // Should display today's goals.
+function useDailyTasks() {
+    const [tasks, setTasks] = useState<Task[] | undefined>(undefined)
 
-    const goalsForToday: string[] = ["goal_1", "goal_2", "goal_3"]
+    useEffect(() => {
+        let userId = utils.getUserId()
+        service.getTodayTasks(userId)
+            .then((tasks: Task[]) => setTasks(tasks))
+    }, [])
+
+    return { tasks }
+}
+
+function DailyTasks() {
+    const { tasks } = useDailyTasks()
+
     return (
         <div>
-            <h1>Daily Goals</h1>
-            {goalsForToday.map((goal: string) => 
-                <p>{goal}</p>
+            <h1>Today's Tasks!</h1>
+            {tasks?.map((task: Task, index: number) => 
+                <div key={index}>
+                    <p>{task.title}</p>
+                    <p>{task.tag}</p>
+                </div>
             )}
         </div>
     )
@@ -59,7 +76,7 @@ export default function Dashboard() {
             <img src="test.webp" alt="Avatar" />
             <p>{get_welcome_message()}</p>
             <WeekGoal/>
-            <DailyGoals/>
+            <DailyTasks/>
             <WeekSchedule/>
             <WeekStats/>
         </div>

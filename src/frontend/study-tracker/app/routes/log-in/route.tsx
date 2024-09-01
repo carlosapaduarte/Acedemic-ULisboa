@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
-import AppUseGoals from "~/components/login/AppUseGoal";
-import { Avatar } from "~/components/login/Avatar";
-import { PlanDaySelection } from "~/components/login/PlanDaySelection";
-import { ReceiveNotificationsPreferenceSelection } from "~/components/login/ReceiveNotificationsPrefSelection";
-import { ShareProgress } from "~/components/login/ShareProgress";
-import { UserInfo } from "~/components/login/UserInfo";
+import { UserInfo } from "./UserInfo";
+import AppUseGoals from "./AppUseGoal";
+import { ReceiveNotificationsPreferenceSelection } from "./ReceiveNotificationsPrefSelection";
+import { PlanDaySelection } from "./PlanDaySelection";
+import { ShareProgress } from "./ShareProgress";
+import { Avatar } from "./Avatar";
 
 type Views =
     | "userInfo"

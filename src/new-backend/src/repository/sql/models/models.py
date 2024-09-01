@@ -12,7 +12,7 @@ class UserModel(SQLModel, table=True):
     user_batches: list["BatchModel"] = Relationship(back_populates="user")
     user_study_tracker_app_uses: list["StudyTrackerAppUseModel"] = Relationship(back_populates="user")
     study_tracker_planning_day: "StudyTrackerWeekDayPlanningModel" = Relationship(back_populates="user")
-    study_tracker_tasks: list["StudyTrackerTask"] = Relationship(back_populates="user")
+    study_tracker_tasks: list["StudyTrackerTaskModel"] = Relationship(back_populates="user")
 
 class NoteModel(SQLModel, table=True):
     id: int = Field(primary_key=True)
@@ -65,7 +65,7 @@ class StudyTrackerWeekDayPlanningModel(SQLModel, table=True):
     user_id: int = Field(foreign_key="usermodel.id", primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
     user: UserModel = Relationship(back_populates="study_tracker_planning_day")
 
-class StudyTrackerTask(SQLModel, table=True):
+class StudyTrackerTaskModel(SQLModel, table=True):
     id: int = Field(primary_key=True)
     start_date: datetime
     end_date: datetime

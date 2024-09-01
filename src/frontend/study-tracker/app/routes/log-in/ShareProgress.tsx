@@ -1,5 +1,5 @@
+import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
-import { useSetError } from "../error/ErrorContainer";
 
 export function ShareProgress({
     userId,

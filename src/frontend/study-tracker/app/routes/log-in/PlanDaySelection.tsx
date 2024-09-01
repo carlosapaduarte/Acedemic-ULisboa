@@ -1,6 +1,6 @@
 import { service } from "~/service/service"
-import { useSetError } from "../error/ErrorContainer";
 import { useState } from "react";
+import { useSetError } from "~/components/error/ErrorContainer";
 
 const weekDays = [ 
     "Monday",

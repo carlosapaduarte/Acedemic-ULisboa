@@ -11,7 +11,7 @@ import {doFetch, toBody} from "./fetch"
 async function createUserOrLogin(userId: number) {
     //console.log("Trying to use userId: ", userId)
     const request = {
-        path: 'login',
+        path: 'commons/login',
         method: 'POST',
         body: toBody({id: userId}),
     }
@@ -23,7 +23,7 @@ async function createUserOrLogin(userId: number) {
 
 async function selectShareProgressState(userId: number, shareProgress: boolean) {
     const request = {
-        path: `users/${userId}/publish-state`,
+        path: `commons/users/${userId}/publish-state`,
         method: 'PUT',
         body: toBody({shareProgress}),
     }
@@ -35,7 +35,7 @@ async function selectShareProgressState(userId: number, shareProgress: boolean) 
 
 async function selectAvatar(userId: number, avatarFilename: string) {
     const request = {
-        path: `users/${userId}/avatar`,
+        path: `commons/users/${userId}/avatar`,
         method: 'PUT',
         body: toBody({avatarFilename}),
     }
@@ -57,7 +57,7 @@ export type UserInfo = {
 
 async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
     const request = {
-        path: `users/${userId}`,
+        path: `commons/users/${userId}`,
         method: 'GET'
     }
     const response: Response = await doFetch(request)
@@ -73,7 +73,7 @@ async function updateAppUseGoals(userId: number, uses: Set<number>) {
     // Set needs to be converted to list
     const usesList = Array.from(uses)
     const request = {
-        path: `users/${userId}/study-tracker-app/use-goals`,
+        path: `study-tracker/users/${userId}/use-goals`,
         method: 'PUT',
         body: toBody({uses: usesList}),
     }
@@ -89,7 +89,7 @@ async function updateAppUseGoals(userId: number, uses: Set<number>) {
 export enum BinaryAnswer { YES, NO }
 async function updateReceiveNotificationsPreference(userId: number, answer: BinaryAnswer) {
     const request = {
-        path: `users/${userId}/study-tracker-app/receive-notifications-pref`,
+        path: `study-tracker/users/${userId}/receive-notifications-pref`,
         method: 'PUT',
         body: toBody({receive: answer}),
     }
@@ -103,7 +103,7 @@ async function updateWeekPlanningDay(userId: number, day: number, hour: number) 
         return Promise.reject(new Error('Day ' + day + " is not a valid week day!"))
 
     const request = {
-        path: `users/${userId}/study-tracker-app/week-planning-day`,
+        path: `study-tracker/users/${userId}/week-planning-day`,
         method: 'PUT',
         body: toBody({day, hour}),
     }
@@ -120,12 +120,12 @@ export type NewTaskInfo = {
 }
 
 async function createNewTask(userId: number, newTaskInfo: NewTaskInfo) {
-    console.log("New Task Info: ", newTaskInfo)
-    console.log(newTaskInfo.startDate.getTime() / 1000)
-    console.log(newTaskInfo.endDate.getTime() / 1000)
+    //console.log("New Task Info: ", newTaskInfo)
+    //console.log(newTaskInfo.startDate.getTime() / 1000)
+    //console.log(newTaskInfo.endDate.getTime() / 1000)
 
     const request = {
-        path: `users/${userId}/study-tracker-app/tasks`,
+        path: `study-tracker/users/${userId}/tasks`,
         method: 'POST',
         body: toBody({
             title: newTaskInfo.title,
@@ -139,6 +139,40 @@ async function createNewTask(userId: number, newTaskInfo: NewTaskInfo) {
         return Promise.reject(new Error('New task could not be created!'))
 }
 
+type TaskDto = {
+    startDate: number,
+    endDate: number,
+    title: string,
+    tag: string
+}
+
+export type Task = {
+    startDate: Date,
+    endDate: Date,
+    title: string,
+    tag: string
+}
+
+async function getTodayTasks(userId: number): Promise<Task[]> {
+    const request = {
+        path: `study-tracker/users/${userId}/tasks?today=true`,
+        method: 'GET'
+    }
+    const response: Response = await doFetch(request)
+
+    if (response.ok) {
+        const responseObject: TaskDto[] = await response.json() // TODO: how 
+        return responseObject.map((taskDto: TaskDto) => {
+            return {
+                startDate: new Date(taskDto.startDate * 1000),
+                endDate: new Date(taskDto.endDate * 1000),
+                title: taskDto.title,
+                tag: taskDto.tag
+            }})
+    } else
+        return Promise.reject(new Error('User daily tasks could not be obtained!'))   
+}
+
 export const service = {
     createUserOrLogin,
     selectShareProgressState,
@@ -147,5 +181,6 @@ export const service = {
     updateAppUseGoals,
     updateReceiveNotificationsPreference,
     updateWeekPlanningDay,
-    createNewTask
+    createNewTask,
+    getTodayTasks
 }

@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react"
 import { useSetError } from "~/components/error/ErrorContainer"
 import { NewTaskInfo, service } from "~/service/service"
+import { utils } from "~/utils"
 
 type Category = {
     name: string,
@@ -56,8 +57,7 @@ function useAddTask(startDate: Date, onNewTaskCreated: () => void) {
     const [tag, setTag] = useState<string | undefined>(undefined)
 
     function createNewTask(title: string, endDate: Date, tag: string) {
-        const userIdStr = localStorage["userId"]
-        const userId = Number(userIdStr)
+        let userId = utils.getUserId()
                 
         service.createNewTask(userId, {
             title,
@@ -80,8 +80,12 @@ function EndDatePicker({selectedDate, onEndDateChange} : {selectedDate: Date, on
     }
 
     function toInputDateValueStr(date: Date) {
-        const month = date.getMonth()
+
+        // +1 is needed because, then, <input> component will display the previous month
+        const month = date.getMonth() + 1
         const monthStr = month < 10 ? `0${month}` : month.toString()
+
+        // For some reason, it's not necessary to add +1 here
         const day = date.getDate()
         const dayStr = day < 10 ? `0${day}` : day.toString()
         const hour = date.getHours()
@@ -95,7 +99,7 @@ function EndDatePicker({selectedDate, onEndDateChange} : {selectedDate: Date, on
     const todayStr = toInputDateValueStr(selectedDate)
     return (
         <div>
-            <label>Hour</label>
+            <label>End date</label>
             <br/>
             <input
                 type="datetime-local"
@@ -116,7 +120,6 @@ function CategoryAndTagPicker({onTagClick} : {onTagClick: (tag: string) => void}
         :
         <TagPicker category={category} onTagClick={onTagClick} />
     )
-    
 }
 
 function CategoryPicker({onCategoryClick} : {onCategoryClick: (cat: Category) => void}) {
@@ -126,7 +129,6 @@ function CategoryPicker({onCategoryClick} : {onCategoryClick: (cat: Category) =>
                 <button onClick={() => onCategoryClick(cat)}>
                     {cat.name}
                 </button>
-                <label>{cat.name}</label>
             </div>
         )
     )

@@ -1,6 +1,6 @@
 import { service } from "~/service/service";
 import { useTranslation } from "react-i18next";
-import { useSetError } from "../error/ErrorContainer";
+import { useSetError } from "~/components/error/ErrorContainer";
 
 export function Avatar({
     userId,

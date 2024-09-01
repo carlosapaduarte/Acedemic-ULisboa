@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useSetError } from "../error/ErrorContainer";
+import { useSetIsLoggedIn } from "~/components/auth/Authn";
+import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
-import { useSetIsLoggedIn } from "../auth/Authn";
 
 const MAX_USER_ID = 9999;
 
