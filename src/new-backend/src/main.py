@@ -78,8 +78,8 @@ def add_completed_goal(user_id: int, batch_id: int, input_dto: GoalCompletedDto)
     service.create_completed_goal(
         user_id, 
         batch_id, 
-        input_dto.goalName,
-        input_dto.goalDay, 
+        input_dto.goalId,
+        input_dto.goalDay,
         datetime.now()
     )
     return Response()

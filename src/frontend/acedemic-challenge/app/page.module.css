@@ -1,0 +1,56 @@
+
+.pageContainer {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.pageInnerContainer {
+    margin: 2rem;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pageInnerContainer h1, h2, h3 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--secondary);
+}
+
+.pageInnerContainer h2 {
+    font-size: 1.5rem;
+}
+
+.pageInnerContainer h3 {
+    font-size: 1.25rem;
+    color: white;
+}
+
+.pageInnerContainer p {
+    font-size: 1rem;
+    color: white;
+    margin-top: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .pageContainer {
+        height: 50%;
+    }
+
+    .pageInnerContainer {
+        width: 75%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .pageInnerContainer {
+        width: 50%;
+    }
+}

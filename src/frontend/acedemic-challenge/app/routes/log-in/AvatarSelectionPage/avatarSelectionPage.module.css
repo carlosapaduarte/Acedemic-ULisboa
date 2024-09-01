@@ -1,0 +1,70 @@
+@import "../login.module.css";
+
+.avatarSelectionPageContainer {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatarSelectionPageInnerContainer {
+    margin: 2rem;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titleContainer {
+    margin-bottom: 5%;
+    margin-top: 3%;
+    display: flex;
+    justify-content: center;
+}
+
+.titleHeading {
+    font-size: 1.25rem;
+    color: white;
+    font-weight: 300;
+}
+
+.avatarListContainer {
+    flex-basis: 50%;
+    width: 100%;
+    overflow: auto;
+}
+
+.avatarGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(6.5rem, 25%), 1fr)); /* This 25% needs to be adjusted if gap is added (to maintain 4 columns in small screen)*/
+}
+
+.avatarContainer {
+    min-width: 2rem;
+    min-height: 2rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid transparent;
+}
+
+.avatarContainer.selected {
+    border-color: var(--yellow);
+    transition: border-color 0.2s;
+}
+
+.confirmButtonContainer {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (hover: hover) {
+    .confirmButtonContainer button:hover {
+        background-color: var(--yellow-85);
+    }
+}
