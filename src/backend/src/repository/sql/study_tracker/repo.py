@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import datetime
 
-from domain.study_tracker.task import StudyTrackerTask
+from domain.study_tracker import StudyTrackerTask, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -26,4 +26,8 @@ class StudyTrackerRepo(ABC):
 
     @abstractmethod
     def update_receive_notifications_pref(self, user_id: int, receive: bool):
+        pass
+
+    @abstractmethod
+    def create_schedule_not_available_block(self, user_id: int, info: UnavailableScheduleBlock):
         pass

@@ -2,6 +2,11 @@ import datetime
 
 from repository.sql.models.models import StudyTrackerTaskModel
 
+class UnavailableScheduleBlock():
+    def __init__(self, week_day: int, start_hour: int, duration: int):
+        self.week_day=week_day
+        self.start_hour=start_hour
+        self.duration=duration
 
 class StudyTrackerTask():
     def __init__(

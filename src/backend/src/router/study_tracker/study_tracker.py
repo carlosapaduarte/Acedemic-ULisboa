@@ -1,6 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
-from router.study_tracker.dtos.input_dtos import CreateNewStudyTrackerTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto
+from domain.study_tracker import UnavailableScheduleBlock
+from router.study_tracker.dtos.input_dtos import CreateNewStudyTrackerTaskInputDto, CreateScheduleNotAvailableBlock, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto
 from service import common as common_service
 from service import study_tracker as study_tracker_service
 
@@ -14,8 +15,8 @@ def create_new_task(user_id: int, input_dto: CreateNewStudyTrackerTaskInputDto) 
     study_tracker_service.create_new_study_tracker_task(
         user_id, 
         input_dto.title, 
-        datetime.fromtimestamp(input_dto.start_date),
-        datetime.fromtimestamp(input_dto.end_date),
+        datetime.fromtimestamp(input_dto.startDate),
+        datetime.fromtimestamp(input_dto.endDate),
         input_dto.tags
     )
     return Response()
@@ -39,3 +40,15 @@ def get_study_tasks(user_id: int, today: bool):
         return study_tracker_service.get_study_tracker_today_tasks(user_id)
     else:
         return study_tracker_service.get_study_tracker_tasks(user_id)
+    
+@router.post("/users/{user_id}/schedule/unavailable")
+def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvailableBlock) -> Response:
+    study_tracker_service.create_schedule_not_available_block(
+        user_id, 
+        UnavailableScheduleBlock(
+            week_day=dto.weekDay,
+            start_hour=dto.startHour,
+            duration=dto.duration
+        )
+    )
+    return Response()

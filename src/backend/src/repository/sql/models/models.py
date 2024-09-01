@@ -13,6 +13,7 @@ class UserModel(SQLModel, table=True):
     user_study_tracker_app_uses: list["StudyTrackerAppUseModel"] = Relationship(back_populates="user")
     study_tracker_planning_day: "StudyTrackerWeekDayPlanningModel" = Relationship(back_populates="user")
     study_tracker_tasks: list["StudyTrackerTaskModel"] = Relationship(back_populates="user")
+    schedule_unavailable_blocks: list["StudyTrackerScheduleNotAvailableBlockModel"] = Relationship(back_populates="user")
 
 class NoteModel(SQLModel, table=True):
     id: int = Field(primary_key=True)
@@ -81,3 +82,11 @@ class StudyTrackerTaskTagModel(SQLModel, table=True):
 
     task_id: int = Field(foreign_key="studytrackertaskmodel.id", primary_key=True)
     task: StudyTrackerTaskModel = Relationship(back_populates="tags")
+
+class StudyTrackerScheduleNotAvailableBlockModel(SQLModel, table=True):
+    week_day: int = Field(primary_key=True)
+    start_hour: int = Field(primary_key=True)
+    duration: int = Field(primary_key=True)
+
+    user_id: int = Field(foreign_key="usermodel.id", primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
+    user: UserModel = Relationship(back_populates="schedule_unavailable_blocks")

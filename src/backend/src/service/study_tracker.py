@@ -1,5 +1,7 @@
 import datetime
+from domain.study_tracker import UnavailableScheduleBlock
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
+from router.study_tracker.dtos.input_dtos import CreateScheduleNotAvailableBlock
 from router.study_tracker.dtos.output_dtos import StudyTrackerTaskOutputDto
 
 study_tracker_repo = StudyTrackerSqlRepo()
@@ -23,3 +25,6 @@ def get_study_tracker_today_tasks(user_id: int) -> list[StudyTrackerTaskOutputDt
 def get_study_tracker_tasks(user_id: int) -> list[StudyTrackerTaskOutputDto]:
     stored_tasks = study_tracker_repo.get_study_tracker_tasks(user_id)
     return StudyTrackerTaskOutputDto.from_study_tracker_tasks(stored_tasks)
+
+def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
+    study_tracker_repo.create_schedule_not_available_block(user_id, info)

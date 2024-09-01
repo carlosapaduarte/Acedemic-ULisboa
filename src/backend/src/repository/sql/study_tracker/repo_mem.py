@@ -1,5 +1,5 @@
 from datetime import datetime
-from domain.study_tracker.task import StudyTrackerTask
+from domain.study_tracker import StudyTrackerTask, UnavailableScheduleBlock
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
 class StudyTrackerMemRepo(StudyTrackerRepo):
@@ -17,4 +17,7 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
         pass
 
     def get_study_tracker_tasks(self, user_id: int) -> list[StudyTrackerTask]:
+        pass
+    
+    def create_schedule_not_available_block(self, user_id: int, info: UnavailableScheduleBlock):
         pass

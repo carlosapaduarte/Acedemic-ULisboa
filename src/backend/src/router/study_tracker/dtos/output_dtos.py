@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from domain.study_tracker.task import StudyTrackerTask
+from domain.study_tracker import StudyTrackerTask
 from service.common import get_datetime_utc
 
 

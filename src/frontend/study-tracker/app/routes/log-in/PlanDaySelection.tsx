@@ -1,88 +1,31 @@
 import { service } from "~/service/service"
 import { useState } from "react";
 import { useSetError } from "~/components/error/ErrorContainer";
-
-const weekDays = [ 
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-]
+import { WeekDayAndHour, WeekDayAndHourPicker, weekDays } from "../commons";
 
 export function PlanDaySelection({onProceed} : {onProceed: () => void}) {
-    const {
-        weekDayInternal,
-        hourInternal,
-        setWeekDay,
-        setHour,
-        submitPlanDaySelection
-    } = usePlanDaySelection(onProceed)
+    const { submitPlanDaySelection } = usePlanDaySelection(onProceed)
+
+    function onDayPlanDateConfirm(info: WeekDayAndHour) {
+        submitPlanDaySelection(info.weekDay, info.hour)
+    }
 
     return (
-        <div className="flex flex-col">
-            <div className="flex flex-col">
-                {weekDays.map((key: string, index: number) => 
-                    <div key={index}>
-                        <button onClick={() => setWeekDay(index)}>
-                            {key}
-                        </button>
-                    </div>
-                )}
-
-                <br/>
-
-                <label>Hour</label>                
-                <input type="number" min={0} max={23} onChange={(e) => setHour(Number(e.target.value))} />
-                
-                <br/>
-
-                <button onClick={submitPlanDaySelection}>
-                    Confirm Here!    
-                </button>
-            </div>
-        </div>
+        <WeekDayAndHourPicker onConfirm={onDayPlanDateConfirm} />
     )
 
 }
 
 function usePlanDaySelection(onProceed: () => void) {
     const setError = useSetError();
-    
-    const [weekDayInternal, setWeekDayInternal] = useState<number | undefined>(undefined)
-    const [hourInternal, setHourInternal] = useState<number | undefined>(undefined)
 
-    function setWeekDay(weekDay: number) {
-        if (weekDay >= 0 && weekDay <= 6)
-            setWeekDayInternal(weekDay)
-    }
-
-    function setHour(hour: number) {
-        if (hour >= 0 && hour <= 23)
-            setHourInternal(hour)
-    }
-
-    function submitPlanDaySelection() {
-        if (weekDayInternal == undefined)
-            throw Error("Week day is not set")
-
-        if (hourInternal == undefined)
-            throw Error("Hour is not set")
-
+    function submitPlanDaySelection(weekDay: number, hour: number) {
         const userIdStr = localStorage["userId"]
         const userId = Number(userIdStr)
-        service.updateWeekPlanningDay(userId, weekDayInternal, hourInternal)
+        service.updateWeekPlanningDay(userId, weekDay, hour)
             .then(() => onProceed())
             .catch((error) => setError(error));
     }
 
-    return {
-        weekDayInternal,
-        hourInternal,
-        setWeekDay,
-        setHour,
-        submitPlanDaySelection
-    }
+    return { submitPlanDaySelection }
 }

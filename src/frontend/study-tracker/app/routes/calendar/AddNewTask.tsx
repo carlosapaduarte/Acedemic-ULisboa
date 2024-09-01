@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react"
 import { useSetError } from "~/components/error/ErrorContainer"
 import { NewTaskInfo, service } from "~/service/service"
 import { utils } from "~/utils"
+import { toInputDateValueStr } from "./commons"
 
 type Category = {
     name: string,
@@ -90,23 +91,6 @@ function EndDatePicker({selectedDate, onEndDateChange} : {selectedDate: Date, on
     function onEndDateChangeHandler(e: ChangeEvent<HTMLInputElement>) {
         const selectedEndDate = new Date(e.target.value)
         onEndDateChange(selectedEndDate)
-    }
-
-    function toInputDateValueStr(date: Date) {
-
-        // +1 is needed because, then, <input> component will display the previous month
-        const month = date.getMonth() + 1
-        const monthStr = month < 10 ? `0${month}` : month.toString()
-
-        // For some reason, it's not necessary to add +1 here
-        const day = date.getDate()
-        const dayStr = day < 10 ? `0${day}` : day.toString()
-        const hour = date.getHours()
-        const hourStr = hour < 10 ? `0${hour}` : hour.toString()
-        const minute = date.getMinutes()
-        const minuteStr = minute < 10 ? `0${minute}` : minute.toString()
-        
-        return `${date.getFullYear()}-${monthStr}-${dayStr}T${hourStr}:${minuteStr}`
     }
 
     const todayStr = toInputDateValueStr(selectedDate)

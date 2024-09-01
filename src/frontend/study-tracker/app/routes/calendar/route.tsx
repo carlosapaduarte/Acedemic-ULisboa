@@ -5,42 +5,13 @@ import { CalendarMonthView } from "./MonthView";
 import { CalendarWeekView } from "./WeekView";
 import { CalendarDayView } from "./DayView";
 import { AddTask } from "./AddNewTask";
+import { AddScheduleNotAvailableBlock } from "./AddScheduleNotAvailableBlock";
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 
     'July', 'August', 'September', 'October', 'November', 'December'];
 
 enum TimeGranularity {
 	MONTH, WEEK, DAY
-}
-
-export default function CalendarPage() {
-	const { startDate, setStartDate, clearStartDate } = useCalendarPage()
-	
-	const isAddNewTaskViewTypeSelected = startDate != undefined
-	
-	const domToDisplay = isAddNewTaskViewTypeSelected ?
-		<AddTask startDate={startDate} onNewTaskCreated={clearStartDate}/>
-		:
-		(
-			<div>
-				<Calendar onAddNewTaskClick={setStartDate}/>
-				<br/>
-				<DailyTasks />
-				<br/>
-			</div>
-		)
-
-	return domToDisplay
-}
-
-function useCalendarPage() {
-	const [startDate, setStartDate] = useState<Date | undefined>(undefined)
-
-	function clearStartDate() {
-		setStartDate(undefined)
-	}
-
-	return { startDate, setStartDate, clearStartDate }
 }
 
 function DailyTasks() {
@@ -51,47 +22,41 @@ function DailyTasks() {
 	)
 }
 
-function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (startDate: Date) => void}) {
-	const {
-		selectedTimeGranularity,
-		baseDate,
-		onButtonClickHandler,
-		setCalendarViewType,
-	} = useMyCalendar()
 
-	// Decides based on selected calendar view
-	let calendarComponent
-	switch(selectedTimeGranularity) {
-		case TimeGranularity.MONTH: {
-			calendarComponent =
-				<CalendarMonthView dayProp={baseDate} onDayClick={(date: Date) => onAddNewTaskClick(date)}/>
-		}
-		break
-		case TimeGranularity.WEEK: calendarComponent = (
-			<CalendarWeekView baseDate={baseDate} onHourClick={(date: Date) => onAddNewTaskClick(date)} />
-		)
-		break
-		case TimeGranularity.DAY: {
-			calendarComponent = (
-				<div>
-					<CalendarDayView date={baseDate} onHourClick={(hour: number) => {
-						baseDate.setHours(hour)
-						onAddNewTaskClick(baseDate)
-					}} />
-				</div>
-			)
-		} 
-	}
 
-    return (
-		<div className={`${styles.calendar}`}>
-			<TimeGranularityChangeButtons onCalendarViewChangeClick={setCalendarViewType} />
-			<br/>
-			<NavigateButtons onButtonClick={onButtonClickHandler} />
-			<Title date={baseDate} />
-			{calendarComponent}
+
+function TimeGranularityChangeButtons({onCalendarViewChangeClick} : {onCalendarViewChangeClick: (type: TimeGranularity) => void}) {
+	return (
+		<div>
+			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.MONTH)}>Monthly</button>
+			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.WEEK)}>Weekly</button>
+			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.DAY)}>Daily</button>
 		</div>
-    )
+	)
+}
+
+function Title({date} : {date: Date}) {
+	return(
+		<p className="title">{months[date.getMonth()] + " / " + date.getDate() + " / " + date.getFullYear()}</p>
+	)
+}
+
+enum Navigate { PREVIOUS, TODAY, NEXT }
+
+function NavigateButtons({onButtonClick} : {onButtonClick: (action: Navigate) => void}) {
+	return (
+		<div className={`${styles.changeViewButtons}`}>
+			<button onClick={() => onButtonClick(Navigate.PREVIOUS)}>
+				Previous
+			</button>
+			<button onClick={() => onButtonClick(Navigate.TODAY)}>
+				Today
+			</button>
+			<button onClick={() => onButtonClick(Navigate.NEXT)}>
+				Next
+			</button>
+		</div>
+	)
 }
 
 function navigateOnMonth(oldDate: Date, action: Navigate): number {
@@ -157,36 +122,79 @@ function useMyCalendar() {
 	}
 }
 
-function TimeGranularityChangeButtons({onCalendarViewChangeClick} : {onCalendarViewChangeClick: (type: TimeGranularity) => void}) {
-	return (
-		<div>
-			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.MONTH)}>Monthly</button>
-			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.WEEK)}>Weekly</button>
-			<button onClick={() => onCalendarViewChangeClick(TimeGranularity.DAY)}>Daily</button>
+function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (startDate: Date) => void}) {
+	const {
+		selectedTimeGranularity,
+		baseDate,
+		onButtonClickHandler,
+		setCalendarViewType,
+	} = useMyCalendar()
+
+	// Decides based on selected calendar view
+	let calendarComponent
+	switch(selectedTimeGranularity) {
+		case TimeGranularity.MONTH: {
+			calendarComponent =
+				<CalendarMonthView dayProp={baseDate} onDayClick={(date: Date) => onAddNewTaskClick(date)}/>
+		}
+		break
+		case TimeGranularity.WEEK: calendarComponent = (
+			<CalendarWeekView baseDate={baseDate} onHourClick={(date: Date) => onAddNewTaskClick(date)} />
+		)
+		break
+		case TimeGranularity.DAY: {
+			calendarComponent = (
+				<div>
+					<CalendarDayView date={baseDate} onHourClick={(hour: number) => {
+						baseDate.setHours(hour)
+						onAddNewTaskClick(baseDate)
+					}} />
+				</div>
+			)
+		} 
+	}
+
+    return (
+		<div className={`${styles.calendar}`}>
+			<TimeGranularityChangeButtons onCalendarViewChangeClick={setCalendarViewType} />
+			<br/>
+			<NavigateButtons onButtonClick={onButtonClickHandler} />
+			<Title date={baseDate} />
+			{calendarComponent}
 		</div>
-	)
+    )
 }
 
-function Title({date} : {date: Date}) {
-	return(
-		<p className="title">{months[date.getMonth()] + " / " + date.getDate() + " / " + date.getFullYear()}</p>
-	)
+function useCalendarPage() {
+	const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+
+	function clearStartDate() {
+		setStartDate(undefined)
+	}
+
+	return { startDate, setStartDate, clearStartDate }
 }
 
-enum Navigate { PREVIOUS, TODAY, NEXT }
+export default function CalendarPage() {
+	const { startDate, setStartDate, clearStartDate } = useCalendarPage()
+	
+	const isAddNewTaskViewTypeSelected = startDate != undefined
+	
+	const domToDisplay = isAddNewTaskViewTypeSelected ?
+		<AddTask startDate={startDate} onNewTaskCreated={clearStartDate}/>
+		:
+		(
+			<div>
+				<Calendar onAddNewTaskClick={setStartDate}/>
+				<br/>
+				<h1>Add Unavailable Schedule Block</h1>
+				<br/>
+				<AddScheduleNotAvailableBlock />
+				<br/>
+				<DailyTasks />
+				<br/>
+			</div>
+		)
 
-function NavigateButtons({onButtonClick} : {onButtonClick: (action: Navigate) => void}) {
-	return (
-		<div className={`${styles.changeViewButtons}`}>
-			<button onClick={() => onButtonClick(Navigate.PREVIOUS)}>
-				Previous
-			</button>
-			<button onClick={() => onButtonClick(Navigate.TODAY)}>
-				Today
-			</button>
-			<button onClick={() => onButtonClick(Navigate.NEXT)}>
-				Next
-			</button>
-		</div>
-	)
+	return domToDisplay
 }

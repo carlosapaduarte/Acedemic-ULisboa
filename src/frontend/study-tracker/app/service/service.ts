@@ -173,6 +173,24 @@ async function getTodayTasks(userId: number): Promise<Task[]> {
         return Promise.reject(new Error('User daily tasks could not be obtained!'))   
 }
 
+export type CreateScheduleNotAvailableBlock = {
+    weekDay: number
+    startHour: number
+    duration: number
+}
+
+
+async function createScheduleNotAvailableBlock(userId: number, info: CreateScheduleNotAvailableBlock) {
+    const request = {
+        path: `study-tracker/users/${userId}/schedule/unavailable`,
+        method: 'POST',
+        body: toBody(info)
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('Unavailable Schedule Block creation failed!'))
+}
+
 export const service = {
     createUserOrLogin,
     selectShareProgressState,
@@ -182,5 +200,6 @@ export const service = {
     updateReceiveNotificationsPreference,
     updateWeekPlanningDay,
     createNewTask,
-    getTodayTasks
+    getTodayTasks,
+    createScheduleNotAvailableBlock
 }

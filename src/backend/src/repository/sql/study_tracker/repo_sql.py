@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
 
-from domain.study_tracker.task import StudyTrackerTask
+from domain.study_tracker import StudyTrackerTask, UnavailableScheduleBlock
 from repository.sql.models import database
-from repository.sql.models.models import StudyTrackerAppUseModel, StudyTrackerTaskModel, StudyTrackerTaskTagModel, StudyTrackerWeekDayPlanningModel, UserModel
+from repository.sql.models.models import StudyTrackerAppUseModel, StudyTrackerScheduleNotAvailableBlockModel, StudyTrackerTaskModel, StudyTrackerTaskTagModel, StudyTrackerWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
@@ -120,4 +120,18 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
             session.add(user_model)
             session.commit()
-            session.refresh(user_model)
+
+    def create_schedule_not_available_block(self, user_id: int, info: UnavailableScheduleBlock):
+        with Session(engine) as session:
+            statement = select(UserModel).where(UserModel.id == user_id)
+            result = session.exec(statement)
+            
+            user_model: UserModel = result.one()
+            user_model.schedule_unavailable_blocks.append(StudyTrackerScheduleNotAvailableBlockModel(
+                week_day=info.week_day,
+                start_hour=info.start_hour,
+                duration=info.duration
+            ))
+
+            session.add(user_model)
+            session.commit()

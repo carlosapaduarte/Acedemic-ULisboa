@@ -12,7 +12,12 @@ class UpdateStudyTrackerWeekPlanningDayInputDto(BaseModel):
     hour: int
 
 class CreateNewStudyTrackerTaskInputDto(BaseModel):
-    start_date: float
-    end_date: float
+    startDate: float
+    endDate: float
     title: str
     tags: list[str]
+
+class CreateScheduleNotAvailableBlock(BaseModel):
+    weekDay: int
+    startHour: int
+    duration: int
