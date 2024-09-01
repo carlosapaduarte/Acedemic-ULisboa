@@ -6,7 +6,7 @@ from repository.sql.models import BatchModel, GoalModel, NoteModel, StudyTracker
     StudyTrackerWeekDayPlanningModel, UserModel
 from sqlmodel import Session, select
 
-from user_repo import UserRepo
+from repository.user_repo import UserRepo
 
 engine = database.get_engine()
 
