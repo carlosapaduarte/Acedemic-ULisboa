@@ -1,6 +1,6 @@
 import * as React from 'react'
-import {useError} from "./ErrorContainer";
 import { t } from 'i18next';
+import { useError } from './ErrorContainer';
 
 
 export function ErrorController({ children }: { children: React.ReactNode }): React.ReactElement {

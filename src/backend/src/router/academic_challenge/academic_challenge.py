@@ -2,7 +2,8 @@ from datetime import datetime
 from fastapi import APIRouter, Response
 
 from router.academic_challenge.dtos.input_dtos import CreateBatchInputDto, GoalCompletedDto, NewUserNoteDto
-from service import academic_challenge_service
+
+from service import academic_challenge as academic_challenge_service
 
 
 router = APIRouter(

@@ -2,7 +2,8 @@ from fastapi import APIRouter, Response
 
 from router.academic_challenge.dtos.input_dtos import SetShareProgressPreferenceDto
 from router.commons.dtos.input_dtos import LoginInputDto, SetUserAvatarDto
-from service import academic_challenge_service, common_service
+
+from service import common as common_service
 
 router = APIRouter(
     prefix="/commons",

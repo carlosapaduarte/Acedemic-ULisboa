@@ -15,4 +15,4 @@ class CreateNewStudyTrackerTaskInputDto(BaseModel):
     start_date: float
     end_date: float
     title: str
-    tag: str
+    tags: list[str]

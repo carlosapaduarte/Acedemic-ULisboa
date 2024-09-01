@@ -1,7 +1,8 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
 from router.study_tracker.dtos.input_dtos import CreateNewStudyTrackerTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto
-from service import common_service, study_tracker_service
+from service import common as common_service
+from service import study_tracker as study_tracker_service
 
 
 router = APIRouter(
@@ -15,7 +16,7 @@ def create_new_task(user_id: int, input_dto: CreateNewStudyTrackerTaskInputDto) 
         input_dto.title, 
         datetime.fromtimestamp(input_dto.start_date),
         datetime.fromtimestamp(input_dto.end_date),
-        input_dto.tag
+        input_dto.tags
     )
     return Response()
     

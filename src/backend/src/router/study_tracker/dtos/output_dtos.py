@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from domain.study_tracker.task import StudyTrackerTask
-from service.common_service import get_datetime_utc
+from service.common import get_datetime_utc
 
 
 class StudyTrackerTaskOutputDto(BaseModel):

@@ -116,7 +116,7 @@ export type NewTaskInfo = {
     title: string,
     startDate: Date,
     endDate: Date,
-    tag: string
+    tags: string[]
 }
 
 async function createNewTask(userId: number, newTaskInfo: NewTaskInfo) {
@@ -131,7 +131,7 @@ async function createNewTask(userId: number, newTaskInfo: NewTaskInfo) {
             title: newTaskInfo.title,
             start_date: newTaskInfo.startDate.getTime() / 1000,
             end_date: newTaskInfo.endDate.getTime() / 1000,
-            tag: newTaskInfo.tag
+            tags: newTaskInfo.tags
         }),
     }
     const response: Response = await doFetch(request)

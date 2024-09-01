@@ -2,7 +2,7 @@ from sqlmodel import Session, select
 
 from domain.study_tracker.task import StudyTrackerTask
 from repository.sql.models import database
-from repository.sql.models.models import StudyTrackerAppUseModel, StudyTrackerTaskModel, StudyTrackerWeekDayPlanningModel, UserModel
+from repository.sql.models.models import StudyTrackerAppUseModel, StudyTrackerTaskModel, StudyTrackerTaskTagModel, StudyTrackerWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
@@ -50,27 +50,41 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.commit()
             session.refresh(user_model)
 
-    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime, tag: str):
+    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime, tags: list[str]):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
 
             user_model: UserModel = result.one()
 
-            user_model.study_tracker_tasks.append(
-                StudyTrackerTaskModel(
+            new_task_model = StudyTrackerTaskModel(
                     title=title,
                     start_date=start_date,
                     end_date=end_date,
-                    tag=tag,
                     user_id=user_id,
-                    user=user_model
+                    user=user_model,
+                    tags=[] # tags added next
                 )
+
+            user_model.study_tracker_tasks.append(
+                new_task_model
             )
 
             session.add(user_model)
             session.commit()
-            session.refresh(user_model)
+            session.refresh(new_task_model)
+
+            tags_model: list[StudyTrackerTaskTagModel] = []
+            for tag in tags:
+                tags_model.append(StudyTrackerTaskTagModel(
+                    tag=tag,
+                    task_id=new_task_model.id,
+                    task=new_task_model
+                ))
+
+            for tag_model in tags_model:
+                session.add(tag_model)
+                session.commit()
 
     def is_today(date_1: datetime) -> bool:
         today = datetime.today()

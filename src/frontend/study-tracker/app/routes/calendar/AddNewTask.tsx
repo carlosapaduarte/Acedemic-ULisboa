@@ -28,12 +28,12 @@ const categories: Category[] = [
 ]
 
 export function AddTask({startDate, onNewTaskCreated} : {startDate: Date, onNewTaskCreated: () => void}) {
-	const { title, endDate, tag, setTitle, setEndDate, setTag, createNewTask } = useAddTask(startDate, onNewTaskCreated)
+	const { title, endDate, tags, setTitle, setEndDate, appendTag, createNewTask } = useAddTask(startDate, onNewTaskCreated)
 
     let confirmButtonDom = <></>
-    if (title.length > 0  && endDate != undefined && tag != undefined)
+    if (title.length > 0  && endDate != undefined && tags != undefined)
         confirmButtonDom = 
-            <button onClick={() => createNewTask(title, endDate, tag)}>
+            <button onClick={() => createNewTask(title, endDate, tags)}>
                 Confirm!
             </button>
 
@@ -43,7 +43,7 @@ export function AddTask({startDate, onNewTaskCreated} : {startDate: Date, onNewT
 			<br/>
 			<input value={title} placeholder="New task..." onChange={e => setTitle(e.target.value)} />
 			<EndDatePicker selectedDate={endDate ? endDate : new Date()} onEndDateChange={setEndDate} />
-            <CategoryAndTagPicker onTagClick={setTag}/>
+            <CategoryAndTagsPicker onTagClick={appendTag}/>
             {confirmButtonDom}
 		</div>
 	)
@@ -54,22 +54,35 @@ function useAddTask(startDate: Date, onNewTaskCreated: () => void) {
     
     const [title, setTitle] = useState<string>("")
     const [endDate, setEndDate] = useState<Date | undefined>(undefined)
-    const [tag, setTag] = useState<string | undefined>(undefined)
+    const [tags, setTags] = useState<string[] | undefined>(undefined)
 
-    function createNewTask(title: string, endDate: Date, tag: string) {
+    function appendTag(tag: string) {
+        let new_tags
+        if (tags == undefined)
+            new_tags = [tag]
+        else {
+            if (tags.includes(tag))
+                return
+            new_tags = [...tags]
+            new_tags.push(tag)
+        }
+        setTags(new_tags)
+    }
+
+    function createNewTask(title: string, endDate: Date, tags: string[]) {
         let userId = utils.getUserId()
                 
         service.createNewTask(userId, {
             title,
             startDate,
             endDate,
-            tag: tag
+            tags
         })
         .then(() => onNewTaskCreated()  )
         .catch((error) => setError(error));
     }
 
-    return { title, endDate, tag, setTitle, setEndDate, setTag, createNewTask }
+    return { title, endDate, tags, setTitle, setEndDate, appendTag, createNewTask }
 }
 
 function EndDatePicker({selectedDate, onEndDateChange} : {selectedDate: Date, onEndDateChange: (date: Date) => void}) {
@@ -111,14 +124,19 @@ function EndDatePicker({selectedDate, onEndDateChange} : {selectedDate: Date, on
     )
 }
 
-function CategoryAndTagPicker({onTagClick} : {onTagClick: (tag: string) => void}) {
+function CategoryAndTagsPicker({onTagClick} : {onTagClick: (tag: string) => void}) {
     const [category, setCategory] = useState<Category | undefined>(undefined)
+
+    function onTagClickHandler(tag: string) {
+        setCategory(undefined) // Allows to select new tag
+        onTagClick(tag)
+    }
 
     return (
         category == undefined ? 
             <CategoryPicker onCategoryClick={setCategory} />
         :
-        <TagPicker category={category} onTagClick={onTagClick} />
+        <TagPicker category={category} onTagClick={onTagClickHandler} />
     )
 }
 

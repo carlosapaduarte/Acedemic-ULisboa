@@ -66,11 +66,18 @@ class StudyTrackerWeekDayPlanningModel(SQLModel, table=True):
     user: UserModel = Relationship(back_populates="study_tracker_planning_day")
 
 class StudyTrackerTaskModel(SQLModel, table=True):
-    id: int = Field(primary_key=True)
+    id: int = Field(primary_key=True, default=None)
     start_date: datetime
     end_date: datetime
     title: str
-    tag: str
+    
+    tags: list["StudyTrackerTaskTagModel"] = Relationship(back_populates="task")
 
-    user_id: int = Field(foreign_key="usermodel.id")    
+    user_id: int = Field(foreign_key="usermodel.id")
     user: UserModel = Relationship(back_populates="study_tracker_tasks")
+
+class StudyTrackerTaskTagModel(SQLModel, table=True):
+    tag: str = Field(primary_key=True)
+
+    task_id: int = Field(foreign_key="studytrackertaskmodel.id", primary_key=True)
+    task: StudyTrackerTaskModel = Relationship(back_populates="tags")
