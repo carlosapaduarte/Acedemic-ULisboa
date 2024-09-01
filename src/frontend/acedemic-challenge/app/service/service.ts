@@ -69,7 +69,7 @@ export type GoalAndDate = {
 
 export type CompletedGoal = {
     goalDay: number
-    name: string
+    id: number
     conclusionDate: number
 }
 

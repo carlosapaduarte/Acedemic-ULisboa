@@ -30,19 +30,18 @@ function getTodayNotes(allNotes: UserNote[]): UserNote[] {
     return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date * 1000), today));
 }
 
-function getTodayCompletedGoals(batch: Batch): string[] {
+function getTodayCompletedGoals(batch: Batch): number[] {
     const today = new Date();
     const batchStartDate = new Date(batch.startDate * 1000);
     //const batchStartDate = new Date(2024, 7, 21, 12) // For testing...
     return batch.completedGoals
         .filter((completedGoal: CompletedGoal) => {
-
             // To obtain the date of the goal: batch-start-date + (goal day index - 1)
             const goalDate = batchStartDate;
             goalDate.setDate(goalDate.getDate() + (completedGoal.goalDay - 1));
 
             return sameDate(new Date(goalDate), today);
-        }).map((v) => v.name);
+        }).map((completedGoal) => completedGoal.id);
 }
 
 function useMainDashboardContent(userId: number) {
@@ -56,7 +55,7 @@ function useMainDashboardContent(userId: number) {
 
     const [userInfo, setUserInfo] = useState<UserInfo>();
 
-    const [todayCompletedGoals, setTodayCompletedGoals] = useState<string[]>();
+    const [todayCompletedGoals, setTodayCompletedGoals] = useState<number[]>();
     const [todayNotes, setTodayNotes] = useState<UserNote[]>();
     const [todayGoals, setTodayGoals] = useState<DayGoals>();
     const [batchToDisplay, setBatchToDisplay] = useState<Batch | undefined>(undefined);
@@ -96,7 +95,7 @@ function useMainDashboardContent(userId: number) {
             // TODO: handle error when undefined later
             const todayGoalsAux: DayGoals | undefined = getTodayGoals(goals);
             const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes);
-            const todaysCompletedGoals: string[] = getTodayCompletedGoals(batchToDisplay);
+            const todaysCompletedGoals: number[] = getTodayCompletedGoals(batchToDisplay);
 
             setTodayGoals(todayGoalsAux);
             setTodayCompletedGoals(todaysCompletedGoals);

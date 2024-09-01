@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Goals({ goals, completedGoals, onMarkComplete }: {
     goals: Goal[],
-    completedGoals: string[],
+    completedGoals: number[],
     onMarkComplete: (goal: Goal) => void
 }) {
 
@@ -15,7 +15,7 @@ export default function Goals({ goals, completedGoals, onMarkComplete }: {
             <h4 style={{ textAlign: "left", width: "50%" }}>{t("dashboard:current_challenge")}</h4>
             <br />
             {goals.map((goal: Goal) => {
-                const completed = completedGoals.find((completedGoalName) => goal.title == completedGoalName);
+                const completed = completedGoals.find((completedGoalId) => goal.id == completedGoalId);
                 return (
                     <div key={goal.title} style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
                         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
