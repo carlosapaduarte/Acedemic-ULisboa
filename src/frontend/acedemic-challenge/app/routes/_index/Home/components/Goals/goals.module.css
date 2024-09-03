@@ -1,0 +1,47 @@
+
+.currentDayText {
+    font-family: 'Chakra Petch', sans-serif;
+    text-transform: uppercase;
+}
+
+.challengeTitle {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.goalDescription {
+    font-size: 0.75rem;
+    font-weight: 400;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 1%;
+}
+
+.buttonsContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 50px;
+    width: 100%;
+}
+
+.addNoteButton {
+    background-color: var(--secondary);
+    font-weight: bold;
+    font-size: 1rem;
+    flex-basis: 40%;
+}
+
+.completeGoalButton {
+    background-color: var(--yellow);
+    font-weight: bold;
+    font-size: 1rem;
+    height: auto;
+    flex-basis: 60%;
+}

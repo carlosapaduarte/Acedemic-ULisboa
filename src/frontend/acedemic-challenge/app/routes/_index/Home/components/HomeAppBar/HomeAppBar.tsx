@@ -64,7 +64,7 @@ function GreetingsContainer() {
     const userId = useUserId();
 
     return (
-        <div className={styles.greetingsContainers}>
+        <div className={styles.greetingsContainer}>
             <h4 className={styles.helloQuote}>
                 {helloQuote}, {userId ?? "loading..."}
             </h4>

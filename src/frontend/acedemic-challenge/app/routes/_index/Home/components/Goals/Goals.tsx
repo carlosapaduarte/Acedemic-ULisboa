@@ -1,10 +1,12 @@
 import { Goal } from "~/challenges/types";
-import { t } from "i18next";
-import { Button } from "~/components/Button/Button";
+import { CutButton } from "~/components/Button/Button";
 import React from "react";
+
+import styles from "./Goals.module.css";
 import { useTranslation } from "react-i18next";
 
-export default function Goals({ goals, completedGoals, onMarkComplete }: {
+export default function Goals({ currentDayNumber, goals, completedGoals, onMarkComplete }: {
+    currentDayNumber: number,
     goals: Goal[],
     completedGoals: number[],
     onMarkComplete: (goal: Goal) => void
@@ -14,14 +16,15 @@ export default function Goals({ goals, completedGoals, onMarkComplete }: {
     // Per goal, there is a "Mark Complete" button
     return (
         <div>
-            <h4 style={{ textAlign: "left", width: "50%" }}>{t("dashboard:current_challenge")}</h4>
-            <br />
+            <h1 className={styles.currentDayText}>
+                {t("dashboard:day")} {currentDayNumber}
+            </h1>
             {goals.map((goal: Goal) => {
                 const completed = completedGoals.find((completedGoalId) => goal.id == completedGoalId);
                 return (
-                    <div key={goal.title} style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
+                    <div key={goal.id} style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
                         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                            <h5 style={{ textAlign: "left", width: "20%", marginBottom: "1%" }}>{goal.title}</h5>
+                            <h2 className={styles.challengeTitle}>{goal.title}</h2>
                             {
                                 completed ?
                                     <p style={{
@@ -35,20 +38,24 @@ export default function Goals({ goals, completedGoals, onMarkComplete }: {
                                     :
                                     <></>
                             }
-
                         </div>
-                        <p style={{ fontSize: "110%", textAlign: "left", width: "100%", marginBottom: "1%" }}>
+                        <p className={styles.goalDescription}>
                             {goal.description}
                         </p>
-                        {
-                            // Depends if goal is or not completed
-                            completed ?
-                                <></>
-                                :
-                                <Button variant="round" style={{ width: "20%", marginBottom: "3%" }}
-                                        onClick={() => onMarkComplete(goal)}>{t("dashboard:mark_complete")}
-                                </Button>
-                        }
+                        <div className={styles.buttonsContainer}>
+                            <CutButton className={styles.addNoteButton}>
+                                {t("dashboard:add_note")}
+                            </CutButton>
+                            {
+                                completed ?
+                                    <></>
+                                    :
+                                    <CutButton className={styles.completeGoalButton}
+                                               onClick={() => onMarkComplete(goal)}>
+                                        {t("dashboard:mark_complete")}
+                                    </CutButton>
+                            }
+                        </div>
                     </div>
                 );
             })}

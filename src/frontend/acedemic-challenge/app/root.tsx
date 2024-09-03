@@ -47,7 +47,7 @@ export default function Root() {
 export function App() {
     return (
         <div className="app">
-            <div style={{overflow: "auto", flexGrow: 1}}>
+            <div className="mainContentContainer">
                 <Outlet />
             </div>
             <Footer />

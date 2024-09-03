@@ -28,6 +28,13 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+}
+
+.mainContentContainer {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-grow: 1;
 }
 
 .app-dashboard {

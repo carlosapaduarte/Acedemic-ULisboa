@@ -1,19 +1,13 @@
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useUserId } from "~/components/auth/Authn";
 import React, { useEffect, useState } from "react";
-import { Batch, CompletedGoal, service, UserInfo, UserNote } from "~/service/service";
 import { DayGoals, Goal } from "~/challenges/types";
+import { Batch, CompletedGoal, service, UserInfo, UserNote } from "~/service/service";
+import { useSetError } from "~/components/error/ErrorContainer";
 import { Level1 } from "~/challenges/level_1";
 import { Level2 } from "~/challenges/level_2";
 import { Level3 } from "~/challenges/level_3";
-import { Button } from "~/components/Button/Button";
-import DisplayUserNotes from "~/routes/_index/Home/components/DisplayUserNotes/DisplayUserNotes";
 import Goals from "~/routes/_index/Home/components/Goals/Goals";
-const { t } = useTranslation(["hello_quote"]);
-
-enum View {
-    Default,
-    CreateNewNote
-}
+import styles from "./challengeView.module.css";
 
 function sameDate(date1: Date, date2: Date): boolean {
     return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate();
@@ -47,14 +41,12 @@ function getTodayCompletedGoals(batch: Batch): number[] {
 function useMainDashboardContent(userId: number) {
     // In reality, there could be multiple Goals per day!!!
 
-    //const [state, dispatch] = useReducer(reducer, {type: 'challengesNotLoaded'})
     const setError = useSetError();
     const [newNoteText, setNewNoteText] = useState("");
 
-    const [view, setView] = useState<View>(View.Default);
-
     const [userInfo, setUserInfo] = useState<UserInfo>();
 
+    const [daysSinceStart, setDaysSinceStart] = useState<number>();
     const [todayCompletedGoals, setTodayCompletedGoals] = useState<number[]>();
     const [todayNotes, setTodayNotes] = useState<UserNote[]>();
     const [todayGoals, setTodayGoals] = useState<DayGoals>();
@@ -125,7 +117,7 @@ function useMainDashboardContent(userId: number) {
         setUserInfo(userInfo);
     }
 
-    function onAddNewNoteClickHandler() {
+    /*function onAddNewNoteClickHandler() {
         setView(View.CreateNewNote);
     }
 
@@ -136,7 +128,7 @@ function useMainDashboardContent(userId: number) {
                 setView(View.Default);
             }) // this triggers a new refresh. TODO: improve later)
             .catch((error) => setError(error));
-    }
+    }*/
 
     async function onMarkCompleteClickHandler(goal: Goal, batch: Batch) {
         const today = new Date();
@@ -152,67 +144,73 @@ function useMainDashboardContent(userId: number) {
             .catch((error) => setError(error));
     }
 
+    useEffect(() => {
+        if (!batchToDisplay)
+            return;
+
+        setDaysSinceStart(Math.round((new Date().getTime() - batchToDisplay.startDate * 1000) / (1000 * 3600 * 24)) + 1);
+    }, [batchToDisplay]);
+
     return {
         userInfo,
+        daysSinceStart,
         todayGoals,
         todayCompletedGoals,
         todayNotes,
         newNoteText,
         batchToDisplay,
-        view,
         setError,
         setNewNoteText,
-        setView,
+        /*
         onAddNewNoteClickHandler,
-        onConfirmNewNoteSubmitClickHandler,
+        onConfirmNewNoteSubmitClickHandler,*/
         onMarkCompleteClickHandler
     };
 }
 
-export function MainDashboardContent({ userId }: { userId: number }) {
+function MainContent({ userId }: { userId: number }) {
     const {
         userInfo,
+        daysSinceStart,
         todayGoals,
         todayCompletedGoals,
         todayNotes,
         newNoteText,
         batchToDisplay,
-        view,
         setError,
         setNewNoteText,
-        setView,
+        /*
         onAddNewNoteClickHandler,
-        onConfirmNewNoteSubmitClickHandler,
+        onConfirmNewNoteSubmitClickHandler,*/
         onMarkCompleteClickHandler
     } = useMainDashboardContent(userId);
     console.log(userInfo?.avatarFilename);
+    if (userInfo && daysSinceStart && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay) {
+        return (
+            <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>
+                <Goals
+                    currentDayNumber={daysSinceStart}
+                    goals={todayGoals.goals}
+                    completedGoals={todayCompletedGoals}
+                    onMarkComplete={(goal: Goal) => onMarkCompleteClickHandler(goal, batchToDisplay)} />
+                {/*<div style={{ flexGrow: 1 }}>
+                    <DisplayUserNotes notes={todayNotes} alignTitleLeft={true} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "right" }}>
 
-    const { t } = useTranslation(["dashboard"]);
-
-    if (view == View.Default) {
-        if (userInfo && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay)
-            return (
-                <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>
-                    <Goals goals={todayGoals.goals} completedGoals={todayCompletedGoals}
-                           onMarkComplete={(goal: Goal) => onMarkCompleteClickHandler(goal, batchToDisplay)} />
-                    <div style={{ flexGrow: 1 }}>
-                        <DisplayUserNotes notes={todayNotes} alignTitleLeft={true} />
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "right" }}>
-
-                        <Button variant="round" style={{ fontSize: "150%" }}
+                    <Button variant="round" style={{ fontSize: "150%" }}
                                 onClick={onAddNewNoteClickHandler}>
                             {t("dashboard:add_note")}
                         </Button>
-                    </div>
-                </div>
-            );
-        else
-            return <></>;
-    } else if (view == View.CreateNewNote)
+                </div>*/}
+            </div>
+        );
+    } else
+        return <></>;
+    /*} else if (view == View.CreateNewNote)
         return (
             <div style={{ display: "flex", flexDirection: "column" }}>
-                {/*<TextField
+                {/!*<TextField
                     sx={{ marginBottom: "2%", width: "60%" }}
                     id="outlined-controlled"
                     label="Note Description"
@@ -220,7 +218,7 @@ export function MainDashboardContent({ userId }: { userId: number }) {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setNewNoteText(event.target.value);
                     }}
-                />*/}
+                />*!/}
                 <Button variant="round" style={{ width: "15%" }} onClick={onConfirmNewNoteSubmitClickHandler}>
                     {t("dashboard:confirm_new_note")}
                 </Button>
@@ -229,5 +227,29 @@ export function MainDashboardContent({ userId }: { userId: number }) {
     else {
         setError(new Error("Something went wrong..."));
         return <></>;
-    }
+    }*/
+}
+
+export function ChallengeView() {
+    const userId = useUserId();
+
+    return (
+        <div className={styles.challengeViewContainer}>
+            {userId
+                ? <>
+                    <MainContent userId={userId} />
+                    {/*<Button variant={"round"}
+                            className={styles.logoutButton}
+                            onClick={() => {
+                                logOut();
+                                navigate("/");
+                            }}
+                    >Log out</Button>*/}
+                </>
+                : <div className={styles.loadingTextContainer}>
+                    <h1>Loading...</h1>
+                </div>
+            }
+        </div>
+    );
 }
