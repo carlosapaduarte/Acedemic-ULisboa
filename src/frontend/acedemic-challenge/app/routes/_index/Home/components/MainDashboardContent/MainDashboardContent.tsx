@@ -169,7 +169,7 @@ function useMainDashboardContent(userId: number) {
     };
 }
 
-export default function MainDashboardContent({ userId }: { userId: number }) {
+export function MainDashboardContent({ userId }: { userId: number }) {
     const {
         userInfo,
         todayGoals,
@@ -192,22 +192,18 @@ export default function MainDashboardContent({ userId }: { userId: number }) {
     if (view == View.Default) {
         if (userInfo && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay)
             return (
-                <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>
-                    <div style={{ display: "flex", justifyContent: "right" }}>
-                        <img
-                            src={"./test.webp"/*`./${userInfo.avatarFilename}`*/}
-                            height="100px"
-                            loading="lazy"
-                            alt={"User's Avatar"} />
-                        <Button variant="round" style={{ fontSize: "150%" }}
-                                onClick={onAddNewNoteClickHandler}>
-                            {t("dashboard:add_note")}
-                        </Button>
-                    </div>
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", color: "white" }}>
                     <Goals goals={todayGoals.goals} completedGoals={todayCompletedGoals}
                            onMarkComplete={(goal: Goal) => onMarkCompleteClickHandler(goal, batchToDisplay)} />
                     <div style={{ flexGrow: 1 }}>
                         <DisplayUserNotes notes={todayNotes} alignTitleLeft={true} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "right" }}>
+
+                        <Button variant="round" style={{ fontSize: "150%" }}
+                                onClick={onAddNewNoteClickHandler}>
+                            {t("dashboard:add_note")}
+                        </Button>
                     </div>
                 </div>
             );

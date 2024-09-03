@@ -1,7 +1,7 @@
 import { UserNote } from "~/service/service";
 import React, { useState } from "react";
 import { utils } from "~/utils";
-import DisplayUserNotes from "~/routes/_index/components/DisplayUserNotes/DisplayUserNotes";
+import DisplayUserNotes from "~/routes/_index/Home/components/DisplayUserNotes/DisplayUserNotes";
 
 function useSelectedDayNotes({ selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler }: {
     selectedDate: Date,
