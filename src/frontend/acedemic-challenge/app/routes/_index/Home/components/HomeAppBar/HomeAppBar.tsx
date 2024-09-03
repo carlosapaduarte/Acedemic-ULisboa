@@ -52,8 +52,8 @@ function Header() {
                 {"<"}
             </CutButton>
             <div className={styles.headerRightSide}>
-                <LanguageButton language={"ptPT"} />
-                <LanguageButton language={"enGB"} />
+                <LanguageButton language={"pt-PT"} />
+                <LanguageButton language={"en-GB"} />
             </div>
         </div>
     );

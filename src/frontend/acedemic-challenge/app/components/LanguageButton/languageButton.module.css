@@ -40,10 +40,10 @@
     );
 }
 
-.languageButton.ptPT::after {
+.languageButton.pt-PT::after {
     background-image: url('minimalist-ptPT.png');
 }
 
-.languageButton.enGB::after {
+.languageButton.en-GB::after {
     background-image: url('minimalist-enGB.png');
 }
