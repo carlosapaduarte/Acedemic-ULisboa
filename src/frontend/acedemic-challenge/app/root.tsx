@@ -2,6 +2,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, 
 import type { MetaFunction } from "@remix-run/node";
 import { AuthnContainer } from "~/components/auth/Authn";
 import { NotFoundPage } from "~/Pages/NotFoundPage";
+import { Footer } from "~/components/Footer";
 
 import "./global.css";
 import "./i18n";
@@ -46,7 +47,10 @@ export default function Root() {
 export function App() {
     return (
         <div className="app">
-            <Outlet />
+            <div style={{overflow: "auto", flexGrow: 1}}>
+                <Outlet />
+            </div>
+            <Footer />
         </div>
     );
 }

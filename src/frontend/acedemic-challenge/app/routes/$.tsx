@@ -2,7 +2,7 @@ import { NotFoundPage } from "~/Pages/NotFoundPage";
 
 export default function DefaultRoute() {
     return (
-        <div className="h-screen w-screen bg-primary">
+        <div style={{width: "100%", height: "100%"}}>
             <NotFoundPage />
         </div>
     );
