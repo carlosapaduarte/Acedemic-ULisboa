@@ -3,7 +3,7 @@ import { service } from "~/service/service";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./selectLevelPage.module.css";
-import { ConfirmButton, CutButton } from "~/components/Button";
+import { ConfirmButton, CutButton } from "~/components/Button/Button";
 
 export default function SelectLevelPage(
     {

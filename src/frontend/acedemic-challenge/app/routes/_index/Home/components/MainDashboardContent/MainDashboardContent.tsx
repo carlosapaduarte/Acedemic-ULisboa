@@ -5,10 +5,10 @@ import { DayGoals, Goal } from "~/challenges/types";
 import { Level1 } from "~/challenges/level_1";
 import { Level2 } from "~/challenges/level_2";
 import { Level3 } from "~/challenges/level_3";
-import { Button } from "~/components/Button";
-import DisplayUserNotes from "~/routes/_index/components/DisplayUserNotes/DisplayUserNotes";
-import Goals from "~/routes/_index/components/Goals/Goals";
-import { useTranslation } from "react-i18next";
+import { Button } from "~/components/Button/Button";
+import DisplayUserNotes from "~/routes/_index/Home/components/DisplayUserNotes/DisplayUserNotes";
+import Goals from "~/routes/_index/Home/components/Goals/Goals";
+const { t } = useTranslation(["hello_quote"]);
 
 enum View {
     Default,
@@ -192,7 +192,7 @@ export function MainDashboardContent({ userId }: { userId: number }) {
     if (view == View.Default) {
         if (userInfo && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay)
             return (
-                <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", color: "white" }}>
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>
                     <Goals goals={todayGoals.goals} completedGoals={todayCompletedGoals}
                            onMarkComplete={(goal: Goal) => onMarkCompleteClickHandler(goal, batchToDisplay)} />
                     <div style={{ flexGrow: 1 }}>

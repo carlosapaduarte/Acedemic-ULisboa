@@ -1,5 +1,6 @@
 import { Goal } from "~/challenges/types";
-import { Button } from "~/components/Button";
+import { t } from "i18next";
+import { Button } from "~/components/Button/Button";
 import React from "react";
 import { useTranslation } from "react-i18next";
 

@@ -2,7 +2,7 @@ import { useIsLoggedIn } from "~/components/auth/Authn";
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import styles from "~/routes/_index/WelcomePage/welcomePage.module.css";
-import { Button } from "~/components/Button";
+import { Button } from "~/components/Button/Button";
 
 function useWelcomePage() {
     const isLoggedIn = useIsLoggedIn();

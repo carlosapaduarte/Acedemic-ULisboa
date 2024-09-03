@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { utils } from "~/utils";
-import { Button } from "~/components/Button";
+import { Button } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

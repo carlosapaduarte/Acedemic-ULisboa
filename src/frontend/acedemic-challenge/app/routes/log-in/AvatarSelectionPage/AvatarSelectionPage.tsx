@@ -2,7 +2,7 @@ import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
 import React, { useEffect } from "react";
 import styles from "./avatarSelectionPage.module.css";
-import { ConfirmButton } from "~/components/Button";
+import { ConfirmButton } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
 
 function createAvatars(): string[] {

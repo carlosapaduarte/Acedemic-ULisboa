@@ -1,0 +1,49 @@
+@import "../Button/button.module.css";
+
+.languageButton {
+    color: black;
+    width: 3rem;
+    height: 2rem;
+
+    --edge-size: 0.5rem;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: white;
+
+    position: relative;
+    isolation: isolate;
+}
+
+.languageButton::after,
+.languageButton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    scale: 95%;
+    --border-edge-size: calc(var(--edge-size));
+    clip-path: polygon(
+            var(--border-edge-size) 0,
+            calc(100% - var(--border-edge-size)) 0,
+            100% var(--border-edge-size),
+            100% calc(100% - var(--border-edge-size)),
+            calc(100% - var(--border-edge-size)) 100%,
+            var(--border-edge-size) 100%,
+            0 calc(100% - var(--border-edge-size)),
+            0 var(--border-edge-size)
+    );
+}
+
+.languageButton.ptPT::after {
+    background-image: url('minimalist-ptPT.png');
+}
+
+.languageButton.enGB::after {
+    background-image: url('minimalist-enGB.png');
+}

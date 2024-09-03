@@ -11,7 +11,7 @@ const buttonVariantClassMap: Record<ButtonVariant, string> = {
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant: ButtonVariant;
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 export function Button({ variant, children, ...buttonProps }: ButtonProps) {
@@ -28,7 +28,7 @@ export function Button({ variant, children, ...buttonProps }: ButtonProps) {
 }
 
 interface CutButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 export function CutButton({ children, ...buttonProps }: CutButtonProps) {

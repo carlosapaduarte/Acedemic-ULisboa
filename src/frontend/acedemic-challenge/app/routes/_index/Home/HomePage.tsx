@@ -1,4 +1,4 @@
-import { Button } from "~/components/Button";
+import { Button } from "~/components/Button/Button";
 import { Logger } from "tslog";
 import React from "react";
 import { MainDashboardContent } from "./components/MainDashboardContent/MainDashboardContent";
@@ -17,7 +17,7 @@ function ChallengeView() {
     const logOut = useLogOut();
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", padding: "3%", overflow: "auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", padding: "3%", overflow: "auto", color: "white" }}>
             {userId
                 ? <>
                     <MainDashboardContent userId={Number(userId)} />

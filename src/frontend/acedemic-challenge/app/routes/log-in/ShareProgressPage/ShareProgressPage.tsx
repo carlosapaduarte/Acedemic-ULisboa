@@ -2,7 +2,7 @@ import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
 import React from "react";
 import styles from "./shareProgressPage.module.css";
-import { Button } from "~/components/Button";
+import { Button } from "~/components/Button/Button";
 
 export default function ShareProgressPage(
     {

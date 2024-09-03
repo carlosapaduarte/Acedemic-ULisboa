@@ -1,4 +1,5 @@
 @import "../../../../../components/avatar.module.css";
+@import "../../../../../components/LanguageButton/languageButton.module.css";
 
 @import "../../../../../page.module.css";
 
@@ -6,6 +7,11 @@
     width: 100%;
     flex-basis: 30%;
     flex-shrink: 0;
+
+    padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
 
     background-color: var(--purple-dark);
     color: #ffffff;
@@ -20,4 +26,63 @@
             var(--edge-size) 100%,
             0 calc(100% - var(--edge-size)),
             0 0);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.backButton {
+    background-color: var(--secondary);
+    color: black;
+    width: 4rem;
+    height: 3rem;
+
+    --edge-size: 0.75rem;
+}
+
+.headerRightSide {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.avatarContainer {
+    flex-shrink: 0;
+}
+
+.helloQuote {
+    text-align: left;
+    font-size: 2rem;
+    font-weight: 400;
+}
+
+.greetingsContainers {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navBar {
+    display: grid;
+    grid-auto-flow: column;
+    margin-bottom: 1rem;
+}
+
+.navBarButtonContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.navBarButton {
+    background-color: var(--primary);
+    color: white;
+    width: 5rem;
+    height: 4rem;
+}
+
+.navBarButtonText {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
 }

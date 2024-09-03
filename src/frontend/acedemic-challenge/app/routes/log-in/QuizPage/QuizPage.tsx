@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import { service } from "~/service/service";
-import { Button } from "~/components/Button";
+import { Button } from "~/components/Button/Button";
 
 export default function QuizPage({
                                      userId,
