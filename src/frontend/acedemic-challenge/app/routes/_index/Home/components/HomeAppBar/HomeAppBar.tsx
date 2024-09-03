@@ -45,20 +45,6 @@ function NavBarButton({ text, url }: { text: string, url: string }) {
     );
 }
 
-function Header() {
-    return (
-        <div className={styles.header}>
-            <CutButton className={`${styles.backButton}`}>
-                {"<"}
-            </CutButton>
-            <div className={styles.headerRightSide}>
-                <LanguageButton language={"pt-PT"} />
-                <LanguageButton language={"en-GB"} />
-            </div>
-        </div>
-    );
-}
-
 function GreetingsContainer() {
     let helloQuote = getHelloQuote();
     const userId = useUserId();
@@ -92,7 +78,13 @@ function NavBar() {
 export function HomeAppBar() {
     return (
         <div className={styles.homeAppBar}>
-            <Header />
+            <CutButton className={`${styles.backButton}`}>
+                {"<"}
+            </CutButton>
+            <div className={styles.languageButtons}>
+                <LanguageButton language={"pt-PT"} />
+                <LanguageButton language={"en-GB"} />
+            </div>
             <GreetingsContainer />
             <NavBar />
         </div>
