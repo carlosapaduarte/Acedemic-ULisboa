@@ -1,9 +1,10 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from "@remix-run/react";
-import "./global.css";
-import "./Translations";
 import type { MetaFunction } from "@remix-run/node";
 import { AuthnContainer } from "~/components/auth/Authn";
 import { NotFoundPage } from "~/Pages/NotFoundPage";
+
+import "./global.css";
+import "./i18n";
 
 export const meta: MetaFunction = () => {
     return [

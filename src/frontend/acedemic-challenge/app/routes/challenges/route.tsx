@@ -83,7 +83,7 @@ function GoalRow({ rowIndex, currentGoal, onGoalClick }: {
 }
 
 function Title() {
-    const { t } = useTranslation();
+    const { t } = useTranslation(["goal_overview"]);
     return (
         <div style={{ marginBottom: "2%" }}>
             <h2>
@@ -151,7 +151,7 @@ function useChallenges() {
 }
 
 export default function Challenges() {
-    const { t } = useTranslation();
+    const { t } = useTranslation(["goal_overview"]);
     const { goalsInfoToDisplay, onGoalClickHandler, goals } = useChallenges();
 
     return (

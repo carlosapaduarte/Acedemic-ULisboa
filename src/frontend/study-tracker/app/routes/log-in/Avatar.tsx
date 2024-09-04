@@ -35,7 +35,7 @@ function AvatarSelection({
 }
 
 function Title() {
-    const { t } = useTranslation();
+    const { t } = useTranslation(["login"]);
     return (
         <div className="flex justify-center py-[1%]">
             <h5 className="text-3xl font-medium text-secondary">

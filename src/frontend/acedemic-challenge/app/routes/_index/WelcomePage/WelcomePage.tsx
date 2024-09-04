@@ -19,7 +19,7 @@ function useWelcomePage() {
 
 
 export default function WelcomePage() {
-    const { t } = useTranslation();
+    const { t } = useTranslation(["welcome_page"]);
     const { isLoggedIn, handleOnProceedClick } = useWelcomePage();
 
     if (isLoggedIn == true || isLoggedIn == undefined) {

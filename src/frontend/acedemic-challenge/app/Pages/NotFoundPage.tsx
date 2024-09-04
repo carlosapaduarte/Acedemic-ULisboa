@@ -8,7 +8,7 @@ import { Button } from "~/components/Button";
  */
 export function NotFoundPage() {
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t } = useTranslation(["not_found_page"]);
 
     return (
         <div className={styles.pageContainer}>

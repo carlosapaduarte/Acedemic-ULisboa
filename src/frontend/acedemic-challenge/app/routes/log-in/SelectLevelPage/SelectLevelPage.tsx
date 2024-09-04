@@ -22,7 +22,7 @@ export default function SelectLevelPage(
             onLevelSelected: onLevelSelected,
             onStartQuizClick: onStartQuizClick
         });
-    const { t } = useTranslation();
+    const { t } = useTranslation(["login"]);
 
     return (
         <div className={styles.selectLevelPageContainer}>
