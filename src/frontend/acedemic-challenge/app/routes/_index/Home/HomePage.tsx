@@ -1,11 +1,11 @@
 import { Button } from "~/components/Button";
 import { Logger } from "tslog";
-import { t } from "i18next";
 import React from "react";
 import MainDashboardContent from "~/routes/_index/components/MainDashboardContent/MainDashboardContent";
 import { useLogOut, useUserId } from "~/components/auth/Authn";
 import { useNavigate } from "@remix-run/react";
 import styles from "./home.module.css";
+import { useTranslation } from "react-i18next";
 
 const logger = new Logger({ name: "HomePage" });
 
@@ -13,7 +13,9 @@ const logger = new Logger({ name: "HomePage" });
  * Determines initial quote to be displayed to user, based on current time of day.
  */
 function getHelloQuote(): string {
+    const { t } = useTranslation(["hello_quote"]);
     const hourOfDay = new Date().getHours();
+
     switch (true) {
         case hourOfDay < 5:
             return t("hello_quote:night");
@@ -33,6 +35,7 @@ export default function HomePage() {
     const userId = useUserId();
     const logOut = useLogOut();
     let helloQuote = getHelloQuote();
+    const { t } = useTranslation(["dashboard"]);
 
     return (
         <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", padding: "3%" }}>

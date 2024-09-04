@@ -1,15 +1,16 @@
-import * as React from 'react'
-import { t } from 'i18next';
-import { useError } from './ErrorContainer';
+import * as React from "react";
+import { useError } from "./ErrorContainer";
+import { useTranslation } from "react-i18next";
 
 
 export function ErrorController({ children }: { children: React.ReactNode }): React.ReactElement {
-    const error = useError()
+    const error = useError();
+    const { t } = useTranslation(["error"]);
 
     if (error === undefined) {
-        return <>{children}</>
+        return <>{children}</>;
     } else {
-        console.log("Error: " + error.message)
+        console.log("Error: " + error.message);
         return (
             <div>
                 <h3>{t("error:title")}</h3>

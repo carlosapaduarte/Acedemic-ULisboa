@@ -6,9 +6,9 @@ import { Level1 } from "~/challenges/level_1";
 import { Level2 } from "~/challenges/level_2";
 import { Level3 } from "~/challenges/level_3";
 import { Button } from "~/components/Button";
-import { t } from "i18next";
 import DisplayUserNotes from "~/routes/_index/components/DisplayUserNotes/DisplayUserNotes";
 import Goals from "~/routes/_index/components/Goals/Goals";
+import { useTranslation } from "react-i18next";
 
 enum View {
     Default,
@@ -186,6 +186,8 @@ export default function MainDashboardContent({ userId }: { userId: number }) {
         onMarkCompleteClickHandler
     } = useMainDashboardContent(userId);
     console.log(userInfo?.avatarFilename);
+
+    const { t } = useTranslation(["dashboard"]);
 
     if (view == View.Default) {
         if (userInfo && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay)

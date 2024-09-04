@@ -1,13 +1,14 @@
 import { Goal } from "~/challenges/types";
-import { t } from "i18next";
 import { Button } from "~/components/Button";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Goals({ goals, completedGoals, onMarkComplete }: {
     goals: Goal[],
     completedGoals: number[],
     onMarkComplete: (goal: Goal) => void
 }) {
+    const { t } = useTranslation(["dashboard"]);
 
     // Per goal, there is a "Mark Complete" button
     return (

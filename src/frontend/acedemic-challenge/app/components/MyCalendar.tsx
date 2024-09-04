@@ -1,7 +1,7 @@
-import { t } from "i18next";
 import { useState } from "react";
 import { utils } from "~/utils";
 import { Button } from "~/components/Button";
+import { useTranslation } from "react-i18next";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const months = ["January", "February", "March", "April", "May", "June",
@@ -51,6 +51,8 @@ function Title({ date }: { date: Date }) {
 enum Action { PREV_MONTH, NEXT_MONTH, TODAY }
 
 function ChangeViewButtons({ onButtonClick }: { onButtonClick: (action: Action) => void }) {
+    const { t } = useTranslation(["calendar"]);
+
     return (
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", marginBottom: "2%" }}>
             <Button variant="round" onClick={() => onButtonClick(Action.PREV_MONTH)}>

@@ -1,4 +1,3 @@
-import { t } from "i18next";
 import { useState } from "react";
 import styles from "./calendar.module.css";
 import { CalendarMonthView } from "./MonthView";
@@ -7,7 +6,7 @@ import { CalendarDayView } from "./DayView";
 import { AddTask } from "./AddNewTask";
 import { AddScheduleNotAvailableBlock } from "./AddScheduleNotAvailableBlock";
 
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+const months = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'];
 
 enum TimeGranularity {
@@ -21,9 +20,6 @@ function DailyTasks() {
 		</h1>
 	)
 }
-
-
-
 
 function TimeGranularityChangeButtons({onCalendarViewChangeClick} : {onCalendarViewChangeClick: (type: TimeGranularity) => void}) {
 	return (
@@ -95,7 +91,7 @@ function useMyCalendar() {
 
 		if (action != Navigate.TODAY) {
 			newDate = new Date(baseDate)
-			
+
 			switch(selectedTimeGranularity) {
 				case TimeGranularity.MONTH : newDate.setMonth(navigateOnMonth(baseDate, action))
 				break;
@@ -106,7 +102,7 @@ function useMyCalendar() {
 		} else {
 			newDate = new Date()
 		}
-		
+
 		setBaseDate(newDate)
 	}
 
@@ -151,7 +147,7 @@ function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (startDate: Date) =>
 					}} />
 				</div>
 			)
-		} 
+		}
 	}
 
     return (
@@ -177,9 +173,9 @@ function useCalendarPage() {
 
 export default function CalendarPage() {
 	const { startDate, setStartDate, clearStartDate } = useCalendarPage()
-	
+
 	const isAddNewTaskViewTypeSelected = startDate != undefined
-	
+
 	const domToDisplay = isAddNewTaskViewTypeSelected ?
 		<AddTask startDate={startDate} onNewTaskCreated={clearStartDate}/>
 		:

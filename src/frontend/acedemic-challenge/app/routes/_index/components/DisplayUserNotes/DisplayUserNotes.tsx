@@ -1,8 +1,10 @@
 import { UserNote } from "~/service/service";
-import { t } from "i18next";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function DisplayUserNotes({ notes, alignTitleLeft }: { notes: UserNote[], alignTitleLeft: boolean }) {
+    const { t } = useTranslation(["dashboard"]);
+
     // TODO: make this flex component have its own scroll bar instead of overflowing the main page
     return (
         <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>

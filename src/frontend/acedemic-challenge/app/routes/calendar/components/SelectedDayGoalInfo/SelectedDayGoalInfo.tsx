@@ -1,7 +1,7 @@
 import { DayGoals, Goal } from "~/challenges/types";
 import { utils } from "~/utils";
-import { t } from "i18next";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 function useSelectedDayGoalInfo({ goals, selectedDay }: { goals: DayGoals[], selectedDay: Date }) {
     // TODO: only displaying one Goal!!! There could be more
@@ -26,6 +26,7 @@ function useSelectedDayGoalInfo({ goals, selectedDay }: { goals: DayGoals[], sel
 
 export default function SelectedDayGoalInfo({ goals, selectedDay }: { goals: DayGoals[], selectedDay: Date }) {
     const { goalsToDisplay } = useSelectedDayGoalInfo({ goals, selectedDay });
+    const { t } = useTranslation(["calendar"]);
 
     if (goalsToDisplay.length != 0)
         // Showing a single goal, for now

@@ -1,4 +1,3 @@
-import { t } from "i18next";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
 import React from "react";
@@ -76,6 +75,8 @@ function useSelectLevelPage(
 }
 
 function Title() {
+    const { t } = useTranslation(["login"]);
+
     return (
         <div className={styles.titleContainer}>
             <h1 className={styles.titleHeading}>
@@ -152,6 +153,8 @@ function getLevelTypes(): LevelType[] {
 }
 
 function getLevelTitleAndDescription(levelType: LevelType) {
+    const { t } = useTranslation(["login"]);
+
     let title;
     let description;
 

@@ -1,9 +1,9 @@
-import { t } from "i18next";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
 import React, { useEffect } from "react";
 import styles from "./avatarSelectionPage.module.css";
 import { ConfirmButton } from "~/components/Button";
+import { useTranslation } from "react-i18next";
 
 function createAvatars(): string[] {
     const avatars: string[] = [];
@@ -45,6 +45,8 @@ function useAvatarSelection(
 }
 
 function Title() {
+    const { t } = useTranslation(["login"]);
+
     return (
         <div className={styles.titleContainer}>
             <h1 className={styles.titleHeading}>
@@ -97,6 +99,7 @@ export default function AvatarSelectionPage(
             userId: userId,
             onComplete: onComplete
         });
+    const { t } = useTranslation(["login"]);
 
     return (
         <div className={styles.avatarSelectionPageContainer}>
