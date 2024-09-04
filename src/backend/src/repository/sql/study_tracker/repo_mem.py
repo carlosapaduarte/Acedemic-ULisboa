@@ -19,5 +19,8 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
     def get_study_tracker_tasks(self, user_id: int) -> list[StudyTrackerTask]:
         pass
     
-    def create_schedule_not_available_block(self, user_id: int, info: UnavailableScheduleBlock):
+    def create_not_available_schedule_block(self, user_id: int, info: UnavailableScheduleBlock):
+        pass
+
+    def get_not_available_schedule_blocks(self, user_id: int) -> list[UnavailableScheduleBlock]:
         pass

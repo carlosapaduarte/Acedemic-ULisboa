@@ -121,7 +121,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(user_model)
             session.commit()
 
-    def create_schedule_not_available_block(self, user_id: int, info: UnavailableScheduleBlock):
+    def create_not_available_schedule_block(self, user_id: int, info: UnavailableScheduleBlock):
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == user_id)
             result = session.exec(statement)
@@ -135,3 +135,17 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
             session.add(user_model)
             session.commit()
+
+    def get_not_available_schedule_blocks(self, user_id: int) -> list[UnavailableScheduleBlock]:
+         with Session(engine) as session:
+            statement = select(StudyTrackerScheduleNotAvailableBlockModel).where(StudyTrackerScheduleNotAvailableBlockModel.user_id == user_id)
+            results = session.exec(statement)
+        
+            blocks: list[StudyTrackerScheduleNotAvailableBlockModel] = []
+            for block_model in results:
+                blocks.append(UnavailableScheduleBlock(
+                    week_day=block_model.week_day,
+                    start_hour=block_model.start_hour,
+                    duration=block_model.duration
+                ))
+            return blocks

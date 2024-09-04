@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from exception import NotFoundException
+from exception import NotFoundException, NotAvailableScheduleBlockCollision
 from router.academic_challenge import academic_challenge
 from router.commons import common
 
@@ -34,8 +34,15 @@ app.add_middleware(
 )
 
 @app.exception_handler(NotFoundException)
-async def unicorn_exception_handler(request: Request, exc: NotFoundException):
+async def not_available_schedule_block_collision_exception_handler(request: Request, exc: NotFoundException):
     return JSONResponse(
         status_code=404,
         content={"error": f"Not Found: {exc.user_id}"},
+    )
+
+@app.exception_handler(NotAvailableScheduleBlockCollision)
+async def not_available_schedule_block_collision_exception_handler(request: Request, exc: NotFoundException):
+    return JSONResponse(
+        status_code=409, # Conflict
+        content={"error": "Task collides with an existent not-available schedule block"},
     )

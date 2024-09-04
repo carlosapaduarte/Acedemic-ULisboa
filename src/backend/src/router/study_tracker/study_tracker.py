@@ -34,19 +34,29 @@ def update_week_planning_day(user_id: int, input_dto: UpdateStudyTrackerWeekPlan
     study_tracker_service.update_study_tracker_app_planning_day(user_id, input_dto.day, input_dto.hour)
 
 @router.get("/users/{user_id}/tasks")
-def get_study_tasks(user_id: int, today: bool):
+def get_tasks(user_id: int, today: bool):
+    # PROBLEM: it's returning with date one hour different
+
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
     if today:
-        return study_tracker_service.get_study_tracker_today_tasks(user_id)
+        return study_tracker_service.get_today_tasks(user_id)
     else:
-        return study_tracker_service.get_study_tracker_tasks(user_id)
+        return study_tracker_service.get_tasks(user_id)
+    
+def fix_weekday_from_javascript(weekday: int) -> int:
+    # Temporary solution to convert javascript Date().getDay() into python datetime.date().weekday
+    # A better solution should be fixing this in the frontend!
+    
+    if weekday == 0:
+        return 6
+    return weekday - 1
     
 @router.post("/users/{user_id}/schedule/unavailable")
 def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvailableBlock) -> Response:
     study_tracker_service.create_schedule_not_available_block(
         user_id, 
         UnavailableScheduleBlock(
-            week_day=dto.weekDay,
+            week_day=fix_weekday_from_javascript(dto.weekDay),
             start_hour=dto.startHour,
             duration=dto.duration
         )

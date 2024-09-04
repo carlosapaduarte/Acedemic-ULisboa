@@ -8,7 +8,7 @@ class StudyTrackerTaskOutputDto(BaseModel):
     start_date: float
     end_date: float
     title: str
-    tag: str
+    tag: list[str]
 
     def from_study_tracker_tasks(tasks: list[StudyTrackerTask]):
         output_dtos_tasks: list[StudyTrackerTaskOutputDto] = []
@@ -18,7 +18,7 @@ class StudyTrackerTaskOutputDto(BaseModel):
                     start_date=get_datetime_utc(task.start_date),
                     end_date=get_datetime_utc(task.end_date),
                     title=task.title,
-                    tag=task.tag
+                    tag=task.tags
                 )
             )
 

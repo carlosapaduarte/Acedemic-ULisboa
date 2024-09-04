@@ -29,5 +29,9 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def create_schedule_not_available_block(self, user_id: int, info: UnavailableScheduleBlock):
+    def create_not_available_schedule_block(self, user_id: int, info: UnavailableScheduleBlock):
+        pass
+
+    @abstractmethod
+    def get_not_available_schedule_blocks(self, user_id: int) -> list[UnavailableScheduleBlock]:
         pass
