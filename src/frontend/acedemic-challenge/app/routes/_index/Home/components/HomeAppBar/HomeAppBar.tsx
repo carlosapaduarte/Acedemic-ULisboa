@@ -76,9 +76,11 @@ function NavBar() {
 }
 
 export function HomeAppBar() {
+    const navigate = useNavigate();
+
     return (
         <div className={styles.homeAppBar}>
-            <CutButton className={`${styles.backButton}`}>
+            <CutButton className={`${styles.backButton}`} onClick={() => navigate(-1)}>
                 {"<"}
             </CutButton>
             <div className={styles.languageButtons}>
