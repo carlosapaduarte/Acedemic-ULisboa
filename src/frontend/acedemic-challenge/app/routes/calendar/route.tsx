@@ -2,7 +2,7 @@ import { Logger } from "tslog";
 import React from "react";
 import { DayGoals } from "~/challenges/types";
 import { UserNote } from "~/service/service";
-import { MyCalendar } from "~/components/MyCalendar";
+import { MyCalendar } from "~/routes/calendar/components/MyCalendar/MyCalendar";
 import SelectedDayGoalInfo from "~/routes/calendar/components/SelectedDayGoalInfo/SelectedDayGoalInfo";
 import SelectedDayNotes from "~/routes/calendar/components/SelectedDayNotes/SelectedDayNotes";
 import { useCalendar } from "~/routes/calendar/useCalendar";
