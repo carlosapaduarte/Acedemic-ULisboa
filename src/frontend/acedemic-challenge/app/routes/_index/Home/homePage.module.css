@@ -2,8 +2,9 @@
 @import "../../../components/avatar.module.css";
 
 .homePage {
-    display: flex;
-    flex-direction: column;
     width: 100%;
     height: 100%;
+
+    display: flex;
+    flex-direction: column;
 }

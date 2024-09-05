@@ -6,6 +6,8 @@ import { MyCalendar } from "~/components/MyCalendar";
 import SelectedDayGoalInfo from "~/routes/calendar/components/SelectedDayGoalInfo/SelectedDayGoalInfo";
 import SelectedDayNotes from "~/routes/calendar/components/SelectedDayNotes/SelectedDayNotes";
 import { useCalendar } from "~/routes/calendar/useCalendar";
+import styles from "./calendarPage.module.css";
+import { AppBar } from "~/components/AppBar/AppBar";
 
 const logger = new Logger({ name: "Calendar" });
 
@@ -32,29 +34,39 @@ function RightContent({ goals, selectedDate, userNotes, onConfirmNewNoteSubmitCl
     );
 }
 
-export default function Calendar() {
+function MainContent() {
     const { goals, userNotes, selectedDate, handleDateClick, onConfirmNewNoteSubmitClickHandler } = useCalendar();
-    return goals == undefined || userNotes == undefined ?
-        <h1>{`Loading Goals and Calendar...`}</h1>
-        :
-        (
-            <div style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-evenly"
-            }}>
-                <div style={{ width: "45%" }}>
-                    <MyCalendar onDayClickHandler={handleDateClick} />
-                </div>
-                <RightContent
-                    goals={goals}
-                    selectedDate={selectedDate}
-                    userNotes={userNotes}
-                    onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler}
-                />
-            </div>
-        );
+
+
+    return (
+        <div className={`${styles.mainContent}`}>
+            {
+                goals == undefined || userNotes == undefined ?
+                    <h1>{`Loading Goals and Calendar...`}</h1>
+                    :
+                    (
+                        <>
+                            <div>
+                                <MyCalendar onDayClickHandler={handleDateClick} />
+                            </div>
+                            {/*<RightContent
+                                goals={goals}
+                                selectedDate={selectedDate}
+                                userNotes={userNotes}
+                                onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler}
+                            />*/}
+                        </>
+                    )
+            }
+        </div>
+    );
+}
+
+export default function CalendarPage() {
+    return (
+        <div className={`${styles.calendarPage}`}>
+            <AppBar />
+            <MainContent />
+        </div>
+    );
 }

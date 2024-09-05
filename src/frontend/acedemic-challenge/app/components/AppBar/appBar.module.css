@@ -1,0 +1,71 @@
+.appBar {
+    flex: 0;
+    width: 100%;
+
+    padding: 1rem;
+
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    gap: 1rem;
+
+    background-color: var(--purple-dark);
+    color: white;
+
+    --edge-size: 1.5em;
+
+    clip-path: polygon(
+            100% 0%,
+            100% calc(100% - var(--edge-size)),
+            calc(100% - var(--edge-size)) 100%,
+            var(--edge-size) 100%,
+            0 calc(100% - var(--edge-size)),
+            0 0);
+}
+
+.backButton {
+    grid-column: 1;
+    grid-row: 1;
+
+    background-color: var(--secondary);
+    color: black;
+    width: 4rem;
+    height: 3rem;
+
+    text-align: center;
+    font-size: xx-large;
+    font-weight: bold;
+
+    --edge-size: 0.75rem;
+}
+
+.homeButtonContainer {
+    grid-column: 2;
+    grid-row: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.homeButton {
+    background-color: var(--secondary);
+    color: black;
+    width: 4rem;
+    height: 3rem;
+
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+
+    --edge-size: 0.75rem;
+}
+
+.languageButtons {
+    grid-column: 4;
+    grid-row: 1;
+
+    height: 100%;
+
+    display: flex;
+    gap: 0.5rem;
+}
