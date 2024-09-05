@@ -10,7 +10,7 @@ import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
  * Determines initial quote to be displayed to user, based on current time of day.
  */
 function getHelloQuote(): string {
-    const { t } = useTranslation();
+    const { t } = useTranslation(["hello_quote"]);
 
     const hourOfDay = new Date().getHours();
     switch (true) {
@@ -52,7 +52,7 @@ function GreetingsContainer() {
     return (
         <div className={styles.greetingsContainer}>
             <h4 className={styles.helloQuote}>
-                {helloQuote}, {userId ?? "loading..."}
+                <span>{helloQuote}, nyckbrandao1236{/*{userId ?? "loading..."}*/}</span>
             </h4>
             <div className={`${styles.avatarContainer}`}>
                 <img

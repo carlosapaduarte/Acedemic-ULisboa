@@ -70,7 +70,7 @@
 .helloQuote {
     max-height: 100%;
 
-    overflow-y: auto;
+    overflow: auto;
 
     text-align: left;
     font-size: 1.5rem;
@@ -95,17 +95,11 @@
     grid-gap: 1rem;
 }
 
-@media (min-width: 480px) {
+@media (min-width: 512px) {
     .homeAppBar {
-        grid-template-columns: auto 1fr auto;
         grid-template-rows: auto auto;
         align-items: center;
         justify-content: space-between;
-    }
-
-    .backButton {
-        grid-column: 1;
-        grid-row: 1;
     }
 
     .greetingsContainer {
@@ -115,13 +109,7 @@
     }
 
     .navBar {
-        grid-column: 2;
         grid-row: 2;
-    }
-
-    .languageButtons {
-        grid-column: 3;
-        grid-row: 1;
     }
 }
 
@@ -129,21 +117,10 @@
     .homeAppBar {
         grid-template-columns: auto 1fr 1fr auto;
         grid-template-rows: auto;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .backButton {
-        grid-column: 1;
-        grid-row: 1;
     }
 
     .greetingsContainer {
-        grid-column: 2;
-        grid-row: 1;
         justify-content: start;
-        margin-left: 2rem;
-        gap: 1rem;
     }
 
     .navBar {
@@ -155,7 +132,6 @@
 
     .languageButtons {
         grid-column: 4;
-        grid-row: 1;
     }
 }
 
