@@ -51,7 +51,8 @@ class StudyTrackerEventOutputDto(BaseModel):
     title: str
     tag: list[str]
 
-    def from_events(events: list[Event]):
+    @staticmethod
+    def from_events(events: list[Event]) -> list['StudyTrackerEventOutputDto']:
         output_dtos_events: list[StudyTrackerEventOutputDto] = []
         for event in events:
             output_dtos_events.append(

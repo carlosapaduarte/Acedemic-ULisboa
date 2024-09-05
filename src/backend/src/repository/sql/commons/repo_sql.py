@@ -3,13 +3,14 @@ from sqlmodel import Session, select
 from exception import NotFoundException
 from repository.sql.commons.repo import CommonsRepo
 from repository.sql.models import database
-from repository.sql.models.models import BatchModel, NoteModel, UserModel
+from repository.sql.models.models import BatchModel, UserModel
 from domain.commons.user import Batch, CompletedGoal, User, UserNote
 
 engine = database.get_engine()
 
 class CommonsSqlRepo(CommonsRepo):
 
+    @staticmethod
     def get_user_or_raise(user_id: int, session: Session) -> UserModel:
         statement = select(UserModel).where(UserModel.id == user_id)
         result = session.exec(statement)
@@ -26,10 +27,11 @@ class CommonsSqlRepo(CommonsRepo):
 
         with Session(engine) as session:
             db_user = UserModel(
-                id=id, 
+                id=id,
                 username=username, 
                 avatar_filename=None, 
-                share_progress=None
+                share_progress=None,
+                receive_st_app_notifications=None
             )
             session.add(db_user)
             session.commit()
@@ -40,13 +42,12 @@ class CommonsSqlRepo(CommonsRepo):
             results = session.exec(statement)
             return results.first() is not None
 
-    def get_user(self, id) -> User:
+    def get_user(self, id: int) -> User:
         with Session(engine) as session:
             statement = select(UserModel).where(UserModel.id == id)
             result = session.exec(statement)
             
             user_model: UserModel = result.one()
-            user_notes_model: list[NoteModel] = user_model.user_notes
             batches_model: list[BatchModel] = user_model.user_batches
             
             # map() in Python is lazy, not eager!
@@ -54,23 +55,30 @@ class CommonsSqlRepo(CommonsRepo):
             # Better solutions are appreciated!
             for batch in batches_model:
                 batch.completed_goals
+                
+            # Build User Notes
+            user_notes: list[UserNote] = []
+            for note in user_model.user_notes:
+                user_notes.append(UserNote(note.text, note.date))
+                
+            # Build User Batches
+            batches: list[Batch] = []
+            for batch in user_model.user_batches:
+                
+                # Build Batch Completed Goals
+                completed_goals: list[CompletedGoal] = []
+                for goal in batch.completed_goals:
+                    completed_goals.append(CompletedGoal(goal.goal_day, goal.id, goal.conclusion_date))
+                
+                batches.append(Batch(batch.id, batch.start_date, batch.level, completed_goals))
 
             return User(
                 id,
                 user_model.username,
                 user_model.avatar_filename,
                 user_model.share_progress,
-                user_notes=map(lambda note: UserNote(note.text, note.date), user_notes_model),
-                batches=map(lambda batch: Batch(
-                    id=batch.id,
-                    start_date=batch.start_date,
-                    level=batch.level,
-                    completed=map(lambda completed_goal: CompletedGoal(
-                        goal_day=completed_goal.goal_day,
-                        id=completed_goal.id,
-                        conclusion_date=completed_goal.conclusion_date
-                    ), batch.completed_goals)
-                ), batches_model)
+                user_notes=user_notes,
+                batches=batches
             )
 
     def update_user_avatar(self, user_id: int, avatar_filename: str):

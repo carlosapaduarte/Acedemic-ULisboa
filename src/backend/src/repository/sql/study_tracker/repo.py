@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-import datetime
 
-from domain.study_tracker import Event, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Task, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -17,11 +16,7 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def get_events(self, user_id: int) -> list[Event]:
-        pass
-
-    @abstractmethod
-    def update_user_study_tracker_use_goals(self, user_id: int, avatar_filename: str):
+    def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set[int]):
         pass
 
     @abstractmethod

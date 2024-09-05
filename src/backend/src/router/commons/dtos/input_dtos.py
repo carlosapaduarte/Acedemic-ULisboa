@@ -1,4 +1,3 @@
-from typing import Set
 from pydantic import BaseModel
 
 class LoginInputDto(BaseModel):

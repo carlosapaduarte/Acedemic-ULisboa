@@ -78,5 +78,5 @@ def create_task(user_id: int, dto: CreateTaskInputDto) -> TaskCreatedOutputDto:
     return TaskCreatedOutputDto(task_id=task_id)
 
 @router.put("/users/{user_id}/tasks/{task_id}")
-def update_task_status(user_id: int, task_id: int, dto: UpdateTaskStatus) -> Response:
+def update_task_status(user_id: int, task_id: int, dto: UpdateTaskStatus):
     study_tracker_service.update_task_status(user_id, task_id, dto.new_status)

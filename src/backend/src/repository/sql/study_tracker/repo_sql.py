@@ -10,11 +10,11 @@ from repository.sql.study_tracker.repo import StudyTrackerRepo
 engine = database.get_engine()
 
 class StudyTrackerSqlRepo(StudyTrackerRepo):    
-    def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set):
+    def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set[int]):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
 
-            new_user_study_tracker_app_uses = []
+            new_user_study_tracker_app_uses: list[STAppUseModel] = []
             for use_goal in use_goals:
                 new_user_study_tracker_app_uses.append(
                     STAppUseModel(
@@ -77,6 +77,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 session.add(tag_model)
                 session.commit()
 
+    @staticmethod
     def is_today(date_1: datetime) -> bool:
         today = datetime.today()
         return date_1.year == today.year and date_1.month == today.month and date_1.day == today.day
@@ -93,13 +94,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     today_events.append(event)
             
             return Event.from_STEventModel(today_events)
-
-    def get_events(self, user_id: int) -> list[Event]:
-        with Session(engine) as session:
-            statement = select(STEventModel).where(STEventModel.user_id == user_id)
-            results = session.exec(statement)
-
-            return Event.from_STEventModel(results)
         
     def update_receive_notifications_pref(self, user_id: int, receive: bool):
         with Session(engine) as session:
@@ -115,7 +109,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             user_model.schedule_unavailable_blocks.append(STScheduleBlockNotAvailableModel(
                 week_day=info.week_day,
                 start_hour=info.start_hour,
-                duration=info.duration
+                duration=info.duration,
+                user_id=user_id
             ))
 
             session.add(user_model)
@@ -126,7 +121,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             statement = select(STScheduleBlockNotAvailableModel).where(STScheduleBlockNotAvailableModel.user_id == user_id)
             results = session.exec(statement)
         
-            blocks: list[STScheduleBlockNotAvailableModel] = []
+            blocks: list[UnavailableScheduleBlock] = []
             for block_model in results:
                 blocks.append(UnavailableScheduleBlock(
                     week_day=block_model.week_day,

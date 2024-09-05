@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-import datetime
+from datetime import datetime
 
 class AcademicChallengeRepo(ABC):
     @abstractmethod
-    def create_new_batch(self, user_id: int, new_level: int):
+    def create_new_batch(self, user_id: int, new_level: int) -> int:
         pass
 
     @abstractmethod

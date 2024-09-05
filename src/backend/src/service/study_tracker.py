@@ -6,7 +6,7 @@ from datetime import datetime
 
 study_tracker_repo = StudyTrackerSqlRepo()
 
-def update_user_study_tracker_use_goals(user_id: int, use_goals: set):
+def update_user_study_tracker_use_goals(user_id: int, use_goals: set[int]):
     study_tracker_repo.update_user_study_tracker_use_goals(user_id, use_goals)
 
 def update_study_tracker_app_planning_day(user_id: int, day: int, hour: int):

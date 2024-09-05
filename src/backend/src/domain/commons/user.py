@@ -23,8 +23,8 @@ class User:
             self,
             id: int, 
             username: str, 
-            avatar_filename: str, 
-            share_progress: bool,
+            avatar_filename: str | None, 
+            share_progress: bool | None,
             user_notes: list[UserNote],
             batches: list[Batch]
     ) -> None:

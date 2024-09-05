@@ -11,7 +11,7 @@ class CommonsRepo(ABC):
         pass
 
     @abstractmethod
-    def get_user(self, id) -> User:
+    def get_user(self, id: int) -> User:
         pass
 
     @abstractmethod

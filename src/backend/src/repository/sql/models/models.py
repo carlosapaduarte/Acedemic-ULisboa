@@ -21,7 +21,7 @@ class UserModel(SQLModel, table=True):
 class NoteModel(SQLModel, table=True):
     __tablename__ = "note"
 
-    id: int = Field(primary_key=True)
+    id: int = Field(primary_key=True, default=None)
     text: str
     date: datetime
 
@@ -31,7 +31,7 @@ class NoteModel(SQLModel, table=True):
 class BatchModel(SQLModel, table=True):
     __tablename__ = "batch"
 
-    id: int = Field(primary_key=True)
+    id: int = Field(primary_key=True, default=None)
     start_date: datetime
     level: int
 

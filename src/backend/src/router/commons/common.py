@@ -3,6 +3,7 @@ from fastapi import APIRouter, Response
 from router.academic_challenge.dtos.input_dtos import SetShareProgressPreferenceDto
 from router.commons.dtos.input_dtos import LoginInputDto, SetUserAvatarDto
 
+from router.commons.dtos.output_dtos import UserOutputDto
 from service import common as common_service
 
 router = APIRouter(
@@ -23,6 +24,7 @@ def set_user_avatar(user_id: int, input_dto: SetUserAvatarDto):
     common_service.set_user_avatar(user_id, input_dto.avatarFilename)
 
 @router.get("/users/{user_id}")
-def get_user_info(user_id: int):
+def get_user_info(user_id: int) -> UserOutputDto:
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
-    return common_service.get_user_info(user_id)
+    user = common_service.get_user_info(user_id)
+    return UserOutputDto.fromUser(user)

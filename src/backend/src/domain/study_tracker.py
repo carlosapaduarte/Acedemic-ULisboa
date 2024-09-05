@@ -84,7 +84,8 @@ class Event():
         self.date=date
         self.tags=tags
 
-    def from_STEventModel(events: list[STEventModel]):
+    @staticmethod
+    def from_STEventModel(events: list[STEventModel]) -> list['Event']:
         today_events: list[Event] = []
         for event_result in events:
 
