@@ -1,20 +1,21 @@
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import styles from "./button.module.css";
 
-type ButtonVariant = "cut" | "round";
+type ButtonVariant = "cut" | "round" | "none";
 
 // Map variants to classes
 const buttonVariantClassMap: Record<ButtonVariant, string> = {
     "cut": styles.cutButton,
     "round": styles.roundButton,
+    "none": "",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    variant: ButtonVariant;
+    variant?: ButtonVariant;
     children?: ReactNode;
 }
 
-export function Button({ variant, children, ...buttonProps }: ButtonProps) {
+export function Button({ variant = "none", children, ...buttonProps }: ButtonProps) {
     const buttonClass: string = buttonVariantClassMap[variant];
 
     return (
