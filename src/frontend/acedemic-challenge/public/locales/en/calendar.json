@@ -3,5 +3,28 @@
     "today": "Today",
     "next_month_but": "Next Month",
     "no_goals_title": "There are no goals for today...",
-    "new_note_label": "Note"
+    "new_note_label": "Note",
+    "weekdays": {
+        "sunday": "Sun",
+        "monday": "Mon",
+        "tuesday": "Tue",
+        "wednesday": "Wed",
+        "thursday": "Thu",
+        "friday": "Fri",
+        "saturday": "Sat"
+    },
+    "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+    }
 }

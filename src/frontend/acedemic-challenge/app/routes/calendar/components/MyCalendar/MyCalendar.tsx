@@ -1,15 +1,56 @@
 import { useState } from "react";
 import { utils } from "~/utils";
-import { Button } from "~/components/Button/Button";
+import { Button, CutButton } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
+import styles from "./myCalendar.module.css";
 
-const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const months = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"];
+const weekdays = ["calendar:weekdays.sunday", "calendar:weekdays.monday", "calendar:weekdays.tuesday",
+    "calendar:weekdays.wednesday", "calendar:weekdays.thursday", "calendar:weekdays.friday", "calendar:weekdays.saturday"];
+const months = ["calendar:months.january", "calendar:months.february", "calendar:months.march", "calendar:months.april",
+    "calendar:months.may", "calendar:months.june", "calendar:months.july", "calendar:months.august",
+    "calendar:months.september", "calendar:months.october", "calendar:months.november", "calendar:months.december"];
 
-const calendarElemSize = "2%";
+enum Action { PREV_MONTH, NEXT_MONTH, TODAY }
 
-export function MyCalendar({ onDayClickHandler }: { onDayClickHandler: (day: CalendarDay) => void }) {
+function Title({ date }: { date: Date }) {
+    const { t } = useTranslation(["calendar"]);
+
+    return (
+        <h2 className={`${styles.calendarTitle}`}>
+            {t(months[date.getMonth()]) /*+ " / " + date.getDate()*/ + " / " + date.getFullYear()}
+        </h2>
+    );
+}
+
+function ChangeViewButtons(
+    { date, onButtonClick }: { date: Date, onButtonClick: (action: Action) => void }
+) {
+    const { t } = useTranslation(["calendar"]);
+
+    return (
+        <div className={`${styles.changeViewButtonsContainer}`}>
+            <Button className={`${styles.changeMonthButton}`} onClick={() => onButtonClick(Action.PREV_MONTH)}>
+                {"<"}
+            </Button>
+            <Title date={date} />
+            <Button className={`${styles.changeMonthButton}`} onClick={() => onButtonClick(Action.NEXT_MONTH)}>
+                {">"}
+            </Button>
+            {/*<Button variant="round" onClick={() => onButtonClick(Action.PREV_MONTH)}>
+                {t("calendar:prev_month_but")}
+            </Button>
+            <Title date={date} />
+            <Button variant="round" onClick={() => onButtonClick(Action.TODAY)}>
+                {t("calendar:today")}
+            </Button>
+            <Button variant="round" onClick={() => onButtonClick(Action.NEXT_MONTH)}>
+                {t("calendar:next_month_but")}
+            </Button>*/}
+        </div>
+    );
+}
+
+function useMyCalendar() {
     const [baseDate, setBaseDate] = useState(new Date()); // Starts as Today
 
     function onButtonClickHandler(action: Action) {
@@ -32,56 +73,7 @@ export function MyCalendar({ onDayClickHandler }: { onDayClickHandler: (day: Cal
         setBaseDate(newDate);
     }
 
-    return (
-        <div style={{ marginTop: "2%" }}>
-            <ChangeViewButtons onButtonClick={onButtonClickHandler} />
-            <Title date={baseDate} />
-            <WeekHeader />
-            <CalendarDays dayProp={baseDate} onDayClick={onDayClickHandler} />
-        </div>
-    );
-}
-
-function Title({ date }: { date: Date }) {
-    return (
-        <h2 style={{ fontSize: "170%" }}>{months[date.getMonth()] + " / " + date.getDate() + " / " + date.getFullYear()}</h2>
-    );
-}
-
-enum Action { PREV_MONTH, NEXT_MONTH, TODAY }
-
-function ChangeViewButtons({ onButtonClick }: { onButtonClick: (action: Action) => void }) {
-    const { t } = useTranslation(["calendar"]);
-
-    return (
-        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", marginBottom: "2%" }}>
-            <Button variant="round" onClick={() => onButtonClick(Action.PREV_MONTH)}>
-                {t("calendar:prev_month_but")}
-            </Button>
-            <Button variant="round" onClick={() => onButtonClick(Action.TODAY)}>
-                {t("calendar:today")}
-            </Button>
-            <Button variant="round" onClick={() => onButtonClick(Action.NEXT_MONTH)}>
-                {t("calendar:next_month_but")}
-            </Button>
-        </div>
-    );
-}
-
-function WeekHeader() {
-    return (
-        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly", marginBottom: "1%" }}>
-            {
-                weekdays.map((weekday) => {
-                    return (
-                        <div key={weekday} style={{ alignItems: "center", width: calendarElemSize }}>
-                            <h1 style={{ fontSize: "170%" }}>{weekday}</h1>
-                        </div>
-                    );
-                })
-            }
-        </div>
-    );
+    return { baseDate, onButtonClickHandler };
 }
 
 export type CalendarDay = {
@@ -93,7 +85,7 @@ export type CalendarDay = {
     year: number
 }
 
-function CalendarDays({ dayProp, onDayClick }: { dayProp: Date, onDayClick: (day: CalendarDay) => void }) {
+function useCalendarDays(dayProp: Date) {
     let firstDayOfMonth = new Date(dayProp.getFullYear(), dayProp.getMonth(), 1);
     let weekdayOfFirstDay = firstDayOfMonth.getDay();
     let currentDays: CalendarDay[] = [];
@@ -132,40 +124,78 @@ function CalendarDays({ dayProp, onDayClick }: { dayProp: Date, onDayClick: (day
 
     const daysPerWeek: CalendarDay[][] = parsePerWeek(currentDays);
 
+    return { daysPerWeek };
+}
+
+function WeekHeader() {
+    const { t } = useTranslation(["calendar"]);
+
     return (
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <>
             {
-                daysPerWeek.map((weekDays: CalendarDay[], index: number) => {
+                weekdays.map((weekday) => {
                     return (
-                        <div key={index}
-                             style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly" }}>
-                            {
-                                weekDays.map((day: CalendarDay) => {
-                                    return (
-                                        <Day key={day.date.getDate()} day={day} onDayClick={onDayClick} />
-                                    );
-                                })
-                            }
+                        <div key={weekday} className={`${styles.weekHeaderDayContainer}`}>
+                            <h1 className={`${styles.weekHeaderDayText}`}>{t(weekday)}</h1>
                         </div>
                     );
                 })
             }
-        </div>
+        </>
     );
 }
 
 function Day({ day, onDayClick }: { day: CalendarDay, onDayClick: (day: CalendarDay) => void }) {
-    const isCurrentMonth = day.month == new Date().getMonth();
-    const opacity = isCurrentMonth ? "100%" : "35%";
+    const isNotCurrentMonth = day.month != new Date().getMonth();
 
     const isToday = utils.sameDay(day.date, new Date());
-    const fontColor = isToday ? "red" : "black";
 
     return (
-        <div style={{ alignItems: "center", width: calendarElemSize }} onClick={() => onDayClick(day)}>
-            <h1 style={{ fontSize: "150%", padding: "20%", opacity: opacity, color: fontColor }}>
-                {day.number}
+        <CutButton className={`${styles.calendarDayContainer}`} onClick={() => onDayClick(day)}>
+            <h1 className={
+                `${styles.calendarDayText}
+                ${isToday ? styles.today : ""}
+                ${isNotCurrentMonth ? styles.notCurrentMonth : ""}`}>
+                {day.number} {/*.toString().padStart(2, "0")*/}
             </h1>
+        </CutButton>
+    );
+}
+
+function CalendarDays({ dayProp, onDayClick }: { dayProp: Date, onDayClick: (day: CalendarDay) => void }) {
+    const { daysPerWeek } = useCalendarDays(dayProp);
+
+    const flattenedDays = daysPerWeek.flat();
+
+    return (
+        <>
+            {
+                flattenedDays.map((day: CalendarDay, index: number) => {
+                    return (
+                        <Day key={index} day={day} onDayClick={onDayClick} />
+                    );
+                })
+            }
+        </>
+    );
+}
+
+function CalendarGrid({ dayProp, onDayClick }: { dayProp: Date, onDayClick: (day: CalendarDay) => void }) {
+    return (
+        <div className={`${styles.calendarGridContainer}`}>
+            <WeekHeader />
+            <CalendarDays dayProp={dayProp} onDayClick={onDayClick} />
+        </div>
+    );
+}
+
+export function MyCalendar({ onDayClickHandler }: { onDayClickHandler: (day: CalendarDay) => void }) {
+    const { baseDate, onButtonClickHandler } = useMyCalendar();
+
+    return (
+        <div className={`${styles.myCalendar}`}>
+            <ChangeViewButtons date={baseDate} onButtonClick={onButtonClickHandler} />
+            <CalendarGrid dayProp={baseDate} onDayClick={onDayClickHandler} />
         </div>
     );
 }

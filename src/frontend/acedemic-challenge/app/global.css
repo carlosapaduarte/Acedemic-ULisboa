@@ -11,6 +11,9 @@
     --blue: #2e3192;
     --yellow-85: rgba(255, 230, 0, 0.85);
     --secondary-85: rgba(125, 244, 190, 0.85);
+
+    --font-family1: 'DM Sans';
+    --font-family2: 'Chakra Petch';
 }
 
 html, body {
@@ -20,7 +23,7 @@ html, body {
 
 body {
     background-color: var(--primary);
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-family1), sans-serif;
 }
 
 .app {
