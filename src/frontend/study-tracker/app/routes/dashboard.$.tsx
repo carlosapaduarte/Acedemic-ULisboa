@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { service, Task } from "~/service/service";
+import { service, Event } from "~/service/service";
 import { utils } from "~/utils";
 
 /**
@@ -27,28 +27,28 @@ function WeekGoal() {
     )
 }
 
-function useDailyTasks() {
-    const [tasks, setTasks] = useState<Task[] | undefined>(undefined)
+function useDailyEvents() {
+    const [events, setEvents] = useState<Event[] | undefined>(undefined)
 
     useEffect(() => {
         let userId = utils.getUserId()
-        service.getTodayTasks(userId)
-            .then((tasks: Task[]) => setTasks(tasks))
+        service.getTodayEvents(userId)
+            .then((events: Event[]) => setEvents(events))
     }, [])
 
-    return { tasks }
+    return { events }
 }
 
-function DailyTasks() {
-    const { tasks } = useDailyTasks()
+function DailyEvents() {
+    const { events } = useDailyEvents()
 
     return (
         <div>
-            <h1>Today's Tasks!</h1>
-            {tasks?.map((task: Task, index: number) => 
+            <h1>Today's Events!</h1>
+            {events?.map((events: Event, index: number) => 
                 <div key={index}>
-                    <p>{task.title}</p>
-                    <p>{task.tag}</p>
+                    <p>{events.title}</p>
+                    <p>{events.tag}</p>
                 </div>
             )}
         </div>
@@ -76,7 +76,7 @@ export default function Dashboard() {
             <img src="test.webp" alt="Avatar" />
             <p>{get_welcome_message()}</p>
             <WeekGoal/>
-            <DailyTasks/>
+            <DailyEvents/>
             <WeekSchedule/>
             <WeekStats/>
         </div>

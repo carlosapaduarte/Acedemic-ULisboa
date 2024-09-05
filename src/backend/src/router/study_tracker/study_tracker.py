@@ -1,8 +1,8 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
-from domain.study_tracker import UnavailableScheduleBlock
-from router.study_tracker.dtos.input_dtos import CreateNewStudyTrackerTaskInputDto, CreateScheduleNotAvailableBlock, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto
-from service import common as common_service
+from domain.study_tracker import Event, EventDate, Task, UnavailableScheduleBlock
+from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlock, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.output_dtos import TaskCreatedOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -10,14 +10,18 @@ router = APIRouter(
     prefix="/study-tracker",
 )
 
-@router.post("/users/{user_id}/tasks")
-def create_new_task(user_id: int, input_dto: CreateNewStudyTrackerTaskInputDto) -> Response:
-    study_tracker_service.create_new_study_tracker_task(
+@router.post("/users/{user_id}/events")
+def create_event(user_id: int, dto: CreateEventInputDto) -> Response:
+    study_tracker_service.create_event(
         user_id, 
-        input_dto.title, 
-        datetime.fromtimestamp(input_dto.startDate),
-        datetime.fromtimestamp(input_dto.endDate),
-        input_dto.tags
+        Event(
+            title=dto.title,
+            date=EventDate(
+                    start_date=datetime.fromtimestamp(dto.startDate),
+                    end_date=datetime.fromtimestamp(dto.endDate)
+                ),
+            tags=dto.tags
+        )
     )
     return Response()
     
@@ -33,15 +37,15 @@ def update_receive_notifications_pref(user_id: int, input_dto: UpdateStudyTracke
 def update_week_planning_day(user_id: int, input_dto: UpdateStudyTrackerWeekPlanningDayInputDto):
     study_tracker_service.update_study_tracker_app_planning_day(user_id, input_dto.day, input_dto.hour)
 
-@router.get("/users/{user_id}/tasks")
-def get_tasks(user_id: int, today: bool):
+@router.get("/users/{user_id}/events")
+def get_events(user_id: int, today: bool):
     # PROBLEM: it's returning with date one hour different
 
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
     if today:
-        return study_tracker_service.get_today_tasks(user_id)
+        return study_tracker_service.get_today_events(user_id)
     else:
-        return study_tracker_service.get_tasks(user_id)
+        return study_tracker_service.get_events(user_id)
     
 def fix_weekday_from_javascript(weekday: int) -> int:
     # Temporary solution to convert javascript Date().getDay() into python datetime.date().weekday
@@ -62,3 +66,17 @@ def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvai
         )
     )
     return Response()
+
+@router.get("/users/{user_id}/tasks")
+def get_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[UserTaskOutputDto]:
+    tasks: list[Task] = study_tracker_service.get_user_tasks(user_id, order_by_deadline_and_priority)
+    return UserTaskOutputDto.from_Tasks(tasks)
+
+@router.post("/users/{user_id}/tasks")
+def create_task(user_id: int, dto: CreateTaskInputDto) -> TaskCreatedOutputDto:
+    task_id = study_tracker_service.create_task(user_id, Task.fromCreateTaskInputDto(dto), dto.createEvent)
+    return TaskCreatedOutputDto(task_id=task_id)
+
+@router.put("/users/{user_id}/tasks/{task_id}")
+def update_task_status(user_id: int, task_id: int, dto: UpdateTaskStatus) -> Response:
+    study_tracker_service.update_task_status(user_id, task_id, dto.new_status)

@@ -34,15 +34,16 @@ app.add_middleware(
 )
 
 @app.exception_handler(NotFoundException)
-async def not_available_schedule_block_collision_exception_handler(request: Request, exc: NotFoundException):
+@app.exception_handler(NotFoundException)
+async def not_found_exception_handler(request: Request, exc: NotFoundException):
     return JSONResponse(
         status_code=404,
         content={"error": f"Not Found: {exc.user_id}"},
     )
 
 @app.exception_handler(NotAvailableScheduleBlockCollision)
-async def not_available_schedule_block_collision_exception_handler(request: Request, exc: NotFoundException):
+async def not_available_schedule_block_collision_exception_handler(request: Request, exc: NotAvailableScheduleBlockCollision):
     return JSONResponse(
         status_code=409, # Conflict
-        content={"error": "Task collides with an existent not-available schedule block"},
+        content={"error": "Event collides with an existent not-available schedule block"},
     )

@@ -1,5 +1,6 @@
 from sqlmodel import Session, select
 
+from exception import NotFoundException
 from repository.sql.commons.repo import CommonsRepo
 from repository.sql.models import database
 from repository.sql.models.models import BatchModel, NoteModel, UserModel
@@ -8,6 +9,17 @@ from domain.commons.user import Batch, CompletedGoal, User, UserNote
 engine = database.get_engine()
 
 class CommonsSqlRepo(CommonsRepo):
+
+    def get_user_or_raise(user_id: int, session: Session) -> UserModel:
+        statement = select(UserModel).where(UserModel.id == user_id)
+        result = session.exec(statement)
+
+        user_model = result.first()
+        
+        if user_model is None:
+            raise NotFoundException(user_id)
+        
+        return user_model
     
     def create_user(self, id: int, username: str):
         "Creates a user without avatar, notes and goals, in level 1, and share_progress set to false"

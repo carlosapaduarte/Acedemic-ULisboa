@@ -7,7 +7,7 @@ import {doFetch, toBody} from "./fetch"
 // If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
 // In my opinion, this eases error handling in the caller.
 
-// TODO: separate create-user and login tasks in the future
+// TODO: separate create-user and login events in the future
 async function createUserOrLogin(userId: number) {
     //console.log("Trying to use userId: ", userId)
     const request = {
@@ -112,65 +112,61 @@ async function updateWeekPlanningDay(userId: number, day: number, hour: number) 
         return Promise.reject(new Error('Week planning day could not be updated!'))
 }
 
-export type NewTaskInfo = {
+export type NewEventInfo = {
     title: string,
     startDate: Date,
     endDate: Date,
     tags: string[]
 }
 
-async function createNewTask(userId: number, newTaskInfo: NewTaskInfo) {
-    //console.log("New Task Info: ", newTaskInfo)
-    //console.log(newTaskInfo.startDate.getTime() / 1000)
-    //console.log(newTaskInfo.endDate.getTime() / 1000)
-
+async function createNewEvent(userId: number, newEventInfo: NewEventInfo) {
     const request = {
-        path: `study-tracker/users/${userId}/tasks`,
+        path: `study-tracker/users/${userId}/events`,
         method: 'POST',
         body: toBody({
-            title: newTaskInfo.title,
-            start_date: newTaskInfo.startDate.getTime() / 1000,
-            end_date: newTaskInfo.endDate.getTime() / 1000,
-            tags: newTaskInfo.tags
+            title: newEventInfo.title,
+            start_date: newEventInfo.startDate.getTime() / 1000,
+            end_date: newEventInfo.endDate.getTime() / 1000,
+            tags: newEventInfo.tags
         }),
     }
     const response: Response = await doFetch(request)
     if (!response.ok)
-        return Promise.reject(new Error('New task could not be created!'))
+        return Promise.reject(new Error('New event could not be created!'))
 }
 
-type TaskDto = {
+type EventDto = {
     startDate: number,
     endDate: number,
     title: string,
     tag: string
 }
 
-export type Task = {
+export type Event = {
     startDate: Date,
     endDate: Date,
     title: string,
     tag: string
 }
 
-async function getTodayTasks(userId: number): Promise<Task[]> {
+async function getTodayEvents(userId: number): Promise<Event[]> {
     const request = {
-        path: `study-tracker/users/${userId}/tasks?today=true`,
+        path: `study-tracker/users/${userId}/events?today=true`,
         method: 'GET'
     }
     const response: Response = await doFetch(request)
 
     if (response.ok) {
-        const responseObject: TaskDto[] = await response.json() // TODO: how 
-        return responseObject.map((taskDto: TaskDto) => {
+        const responseObject: EventDto[] = await response.json() // TODO: how 
+        return responseObject.map((eventDto: EventDto) => {
             return {
-                startDate: new Date(taskDto.startDate * 1000),
-                endDate: new Date(taskDto.endDate * 1000),
-                title: taskDto.title,
-                tag: taskDto.tag
+                startDate: new Date(eventDto.startDate * 1000),
+                endDate: new Date(eventDto.endDate * 1000),
+                title: eventDto.title,
+                tag: eventDto.tag
             }})
     } else
-        return Promise.reject(new Error('User daily tasks could not be obtained!'))   
+        return Promise.reject(new Error('User daily events could not be obtained!'))   
 }
 
 export type CreateScheduleNotAvailableBlock = {
@@ -178,7 +174,6 @@ export type CreateScheduleNotAvailableBlock = {
     startHour: number
     duration: number
 }
-
 
 async function createScheduleNotAvailableBlock(userId: number, info: CreateScheduleNotAvailableBlock) {
     const request = {
@@ -191,6 +186,78 @@ async function createScheduleNotAvailableBlock(userId: number, info: CreateSched
         return Promise.reject(new Error('Unavailable Schedule Block creation failed!'))
 }
 
+export type SubTaskDto = {
+    title: string,
+    status: string
+}
+
+export type TaskDto = {
+    title: string
+    description: string
+    deadline: number
+    priority: string
+    tags: string[]
+    status: string,
+    subTasks: SubTaskDto[]
+}
+
+export type Task = {
+    title: string
+    description: string
+    deadline: Date
+    priority: string
+    tags: string[]
+    status: string,
+    subTasks: SubTask[]
+}
+
+export type SubTask = {
+    title: string,
+    status: string
+}
+
+async function getTasks(userId: number): Promise<Task[]> {
+    const request = {
+        path: `study-tracker/users/${userId}/tasks?order_by_deadline_and_priority=true`,
+        method: 'GET',
+    }
+    const response: Response = await doFetch(request)
+    if (response.ok) {
+        const responseObject: TaskDto[] = await response.json() // TODO: how 
+        return responseObject.map((taskDto: TaskDto) => {
+            return {
+                title: taskDto.title,
+                description: taskDto.description,
+                deadline: new Date(taskDto.deadline * 1000),
+                priority: taskDto.priority,
+                tags: taskDto.tags,
+                status: taskDto.status,
+                subTasks: taskDto.subTasks
+            }})
+    } else
+        return Promise.reject(new Error('User tasks could not be obtained!'))   
+}
+
+async function createNewTask(userId: number, newTaskInfo: Task, createEvent: boolean) {
+    const request = {
+        path: `study-tracker/users/${userId}/tasks`,
+        method: 'POST',
+        body: toBody({
+            title: newTaskInfo.title,
+            description: newTaskInfo.description,
+            deadline: newTaskInfo.deadline.getTime() / 1000,
+            priority: newTaskInfo.priority,
+            tags: newTaskInfo.tags,
+            status: newTaskInfo.status,
+            subTasks: newTaskInfo.subTasks,
+            createEvent
+        }),
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('New task could not be created!'))
+}
+
 export const service = {
     createUserOrLogin,
     selectShareProgressState,
@@ -199,7 +266,9 @@ export const service = {
     updateAppUseGoals,
     updateReceiveNotificationsPreference,
     updateWeekPlanningDay,
-    createNewTask,
-    getTodayTasks,
-    createScheduleNotAvailableBlock
+    createNewEvent,
+    getTodayEvents,
+    createScheduleNotAvailableBlock,
+    getTasks,
+    createNewTask
 }

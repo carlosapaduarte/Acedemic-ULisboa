@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from router.academic_challenge.dtos.output_dtos import BatchDto, CompletedGoalDto, UserNoteDto
 from router.commons.dtos.output_dtos import UserDto
+from utils import get_datetime_utc
 
 # TODO: this is a problem for the mem repo, since data is stored inside the object.
 # Instead, pass a common dependency to the services.
@@ -13,9 +14,6 @@ commons_repo = CommonsSqlRepo()
 class LoginResult(Enum):
     SUCCESS = 0,
     CREATED_USER = 1
-
-def get_datetime_utc(datetime: datetime) -> int:
-    return int(datetime.replace(tzinfo=timezone.utc).timestamp())
 
 def login(user_id: int) -> LoginResult:
     if commons_repo.exists_user(user_id):
