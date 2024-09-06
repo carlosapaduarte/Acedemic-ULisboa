@@ -46,6 +46,7 @@ body {
 }
 
 button {
+    color: black;
     cursor: pointer;
     border-width: 0;
 }
