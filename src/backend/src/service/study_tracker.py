@@ -1,7 +1,7 @@
-from domain.study_tracker import EventDate, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import DateInterval, Event, Task, UnavailableScheduleBlock
 from exception import NotAvailableScheduleBlockCollision
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
-from router.study_tracker.dtos.output_dtos import StudyTrackerEventOutputDto
+from router.study_tracker.dtos.output_dtos import EventOutputDto
 from datetime import datetime
 
 study_tracker_repo = StudyTrackerSqlRepo()
@@ -11,31 +11,29 @@ def update_user_study_tracker_use_goals(user_id: int, use_goals: set[int]):
 
 def update_study_tracker_app_planning_day(user_id: int, day: int, hour: int):
     study_tracker_repo.update_study_tracker_app_planning_day(user_id, day, hour)
-
-def require_available_schedule_block(
+    
+def does_not_collide_with_unavailable_block(
     user_id: int,
-    event_date: EventDate
+    event_date_interval: DateInterval
 ):
     # Don't allow to create event where schedule block is of type: not available
     not_available_blocks = study_tracker_repo.get_not_available_schedule_blocks(user_id)
     for block in not_available_blocks:
-        if event_date.collides_with_unavailable_block(block):
+        if event_date_interval.collides_with_unavailable_block(block):
             raise NotAvailableScheduleBlockCollision()
 
 def create_event(user_id: int, event: Event):
-    require_available_schedule_block(user_id, event.date)
+    does_not_collide_with_unavailable_block(user_id, event.date)
     study_tracker_repo.create_event(user_id, event)
 
 def update_receive_notifications_pref(user_id: int, receive: bool):
     study_tracker_repo.update_receive_notifications_pref(user_id, receive)
 
-def get_today_events(user_id: int) -> list[StudyTrackerEventOutputDto]:
-    stored_events = study_tracker_repo.get_events(user_id)
-    return StudyTrackerEventOutputDto.from_events(stored_events)
+def get_today_events(user_id: int) -> list[Event]:
+    return study_tracker_repo.get_events(user_id)
 
-def get_events(user_id: int) -> list[StudyTrackerEventOutputDto]:
-    stored_events = study_tracker_repo.get_events(user_id)
-    return StudyTrackerEventOutputDto.from_events(stored_events)
+def get_events(user_id: int) -> list[Event]:
+    return study_tracker_repo.get_events(user_id)
 
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
@@ -46,11 +44,12 @@ def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[T
 def create_event_from_task(user_id: int, task: Task):
     associatedEvent = Event(
         title=task.title,
-        date=EventDate(
+        date=DateInterval(
             start_date=datetime.now(),
             end_date=task.deadline
         ),
-        tags=task.tags
+        tags=task.tags,
+        every_week=False
     )
     create_event(user_id, associatedEvent)
 

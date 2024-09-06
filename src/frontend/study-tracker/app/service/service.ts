@@ -139,14 +139,16 @@ type EventDto = {
     startDate: number,
     endDate: number,
     title: string,
-    tag: string
+    tag: string,
+    everyWeek: boolean
 }
 
 export type Event = {
     startDate: Date,
     endDate: Date,
     title: string,
-    tag: string
+    tag: string,
+    everyWeek: boolean
 }
 
 async function getTodayEvents(userId: number): Promise<Event[]> {
@@ -163,7 +165,8 @@ async function getTodayEvents(userId: number): Promise<Event[]> {
                 startDate: new Date(eventDto.startDate * 1000),
                 endDate: new Date(eventDto.endDate * 1000),
                 title: eventDto.title,
-                tag: eventDto.tag
+                tag: eventDto.tag,
+                everyWeek: eventDto.everyWeek
             }})
     } else
         return Promise.reject(new Error('User daily events could not be obtained!'))   

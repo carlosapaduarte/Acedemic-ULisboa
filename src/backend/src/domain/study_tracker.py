@@ -1,16 +1,7 @@
 from datetime import datetime
 
-from repository.sql.models.models import STEventModel
+from repository.sql.models.models import STEventModel, STTaskModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto
-
-class SubTask():
-    def __init__(
-        self, 
-        title: str,
-        status: str="Tarefa não iniciada" # Default value
-    ) -> None:
-        self.title=title
-        self.status=status
         
 class Task():
     def __init__(
@@ -20,7 +11,7 @@ class Task():
             deadline: datetime, 
             priority: str, 
             tags: list[str], 
-            sub_tasks: list[SubTask],
+            sub_tasks: list['Task'],
             status: str="Tarefa não iniciada", # Default value
     ) -> None:
         self.title=title
@@ -33,12 +24,9 @@ class Task():
         
     @staticmethod
     def fromCreateTaskInputDto(task_dto: CreateTaskInputDto) -> 'Task':
-        sub_tasks: list[SubTask] = []
+        sub_tasks: list['Task'] = []
         for sub_task in task_dto.subTasks:
-            sub_tasks.append(SubTask(
-                title=sub_task.title,
-                status=sub_task.status
-            ))
+            sub_tasks.append(Task.fromCreateTaskInputDto(sub_task))
         return Task(
             title=task_dto.title,
             description=task_dto.description,
@@ -48,19 +36,18 @@ class Task():
             status=task_dto.status,
             sub_tasks=sub_tasks
         )
-        
 
 class UnavailableScheduleBlock():
     def __init__(self, week_day: int, start_hour: int, duration: int):
         self.week_day=week_day
         self.start_hour=start_hour
         self.duration=duration 
-
-class EventDate():
+        
+class DateInterval():
     def __init__(self, start_date: datetime, end_date: datetime): 
          self.start_date=start_date
          self.end_date=end_date
-
+         
     def collides_with_unavailable_block(self, block: UnavailableScheduleBlock):
         block_start_hour = block.start_hour
         block_end_hour = block.start_hour + block.duration
@@ -78,11 +65,29 @@ class EventDate():
         
         return False
 
+"""
+class ScheduleBlock():
+    def __init__(self, title: str, date: DateInterval):
+        self.title=title
+        self.date=date
+        
+    @staticmethod
+    def fromCreateScheduleBlockInputDto(dto: CreateScheduleBlockInputDto) -> 'ScheduleBlock':
+        return ScheduleBlock(
+            title=dto.title,
+            date=DateInterval(
+                start_date=datetime.fromtimestamp(dto.startDate),
+                end_date=datetime.fromtimestamp(dto.endDate)
+            )
+        )
+"""
+
 class Event():
-    def __init__(self, title: str, date: EventDate, tags: list[str]):
+    def __init__(self, title: str, date: DateInterval, tags: list[str], every_week: bool):
         self.title=title
         self.date=date
         self.tags=tags
+        self.every_week=every_week
 
     @staticmethod
     def from_STEventModel(events: list[STEventModel]) -> list['Event']:
@@ -97,11 +102,12 @@ class Event():
             today_events.append(
                 Event(
                     title=event_result.title,
-                    date=EventDate(
+                    date=DateInterval(
                         start_date=event_result.start_date,
                         end_date=event_result.end_date
                     ),
-                    tags=tags
+                    tags=tags,
+                    every_week=event_result.every_week
                 )
             )
         return today_events

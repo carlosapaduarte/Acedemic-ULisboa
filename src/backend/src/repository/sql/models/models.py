@@ -1,3 +1,5 @@
+from typing import Optional
+from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, Relationship, SQLModel
 from datetime import datetime
 
@@ -35,7 +37,7 @@ class BatchModel(SQLModel, table=True):
     start_date: datetime
     level: int
 
-    user_id: int = Field(foreign_key="user.id")
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="user_batches")
 
     completed_goals: list["GoalModel"] = Relationship(back_populates="batch")
@@ -47,10 +49,18 @@ class GoalModel(SQLModel, table=True):
     id: int = Field(primary_key=True)
     conclusion_date: datetime
 
-    user_id: int = Field(foreign_key="user.id", primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
+    user_id: int = Field(primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
     
-    batch_id: int = Field(foreign_key="batch.id", primary_key=True)
+    batch_id: int = Field(primary_key=True)
     batch: BatchModel = Relationship(back_populates="completed_goals")
+    
+    # Composite foreign key constraint
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['batch_id', 'user_id'],
+            ['batch.id', 'batch.user_id']
+        ),
+    )
 
 """ 
     Each user could be connected to multiple instances of this type.
@@ -67,7 +77,7 @@ class STAppUseModel(SQLModel, table=True):
 
     id: int = Field(primary_key=True)
     
-    user_id: int = Field(foreign_key="user.id", primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="user_st_app_uses")
 
 class STWeekDayPlanningModel(SQLModel, table=True):
@@ -76,7 +86,7 @@ class STWeekDayPlanningModel(SQLModel, table=True):
     week_planning_day: int | None
     hour: int | None
     
-    user_id: int = Field(foreign_key="user.id", primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_planning_day")
 
 class STEventModel(SQLModel, table=True):
@@ -86,19 +96,33 @@ class STEventModel(SQLModel, table=True):
     start_date: datetime
     end_date: datetime
     title: str
+    every_week: bool
     
     tags: list["STEventTagModel"] = Relationship(back_populates="event")
 
-    user_id: int = Field(foreign_key="user.id")
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
 
 class STEventTagModel(SQLModel, table=True):
     __tablename__ = "st_event_tag"
 
+    # Primary key: Tag
     tag: str = Field(primary_key=True)
 
-    event_id: int = Field(foreign_key="st_event.id", primary_key=True)
-    event: STEventModel = Relationship(back_populates="tags")
+    # Foreign key: Composite key referencing st_task
+    event_id: int = Field(primary_key=True)
+    user_id: int = Field(primary_key=True)
+
+    # Composite foreign key constraint
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['event_id', 'user_id'],
+            ['st_event.id', 'st_event.user_id']
+        ),
+    )
+    
+    # Relationship with STTaskModel
+    event: "STEventModel" = Relationship(back_populates="tags")
 
 class STScheduleBlockNotAvailableModel(SQLModel, table=True):
     __tablename__ = "st_schedule_block_not_available"
@@ -107,39 +131,78 @@ class STScheduleBlockNotAvailableModel(SQLModel, table=True):
     start_hour: int = Field(primary_key=True)
     duration: int = Field(primary_key=True)
 
-    user_id: int = Field(foreign_key="user.id", primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="schedule_unavailable_blocks")
-
+    
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"
-
+    
+    # Composite primary key
     id: int = Field(primary_key=True, default=None)
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+
+    # Task details
     title: str
     description: str
     deadline: datetime
     priority: str
     status: str
-    
+
+    # Relationship with User
+    user: "UserModel" = Relationship(back_populates="st_tasks")
+
+    # Tags (assuming another table/model exists for tags)
     tags: list["STTaskTagModel"] = Relationship(back_populates="task")
     
-    st_sub_tasks: list["STSubTaskModel"] = Relationship(back_populates="task")
+    # Self-referencing foreign key to handle subtasks
+    parent_task_id: Optional[int] = Field(
+        default=None,
+        nullable=True
+    )
+    parent_user_id: Optional[int] = Field(
+        default=None,
+        nullable=True
+    )
 
-    user_id: int = Field(foreign_key="user.id")
-    user: UserModel = Relationship(back_populates="st_tasks")
+    # Composite foreign key constraint for parent task
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['parent_task_id', 'parent_user_id'],
+            ['st_task.id', 'st_task.user_id']
+        ),
+    )
+    
+    # Parent task relationship (many-to-one)
+    parent_task: Optional["STTaskModel"] = Relationship(
+        back_populates="subtasks",
+        sa_relationship_kwargs=dict(
+            remote_side='STTaskModel.id'
+        )
+    )
+    
+    # Maybe, this model should have as well a sub-task-id that could be null.
+    # This allows to use new IDs for the sub tasks, and not compete against the IDs of the tasks.
+    
+    subtasks: list["STTaskModel"] = Relationship(back_populates="parent_task")
+
 
 class STTaskTagModel(SQLModel, table=True):
     __tablename__ = "st_task_tag"
 
+    # Primary key: Tag
     tag: str = Field(primary_key=True)
 
-    task_id: int = Field(foreign_key="st_task.id", primary_key=True)
-    task: STTaskModel = Relationship(back_populates="tags")
-    
-class STSubTaskModel(SQLModel, table=True):
-    __tablename__ = "st_sub_task"
+    # Foreign key: Composite key referencing st_task
+    task_id: int = Field(primary_key=True)
+    user_id: int = Field(primary_key=True)
 
-    title: str = Field(primary_key=True)
-    status: str
+    # Composite foreign key constraint
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['task_id', 'user_id'],
+            ['st_task.id', 'st_task.user_id']
+        ),
+    )
 
-    task_id: int = Field(foreign_key="st_task.id", primary_key=True)
-    task: STTaskModel = Relationship(back_populates="st_sub_tasks")
+    # Relationship with STTaskModel
+    task: "STTaskModel" = Relationship(back_populates="tags")

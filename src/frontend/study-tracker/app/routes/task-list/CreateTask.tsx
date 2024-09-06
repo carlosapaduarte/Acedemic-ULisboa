@@ -138,6 +138,9 @@ export function CreateTask({onTaskCreated} : {onTaskCreated: () => void}) {
             <CategoryAndTagsPicker onTagClick={appendTag}/>
             <StatusPicker onStatusSelect={setStatus} />
 
+            <label>Create associated Event</label>
+            <input type="checkbox" onChange={() => toggleCreateEvent()}/>
+
             <br/><br/>
             
             {!displaySubTaskForm ? 
@@ -153,8 +156,6 @@ export function CreateTask({onTaskCreated} : {onTaskCreated: () => void}) {
                 :
                 <></>
             }
-
-            <input type="checkbox" onChange={() => toggleCreateEvent()}/>
 
             {title && description && deadline && priority && tags && status && subTasks ?
                 <button onClick={() => createTask({title, description, deadline, priority, tags, status, subTasks}, createEvent, onTaskCreated)}>

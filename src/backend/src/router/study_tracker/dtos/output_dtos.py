@@ -3,10 +3,6 @@ from pydantic import BaseModel
 from domain.study_tracker import Event, Task
 from service.common import get_datetime_utc
 
-class UserSubTaskDto(BaseModel):
-    title: str
-    status: str
-
 class UserTaskOutputDto(BaseModel):
     title: str
     description: str
@@ -14,7 +10,7 @@ class UserTaskOutputDto(BaseModel):
     priority: str
     tags: list[str]
     status: str
-    subTasks: list[UserSubTaskDto]
+    subTasks: list['UserTaskOutputDto']
     
     @staticmethod
     def from_Tasks(tasks: list[Task]) -> list['UserTaskOutputDto']:
@@ -25,12 +21,9 @@ class UserTaskOutputDto(BaseModel):
         
     @staticmethod
     def from_Task(task: Task) -> 'UserTaskOutputDto':
-        sub_tasks_output_dto: list[UserSubTaskDto] = []
+        sub_tasks_output_dto: list[UserTaskOutputDto] = []
         for sub_task in task.sub_tasks:
-            sub_tasks_output_dto.append(UserSubTaskDto(
-                title=sub_task.title,
-                status=sub_task.status
-            ))
+            sub_tasks_output_dto.append(UserTaskOutputDto.from_Task(sub_task))
         
         return UserTaskOutputDto(
             title=task.title,
@@ -45,22 +38,24 @@ class UserTaskOutputDto(BaseModel):
 class TaskCreatedOutputDto(BaseModel):
     task_id: int
 
-class StudyTrackerEventOutputDto(BaseModel):
+class EventOutputDto(BaseModel):
     start_date: float
     end_date: float
     title: str
     tag: list[str]
+    everyWeek: bool
 
     @staticmethod
-    def from_events(events: list[Event]) -> list['StudyTrackerEventOutputDto']:
-        output_dtos_events: list[StudyTrackerEventOutputDto] = []
+    def from_events(events: list[Event]) -> list['EventOutputDto']:
+        output_dtos_events: list[EventOutputDto] = []
         for event in events:
             output_dtos_events.append(
-                StudyTrackerEventOutputDto(
+                EventOutputDto(
                     start_date=get_datetime_utc(event.date.start_date),
                     end_date=get_datetime_utc(event.date.end_date),
                     title=event.title,
-                    tag=event.tags
+                    tag=event.tags,
+                    everyWeek=event.every_week
                 )
             )
 

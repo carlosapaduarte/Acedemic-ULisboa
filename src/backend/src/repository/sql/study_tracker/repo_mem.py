@@ -1,5 +1,5 @@
 from datetime import datetime
-from domain.study_tracker import Event, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Event, ScheduleBlock, Task, UnavailableScheduleBlock
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
 class StudyTrackerMemRepo(StudyTrackerRepo):

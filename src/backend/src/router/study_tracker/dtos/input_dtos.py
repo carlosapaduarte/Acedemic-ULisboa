@@ -16,15 +16,19 @@ class CreateEventInputDto(BaseModel):
     endDate: float
     title: str
     tags: list[str]
+    everyWeek: bool
 
 class CreateScheduleNotAvailableBlock(BaseModel):
     weekDay: int
     startHour: int
     duration: int
     
-class SubTaskInputDto(BaseModel):
+"""
+class CreateScheduleBlockInputDto(BaseModel):
     title: str
-    status: str
+    startDate: float
+    endDate: float
+"""
 
 class CreateTaskInputDto(BaseModel):
     title: str
@@ -33,7 +37,7 @@ class CreateTaskInputDto(BaseModel):
     priority: str
     tags: list[str]
     status: str
-    subTasks: list[SubTaskInputDto]
+    subTasks: list['CreateTaskInputDto']
     createEvent: bool
 
 class UpdateTaskStatus(BaseModel):

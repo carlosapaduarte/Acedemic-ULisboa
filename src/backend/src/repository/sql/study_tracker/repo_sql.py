@@ -1,9 +1,10 @@
+import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Event, SubTask, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STAppUseModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STSubTaskModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import STAppUseModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
@@ -49,12 +50,14 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
 
             new_event_model = STEventModel(
+                    id=random.randint(1, 999999999), # For some reason, automatic ID is not working                
                     title=event.title,
                     start_date=event.date.start_date,
                     end_date=event.date.end_date,
                     user_id=user_id,
                     user=user_model,
-                    tags=[] # tags added next
+                    tags=[], # tags added next
+                    every_week=event.every_week
                 )
 
             user_model.st_events.append(
@@ -68,6 +71,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             tags_model: list[STEventTagModel] = []
             for tag in event.tags:
                 tags_model.append(STEventTagModel(
+                    user_id=user_id,
                     tag=tag,
                     event_id=new_event_model.id,
                     event=new_event_model
@@ -129,10 +133,36 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     duration=block_model.duration
                 ))
             return blocks
+    
+    @staticmethod
+    def build_task(task_model: STTaskModel) -> Task:
+        
+        # Build Task Sub-Tasks
+        subtasks: list[Task] = []
+        for sub_task_model in task_model.subtasks:
+            subtasks.append(StudyTrackerSqlRepo.build_task(sub_task_model))
+        
+        # Build Task Tags
+        tags: list[str] = []
+        for tag_model in task_model.tags:
+            tags.append(tag_model.tag)
+            
+        return Task(
+            title=task_model.title,
+            description=task_model.description,
+            deadline=task_model.deadline,
+            priority=task_model.priority,
+            tags=tags,
+            status=task_model.status,
+            sub_tasks=subtasks
+        )
+        
         
     def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
         with Session(engine) as session:
-            statement = select(STTaskModel).where(STTaskModel.user_id == user_id)
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)\
+                .where(STTaskModel.parent_task_id == None) # This is important to not mess parent with child tasks. Remember that each task will also grab it's child tasks (subtasks)
             result = session.exec(statement)
             
             task_models: list[STTaskModel] = result.all()
@@ -140,29 +170,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             # Retrieve Tasks
             tasks: list[Task] = []
             for task_model in task_models:
-                
-                # Retrieve Task Tags
-                tags: list[str] = []
-                for tag_model in task_model.tags:
-                    tags.append(tag_model.tag)
-                    
-                # Retrieve Task Sub-Tasks
-                sub_tasks: list[SubTask] = []
-                for sub_task in task_model.st_sub_tasks:
-                    sub_tasks.append(SubTask(
-                        title=sub_task.title,
-                        status=sub_task.status
-                    ))
-
-                tasks.append(Task(
-                    title=task_model.title,
-                    description=task_model.description,
-                    deadline=task_model.deadline,
-                    priority=task_model.priority,
-                    tags=tags,
-                    status=task_model.status,
-                    sub_tasks=sub_tasks
-                ))
+                tasks.append(StudyTrackerSqlRepo.build_task(task_model))
                 
             # TODO: do this using SQL Model!
             # Right now, he is just sorting based on the task.deadline plus the priority string size
@@ -170,56 +178,55 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 tasks.sort(key=lambda task: (task.deadline, task.priority))
                 
             return tasks
+        
+    
+    @staticmethod
+    def create_task_with_parent(task: Task, user_id: int, user_model: UserModel, parent_task_id: int | None, session: Session) -> int:
+        new_task_model = STTaskModel(
+            id=random.randint(1, 999999999), # For some reason, automatic ID is not working
+            title=task.title,
+            description=task.description,
+            deadline=task.deadline,
+            priority=task.priority,
+            status=task.status,
+            user_id=user_id,
+            user=user_model,
+            tags=[], # tags added next
+            subtasks=[],
+            parent_task_id=parent_task_id,
+            parent_user_id=user_id
+        )
+        
+        session.add(new_task_model)
+        session.commit()
+        session.refresh(new_task_model)
+        
+        # Create associated tags
+        tags_model: list[STTaskTagModel] = []
+        for tag in task.tags:
+            tags_model.append(STTaskTagModel(
+                tag=tag,
+                task_id=new_task_model.id,
+                task=new_task_model,
+                user_id=user_id
+            ))
+
+        for tag_model in tags_model:
+            session.add(tag_model)
+            session.commit()
+            
+        # Create associated sub-tags
+        for sub_task in task.sub_tasks:
+            StudyTrackerSqlRepo.create_task_with_parent(sub_task, user_id, user_model, parent_task_id=new_task_model.id, session=session)
+            
+        return new_task_model.id
          
     def create_task(self, user_id: int, task: Task) -> int:
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
-
-            # Create new Task
-            new_task_model = STTaskModel(
-                    title=task.title,
-                    description=task.description,
-                    deadline=task.deadline,
-                    priority=task.priority,
-                    status=task.status,
-                    user_id=user_id,
-                    user=user_model,
-                    tags=[] # tags added next
-                )
-
-            user_model.st_tasks.append(
-                new_task_model
-            )
-
-            session.add(user_model)
-            session.commit()
-            session.refresh(new_task_model)
-
-            # Create associated tags
-            tags_model: list[STTaskTagModel] = []
-            for tag in task.tags:
-                tags_model.append(STTaskTagModel(
-                    tag=tag,
-                    task_id=new_task_model.id,
-                    task=new_task_model
-                ))
-
-            for tag_model in tags_model:
-                session.add(tag_model)
-                session.commit()
-                
-            # Create associated sub-tags
-            for sub_task in task.sub_tasks:
-                sub_task_model = STSubTaskModel(
-                    title=sub_task.title,
-                    status=sub_task.status,
-                    task_id=new_task_model.id,
-                    task=new_task_model
-                )
-                session.add(sub_task_model)
-                session.commit()
-
-            return new_task_model.id
+            
+            # Create parent Task
+            return StudyTrackerSqlRepo.create_task_with_parent(task, user_id, user_model, parent_task_id=None, session=session)
 
     def update_task_status(self, user_id: int, task_id: int, new_status: str):
         with Session(engine) as session:
