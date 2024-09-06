@@ -1,30 +1,30 @@
 {
+    "months": {
+        "april": "April",
+        "august": "August",
+        "december": "December",
+        "february": "February",
+        "january": "January",
+        "july": "July",
+        "june": "June",
+        "march": "March",
+        "may": "May",
+        "november": "November",
+        "october": "October",
+        "september": "September"
+    },
+    "new_note_label": "Note",
+    "next_month_but": "Next Month",
+    "no_goals_title": "There are no goals for this day...",
     "prev_month_but": "Previous Month",
     "today": "Today",
-    "next_month_but": "Next Month",
-    "no_goals_title": "There are no goals for today...",
-    "new_note_label": "Note",
     "weekdays": {
-        "sunday": "Sun",
-        "monday": "Mon",
-        "tuesday": "Tue",
-        "wednesday": "Wed",
-        "thursday": "Thu",
         "friday": "Fri",
-        "saturday": "Sat"
-    },
-    "months": {
-        "january": "January",
-        "february": "February",
-        "march": "March",
-        "april": "April",
-        "may": "May",
-        "june": "June",
-        "july": "July",
-        "august": "August",
-        "september": "September",
-        "october": "October",
-        "november": "November",
-        "december": "December"
+        "monday": "Mon",
+        "saturday": "Sat",
+        "sunday": "Sun",
+        "thursday": "Thu",
+        "tuesday": "Tue",
+        "wednesday": "Wed"
     }
 }

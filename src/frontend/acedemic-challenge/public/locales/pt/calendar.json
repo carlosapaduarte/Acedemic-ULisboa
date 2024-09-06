@@ -1,30 +1,30 @@
 {
+    "months": {
+        "april": "Abril",
+        "august": "Agosto",
+        "december": "Dezembro",
+        "february": "Fevereiro",
+        "january": "Janeiro",
+        "july": "Julho",
+        "june": "Junho",
+        "march": "Março",
+        "may": "Maio",
+        "november": "Novembro",
+        "october": "Outubro",
+        "september": "Setembro"
+    },
+    "new_note_label": "Nota",
+    "next_month_but": "Próximo",
+    "no_goals_title": "Não há desafios para este dia...",
     "prev_month_but": "Anterior",
     "today": "Hoje",
-    "next_month_but": "Próximo",
-    "no_goals_title": "Não há desafios para hoje...",
-    "new_note_label": "Nota",
     "weekdays": {
-        "sunday": "Dom",
-        "monday": "Seg",
-        "tuesday": "Ter",
-        "wednesday": "Qua",
-        "thursday": "Qui",
         "friday": "Sex",
-        "saturday": "Sáb"
-    },
-    "months": {
-        "january": "Janeiro",
-        "february": "Fevereiro",
-        "march": "Março",
-        "april": "Abril",
-        "may": "Maio",
-        "june": "Junho",
-        "july": "Julho",
-        "august": "Agosto",
-        "september": "Setembro",
-        "october": "Outubro",
-        "november": "Novembro",
-        "december": "Dezembro"
+        "monday": "Seg",
+        "saturday": "Sáb",
+        "sunday": "Dom",
+        "thursday": "Qui",
+        "tuesday": "Ter",
+        "wednesday": "Qua"
     }
 }

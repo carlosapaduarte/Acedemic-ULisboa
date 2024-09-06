@@ -1,11 +1,11 @@
 {
-    "select_level_initial_question": "O quão eficaz têm sido os teus hábitos de estudo ultimamente?",
-    "level_1_title": "Não Eficaz",
-    "level_2_title": "Eficaz",
-    "level_3_title": "Altamente Eficaz",
     "confirm_level": "Confirmar",
     "level_1_description": "Perco o foco e tenho hábitos de estudo desorganizados, o que resulta em baixo desempenho escolar",
+    "level_1_title": "Não Eficaz",
     "level_2_description": "Tenho dificuldade em manter uma rotina de estudo, alcançando notas sólidas, mas médias",
+    "level_2_title": "Eficaz",
     "level_3_description": "Estudo de forma consistente, foco-me facilmente e obtenho as melhores notas",
-    "select_avatar_initial_question": "Escolhe o teu avatar"
+    "level_3_title": "Altamente Eficaz",
+    "select_avatar_initial_question": "Escolhe o teu avatar",
+    "select_level_initial_question": "O quão eficaz têm sido os teus hábitos de estudo ultimamente?"
 }

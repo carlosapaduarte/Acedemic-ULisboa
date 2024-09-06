@@ -1,6 +1,6 @@
 {
-    "night": "Good Night",
-    "morning": "Good Morning",
     "afternoon": "Good Afternoon",
-    "evening": "Good Evening"
+    "evening": "Good Evening",
+    "morning": "Good Morning",
+    "night": "Good Night"
 }
