@@ -1,13 +1,4 @@
-import { SubTask, Task } from "~/service/service"
-
-function SubTask({subTask} : {subTask: SubTask}) {
-    return (
-        <div>
-            <p>Title: {subTask.title}</p>
-            <p>Status: {subTask.status}</p>
-        </div>
-    )
-}
+import { Task } from "~/service/service"
 
 function Tags({tags} : {tags: string[]}) {
     return (
@@ -41,9 +32,9 @@ export function TaskView({task} : {task: Task}) {
             <p>Status: {task.status}</p>
             <br/>
             <h1>Sub Tasks:</h1>
-            {task.subTasks.map((subTask: SubTask, index: number) => 
+            {task.subTasks.map((subTask: Task, index: number) => 
                 <div key={index}>
-                    <SubTask subTask={subTask} />
+                    <TaskView task={subTask} />
                     <br/>
                 </div>
             )}

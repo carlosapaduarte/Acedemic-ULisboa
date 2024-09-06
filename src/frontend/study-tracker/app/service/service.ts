@@ -189,11 +189,6 @@ async function createScheduleNotAvailableBlock(userId: number, info: CreateSched
         return Promise.reject(new Error('Unavailable Schedule Block creation failed!'))
 }
 
-export type SubTaskDto = {
-    title: string,
-    status: string
-}
-
 export type TaskDto = {
     title: string
     description: string
@@ -201,7 +196,7 @@ export type TaskDto = {
     priority: string
     tags: string[]
     status: string,
-    subTasks: SubTaskDto[]
+    subTasks: TaskDto[]
 }
 
 export type Task = {
@@ -211,12 +206,20 @@ export type Task = {
     priority: string
     tags: string[]
     status: string,
-    subTasks: SubTask[]
+    subTasks: Task[]
 }
 
-export type SubTask = {
-    title: string,
-    status: string
+function fromTaskDtoToTask(dto: TaskDto): Task {
+    const subTasks = dto.subTasks.map((dto: TaskDto) => fromTaskDtoToTask(dto))
+    return {
+        title: dto.title,
+        description: dto.description,
+        deadline: new Date(dto.deadline * 1000),
+        priority: dto.priority,
+        tags: dto.tags,
+        status: dto.status,
+        subTasks: subTasks
+    }
 }
 
 async function getTasks(userId: number): Promise<Task[]> {
@@ -227,16 +230,7 @@ async function getTasks(userId: number): Promise<Task[]> {
     const response: Response = await doFetch(request)
     if (response.ok) {
         const responseObject: TaskDto[] = await response.json() // TODO: how 
-        return responseObject.map((taskDto: TaskDto) => {
-            return {
-                title: taskDto.title,
-                description: taskDto.description,
-                deadline: new Date(taskDto.deadline * 1000),
-                priority: taskDto.priority,
-                tags: taskDto.tags,
-                status: taskDto.status,
-                subTasks: taskDto.subTasks
-            }})
+        return responseObject.map((taskDto: TaskDto) => fromTaskDtoToTask(taskDto))
     } else
         return Promise.reject(new Error('User tasks could not be obtained!'))   
 }
