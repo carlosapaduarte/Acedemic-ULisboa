@@ -56,9 +56,13 @@
 .calendarGridContainer {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: 1fr;
+    grid-template-rows: repeat(7, 1fr);
     grid-gap: 0.35rem 0.25rem;
 }
+
+/*.calendarGridContainer.switched {
+    grid-auto-flow: column;
+}*/
 
 .calendarDayContainer {
     display: flex;

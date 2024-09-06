@@ -10,70 +10,60 @@ const months = ["calendar:months.january", "calendar:months.february", "calendar
     "calendar:months.may", "calendar:months.june", "calendar:months.july", "calendar:months.august",
     "calendar:months.september", "calendar:months.october", "calendar:months.november", "calendar:months.december"];
 
-enum Action { PREV_MONTH, NEXT_MONTH, TODAY }
+enum MonthChangeAction { PREV_MONTH, NEXT_MONTH, TODAY }
 
-function Title({ date }: { date: Date }) {
+function Title({ visibleMonth }: { visibleMonth: Date }) {
     const { t } = useTranslation(["calendar"]);
 
     return (
         <h2 className={`${styles.calendarTitle}`}>
-            {t(months[date.getMonth()]) /*+ " / " + date.getDate()*/ + " / " + date.getFullYear()}
+            {t(months[visibleMonth.getMonth()]) + " / " + visibleMonth.getFullYear()}
         </h2>
     );
 }
 
 function ChangeViewButtons(
-    { date, onButtonClick }: { date: Date, onButtonClick: (action: Action) => void }
+    { visibleMonth, onButtonClick }: { visibleMonth: Date, onButtonClick: (action: MonthChangeAction) => void }
 ) {
-    const { t } = useTranslation(["calendar"]);
-
     return (
         <div className={`${styles.changeViewButtonsContainer}`}>
-            <Button className={`${styles.changeMonthButton}`} onClick={() => onButtonClick(Action.PREV_MONTH)}>
+            <Button className={`${styles.changeMonthButton}`}
+                    onClick={() => onButtonClick(MonthChangeAction.PREV_MONTH)}>
                 {"<"}
             </Button>
-            <Title date={date} />
-            <Button className={`${styles.changeMonthButton}`} onClick={() => onButtonClick(Action.NEXT_MONTH)}>
+            <Title visibleMonth={visibleMonth} />
+            <Button className={`${styles.changeMonthButton}`}
+                    onClick={() => onButtonClick(MonthChangeAction.NEXT_MONTH)}>
                 {">"}
             </Button>
-            {/*<Button variant="round" onClick={() => onButtonClick(Action.PREV_MONTH)}>
-                {t("calendar:prev_month_but")}
-            </Button>
-            <Title date={date} />
-            <Button variant="round" onClick={() => onButtonClick(Action.TODAY)}>
-                {t("calendar:today")}
-            </Button>
-            <Button variant="round" onClick={() => onButtonClick(Action.NEXT_MONTH)}>
-                {t("calendar:next_month_but")}
-            </Button>*/}
         </div>
     );
 }
 
-function useMyCalendar() {
-    const [baseDate, setBaseDate] = useState(new Date()); // Starts as Today
+function useVisibleMonth() {
+    const [visibleMonth, setVisibleMonth] = useState(new Date()); // Starts as Today
 
-    function onButtonClickHandler(action: Action) {
-        const newDate = new Date();
+    function monthChangeActionHandler(action: MonthChangeAction) {
+        const newDate = new Date(visibleMonth);
 
         let newMonth = -1;
-        const currentSelectedMonth = baseDate.getMonth();
+        const currentSelectedMonth = visibleMonth.getMonth();
         switch (action) {
-            case Action.PREV_MONTH :
+            case MonthChangeAction.PREV_MONTH :
                 newMonth = currentSelectedMonth - 1;
                 break;
-            case Action.NEXT_MONTH :
+            case MonthChangeAction.NEXT_MONTH :
                 newMonth = currentSelectedMonth + 1;
                 break;
-            case Action.TODAY :
+            case MonthChangeAction.TODAY :
                 newMonth = new Date().getMonth();
         }
         newDate.setMonth(newMonth);
 
-        setBaseDate(newDate);
+        setVisibleMonth(newDate);
     }
 
-    return { baseDate, onButtonClickHandler };
+    return { visibleMonth, monthChangeActionHandler };
 }
 
 export type CalendarDay = {
@@ -85,46 +75,35 @@ export type CalendarDay = {
     year: number
 }
 
-function useCalendarDays(dayProp: Date) {
-    let firstDayOfMonth = new Date(dayProp.getFullYear(), dayProp.getMonth(), 1);
+function useCalendarDays(visibleMonth: Date) {
+    let firstDayOfMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
     let weekdayOfFirstDay = firstDayOfMonth.getDay();
     let currentDays: CalendarDay[] = [];
 
+    let currentDate = new Date(firstDayOfMonth);
+
     for (let day = 0; day < 42; day++) {
         if (day === 0 && weekdayOfFirstDay === 0) {
-            firstDayOfMonth.setDate(firstDayOfMonth.getDate() - 7);
+            currentDate.setDate(currentDate.getDate() - 7);
         } else if (day === 0) {
-            firstDayOfMonth.setDate(firstDayOfMonth.getDate() + (day - weekdayOfFirstDay));
+            currentDate.setDate(currentDate.getDate() + (day - weekdayOfFirstDay));
         } else {
-            firstDayOfMonth.setDate(firstDayOfMonth.getDate() + 1);
+            currentDate.setDate(currentDate.getDate() + 1);
         }
 
         let calendarDay: CalendarDay = {
-            currentMonth: (firstDayOfMonth.getMonth() === dayProp.getMonth()),
-            date: (new Date(firstDayOfMonth)),
-            month: firstDayOfMonth.getMonth(),
-            number: firstDayOfMonth.getDate(),
-            selected: (firstDayOfMonth.toDateString() === dayProp.toDateString()),
-            year: firstDayOfMonth.getFullYear()
+            currentMonth: (currentDate.getMonth() === visibleMonth.getMonth()),
+            date: new Date(currentDate),
+            month: currentDate.getMonth(),
+            number: currentDate.getDate(),
+            selected: (currentDate.toDateString() === visibleMonth.toDateString()),
+            year: currentDate.getFullYear()
         };
 
         currentDays.push(calendarDay);
     }
 
-    function parsePerWeek(days: CalendarDay[]): CalendarDay[][] {
-        const daysPerWeek: CalendarDay[][] = [];
-
-        const chunkSize = 7; // number of days in a week
-        while (days.length > 0) {
-            daysPerWeek.push(currentDays.splice(0, chunkSize));
-        }
-
-        return daysPerWeek;
-    }
-
-    const daysPerWeek: CalendarDay[][] = parsePerWeek(currentDays);
-
-    return { daysPerWeek };
+    return { currentDays };
 }
 
 function WeekHeader() {
@@ -146,7 +125,7 @@ function WeekHeader() {
 }
 
 function Day({ day, onDayClick }: { day: CalendarDay, onDayClick: (day: CalendarDay) => void }) {
-    const isNotCurrentMonth = day.month != new Date().getMonth();
+    const isCurrentMonth = day.currentMonth;
 
     const isToday = utils.sameDay(day.date, new Date());
 
@@ -155,22 +134,20 @@ function Day({ day, onDayClick }: { day: CalendarDay, onDayClick: (day: Calendar
             <h1 className={
                 `${styles.calendarDayText}
                 ${isToday ? styles.today : ""}
-                ${isNotCurrentMonth ? styles.notCurrentMonth : ""}`}>
+                ${isCurrentMonth ? "" : styles.notCurrentMonth}`}>
                 {day.number} {/*.toString().padStart(2, "0")*/}
             </h1>
         </CutButton>
     );
 }
 
-function CalendarDays({ dayProp, onDayClick }: { dayProp: Date, onDayClick: (day: CalendarDay) => void }) {
-    const { daysPerWeek } = useCalendarDays(dayProp);
-
-    const flattenedDays = daysPerWeek.flat();
+function CalendarDays({ visibleMonth, onDayClick }: { visibleMonth: Date, onDayClick: (day: CalendarDay) => void }) {
+    const { currentDays } = useCalendarDays(visibleMonth);
 
     return (
         <>
             {
-                flattenedDays.map((day: CalendarDay, index: number) => {
+                currentDays.map((day: CalendarDay, index: number) => {
                     return (
                         <Day key={index} day={day} onDayClick={onDayClick} />
                     );
@@ -180,22 +157,22 @@ function CalendarDays({ dayProp, onDayClick }: { dayProp: Date, onDayClick: (day
     );
 }
 
-function CalendarGrid({ dayProp, onDayClick }: { dayProp: Date, onDayClick: (day: CalendarDay) => void }) {
+function CalendarGrid({ visibleMonth, onDayClick }: { visibleMonth: Date, onDayClick: (day: CalendarDay) => void }) {
     return (
         <div className={`${styles.calendarGridContainer}`}>
             <WeekHeader />
-            <CalendarDays dayProp={dayProp} onDayClick={onDayClick} />
+            <CalendarDays visibleMonth={visibleMonth} onDayClick={onDayClick} />
         </div>
     );
 }
 
 export function MyCalendar({ onDayClickHandler }: { onDayClickHandler: (day: CalendarDay) => void }) {
-    const { baseDate, onButtonClickHandler } = useMyCalendar();
+    const { visibleMonth, monthChangeActionHandler } = useVisibleMonth();
 
     return (
         <div className={`${styles.myCalendar}`}>
-            <ChangeViewButtons date={baseDate} onButtonClick={onButtonClickHandler} />
-            <CalendarGrid dayProp={baseDate} onDayClick={onDayClickHandler} />
+            <ChangeViewButtons visibleMonth={visibleMonth} onButtonClick={monthChangeActionHandler} />
+            <CalendarGrid visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
         </div>
     );
 }
