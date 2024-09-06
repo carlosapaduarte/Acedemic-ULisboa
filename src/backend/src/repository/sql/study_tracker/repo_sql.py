@@ -1,7 +1,7 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Priority, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
 from repository.sql.models.models import STAppUseModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
@@ -50,7 +50,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
 
             new_event_model = STEventModel(
-                    id=random.randint(1, 999999999), # For some reason, automatic ID is not working                
+                    id=random.randint(1, 999999999), # For some reason, automatic ID is not working
                     title=event.title,
                     start_date=event.date.start_date,
                     end_date=event.date.end_date,
@@ -156,8 +156,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             status=task_model.status,
             sub_tasks=subtasks
         )
-        
-        
+            
     def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
         with Session(engine) as session:
             statement = select(STTaskModel)\
@@ -175,7 +174,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             # TODO: do this using SQL Model!
             # Right now, he is just sorting based on the task.deadline plus the priority string size
             if order_by_deadline_and_priority:
-                tasks.sort(key=lambda task: (task.deadline, task.priority))
+                tasks.sort(key=lambda task: task.deadline)
+                tasks.sort(key=lambda task: Priority.from_str(task.priority).value)
                 
             return tasks
         

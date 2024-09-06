@@ -40,13 +40,13 @@ class BatchModel(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="user_batches")
 
-    completed_goals: list["GoalModel"] = Relationship(back_populates="batch")
+    completed_goals: list["CompletedGoalModel"] = Relationship(back_populates="batch")
 
-class GoalModel(SQLModel, table=True):
-    __tablename__ = "goal"
+class CompletedGoalModel(SQLModel, table=True):
+    __tablename__ = "completed_goal"
 
-    goal_day: int = Field(primary_key=True)
     id: int = Field(primary_key=True)
+    goal_day: int = Field(primary_key=True)
     conclusion_date: datetime
 
     user_id: int = Field(primary_key=True)  # Assuming this should be foreign_key="usermodel.id"

@@ -1,9 +1,10 @@
+import random
 from sqlmodel import Session
 
 from repository.sql.academic_challenge.repo import AcademicChallengeRepo
 from datetime import datetime
 from repository.sql.models import database
-from repository.sql.models.models import BatchModel, GoalModel, NoteModel
+from repository.sql.models.models import BatchModel, CompletedGoalModel, NoteModel
 
 engine = database.get_engine()
 
@@ -12,6 +13,7 @@ class AcademicChallengeSqlRepo(AcademicChallengeRepo):
     def create_new_batch(self, user_id: int, new_level: int) -> int:
         with Session(engine) as session:
             new_batch = BatchModel(
+                id=random.randint(1, 999999999), # For some reason, automatic ID is not working
                 start_date=datetime.now(),
                 level=new_level,
                 user_id=user_id
@@ -23,7 +25,7 @@ class AcademicChallengeSqlRepo(AcademicChallengeRepo):
         
     def create_completed_goal(self, user_id: int, batch_id: int, goal_id: int, goal_day: int, conclusion_date: datetime):
         with Session(engine) as session:
-            completed_goal = GoalModel(
+            completed_goal = CompletedGoalModel(
                 batch_id=batch_id,
                 user_id=user_id,
                 goal_day=goal_day,

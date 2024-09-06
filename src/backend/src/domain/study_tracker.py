@@ -1,7 +1,20 @@
 from datetime import datetime
+from enum import Enum
 
 from repository.sql.models.models import STEventModel, STTaskModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto
+
+class Priority(Enum):
+    URGENTE = 1
+    IMPORTANTE = 2
+    
+    @staticmethod
+    def from_str(priority: str) -> 'Priority':
+        if priority == "importante":
+            return Priority.IMPORTANTE
+        if priority == "urgente":
+            return Priority.URGENTE
+        raise
         
 class Task():
     def __init__(
