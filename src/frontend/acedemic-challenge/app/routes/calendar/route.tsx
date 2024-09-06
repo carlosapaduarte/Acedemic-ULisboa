@@ -11,25 +11,19 @@ import { AppBar } from "~/components/AppBar/AppBar";
 
 const logger = new Logger({ name: "Calendar" });
 
-function RightContent({ goals, selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler }: {
+function Goals({ goals, selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler }: {
     goals: DayGoals[],
     selectedDate: Date,
     userNotes: UserNote[]
     onConfirmNewNoteSubmitClickHandler: (noteText: string) => void
 }) {
     return (
-        <div style={{
-            width: "100%",
-            height: "35%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center"
-        }}
-        >
-            <SelectedDayGoalInfo goals={goals} selectedDay={selectedDate} />
-            <SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes}
-                              onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler} />
+        <div className={`${styles.goalsContainerWrapper}`}>
+            <div className={`${styles.goalsContainer}`}>
+                <SelectedDayGoalInfo goals={goals} selectedDay={selectedDate} />
+                <SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes}
+                                  onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler} />
+            </div>
         </div>
     );
 }
@@ -42,19 +36,19 @@ function MainContent() {
         <div className={`${styles.mainContent}`}>
             {
                 goals == undefined || userNotes == undefined ?
-                    <h1>{`Loading Goals and Calendar...`}</h1>
+                    <h1 className={`${styles.loadingTextContainer}`}>
+                        {`Loading Goals and Calendar...`}
+                    </h1>
                     :
                     (
                         <>
-                            <div>
-                                <MyCalendar onDayClickHandler={handleDateClick} />
-                            </div>
-                            {/*<RightContent
+                            <MyCalendar onDayClickHandler={handleDateClick} />
+                            <Goals
                                 goals={goals}
                                 selectedDate={selectedDate}
                                 userNotes={userNotes}
                                 onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler}
-                            />*/}
+                            />
                         </>
                     )
             }
