@@ -24,11 +24,7 @@
 
     padding: calc(var(--edge-size) + 0.5rem) var(--edge-size) 0.5rem;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    /*overflow: auto;*/
+    overflow: auto;
 
     background-color: var(--yellow);
 
@@ -47,17 +43,30 @@
 .goalsContainer {
     width: 100%;
     height: 100%;
+
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.5rem;
 
-    /*overflow: auto;*/
+    overflow: auto;
+}
+
+.goalTextContainer {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: auto;
 }
 
 .goalTitle {
+    margin-bottom: 0.25em;
+
     font-size: 1.5em;
     font-weight: bold;
-    margin-bottom: 0.5em;
 
     color: black;
     font-family: var(--font-family2), sans-serif;
@@ -65,13 +74,49 @@
 }
 
 .goalDescription {
-    font-size: 1em;
-
     width: 100%;
     height: 100%;
 
+    overflow: auto;
+
+    font-size: 1em;
     color: black;
+}
+
+/*Should have enough compatibility with every recent browser*/
+/*.goalDescription {
+    height: auto;
+    overflow: hidden;
     text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}*/
+
+.seeMoreButton {
+    width: 100%;
+
+    font-size: 1em;
+    font-weight: bold;
+
+    background-color: black;
+    color: white;
+}
+
+.noGoalsTextContainer {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.noGoalsText {
+    font-size: 1em;
+    font-weight: bold;
+
+    color: black;
 }
 
 .loadingTextContainer {

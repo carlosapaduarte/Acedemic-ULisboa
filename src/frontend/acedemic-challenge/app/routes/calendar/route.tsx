@@ -21,8 +21,8 @@ function Goals({ goals, selectedDate, userNotes, onConfirmNewNoteSubmitClickHand
         <div className={`${styles.goalsContainerWrapper}`}>
             <div className={`${styles.goalsContainer}`}>
                 <SelectedDayGoalInfo goals={goals} selectedDay={selectedDate} />
-                <SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes}
-                                  onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler} />
+                {/*<SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes}
+                                  onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler} />*/}
             </div>
         </div>
     );

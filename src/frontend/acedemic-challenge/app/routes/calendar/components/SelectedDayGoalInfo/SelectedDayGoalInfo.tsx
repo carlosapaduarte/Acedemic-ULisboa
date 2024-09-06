@@ -3,6 +3,7 @@ import { utils } from "~/utils";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styles from "../../calendarPage.module.css";
+import { CutButton } from "~/components/Button/Button";
 
 function useSelectedDayGoalInfo({ goals, selectedDay }: { goals: DayGoals[], selectedDay: Date }) {
     // TODO: only displaying one Goal!!! There could be more
@@ -32,14 +33,19 @@ export default function SelectedDayGoalInfo({ goals, selectedDay }: { goals: Day
     if (goalsToDisplay.length == 1) {
         const goal = goalsToDisplay[0];
         return (
-            <div>
-                <h2 className={`${styles.goalTitle}`}>
-                    {goal.title}
-                </h2>
-                <p className={`${styles.goalDescription}`}>
-                    {goal.description}
-                </p>
-            </div>
+            <>
+                <div className={`${styles.goalTextContainer}`}>
+                    <h2 className={`${styles.goalTitle}`}>
+                        {goal.title}
+                    </h2>
+                    <p className={`${styles.goalDescription}`}>
+                        {goal.description}
+                    </p>
+                </div>
+                <CutButton className={`${styles.seeMoreButton}`}>
+                    {t("calendar:see_more_button_text")}
+                </CutButton>
+            </>
         );
     } else if (goalsToDisplay.length > 1) {
         return (
@@ -60,10 +66,10 @@ export default function SelectedDayGoalInfo({ goals, selectedDay }: { goals: Day
         );
     } else
         return (
-            <div>
-                <h6>
+            <div className={`${styles.noGoalsTextContainer}`}>
+                <h4 className={`${styles.noGoalsText}`}>
                     {t("calendar:no_goals_title")}
-                </h6>
+                </h4>
             </div>
         );
 }
