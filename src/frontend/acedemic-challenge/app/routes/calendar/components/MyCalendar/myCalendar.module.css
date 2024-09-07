@@ -60,9 +60,9 @@
     grid-gap: 0.35rem 0.25rem;
 }
 
-/*.calendarGridContainer.switched {
+.calendarGridContainer.switched {
     grid-auto-flow: column;
-}*/
+}
 
 .calendarDayContainer {
     display: flex;

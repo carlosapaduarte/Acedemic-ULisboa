@@ -159,7 +159,7 @@ function CalendarDays({ visibleMonth, onDayClick }: { visibleMonth: Date, onDayC
 
 function CalendarGrid({ visibleMonth, onDayClick }: { visibleMonth: Date, onDayClick: (day: CalendarDay) => void }) {
     return (
-        <div className={`${styles.calendarGridContainer}`}>
+        <div className={`${styles.calendarGridContainer}`}> {/*${styles.switched}*/}
             <WeekHeader />
             <CalendarDays visibleMonth={visibleMonth} onDayClick={onDayClick} />
         </div>

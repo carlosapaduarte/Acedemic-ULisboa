@@ -1,0 +1,191 @@
+/*
+Doesn't work, use SCSS
+:root {
+    --2colbreakpoint: 560px;
+    --3colbreakpoint: 1024px;
+}*/
+
+.challengesPage {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.mainContent {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.challengesListContainer {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+
+    overflow: auto;
+}
+
+.challengesList {
+    display: grid;
+    align-items: start;
+    align-content: start;
+
+    gap: 0.5rem;
+
+    overflow: hidden;
+}
+
+.challengeBoxContainer {
+    width: 100%;
+    height: 100%;
+
+    --expandableContainerMaxHeight: 200px;
+
+    display: flex;
+    align-items: flex-start;
+
+    overflow: hidden;
+}
+
+.challengeBox {
+    width: 100%;
+    background-color: var(--secondary);
+    font-weight: bold;
+}
+
+.challengeBox.expanded {
+    background-color: var(--yellow);
+}
+
+.challengeBox.locked {
+    background-color: var(--purple-dark);
+    color: white;
+}
+
+.challengeBox .challengeContainer {
+    width: 100%;
+
+    padding-top: 0.5rem;
+    padding-left: 1rem;
+}
+
+.challengeBox .challengeTitle {
+    font-size: clamp(1rem, 5vw, 1.25rem);
+
+    padding-right: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    text-wrap: nowrap;
+    text-align: left;
+    text-overflow: ellipsis;
+
+    overflow: hidden;
+}
+
+.challengeBox .challengeExpandableContainer {
+    transition: max-height 0.5s cubic-bezier(0.87, 0, 0.13, 1);
+    max-height: 0;
+    overflow: auto;
+}
+
+.challengeBox.expanded .challengeExpandableContainer {
+    max-height: var(--expandableContainerMaxHeight);
+}
+
+.challengeDescription {
+    overflow: auto;
+
+    text-align: left;
+
+    font-size: 1rem;
+    font-family: var(--font-family1), sans-serif;
+    text-transform: none;
+    font-weight: normal;
+    color: black;
+}
+
+
+@media (min-width: 580px) {
+    :root {
+        --title-height: clamp(1rem, 2.7vw, 1.25rem);
+    }
+
+    .challengesList {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .challengeBox .challengeTitle {
+        font-size: var(--title-height);
+    }
+
+    /***** Solution with expanded challenge staying at one column *****/
+    .challengeBoxContainer {
+        --boxContainerMaxHeight: calc(
+                var(--expandableContainerMaxHeight) +
+                var(--title-height) + 8px + 8px + 6px
+        );
+    }
+
+    .challengeBoxContainer.expanded + .challengeBoxContainer:nth-child(2n).lastExpanded,
+    .challengeBoxContainer.lastExpanded:has(+ .challengeBoxContainer:nth-child(2n).expanded) {
+        height: var(--boxContainerMaxHeight);
+    }
+
+    /***** Solution with expanded challenge spanning multiple columns *****/
+    /*.challengeBoxContainer.expanded {
+        grid-column: span 2;
+    }
+
+    .challengeBoxContainer:nth-child(2n + 1).expanded + .challengeBoxContainer {
+        grid-column: 2;
+    }*/
+}
+
+@media (min-width: 1030px) {
+    .challengesList {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /***** Solution with expanded challenge staying at one column *****/
+    .challengeBoxContainer.expanded + .challengeBoxContainer:nth-child(2n).lastExpanded,
+    .challengeBoxContainer.lastExpanded:has(+ .challengeBoxContainer:nth-child(2n).expanded) {
+        height: auto;
+    }
+
+    .challengeBoxContainer.expanded + .challengeBoxContainer:nth-child(3n-1).lastExpanded,
+    .challengeBoxContainer.expanded + .challengeBoxContainer:nth-child(3n).lastExpanded,
+    .challengeBoxContainer.lastExpanded:has(+ .challengeBoxContainer:nth-child(3n-1).expanded),
+    .challengeBoxContainer.lastExpanded:has(+ .challengeBoxContainer:nth-child(3n).expanded),
+    .challengeBoxContainer.expanded + .challengeBoxContainer:nth-child(3n-1) + .challengeBoxContainer:nth-child(3n).lastExpanded,
+    .challengeBoxContainer.lastExpanded:has(+ .challengeBoxContainer:nth-child(3n-1) + .challengeBoxContainer:nth-child(3n).expanded) {
+        height: var(--boxContainerMaxHeight);
+    }
+
+    .challengeBoxContainer.expanded + .challengeBoxContainer:nth-child(3n-1) + .challengeBoxContainer:nth-child(3n).lastExpanded,
+    .challengeBoxContainer.lastExpanded:has(+ .challengeBoxContainer:nth-child(3n-1) + .challengeBoxContainer:nth-child(3n).expanded) {
+        height: var(--boxContainerMaxHeight);
+    }
+
+    /***** Solution with expanded challenge spanning multiple columns *****/
+    /*.challengeBoxContainer.expanded {
+        grid-column: span 3;
+    }
+
+    .challengeBoxContainer:nth-child(3n + 2).expanded + .challengeBoxContainer {
+        grid-column: 3;
+    }
+
+    .challengeBoxContainer:nth-child(3n + 1).expanded + .challengeBoxContainer {
+        grid-column: 2;
+    }
+
+    .challengeBoxContainer:nth-child(3n).expanded + .challengeBoxContainer {
+        grid-column: 1;
+    }*/
+}

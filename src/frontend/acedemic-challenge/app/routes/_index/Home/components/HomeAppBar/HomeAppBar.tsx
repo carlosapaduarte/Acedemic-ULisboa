@@ -52,7 +52,7 @@ function GreetingsContainer() {
     return (
         <div className={styles.greetingsContainer}>
             <h4 className={styles.helloQuote}>
-                <span>{helloQuote}, nyckbrandao1236{/*{userId ?? "loading..."}*/}</span>
+                <span>{helloQuote}, {userId ?? "loading..."}</span>
             </h4>
             <div className={`${styles.avatarContainer}`}>
                 <img

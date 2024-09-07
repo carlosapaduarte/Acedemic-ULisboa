@@ -1,83 +1,75 @@
-// This makes it 21 challenges
 import { Goal } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { service, UserInfo } from "~/service/service";
 import { utils } from "~/utils";
 import { useUserId } from "~/components/auth/Authn";
+import { AppBar } from "~/components/AppBar/AppBar";
+import styles from "./challengesPage.module.css";
+import { CutButton } from "~/components/Button/Button";
+import { Level1 } from "~/challenges/level_1";
 
-const GOALS_PER_ROW = 7;
-const ROWS = 3;
-const GOAL_WITH = 100 / GOALS_PER_ROW;
-
-function GoalsAccordion({ goals }: { goals: Goal[] }) {
-    return (
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            {goals.map((goal: Goal) =>
-                <div key={goal.title}>
-                    <h1>
-                        {goal.title}
-                    </h1>
-                    <p>
-                        {goal.description}
-                    </p>
-                </div>
-            )}
-            {/*<Accordion>
-                    <AccordionSummary
-                        expandIcon={<ArrowDownward/>}
-                        aria-controls="panel1-content"
-                        id="panel1-header"
-                    >
-                        <Typography>{goal.title}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Typography>
-                            {goal.description}
-                        </Typography>
-                    </AccordionDetails>
-                </Accordion>*/}
-        </div>
-    );
-}
-
-function GoalBox({ goalIndex, achieved, onGoalClick }: {
-    goalIndex: number,
-    achieved: boolean,
-    onGoalClick: (goalIndex: number) => void
-}) {
-    const opacity = achieved ? "100%" : "35%";
-    return (
-        <div
-            style={{
-                width: GOAL_WITH + "%",
-                backgroundColor: "green",
-                color: "white",
-                opacity: opacity,
-                margin: "2%",
-                alignItems: "center"
-            }}
-            onClick={() => onGoalClick(goalIndex)}
-        >
-            <p style={{ fontSize: "180%" }}>{goalIndex + 1}</p>
-        </div>
-    );
-}
-
-function GoalRow({ rowIndex, currentGoal, onGoalClick }: {
-    rowIndex: number,
-    currentGoal: number,
-    onGoalClick: (goalIndex: number) => void
+function ChallengeBox({ challengeIndex, challengeTitle, lastExpanded, expanded, reached, onChallengeClick }: {
+    challengeIndex: number,
+    challengeTitle: string,
+    lastExpanded: boolean,
+    expanded: boolean,
+    reached: boolean,
+    onChallengeClick: (goalIndex: number) => void
 }) {
     return (
-        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly" }}>
-            {Array.from(Array(GOALS_PER_ROW)).map((_, index) => {
-                const goalIndex = GOALS_PER_ROW * rowIndex + index;
-                const visible = goalIndex <= currentGoal - 1;
-                return (
-                    <GoalBox key={goalIndex} achieved={visible} goalIndex={goalIndex} onGoalClick={onGoalClick} />
-                );
-            })}
+        <div className={`
+        ${styles.challengeBoxContainer}
+        ${lastExpanded && reached ? styles.lastExpanded : ""}
+        ${expanded && reached ? styles.expanded : ""}
+        `}>
+            <CutButton
+                className={`
+                ${styles.challengeBox} 
+                ${reached ? "" : styles.locked} 
+                ${expanded && reached ? styles.expanded : ""}
+            `}
+                onClick={() => onChallengeClick(challengeIndex)}>
+                {
+                    reached ?
+                        <div className={`${styles.challengeContainer}`}>
+                            <p className={`${styles.challengeTitle}`}>{challengeIndex + 1} - {challengeTitle}</p>
+                            <div className={`${styles.challengeExpandableContainer}`}>
+                                <div className={`${styles.challengeDescription}`}>
+                                    Lorem ipsum odor amet, consectetuer adipiscing elit. Pharetra fusce primis
+                                    suspendisse
+                                    interdum pharetra cursus habitasse eu. Semper porttitor maecenas phasellus potenti
+                                    malesuada
+                                    quam maximus. Est lectus parturient netus justo convallis et. Pretium aenean vivamus
+                                    commodo
+                                    et dapibus viverra inceptos parturient primis. Natoque magna sapien; gravida rutrum
+                                    sapien
+                                    id gravida. Dolor nunc faucibus massa montes nam at habitant.Lorem ipsum odor amet,
+                                    consectetuer adipiscing elit. Pharetra fusce primis suspendisse
+                                    interdum pharetra cursus habitasse eu. Semper porttitor maecenas phasellus potenti
+                                    malesuada
+                                    quam maximus. Est lectus parturient netus justo convallis et. Pretium aenean vivamus
+                                    commodo
+                                    et dapibus viverra inceptos parturient primis. Natoque magna sapien; gravida rutrum
+                                    sapien
+                                    id gravida. Dolor nunc faucibus massa montes nam at habitant.Lorem ipsum odor amet,
+                                    consectetuer adipiscing elit. Pharetra fusce primis suspendisse
+                                    interdum pharetra cursus habitasse eu. Semper porttitor maecenas phasellus potenti
+                                    malesuada
+                                    quam maximus. Est lectus parturient netus justo convallis et. Pretium aenean vivamus
+                                    commodo
+                                    et dapibus viverra inceptos parturient primis. Natoque magna sapien; gravida rutrum
+                                    sapien
+                                    id gravida. Dolor nunc faucibus massa montes nam at habitant.
+                                </div>
+                            </div>
+                        </div>
+                        :
+                        <div className={`${styles.challengeContainer}`}>
+                            <p className={`${styles.challengeTitle}`}>?</p>
+                        </div>
+                }
+            </CutButton>
         </div>
     );
 }
@@ -94,18 +86,43 @@ function Title() {
 }
 
 function Goals({ goals, onGoalClickHandler }: { goals: Goal[][], onGoalClickHandler: (goalIndex: number) => void }) {
+    const [selectedItem, setSelectedItem] = useState<number>(-1);
+    const [lastSelectedItem, setLastSelectedItem] = useState<number>(-1);
+
+    const currentGoal = goals.length;
+
+    function onItemClickHandler(index: number) {
+        const reached = index <= currentGoal - 1;
+
+        if (!reached) {
+            return;
+        }
+
+        if (selectedItem == index) {
+            setSelectedItem(-1);
+            return;
+        }
+        setLastSelectedItem(selectedItem);
+
+        setSelectedItem(index);
+    }
+
     return (
-        <div style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            marginTop: "2%",
-            width: "100%"
-        }}>
-            {Array.from(Array(ROWS)).map((_, rowIndex: number) => // TODO add flex wrap
-                <GoalRow key={rowIndex} currentGoal={goals.length} rowIndex={rowIndex}
-                         onGoalClick={onGoalClickHandler} />
-            )}
+        <div className={`${styles.challengesList}`}>
+            {
+                Array.from({ length: 21 }).map((_, index) => {
+                        const reached = index <= currentGoal - 1;
+
+                        return <ChallengeBox key={index}
+                                             challengeIndex={index}
+                                             challengeTitle={Level1.getLevel1GoalList()[index].title}
+                                             lastExpanded={lastSelectedItem == index}
+                                             expanded={selectedItem == index}
+                                             reached={reached}
+                                             onChallengeClick={onItemClickHandler} />;
+                    }
+                )
+            }
         </div>
     );
 }
@@ -126,10 +143,10 @@ function useChallenges() {
                     const testStartDate = new Date();
                     testStartDate.setDate(testStartDate.getDate() - 10);
 
-                    const batchToDisplay = userInfo.batches[0]
-                    const level = batchToDisplay.level
+                    const batchToDisplay = userInfo.batches[0];
+                    const level = batchToDisplay.level;
 
-                    const goals = utils.getGoalsPerDayByStartDate(level, testStartDate)
+                    const goals = utils.getGoalsPerDayByStartDate(level, testStartDate);
                     setGoals(goals);
                 });
         }
@@ -150,33 +167,26 @@ function useChallenges() {
     return { goalsInfoToDisplay, onGoalClickHandler, goals };
 }
 
-export default function Challenges() {
+function MainContent() {
     const { t } = useTranslation(["goal_overview"]);
     const { goalsInfoToDisplay, onGoalClickHandler, goals } = useChallenges();
 
     return (
-        <div style={{ marginTop: "2%" }}>
-            <Title />
-            <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <div className={`${styles.mainContent}`}>
+            <div className={`${styles.challengesListContainer}`}>
                 {
                     goals ? <Goals goals={goals} onGoalClickHandler={onGoalClickHandler} /> : <></>
                 }
-                <div style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    width: "100%",
-                    padding: "1%"
-                }}
-                >
-                    {
-                        goalsInfoToDisplay ?
-                            <GoalsAccordion goals={goalsInfoToDisplay} />
-                            :
-                            <h5>{t("goal_overview:no_reached_message")}</h5>
-                    }
-                </div>
             </div>
+        </div>
+    );
+}
+
+export default function ChallengesPage() {
+    return (
+        <div className={`${styles.challengesPage}`}>
+            <AppBar />
+            <MainContent />
         </div>
     );
 }

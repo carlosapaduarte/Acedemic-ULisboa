@@ -16,7 +16,7 @@
     background-color: var(--purple-dark);
     color: white;
 
-    --edge-size: 1.5em;
+    --edge-size: 1.5rem;
 
     clip-path: polygon(
             100% 0%,
@@ -50,6 +50,7 @@
     height: 100%;
 
     display: flex;
+    align-items: flex-start;
     gap: 0.5rem;
 }
 

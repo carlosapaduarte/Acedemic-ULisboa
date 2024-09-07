@@ -2,10 +2,13 @@
 
 .languageButton {
     color: black;
-    width: 3rem;
-    height: 2rem;
 
-    --edge-size: 0.5rem;
+    --width: 2.5rem;
+
+    width: var(--width);
+    height: calc(var(--width) / 1.5);
+
+    --edge-size: calc(var(--width) / 6);
 
     background-repeat: no-repeat;
     background-position: center;

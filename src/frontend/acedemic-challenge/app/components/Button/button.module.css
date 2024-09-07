@@ -10,7 +10,7 @@
 }
 
 .cutButton {
-    --edge-size: .5em;
+    --edge-size: .5rem;
     clip-path: polygon(
             var(--edge-size) 0,
             calc(100% - var(--edge-size)) 0,
