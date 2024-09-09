@@ -48,7 +48,7 @@ class EventOutputDto(BaseModel):
     startDate: int
     endDate: int
     title: str
-    tag: list[str]
+    tags: list[str]
     everyWeek: bool
 
     @staticmethod
@@ -60,7 +60,7 @@ class EventOutputDto(BaseModel):
                     startDate=get_datetime_utc(event.date.start_date),
                     endDate=get_datetime_utc(event.date.end_date),
                     title=event.title,
-                    tag=event.tags,
+                    tags=event.tags,
                     everyWeek=event.every_week
                 )
             )

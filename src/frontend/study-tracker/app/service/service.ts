@@ -141,7 +141,7 @@ type EventDto = {
     startDate: number,
     endDate: number,
     title: string,
-    tag: string,
+    tags: string[],
     everyWeek: boolean
 }
 
@@ -149,7 +149,7 @@ export type Event = {
     startDate: Date,
     endDate: Date,
     title: string,
-    tags: string,
+    tags: string[],
     everyWeek: boolean
 }
 
@@ -167,7 +167,7 @@ async function getUserEvents(userId: number, filterTodayEvents: boolean): Promis
                 startDate: new Date(eventDto.startDate * 1000),
                 endDate: new Date(eventDto.endDate * 1000),
                 title: eventDto.title,
-                tag: eventDto.tag,
+                tags: eventDto.tags,
                 everyWeek: eventDto.everyWeek
             }})
     } else {

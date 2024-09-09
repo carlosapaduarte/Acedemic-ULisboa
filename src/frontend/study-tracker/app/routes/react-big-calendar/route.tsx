@@ -31,20 +31,23 @@ function useMyCalendar() {
         const userId = utils.getUserId()
         service.getUserEvents(userId, false)
             .then((events: Event[]) => {
+                //console.log(events)
                 const calendarEvents: CalendarEvent[] = events.map((event: Event) => {
                     return {
                         title: event.title,
                         start: event.startDate,
                         end: event.endDate,
+                        resource: {tags: event.tags}
                     }
                 })
                 setEvents(calendarEvents)
             })
     }
 
-    function createNewEvent(event: NewEventInfo) {
+    function createNewEvent(event: NewEventInfo, onDone: () => void) {
         const userId = utils.getUserId()
         service.createNewEvent(userId, event)
+            .then(onDone)
             .catch((error) => setError(error))
     }
 
@@ -64,7 +67,7 @@ export default function MyCalendar() {
         }, [])
 
     const handleSelectEvent = useCallback(
-        (event) => window.alert(event.title),
+        (event: CalendarEvent) => window.alert(`Title: ${event.title}\nTags: ${event.resource?.tags}`),
         []
     )
 
@@ -75,23 +78,15 @@ export default function MyCalendar() {
             endDate: eventInfo.end,
             tags,
             everyWeek: false
+        }, () => {
+            setNewEventTitleAndName(undefined) // Values used, discard now...
+            updateUserEvents()
         })
-        setNewEventTitleAndName(undefined) // Values used, discard now...
-        updateUserEvents()
     }
 
     // Title and dates set. Now it's time to choose tags!
-    if (newEventTitleAndName)
-        return (
-            <div>
-                <CategoryAndTagsPicker onTagClick={appendTag}/>
-                <button onClick={() => onTagsConfirmClickHandler(newEventTitleAndName)}>
-                    Confirm!
-                </button>
-            </div>
-        )
-    else
-        return (
+    return (
+        <div>
             <Calendar
                 localizer={localizer}
                 events={events}
@@ -102,5 +97,17 @@ export default function MyCalendar() {
                 selectable
                 style={{ height: 500 }}
             />
-        )
+
+            {newEventTitleAndName ? 
+                <div>
+                    <CategoryAndTagsPicker onTagClick={appendTag}/>
+                    <button onClick={() => onTagsConfirmClickHandler(newEventTitleAndName)}>
+                        Confirm!
+                    </button>
+                </div>
+                :
+                <></>
+            }
+        </div>
+    )
 }
