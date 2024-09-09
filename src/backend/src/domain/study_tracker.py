@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from repository.sql.models.models import STEventModel, STTaskModel
+from repository.sql.models.models import STEventModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto
 
 class Priority(Enum):
@@ -18,7 +18,8 @@ class Priority(Enum):
         
 class Task():
     def __init__(
-            self, 
+            self,
+            id: int | None,
             title: str, 
             description: str, 
             deadline: datetime, 
@@ -27,6 +28,7 @@ class Task():
             sub_tasks: list['Task'],
             status: str="Tarefa não iniciada", # Default value
     ) -> None:
+        self.id=id
         self.title=title
         self.description=description
         self.deadline=deadline
@@ -41,6 +43,7 @@ class Task():
         for sub_task in task_dto.subTasks:
             sub_tasks.append(Task.fromCreateTaskInputDto(sub_task))
         return Task(
+            id=None,
             title=task_dto.title,
             description=task_dto.description,
             deadline=datetime.fromtimestamp(task_dto.deadline),

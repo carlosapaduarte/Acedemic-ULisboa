@@ -1,7 +1,6 @@
 from domain.study_tracker import DateInterval, Event, Task, UnavailableScheduleBlock
 from exception import NotAvailableScheduleBlockCollision
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
-from router.study_tracker.dtos.output_dtos import EventOutputDto
 from datetime import datetime
 
 study_tracker_repo = StudyTrackerSqlRepo()
@@ -37,9 +36,6 @@ def get_events(user_id: int) -> list[Event]:
 
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
-    
-def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
-    return study_tracker_repo.get_tasks(user_id, order_by_deadline_and_priority)
 
 def create_event_from_task(user_id: int, task: Task):
     associatedEvent = Event(
@@ -58,6 +54,9 @@ def create_task(user_id: int, task: Task, createAssociatedEvent: bool) -> int:
         create_event_from_task(user_id, task)
         
     return study_tracker_repo.create_task(user_id, task)
+
+def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
+    return study_tracker_repo.get_tasks(user_id, order_by_deadline_and_priority)
 
 def update_task_status(user_id: int, task_id: int, new_status: str):
     study_tracker_repo.update_task_status(user_id, task_id, new_status)

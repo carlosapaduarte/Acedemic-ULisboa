@@ -1,5 +1,6 @@
 
 const statusValues: string[] = [
+    "Tarefa Completa",
     "Tarefa completa, mas precisa de alguns ajustes ou revisão",
     "Tarefa parcialmente completa",
     "Tarefa incompleta",

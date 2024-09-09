@@ -1,5 +1,5 @@
 from datetime import datetime
-from domain.study_tracker import Event, Event, ScheduleBlock, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Event, ScheduleBlock, Task, Task, UnavailableScheduleBlock
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
 class StudyTrackerMemRepo(StudyTrackerRepo):
@@ -28,7 +28,7 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
     def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
         pass
 
-    def create_task(self, user_id: int, task: Task) -> int:
+    def create_task(self, user_id: int, data: Task) -> int:
         pass
 
     def update_task_status(self, user_id: int, task_id: int, new_status: str):

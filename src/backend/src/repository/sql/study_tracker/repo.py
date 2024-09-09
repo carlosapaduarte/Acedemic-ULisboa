@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from domain.study_tracker import Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Task, Task, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod

@@ -189,7 +189,49 @@ async function createScheduleNotAvailableBlock(userId: number, info: CreateSched
         return Promise.reject(new Error('Unavailable Schedule Block creation failed!'))
 }
 
+export type TaskData = {
+    title: string
+    description: string
+    deadline: Date
+    priority: string
+    tags: string[]
+    status: string,
+}
+
+export type CreateTask = {
+    taskData: TaskData
+    subTasks: CreateTask[],
+    createEvent: boolean
+}
+
+async function createNewTask(userId: number, newTaskInfo: CreateTask) {
+    const request = {
+        path: `study-tracker/users/${userId}/tasks`,
+        method: 'POST',
+        body: toBody({
+            title: newTaskInfo.taskData.title,
+            description: newTaskInfo.taskData.description,
+            deadline: newTaskInfo.taskData.deadline.getTime() / 1000, // Converts to number
+            priority: newTaskInfo.taskData.description,
+            tags: newTaskInfo.taskData.tags,
+            status: newTaskInfo.taskData.status,
+            subTasks: newTaskInfo.subTasks,
+            createEvent: newTaskInfo.createEvent
+        }),
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('New task could not be created!'))
+}
+
+export type Task = {
+    id: number,
+    data: TaskData
+    subTasks: Task[]
+}
+
 export type TaskDto = {
+    id: number,
     title: string
     description: string
     deadline: number
@@ -199,26 +241,19 @@ export type TaskDto = {
     subTasks: TaskDto[]
 }
 
-export type Task = {
-    title: string
-    description: string
-    deadline: Date
-    priority: string
-    tags: string[]
-    status: string,
-    subTasks: Task[]
-}
-
 function fromTaskDtoToTask(dto: TaskDto): Task {
     const subTasks = dto.subTasks.map((dto: TaskDto) => fromTaskDtoToTask(dto))
     return {
-        title: dto.title,
-        description: dto.description,
-        deadline: new Date(dto.deadline * 1000),
-        priority: dto.priority,
-        tags: dto.tags,
-        status: dto.status,
-        subTasks: subTasks
+        id: dto.id,
+        data: {
+            title: dto.title,
+            description: dto.description,
+            deadline: new Date(dto.deadline * 1000),
+            priority: dto.priority,
+            tags: dto.tags,
+            status: dto.status,
+        },
+        subTasks
     }
 }
 
@@ -235,24 +270,25 @@ async function getTasks(userId: number): Promise<Task[]> {
         return Promise.reject(new Error('User tasks could not be obtained!'))   
 }
 
-async function createNewTask(userId: number, newTaskInfo: Task, createEvent: boolean) {
+async function getTask(userId: number, taskId: number): Promise<Task> {
+    // For now, just fetch all tasks and return the one that we want
+
+    const tasks = await getTasks(userId)
+    const task = tasks.find((task: Task) => task.id == taskId)
+    if (task != undefined)
+        return task
+    return Promise.reject(new Error(`Task with ID ${taskId} doesn't exist!`))
+}
+
+async function updateTaskStatus(userId: number, taskId: number, newStatus: string) {
     const request = {
-        path: `study-tracker/users/${userId}/tasks`,
-        method: 'POST',
-        body: toBody({
-            title: newTaskInfo.title,
-            description: newTaskInfo.description,
-            deadline: newTaskInfo.deadline.getTime() / 1000,
-            priority: newTaskInfo.priority,
-            tags: newTaskInfo.tags,
-            status: newTaskInfo.status,
-            subTasks: newTaskInfo.subTasks,
-            createEvent
-        }),
+        path: `study-tracker/users/${userId}/tasks/${taskId}`,
+        method: 'PUT',
+        body: toBody({newStatus}),
     }
     const response: Response = await doFetch(request)
     if (!response.ok)
-        return Promise.reject(new Error('New task could not be created!'))
+        return Promise.reject(new Error('Task status could not be updated!'))
 }
 
 export const service = {
@@ -267,5 +303,7 @@ export const service = {
     getTodayEvents,
     createScheduleNotAvailableBlock,
     getTasks,
-    createNewTask
+    getTask,
+    createNewTask,
+    updateTaskStatus
 }

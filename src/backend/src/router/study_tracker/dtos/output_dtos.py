@@ -1,9 +1,10 @@
 from pydantic import BaseModel
 
 from domain.study_tracker import Event, Task
-from service.common import get_datetime_utc
+from utils import get_datetime_utc
 
 class UserTaskOutputDto(BaseModel):
+    id: int
     title: str
     description: str
     deadline: float
@@ -21,11 +22,16 @@ class UserTaskOutputDto(BaseModel):
         
     @staticmethod
     def from_Task(task: Task) -> 'UserTaskOutputDto':
+        task_id = task.id
+        if task_id is None:
+            raise
+
         sub_tasks_output_dto: list[UserTaskOutputDto] = []
         for sub_task in task.sub_tasks:
             sub_tasks_output_dto.append(UserTaskOutputDto.from_Task(sub_task))
-        
+            
         return UserTaskOutputDto(
+            id=task_id,
             title=task.title,
             description=task.description,
             deadline=get_datetime_utc(task.deadline),

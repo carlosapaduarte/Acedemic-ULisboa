@@ -10,15 +10,19 @@ router = APIRouter(
     prefix="/study-tracker",
 )
 
+@router.post("/users/{user_id}/tasks")
+def create_task(user_id: int, dto: CreateTaskInputDto) -> TaskCreatedOutputDto:
+    task_id = study_tracker_service.create_task(user_id, Task.fromCreateTaskInputDto(dto), dto.createEvent)
+    return TaskCreatedOutputDto(task_id=task_id)
+
 @router.get("/users/{user_id}/tasks")
 def get_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[UserTaskOutputDto]:
     tasks: list[Task] = study_tracker_service.get_user_tasks(user_id, order_by_deadline_and_priority)
     return UserTaskOutputDto.from_Tasks(tasks)
 
-@router.post("/users/{user_id}/tasks")
-def create_task(user_id: int, dto: CreateTaskInputDto) -> TaskCreatedOutputDto:
-    task_id = study_tracker_service.create_task(user_id, Task.fromCreateTaskInputDto(dto), dto.createEvent)
-    return TaskCreatedOutputDto(task_id=task_id)
+@router.put("/users/{user_id}/tasks/{task_id}")
+def update_task_status(user_id: int, task_id: int, dto: UpdateTaskStatus):
+    study_tracker_service.update_task_status(user_id, task_id, dto.newStatus)
 
 @router.get("/users/{user_id}/events")
 def get_events(user_id: int, today: bool) -> list[EventOutputDto]:
@@ -77,7 +81,3 @@ def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvai
         )
     )
     return Response()
-
-@router.put("/users/{user_id}/tasks/{task_id}")
-def update_task_status(user_id: int, task_id: int, dto: UpdateTaskStatus):
-    study_tracker_service.update_task_status(user_id, task_id, dto.new_status)

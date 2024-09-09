@@ -41,4 +41,4 @@ class CreateTaskInputDto(BaseModel):
     createEvent: bool
 
 class UpdateTaskStatus(BaseModel):
-    new_status: str
+    newStatus: str

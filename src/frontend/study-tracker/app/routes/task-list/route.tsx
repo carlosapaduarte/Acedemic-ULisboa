@@ -26,7 +26,7 @@ function TaskList({tasks, onNewTaskViewClick} : {tasks: Task[], onNewTaskViewCli
             <br/><br/>
             <h1>My Tasks</h1>
             {tasks?.map((task: Task, index: number) => 
-                <TaskView key={index} task={task} />
+                <TaskView key={index} taskToDisplay={task} />
             )}
         </div>
     )

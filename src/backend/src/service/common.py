@@ -2,9 +2,6 @@ from enum import Enum
 
 from domain.commons.user import User
 from repository.sql.commons.repo_sql import CommonsSqlRepo
-from router.academic_challenge.dtos.output_dtos import BatchDto, CompletedGoalDto, UserNoteDto
-from router.commons.dtos.output_dtos import UserOutputDto
-from utils import get_datetime_utc
 
 # TODO: this is a problem for the mem repo, since data is stored inside the object.
 # Instead, pass a common dependency to the services.

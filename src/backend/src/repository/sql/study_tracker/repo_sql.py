@@ -1,7 +1,7 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Event, Priority, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Priority, Task, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
 from repository.sql.models.models import STAppUseModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
@@ -148,6 +148,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             tags.append(tag_model.tag)
             
         return Task(
+            id=task_model.id,
             title=task_model.title,
             description=task_model.description,
             deadline=task_model.deadline,
@@ -181,9 +182,16 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         
     
     @staticmethod
-    def create_task_with_parent(task: Task, user_id: int, user_model: UserModel, parent_task_id: int | None, session: Session) -> int:
+    def create_task_with_parent(
+        task: Task, 
+        user_id: int, 
+        user_model: UserModel, 
+        parent_task_id: int | None, 
+        session: Session
+    ) -> int:
+        
         new_task_model = STTaskModel(
-            id=random.randint(1, 999999999), # For some reason, automatic ID is not working
+            id=random.randint(1, 999999999), # For some reason, automatic ID is not working,,
             title=task.title,
             description=task.description,
             deadline=task.deadline,
@@ -217,7 +225,13 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
         # Create associated sub-tags
         for sub_task in task.sub_tasks:
-            StudyTrackerSqlRepo.create_task_with_parent(sub_task, user_id, user_model, parent_task_id=new_task_model.id, session=session)
+            StudyTrackerSqlRepo.create_task_with_parent(
+                sub_task, 
+                user_id, 
+                user_model, 
+                parent_task_id=new_task_model.id, 
+                session=session
+            )
             
         return new_task_model.id
          

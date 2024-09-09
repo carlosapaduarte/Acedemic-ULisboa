@@ -10,16 +10,16 @@ router = APIRouter(
     prefix="/commons",
 )
 
+@router.post("/login")
+def login(input_dto: LoginInputDto) -> Response:
+    common_service.login(input_dto.id)
+    return Response() # Just for now...
+
 @router.get("/users/{user_id}")
 def get_user_info(user_id: int) -> UserOutputDto:
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
     user = common_service.get_user_info(user_id)
     return UserOutputDto.fromUser(user)
-
-@router.post("/login")
-def login(input_dto: LoginInputDto) -> Response:
-    common_service.login(input_dto.id)
-    return Response() # Just for now...
 
 @router.put("/users/{user_id}/publish-state")
 def set_share_progress_preference(user_id: int, input_dto: SetShareProgressPreferenceDto):
