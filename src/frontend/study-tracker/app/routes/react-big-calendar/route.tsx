@@ -21,6 +21,7 @@ function useMyCalendar() {
         const userId = utils.getUserId()
         service.getUserEvents(userId, false)
             .then((events: Event[]) => {
+                console.log(events)
                 const calendarEvents: CalendarEvent[] = events.map((event: Event) => {
                     return {
                         title: event.title,
@@ -55,9 +56,7 @@ export default function MyCalendar() {
                     .then(() => updateUserEvents())
                     .catch((error) => setError(error));
             }
-        },
-        []
-      )
+        }, [])
 
     const handleSelectEvent = useCallback(
         (event) => window.alert(event.title),

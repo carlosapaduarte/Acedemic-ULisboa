@@ -1,7 +1,7 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Event, Priority, Task, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Priority, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
 from repository.sql.models.models import STAppUseModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
@@ -48,7 +48,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def create_event(self, user_id: int, event: Event):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
-
+        
             new_event_model = STEventModel(
                     id=random.randint(1, 999999999), # For some reason, automatic ID is not working
                     title=event.title,
@@ -90,11 +90,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         with Session(engine) as session:
             statement = select(STEventModel).where(STEventModel.user_id == user_id)
             results = session.exec(statement)
-
+            
             # Ideally, we would use another where statement. Yet, this was not working for me...
             today_events: list[STEventModel] = []
             for event in results:
                 if (not filter_today or StudyTrackerSqlRepo.is_today(event.start_date)):
+                    #print('From DB: ', event.start_date.timestamp())
                     today_events.append(event)
             
             return Event.from_STEventModel(today_events)
