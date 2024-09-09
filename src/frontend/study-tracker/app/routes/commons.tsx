@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useSetError } from "~/components/error/ErrorContainer"
 
 export function useTags() {
-    const [tags, setTags] = useState<string[] | undefined>(undefined)
+    const [tags, setTags] = useState<string[]>([])
 
     function appendTag(tag: string) {
         let new_tags
