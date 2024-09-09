@@ -7,7 +7,7 @@ class UserTaskOutputDto(BaseModel):
     id: int
     title: str
     description: str
-    deadline: float
+    deadline: int
     priority: str
     tags: list[str]
     status: str
@@ -45,8 +45,8 @@ class TaskCreatedOutputDto(BaseModel):
     task_id: int
 
 class EventOutputDto(BaseModel):
-    start_date: float
-    end_date: float
+    startDate: int
+    endDate: int
     title: str
     tag: list[str]
     everyWeek: bool
@@ -57,8 +57,8 @@ class EventOutputDto(BaseModel):
         for event in events:
             output_dtos_events.append(
                 EventOutputDto(
-                    start_date=get_datetime_utc(event.date.start_date),
-                    end_date=get_datetime_utc(event.date.end_date),
+                    startDate=get_datetime_utc(event.date.start_date),
+                    endDate=get_datetime_utc(event.date.end_date),
                     title=event.title,
                     tag=event.tags,
                     everyWeek=event.every_week

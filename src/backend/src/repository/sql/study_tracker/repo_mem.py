@@ -1,5 +1,4 @@
-from datetime import datetime
-from domain.study_tracker import Event, Event, ScheduleBlock, Task, Task, UnavailableScheduleBlock
+from domain.study_tracker import Event, Task, UnavailableScheduleBlock
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
 class StudyTrackerMemRepo(StudyTrackerRepo):
@@ -13,10 +12,7 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
     def create_event(self, user_id: int, event: Event):
         pass
 
-    def get_events(self, user_id: int):
-        pass
-
-    def get_events(self, user_id: int) -> list[Event]:
+    def get_events(self, user_id: int, filter_today: bool) -> list[Event]:
         pass
     
     def create_not_available_schedule_block(self, user_id: int, info: UnavailableScheduleBlock):

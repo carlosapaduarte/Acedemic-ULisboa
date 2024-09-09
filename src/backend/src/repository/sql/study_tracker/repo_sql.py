@@ -86,7 +86,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         today = datetime.today()
         return date_1.year == today.year and date_1.month == today.month and date_1.day == today.day
 
-    def get_events(self, user_id: int) -> list[Event]:
+    def get_events(self, user_id: int, filter_today: bool) -> list[Event]:
         with Session(engine) as session:
             statement = select(STEventModel).where(STEventModel.user_id == user_id)
             results = session.exec(statement)
@@ -94,7 +94,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             # Ideally, we would use another where statement. Yet, this was not working for me...
             today_events: list[STEventModel] = []
             for event in results:
-                if (StudyTrackerSqlRepo.is_today(event.start_date)):
+                if (not filter_today or StudyTrackerSqlRepo.is_today(event.start_date)):
                     today_events.append(event)
             
             return Event.from_STEventModel(today_events)

@@ -32,7 +32,7 @@ function useDailyEvents() {
 
     useEffect(() => {
         let userId = utils.getUserId()
-        service.getTodayEvents(userId)
+        service.getUserTodayEvents(userId)
             .then((events: Event[]) => setEvents(events))
     }, [])
 

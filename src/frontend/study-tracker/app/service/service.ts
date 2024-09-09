@@ -117,6 +117,7 @@ export type NewEventInfo = {
     startDate: Date,
     endDate: Date,
     tags: string[]
+    everyWeek: boolean
 }
 
 async function createNewEvent(userId: number, newEventInfo: NewEventInfo) {
@@ -125,9 +126,10 @@ async function createNewEvent(userId: number, newEventInfo: NewEventInfo) {
         method: 'POST',
         body: toBody({
             title: newEventInfo.title,
-            start_date: newEventInfo.startDate.getTime() / 1000,
-            end_date: newEventInfo.endDate.getTime() / 1000,
-            tags: newEventInfo.tags
+            startDate: newEventInfo.startDate.getTime() / 1000,
+            endDate: newEventInfo.endDate.getTime() / 1000,
+            tags: newEventInfo.tags,
+            everyWeek: newEventInfo.everyWeek
         }),
     }
     const response: Response = await doFetch(request)
@@ -151,9 +153,9 @@ export type Event = {
     everyWeek: boolean
 }
 
-async function getTodayEvents(userId: number): Promise<Event[]> {
+async function getUserEvents(userId: number, filterTodayEvents: boolean): Promise<Event[]> {
     const request = {
-        path: `study-tracker/users/${userId}/events?today=true`,
+        path: `study-tracker/users/${userId}/events?today=${filterTodayEvents}`,
         method: 'GET'
     }
     const response: Response = await doFetch(request)
@@ -168,8 +170,16 @@ async function getTodayEvents(userId: number): Promise<Event[]> {
                 tag: eventDto.tag,
                 everyWeek: eventDto.everyWeek
             }})
-    } else
-        return Promise.reject(new Error('User daily events could not be obtained!'))   
+    } else {
+        if (filterTodayEvents)
+            return Promise.reject(new Error('User today-events could not be obtained!'))
+        else
+            return Promise.reject(new Error('User events could not be obtained!'))
+    }
+}
+
+async function getUserTodayEvents(userId: number): Promise<Event[]> {
+    return getUserEvents(userId, true)
 }
 
 export type CreateScheduleNotAvailableBlock = {
@@ -300,7 +310,8 @@ export const service = {
     updateReceiveNotificationsPreference,
     updateWeekPlanningDay,
     createNewEvent,
-    getTodayEvents,
+    getUserEvents,
+    getUserTodayEvents,
     createScheduleNotAvailableBlock,
     getTasks,
     getTask,

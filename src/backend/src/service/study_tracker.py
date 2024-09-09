@@ -29,10 +29,10 @@ def update_receive_notifications_pref(user_id: int, receive: bool):
     study_tracker_repo.update_receive_notifications_pref(user_id, receive)
 
 def get_today_events(user_id: int) -> list[Event]:
-    return study_tracker_repo.get_events(user_id)
+    return study_tracker_repo.get_events(user_id, True)
 
 def get_events(user_id: int) -> list[Event]:
-    return study_tracker_repo.get_events(user_id)
+    return study_tracker_repo.get_events(user_id, False)
 
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
