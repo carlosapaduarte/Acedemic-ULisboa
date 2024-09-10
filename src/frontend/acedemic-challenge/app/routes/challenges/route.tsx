@@ -15,7 +15,7 @@ function ChallengeBox({ challengeIndex, challengeTitle, lastExpanded, expanded, 
     lastExpanded: boolean,
     expanded: boolean,
     reached: boolean,
-    onChallengeClick: (goalIndex: number) => void
+    onChallengeClick: (challengeIndex: number) => void
 }) {
     return (
         <div className={`
@@ -85,14 +85,14 @@ function Title() {
     );
 }
 
-function Goals({ goals, onGoalClickHandler }: { goals: Goal[][], onGoalClickHandler: (goalIndex: number) => void }) {
+function ChallengesList({ challenges, onChallengeClickHandler }: { challenges: Goal[][], onChallengeClickHandler: (challengeIndex: number) => void }) {
     const [selectedItem, setSelectedItem] = useState<number>(-1);
     const [lastSelectedItem, setLastSelectedItem] = useState<number>(-1);
 
-    const currentGoal = goals.length;
+    const currentChallenge = challenges.length;
 
     function onItemClickHandler(index: number) {
-        const reached = index <= currentGoal - 1;
+        const reached = index <= currentChallenge - 1;
 
         if (!reached) {
             return;
@@ -111,7 +111,7 @@ function Goals({ goals, onGoalClickHandler }: { goals: Goal[][], onGoalClickHand
         <div className={`${styles.challengesList}`}>
             {
                 Array.from({ length: 21 }).map((_, index) => {
-                        const reached = index <= currentGoal - 1;
+                        const reached = index <= currentChallenge - 1;
 
                         return <ChallengeBox key={index}
                                              challengeIndex={index}
@@ -128,54 +128,42 @@ function Goals({ goals, onGoalClickHandler }: { goals: Goal[][], onGoalClickHand
 }
 
 function useChallenges() {
-    const userId = useUserId();
+    const userId = useUserId((userId) =>
+    {
+        service.fetchUserInfoFromApi(userId)
+            .then((userInfo: UserInfo) => {
+                const testStartDate = new Date();
+                testStartDate.setDate(testStartDate.getDate() - 10);
 
-    const [selectedGoal, setSelectedGoal] = useState<number | undefined>(undefined);
+                const batchToDisplay = userInfo.batches[0];
+                const level = batchToDisplay.level;
 
-    // Ex: 16 if user in day 16
-    const [goals, setGoals] = useState<Goal[][] | undefined>(undefined);
+                const challenges = utils.getChallengesPerDayByStartDate(level, testStartDate);
+                setChallenges(challenges);
+            });
+    });
 
-    // Fetches a list of goals per each day
-    useEffect(() => {
-        if (userId != undefined) {
-            service.fetchUserInfoFromApi(userId)
-                .then((userInfo: UserInfo) => {
-                    const testStartDate = new Date();
-                    testStartDate.setDate(testStartDate.getDate() - 10);
-
-                    const batchToDisplay = userInfo.batches[0];
-                    const level = batchToDisplay.level;
-
-                    const goals = utils.getGoalsPerDayByStartDate(level, testStartDate);
-                    setGoals(goals);
-                });
-        }
-    }, []);
+    const [selectedChallenge, setSelectedChallenge] = useState<number | undefined>(undefined);
+    const [goals, setChallenges] = useState<Goal[][] | undefined>(undefined);
 
     function onGoalClickHandler(goalIndex: number) {
-        setSelectedGoal(goalIndex);
+        setSelectedChallenge(goalIndex);
     }
 
-    // Could be undefined if goals or selectedGoal is undefined, or if goals doesn't have selectedGoal index
-    let goalsInfoToDisplay: Goal[] | undefined = (selectedGoal != undefined && goals) ? goals[selectedGoal] : undefined;
+    let challengesInfoToDisplay: Goal[] | undefined = (selectedChallenge != undefined && goals) ? goals[selectedChallenge] : undefined;
 
-    //console.log("Selected goal: ", selectedGoal)
-    //console.log("Goals: ", goals)
-    //console.log("Goals info to display: ", goalsInfoToDisplay)
-    //console.log((selectedGoal && goals))
-
-    return { goalsInfoToDisplay, onGoalClickHandler, goals };
+    return { challengesInfoToDisplay, onGoalClickHandler, goals };
 }
 
 function MainContent() {
     const { t } = useTranslation(["goal_overview"]);
-    const { goalsInfoToDisplay, onGoalClickHandler, goals } = useChallenges();
+    const { challengesInfoToDisplay, onGoalClickHandler, goals } = useChallenges();
 
     return (
         <div className={`${styles.mainContent}`}>
             <div className={`${styles.challengesListContainer}`}>
                 {
-                    goals ? <Goals goals={goals} onGoalClickHandler={onGoalClickHandler} /> : <></>
+                    goals ? <ChallengesList challenges={goals} onChallengeClickHandler={onGoalClickHandler} /> : <></>
                 }
             </div>
         </div>

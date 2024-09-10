@@ -87,5 +87,5 @@ export const utils = {
     sameDay,
     getUserGoals,
     getGoalsPerDay,
-    getGoalsPerDayByStartDate
+    getChallengesPerDayByStartDate: getGoalsPerDayByStartDate
 };
