@@ -1,4 +1,4 @@
-import { Calendar, momentLocalizer, Event as CalendarEvent } from "react-big-calendar";
+import { Calendar, momentLocalizer, Event as CalendarEvent, Views, View } from "react-big-calendar";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
 import { utils } from "~/utils";
@@ -18,16 +18,72 @@ type NewEventTitleAndDate = {
     end: Date,
 }
 
+type EventsView =
+    | "allEvents"
+    | "recurringEvents"
+
 function useMyCalendar() {
     const setError = useSetError();
+    
     const [events, setEvents] = useState<CalendarEvent[]>([])
     const [newEventTitleAndName, setNewEventTitleAndName] = useState<NewEventTitleAndDate>()
+    const [isNewEventRecurrent, setIsNewEventRecurrent] = useState<boolean>(false)
+
+    const [calendarView, setCalendarView] = useState<View>(Views.WEEK)
+    const [eventsView, setEventsView] = useState<EventsView>("allEvents")
+
+    const [displayedDates, setDisplayedDates] = useState<Date[]>([])
 
     useEffect(() => {
-        updateUserEvents()
-    }, [])
+        if (eventsView == "allEvents")
+            refreshUserEvents()
+        else
+            refreshUserRecurrentEvents(displayedDates)
+    }, [eventsView])
 
-    function updateUserEvents() {
+    useEffect(() => {
+        if (eventsView == "recurringEvents")
+            refreshUserRecurrentEvents(displayedDates)
+    }, [displayedDates])
+
+    function toggleEventsView() {
+        if (eventsView == "allEvents")
+            setEventsView("recurringEvents")
+        else
+            setEventsView("allEvents")
+    }
+
+    function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
+        const userId = utils.getUserId()
+        service.getUserRecurrentEvents(userId)
+            .then((events: Event[]) => {
+                const calendarEvents: CalendarEvent[] = []
+                calendarDisplayedDates.forEach((displayedDate: Date) => {
+                    events
+                        .filter((event: Event) => event.startDate.getDay() == displayedDate.getDay()) // Same week day
+                        .forEach((event: Event) => {
+                            
+                            // Builds the event for the current displayed week
+                            const start = new Date(displayedDate)
+                            start.setHours(event.startDate.getHours())
+                            start.setMinutes(event.startDate.getMinutes())
+                            const end = new Date(displayedDate)
+                            end.setHours(event.endDate.getHours())
+                            end.setMinutes(event.endDate.getMinutes())
+                            
+                            calendarEvents.push({
+                                title: event.title,
+                                start: start,
+                                end: end,
+                                resource: {tags: event.tags}
+                            })
+                        })
+                })
+                setEvents(calendarEvents)
+            })
+    }
+
+    function refreshUserEvents() {
         const userId = utils.getUserId()
         service.getUserEvents(userId, false)
             .then((events: Event[]) => {
@@ -51,13 +107,40 @@ function useMyCalendar() {
             .catch((error) => setError(error))
     }
 
-    return {events, updateUserEvents, newEventTitleAndName, setNewEventTitleAndName, createNewEvent}
+    return {
+        events,
+        calendarView,
+        setCalendarView,
+        eventsView,
+        isNewEventRecurrent,
+        setIsNewEventRecurrent,
+        setDisplayedDates,
+        refreshUserEvents,
+        newEventTitleAndName, 
+        setNewEventTitleAndName, 
+        createNewEvent, 
+        toggleEventsView
+    }
 }
 
 export default function MyCalendar() {
-    const {events, updateUserEvents, newEventTitleAndName, setNewEventTitleAndName, createNewEvent} = useMyCalendar()
+    const {
+        events,
+        calendarView,
+        setCalendarView,
+        eventsView,
+        isNewEventRecurrent,
+        setIsNewEventRecurrent,
+        setDisplayedDates,
+        refreshUserEvents,
+        newEventTitleAndName, 
+        setNewEventTitleAndName, 
+        createNewEvent, 
+        toggleEventsView
+    } = useMyCalendar()
     const {tags, appendTag} = useTags()
 
+    // This is invoked when the user uses the mouse to create a new event
     const handleSelectSlot = useCallback(
         ({ start, end }) => {
             const title: string | null = window.prompt('New Event Name')
@@ -66,21 +149,30 @@ export default function MyCalendar() {
             }
         }, [])
 
+    // This is invoked when the user clicks on an event
     const handleSelectEvent = useCallback(
         (event: CalendarEvent) => window.alert(`Title: ${event.title}\nTags: ${event.resource?.tags}`),
         []
     )
 
-    function onTagsConfirmClickHandler(eventInfo: NewEventTitleAndDate) {
+    // This is invoked when the user navigates across months/weeks/days with React-Big-Calendar button
+    const onRangeChange = useCallback((range) => {    
+        //console.log(range)
+        
+        setDisplayedDates(range)
+    }, [eventsView, calendarView])
+    
+
+    function onCreateEventClickHandler(eventInfo: NewEventTitleAndDate) {
         createNewEvent({
             title: eventInfo.title,
             startDate: eventInfo.start,
             endDate: eventInfo.end,
             tags,
-            everyWeek: false
+            everyWeek: isNewEventRecurrent
         }, () => {
             setNewEventTitleAndName(undefined) // Values used, discard now...
-            updateUserEvents()
+            refreshUserEvents()
         })
     }
 
@@ -95,13 +187,26 @@ export default function MyCalendar() {
                 onSelectEvent={handleSelectEvent}
                 onSelectSlot={handleSelectSlot}
                 selectable
+                onRangeChange={onRangeChange}
+                view={calendarView}
+                onView={(newView) => setCalendarView(newView)}
                 style={{ height: 500 }}
             />
+
+            <button onClick={toggleEventsView}>
+                {eventsView == "allEvents" ?
+                    (<span>Click To Display Only Recurring Events</span>)
+                    :
+                    (<span>Click To Display All Events</span>)
+                }
+            </button>
 
             {newEventTitleAndName ? 
                 <div>
                     <CategoryAndTagsPicker onTagClick={appendTag}/>
-                    <button onClick={() => onTagsConfirmClickHandler(newEventTitleAndName)}>
+                    <input type="checkbox" id="scales" name="scales" value={isNewEventRecurrent.toString()} onChange={(e) =>  setIsNewEventRecurrent((Boolean)(e.target.value))} />
+                    <label>Every Week</label>
+                    <button onClick={() => onCreateEventClickHandler(newEventTitleAndName)}>
                         Confirm!
                     </button>
                 </div>

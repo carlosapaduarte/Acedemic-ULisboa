@@ -178,6 +178,12 @@ async function getUserEvents(userId: number, filterTodayEvents: boolean): Promis
     }
 }
 
+async function getUserRecurrentEvents(userId: number) {
+    // For simplicity, let's just get all events and filter here instead of in the backend
+    const allEvents = await getUserEvents(userId, false)
+    return allEvents.filter((event: Event) => event.everyWeek)
+}
+
 async function getUserTodayEvents(userId: number): Promise<Event[]> {
     return getUserEvents(userId, true)
 }
@@ -311,6 +317,7 @@ export const service = {
     updateWeekPlanningDay,
     createNewEvent,
     getUserEvents,
+    getUserRecurrentEvents,
     getUserTodayEvents,
     createScheduleNotAvailableBlock,
     getTasks,
