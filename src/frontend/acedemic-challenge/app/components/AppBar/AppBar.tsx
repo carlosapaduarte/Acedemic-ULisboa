@@ -3,6 +3,7 @@ import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
 import React from "react";
 import styles from "./appBar.module.css";
 import { useNavigate } from "@remix-run/react";
+import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 
 export function AppBar() {
     const navigate = useNavigate();
@@ -17,7 +18,8 @@ export function AppBar() {
                     Home
                 </CutButton>
             </div>
-            <div className={styles.languageButtons}>
+            <div className={styles.settingsButtons}>
+                <SettingsButton />
                 <LanguageButton language={"pt-PT"} />
                 <LanguageButton language={"en-GB"} />
             </div>

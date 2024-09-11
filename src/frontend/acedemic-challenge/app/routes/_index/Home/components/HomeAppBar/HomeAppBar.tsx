@@ -5,6 +5,7 @@ import { useUserId } from "~/components/auth/Authn";
 import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
+import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -83,7 +84,8 @@ export function HomeAppBar() {
             <CutButton className={`${styles.backButton}`} onClick={() => navigate(-1)}>
                 {"<"}
             </CutButton>
-            <div className={styles.languageButtons}>
+            <div className={styles.settingsButtons}>
+                <SettingsButton />
                 <LanguageButton language={"pt-PT"} />
                 <LanguageButton language={"en-GB"} />
             </div>

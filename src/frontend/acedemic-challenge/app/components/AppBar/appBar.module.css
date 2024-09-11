@@ -60,13 +60,15 @@
     --edge-size: 0.75rem;
 }
 
-.languageButtons {
+.settingsButtons {
     grid-column: 4;
     grid-row: 1;
-
-    height: 100%;
 
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
+}
+
+.settingsButtons > * {
+    flex-shrink: 0;
 }

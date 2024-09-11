@@ -1,8 +1,6 @@
 @import "../Button/button.module.css";
 
 .languageButton {
-    color: black;
-
     --width: 2.5rem;
 
     width: var(--width);
@@ -10,6 +8,7 @@
 
     --edge-size: calc(var(--width) / 6);
 
+    color: black;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
