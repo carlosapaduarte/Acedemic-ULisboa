@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import { service, UserInfo } from "~/service/service";
 import { utils } from "~/utils";
-import { useUserId } from "~/components/auth/Authn";
+import { useUserIdEvent } from "~/components/auth/Authn";
 import styles from "./challengesPage.module.css";
 import { CutButton } from "~/components/Button/Button";
 import { Level1 } from "~/challenges/level_1";
@@ -130,7 +130,7 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
 }
 
 function useChallenges() {
-    const userId = useUserId((userId) => {
+    useUserIdEvent((userId) => {
         service.fetchUserInfoFromApi(userId)
             .then((userInfo: UserInfo) => {
                 const testStartDate = new Date();

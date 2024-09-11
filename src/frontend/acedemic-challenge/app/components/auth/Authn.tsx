@@ -82,7 +82,9 @@ export function useIsLoggedIn() {
 
 type UserIdCallback = (userId: number) => void;
 
-export const useUserId = (callback?: UserIdCallback): number | undefined => {
+export function useUserId() { return useContext(LoggedInContext).userId }
+
+export function useUserIdEvent(callback: UserIdCallback): number | undefined {
     const { userId } = useContext(LoggedInContext);
 
     useEffect(() => {
@@ -94,7 +96,7 @@ export const useUserId = (callback?: UserIdCallback): number | undefined => {
     }, [userId]);
 
     return userId;
-};
+}
 
 export function useLogIn() {
     return useContext(LoggedInContext).logIn;
