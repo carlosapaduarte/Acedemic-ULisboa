@@ -63,12 +63,14 @@
 }
 
 .settingsButtons {
-    grid-column: 4;
-    grid-row: 1;
-
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
+}
+
+.settingsButtons {
+    grid-column: 4;
+    grid-row: 1;
 }
 
 .settingsButtons > * {

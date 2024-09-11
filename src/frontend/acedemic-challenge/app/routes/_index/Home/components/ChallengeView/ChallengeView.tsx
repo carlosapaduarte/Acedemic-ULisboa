@@ -184,7 +184,7 @@ function MainContent({ userId }: { userId: number }) {
         onConfirmNewNoteSubmitClickHandler,*/
         onMarkCompleteClickHandler
     } = useMainDashboardContent(userId);
-    console.log(userInfo?.avatarFilename);
+    /*console.log(userInfo?.avatarFilename);*/
     if (userInfo && daysSinceStart && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay) {
         return (
             <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>

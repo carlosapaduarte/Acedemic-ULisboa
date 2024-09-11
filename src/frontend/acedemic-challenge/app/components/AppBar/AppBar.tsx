@@ -1,8 +1,9 @@
 import { CutButton } from "~/components/Button/Button";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
 import React, { createContext, useContext, useState } from "react";
-import styles from "./appBar.module.css";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
+import styles from "./appBar.module.css";
+
 import { useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 import { GreetingsContainer, NavBar } from "~/components/AppBar/HomeAppBar/HomeAppBar";
@@ -33,41 +34,33 @@ export function AppBar() {
 
     const navigate = useNavigate();
 
-    switch (appBarVariant) {
-        case "default":
-            return (
-                <div className={styles.appBar}>
-                    <CutButton className={`${styles.backButton}`} onClick={() => navigate(-1)}>
-                        {"<"}
+    return (
+        <div className={appBarVariant === "home" ? homeAppBarStyles.appBar : styles.appBar}>
+            <CutButton
+                className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
+                onClick={() => navigate(-1)}
+            >
+                {"<"}
+            </CutButton>
+            {appBarVariant !== "home" && (
+                <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
+                    <CutButton className={styles.homeButton}>
+                        Home
                     </CutButton>
-                    <div className={`${styles.homeButtonContainer}`} onClick={() => navigate("/")}>
-                        <CutButton className={`${styles.homeButton}`}>
-                            Home
-                        </CutButton>
-                    </div>
-                    <div className={styles.settingsButtons}>
-                        <SettingsButton />
-                        <LanguageButton language={"pt-PT"} />
-                        <LanguageButton language={"en-GB"} />
-                    </div>
-                    {/*<GreetingsContainer />
-                    <NavBar />*/}
                 </div>
-            );
-        case "home":
-            return (
-                <div className={homeAppBarStyles.homeAppBar}>
-                    <CutButton className={`${homeAppBarStyles.backButton}`} onClick={() => navigate(-1)}>
-                        {"<"}
-                    </CutButton>
-                    <div className={homeAppBarStyles.settingsButtons}>
-                        <SettingsButton />
-                        <LanguageButton language={"pt-PT"} />
-                        <LanguageButton language={"en-GB"} />
-                    </div>
+            )}
+            <div key="settingsButtons"
+                 className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>
+                <SettingsButton />
+                <LanguageButton language={"pt-PT"} />
+                <LanguageButton language={"en-GB"} />
+            </div>
+            {appBarVariant === "home" && (
+                <>
                     <GreetingsContainer />
                     <NavBar />
-                </div>
-            );
-    }
+                </>
+            )}
+        </div>
+    );
 }

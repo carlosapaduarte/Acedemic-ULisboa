@@ -2,59 +2,17 @@
 @import "../../LanguageButton/languageButton.module.css";
 
 @import "../../../page.module.css";
+@import "../appBar.module.css";
 
-.homeAppBar {
-    flex: 0;
-    width: 100%;
-
-    padding: 1rem;
-
-    display: grid;
+.appBar {
     grid-template-columns: auto 1fr auto;
     grid-template-rows: auto auto auto;
     align-items: flex-start;
-
-    background-color: var(--purple-dark);
-    color: white;
-
-    --edge-size: 1.5rem;
-
-    clip-path: polygon(
-            100% 0%,
-            100% calc(100% - var(--edge-size)),
-            calc(100% - var(--edge-size)) 100%,
-            var(--edge-size) 100%,
-            0 calc(100% - var(--edge-size)),
-            0 0);
-}
-
-.backButton {
-    grid-column: 1;
-    grid-row: 1;
-
-    background-color: var(--secondary);
-    color: black;
-    width: 4rem;
-    height: 3rem;
-
-    text-align: center;
-    font-size: xx-large;
-    font-weight: bold;
-
-    --edge-size: 0.75rem;
 }
 
 .settingsButtons {
     grid-column: 3;
     grid-row: 1;
-
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-}
-
-.settingsButtons > * {
-    flex-shrink: 0;
 }
 
 .greetingsContainer {
@@ -80,7 +38,7 @@
     font-size: 1.5rem;
     font-weight: 400;
 
-    /*Perhaps change in web version to right of the avatar*/
+    /*TODO Perhaps change in web version to right of the avatar*/
 }
 
 .avatarContainer {
@@ -99,8 +57,26 @@
     grid-gap: 1rem;
 }
 
+.navBarButtonContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.navBarButton {
+    background-color: var(--primary);
+    color: white;
+    width: 5rem;
+    height: 4rem;
+}
+
+.navBarButtonText {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+}
+
 @media (min-width: 512px) {
-    .homeAppBar {
+    .appBar {
         grid-template-rows: auto auto;
         justify-content: space-between;
     }
@@ -119,7 +95,7 @@
 }
 
 @media (min-width: 768px) {
-    .homeAppBar {
+    .appBar {
         grid-template-columns: auto 1fr 1fr auto;
         grid-template-rows: auto;
     }
@@ -136,22 +112,4 @@
     .settingsButtons {
         grid-column: 4;
     }
-}
-
-.navBarButtonContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.navBarButton {
-    background-color: var(--primary);
-    color: white;
-    width: 5rem;
-    height: 4rem;
-}
-
-.navBarButtonText {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
 }
