@@ -4,8 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useUserId } from "~/components/auth/Authn";
 import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
-import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
-import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -46,7 +44,7 @@ function NavBarButton({ text, url }: { text: string, url: string }) {
     );
 }
 
-function GreetingsContainer() {
+export function GreetingsContainer() {
     let helloQuote = getHelloQuote();
     const userId = useUserId();
 
@@ -66,31 +64,12 @@ function GreetingsContainer() {
     );
 }
 
-function NavBar() {
+export function NavBar() {
     return (
         <div className={`${styles.navBar}`}>
             <NavBarButton text="Challenges" url={"/challenges"} />
             <NavBarButton text="Calendar" url={"/calendar"} />
             <NavBarButton text="Badges" url={"/badges"} />
-        </div>
-    );
-}
-
-export function HomeAppBar() {
-    const navigate = useNavigate();
-
-    return (
-        <div className={styles.homeAppBar}>
-            <CutButton className={`${styles.backButton}`} onClick={() => navigate(-1)}>
-                {"<"}
-            </CutButton>
-            <div className={styles.settingsButtons}>
-                <SettingsButton />
-                <LanguageButton language={"pt-PT"} />
-                <LanguageButton language={"en-GB"} />
-            </div>
-            <GreetingsContainer />
-            <NavBar />
         </div>
     );
 }

@@ -1,7 +1,7 @@
-@import "../../../../../components/avatar.module.css";
-@import "../../../../../components/LanguageButton/languageButton.module.css";
+@import "../../avatar.module.css";
+@import "../../LanguageButton/languageButton.module.css";
 
-@import "../../../../../page.module.css";
+@import "../../../page.module.css";
 
 .homeAppBar {
     flex: 0;

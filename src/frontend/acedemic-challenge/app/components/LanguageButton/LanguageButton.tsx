@@ -1,4 +1,4 @@
-import styles from "~/routes/_index/Home/components/HomeAppBar/homeAppBar.module.css";
+import styles from "~/components/AppBar/HomeAppBar/homeAppBar.module.css";
 import { CutButton } from "~/components/Button/Button";
 import React from "react";
 import { useTranslation } from "react-i18next";
