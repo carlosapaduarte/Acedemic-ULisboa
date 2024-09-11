@@ -1,10 +1,9 @@
 import { Goal } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { service, UserInfo } from "~/service/service";
 import { utils } from "~/utils";
 import { useUserId } from "~/components/auth/Authn";
-import { AppBar } from "~/components/AppBar/AppBar";
 import styles from "./challengesPage.module.css";
 import { CutButton } from "~/components/Button/Button";
 import { Level1 } from "~/challenges/level_1";
@@ -85,7 +84,10 @@ function Title() {
     );
 }
 
-function ChallengesList({ challenges, onChallengeClickHandler }: { challenges: Goal[][], onChallengeClickHandler: (challengeIndex: number) => void }) {
+function ChallengesList({ challenges, onChallengeClickHandler }: {
+    challenges: Goal[][],
+    onChallengeClickHandler: (challengeIndex: number) => void
+}) {
     const [selectedItem, setSelectedItem] = useState<number>(-1);
     const [lastSelectedItem, setLastSelectedItem] = useState<number>(-1);
 
@@ -128,8 +130,7 @@ function ChallengesList({ challenges, onChallengeClickHandler }: { challenges: G
 }
 
 function useChallenges() {
-    const userId = useUserId((userId) =>
-    {
+    const userId = useUserId((userId) => {
         service.fetchUserInfoFromApi(userId)
             .then((userInfo: UserInfo) => {
                 const testStartDate = new Date();
@@ -173,7 +174,6 @@ function MainContent() {
 export default function ChallengesPage() {
     return (
         <div className={`${styles.challengesPage}`}>
-            <AppBar />
             <MainContent />
         </div>
     );

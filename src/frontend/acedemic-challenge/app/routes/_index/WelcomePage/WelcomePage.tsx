@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import styles from "~/routes/_index/WelcomePage/welcomePage.module.css";
 import { Button } from "~/components/Button/Button";
 import classNames from "classnames";
-import { AppBar } from "~/components/AppBar/AppBar";
 
 function useWelcomePage() {
     const isLoggedIn = useIsLoggedIn();
@@ -30,7 +29,6 @@ export default function WelcomePage() {
 
     return (
         <div className={classNames(styles.welcomePage)}>
-            <AppBar />
             <div className={styles.pageContainer}>
                 <div className={styles.pageInnerContainer}>
                     <h1>

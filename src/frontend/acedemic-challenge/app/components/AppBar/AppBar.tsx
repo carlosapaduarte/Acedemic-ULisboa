@@ -1,20 +1,39 @@
 import { CutButton } from "~/components/Button/Button";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
-import React from "react";
+import React, { createContext, useContext, useState } from "react";
 import styles from "./appBar.module.css";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
 import { useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 import { GreetingsContainer, NavBar } from "~/components/AppBar/HomeAppBar/HomeAppBar";
 
-interface AppBarProps {
-    variant?: "default" | "home" | "clean";
+type AppBarVariant = "default" | "home" | "clean";
+
+type AppBarContextType = {
+    appBarVariant: AppBarVariant;
+    setAppBarVariant: (variant: AppBarVariant) => void;
+};
+
+export const AppBarContext = createContext<AppBarContextType>({
+    appBarVariant: "default",
+    setAppBarVariant: (variant: AppBarVariant) => {
+    }
+});
+
+export function AppBarProvider({ children }: { children: React.ReactNode }) {
+    const [appBarVariant, setAppBarVariant] = useState<AppBarVariant>("default");
+
+    return <AppBarContext.Provider value={{ appBarVariant, setAppBarVariant }}>
+        {children}
+    </AppBarContext.Provider>;
 }
 
-export function AppBar({ variant = "default" }: AppBarProps) {
+export function AppBar() {
+    const { appBarVariant } = useContext(AppBarContext);
+
     const navigate = useNavigate();
 
-    switch (variant) {
+    switch (appBarVariant) {
         case "default":
             return (
                 <div className={styles.appBar}>

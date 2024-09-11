@@ -5,6 +5,8 @@ import QuizPage from "~/routes/log-in/QuizPage/QuizPage";
 import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelectionPage";
 import { useNavigate } from "@remix-run/react";
+import styles from "./login.module.css";
+import classNames from "classnames";
 
 type Views =
     | "userInfo"
@@ -12,10 +14,6 @@ type Views =
     | "chooseLevel"
     | "quiz"
     | "selectAvatar";
-
-import styles from "./login.module.css";
-import classNames from "classnames";
-import { AppBar } from "~/components/AppBar/AppBar";
 
 function CurrentView() {
     const [currentView, setCurrentView] = useState<Views>("userInfo");
@@ -76,7 +74,6 @@ function CurrentView() {
  */
 export default function LoginPage() {
     return <div className={classNames(styles.loginPage)}>
-        <AppBar />
         <CurrentView />
     </div>;
 }

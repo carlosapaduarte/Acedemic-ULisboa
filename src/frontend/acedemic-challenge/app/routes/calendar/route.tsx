@@ -4,10 +4,8 @@ import { DayGoals } from "~/challenges/types";
 import { UserNote } from "~/service/service";
 import { MyCalendar } from "~/routes/calendar/components/MyCalendar/MyCalendar";
 import SelectedDayGoalInfo from "~/routes/calendar/components/SelectedDayGoalInfo/SelectedDayGoalInfo";
-import SelectedDayNotes from "~/routes/calendar/components/SelectedDayNotes/SelectedDayNotes";
 import { useCalendar } from "~/routes/calendar/useCalendar";
 import styles from "./calendarPage.module.css";
-import { AppBar } from "~/components/AppBar/AppBar";
 
 const logger = new Logger({ name: "Calendar" });
 
@@ -59,7 +57,6 @@ function MainContent() {
 export default function CalendarPage() {
     return (
         <div className={`${styles.calendarPage}`}>
-            <AppBar />
             <MainContent />
         </div>
     );

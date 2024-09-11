@@ -6,6 +6,7 @@ import { Footer } from "~/components/Footer";
 
 import "./global.css";
 import "./i18n";
+import { AppBar, AppBarProvider } from "~/components/AppBar/AppBar";
 
 export const meta: MetaFunction = () => {
     return [
@@ -46,12 +47,15 @@ export default function Root() {
 
 export function App() {
     return (
-        <div className="app">
-            <div className="mainContentContainer">
-                <Outlet />
+        <AppBarProvider>
+            <div className="app">
+                <AppBar />
+                <div className="mainContentContainer">
+                    <Outlet />
+                </div>
+                <Footer />
             </div>
-            <Footer />
-        </div>
+        </AppBarProvider>
     );
 }
 
