@@ -1,9 +1,12 @@
 import styles from "./homeAppBar.module.css";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useUserId } from "~/components/auth/Authn";
+import { useLogOut, useUserId } from "~/components/auth/Authn";
 import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+
+import dropdownStyles from "./dropdown.module.css";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -44,6 +47,28 @@ function NavBarButton({ text, url }: { text: string, url: string }) {
     );
 }
 
+function Dropdown({ trigger }: { trigger: JSX.Element }) {
+    const logout = useLogOut();
+
+    return (<DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+                {trigger}
+            </DropdownMenu.Trigger>
+
+            <DropdownMenu.Portal>
+                <DropdownMenu.Content className={dropdownStyles.Content} sideOffset={5}>
+                    <DropdownMenu.Item className={dropdownStyles.Item}
+                                       onClick={logout}>
+                        Logout
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Arrow className={dropdownStyles.Arrow} />
+                </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+    );
+}
+
 export function GreetingsContainer() {
     let helloQuote = getHelloQuote();
     const userId = useUserId();
@@ -53,12 +78,16 @@ export function GreetingsContainer() {
             <h4 className={styles.helloQuote}>
                 <span>{helloQuote}, {userId ?? "loading..."}</span>
             </h4>
-            <div className={`${styles.avatarContainer}`}>
-                <img
-                    src={"./test.webp"/*`./${userInfo.avatarFilename}`*/}
-                    height="100px"
-                    alt={`User's Avatar`}
-                />
+            <div className={`${styles.avatarAndDropdownContainer}`}>
+                <Dropdown trigger={
+                    <div className={`${styles.avatarContainer}`}>
+                        <img
+                            src={"./test.webp"/*`./${userInfo.avatarFilename}`*/}
+                            height="100px"
+                            alt={`User's Avatar`}
+                        />
+                    </div>
+                } />
             </div>
         </div>
     );

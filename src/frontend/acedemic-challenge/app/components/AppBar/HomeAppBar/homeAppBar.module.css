@@ -41,8 +41,12 @@
     /*TODO Perhaps change in web version to right of the avatar*/
 }
 
-.avatarContainer {
+.avatarAndDropdownContainer {
     flex-shrink: 0;
+}
+
+.avatarContainer {
+    cursor: pointer;
 }
 
 .navBar {
@@ -74,6 +78,7 @@
     margin-top: 0.5rem;
     font-size: 0.75rem;
 }
+
 
 @media (min-width: 512px) {
     .appBar {
