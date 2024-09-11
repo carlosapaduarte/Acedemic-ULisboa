@@ -1,8 +1,12 @@
 import { NotFoundPage } from "~/Pages/NotFoundPage";
+import classNames from "classnames";
+import styles from "../Pages/notFoundPage.module.css";
+import { AppBar } from "~/components/AppBar/AppBar";
 
 export default function DefaultRoute() {
     return (
-        <div style={{width: "100%", height: "100%"}}>
+        <div className={classNames(styles.notFoundPage)}>
+            <AppBar />
             <NotFoundPage />
         </div>
     );

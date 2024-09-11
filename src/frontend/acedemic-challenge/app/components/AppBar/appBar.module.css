@@ -6,7 +6,7 @@
 
     display: grid;
     grid-template-columns: auto auto 1fr auto;
-    gap: 1rem;
+    gap: 0.5rem;
 
     background-color: var(--purple-dark);
     color: white;
@@ -41,6 +41,8 @@
 .homeButtonContainer {
     grid-column: 2;
     grid-row: 1;
+
+    margin-left: 0.5rem;
 
     display: flex;
     justify-content: center;

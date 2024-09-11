@@ -13,15 +13,11 @@ type Views =
     | "quiz"
     | "selectAvatar";
 
-/**
- * This React component:
- * - shows a dialogue to simulate authentication;
- * - asks user if can share progress;
- * - lists possible levels:
- *  - User might choose to start quiz
- * - redirects for calendar component.
- */
-export default function LoginPage() {
+import styles from "./login.module.css";
+import classNames from "classnames";
+import { AppBar } from "~/components/AppBar/AppBar";
+
+function CurrentView() {
     const [currentView, setCurrentView] = useState<Views>("userInfo");
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const navigate = useNavigate();
@@ -68,4 +64,19 @@ export default function LoginPage() {
         default:
             return <h1>Should not have arrived here!</h1>;
     }
+}
+
+/**
+ * This React component:
+ * - shows a dialogue to simulate authentication;
+ * - asks user if can share progress;
+ * - lists possible levels:
+ *  - User might choose to start quiz
+ * - redirects for calendar component.
+ */
+export default function LoginPage() {
+    return <div className={classNames(styles.loginPage)}>
+        <AppBar />
+        <CurrentView />
+    </div>;
 }
