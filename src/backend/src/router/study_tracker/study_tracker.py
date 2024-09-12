@@ -1,8 +1,8 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
 from domain.study_tracker import DateInterval, Event, Task, UnavailableScheduleBlock
-from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlock, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
-from router.study_tracker.dtos.output_dtos import EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -71,7 +71,7 @@ def fix_weekday_from_javascript(weekday: int) -> int:
     return weekday - 1
     
 @router.post("/users/{user_id}/schedule/unavailable")
-def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvailableBlock) -> Response:
+def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvailableBlockInputDto) -> Response:
     study_tracker_service.create_schedule_not_available_block(
         user_id, 
         UnavailableScheduleBlock(
@@ -81,3 +81,12 @@ def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvai
         )
     )
     return Response()
+
+@router.post("/users/{user_id}/archives")
+def create_archive(user_id: int, dto: CreateArchiveInputDto):
+    study_tracker_service.create_archive(user_id, dto.name)
+    
+@router.get("/users/{user_id}/archives")
+def get_events(user_id: int) ->  list[ArchiveOutputDto]:
+    archives = study_tracker_service.get_archives(user_id)
+    return ArchiveOutputDto.from_archives(archives)

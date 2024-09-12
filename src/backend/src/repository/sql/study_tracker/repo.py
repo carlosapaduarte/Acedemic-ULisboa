@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from domain.study_tracker import Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, Event, Task, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -41,4 +41,12 @@ class StudyTrackerRepo(ABC):
 
     @abstractmethod
     def update_task_status(self, user_id: int, task_id: int, new_status: str):
+        pass
+    
+    @abstractmethod
+    def create_archive(self, user_id: int, name: str):
+        pass
+    
+    @abstractmethod
+    def get_archives(self, user_id: int) -> list[Archive]:
         pass

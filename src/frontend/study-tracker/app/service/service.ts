@@ -307,6 +307,40 @@ async function updateTaskStatus(userId: number, taskId: number, newStatus: strin
         return Promise.reject(new Error('Task status could not be updated!'))
 }
 
+async function createArchive(userId: number, name: string) {
+    const request = {
+        path: `study-tracker/users/${userId}/archives`,
+        method: 'POST',
+        body: toBody({name}),
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('New archive could not be created!'))
+}
+
+export type File = {
+    name: string,
+    text: string
+}
+
+export type Archive = {
+    name: string,
+    files: File[]
+}
+
+async function getArchives(userId: number): Promise<Archive[]> {
+    const request = {
+        path: `study-tracker/users/${userId}/archives`,
+        method: 'GET'
+    }
+    const response: Response = await doFetch(request)
+    if (response.ok) {
+        const responseObject: Archive[] = await response.json() // TODO: how 
+        return responseObject
+    } else
+        return Promise.reject(new Error('Archives could not be obtained!'))
+}
+
 export const service = {
     createUserOrLogin,
     selectShareProgressState,
@@ -323,5 +357,7 @@ export const service = {
     getTasks,
     getTask,
     createNewTask,
-    updateTaskStatus
+    updateTaskStatus,
+    createArchive,
+    getArchives
 }

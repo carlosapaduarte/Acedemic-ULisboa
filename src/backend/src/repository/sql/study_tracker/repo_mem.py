@@ -1,4 +1,4 @@
-from domain.study_tracker import Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, Event, Task, UnavailableScheduleBlock
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
 class StudyTrackerMemRepo(StudyTrackerRepo):
@@ -28,4 +28,10 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
         pass
 
     def update_task_status(self, user_id: int, task_id: int, new_status: str):
+        pass
+    
+    def create_archive(self, user_id: int, name: str):
+        pass
+    
+    def get_archives(self, user_id: int) -> list[Archive]:
         pass

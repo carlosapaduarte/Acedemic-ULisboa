@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from domain.study_tracker import Event, Task
+from domain.study_tracker import Archive, Event, File, Task
 from utils import get_datetime_utc
 
 class UserTaskOutputDto(BaseModel):
@@ -66,3 +66,35 @@ class EventOutputDto(BaseModel):
             )
 
         return output_dtos_events
+    
+class FileOutputDto(BaseModel):
+    name: str
+    text: str
+    
+    @staticmethod
+    def from_files(files: list[File]) -> list['FileOutputDto']:
+        file_output_dtos: list['FileOutputDto'] = []
+        
+        for file in files:
+            file_output_dtos.append(FileOutputDto(
+                name=file.name,
+                text=file.text
+            ))
+            
+        return file_output_dtos
+    
+class ArchiveOutputDto(BaseModel):
+    name: str
+    files: list[FileOutputDto]
+    
+    @staticmethod
+    def from_archives(archives: list[Archive]) -> list['ArchiveOutputDto']:
+        archive_output_dtos: list['ArchiveOutputDto'] = []
+        
+        for archive in archives:
+            archive_output_dtos.append(ArchiveOutputDto(
+                name=archive.name,
+                files=FileOutputDto.from_files(archive.files)
+            ))
+            
+        return archive_output_dtos

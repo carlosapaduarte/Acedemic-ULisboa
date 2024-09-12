@@ -1,10 +1,10 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Event, Priority, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, Event, Priority, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STAppUseModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import STAppUseModel, STArchiveModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
@@ -253,3 +253,24 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
             session.add(task_model)
             session.commit()
+            
+    def create_archive(self, user_id: int, name: str):
+        with Session(engine) as session:
+            user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
+            user_model.st_archives.append(STArchiveModel(
+                name=name,
+                user_id=user_id
+            ))
+
+            session.add(user_model)
+            session.commit()
+            
+    def get_archives(self, user_id: int) -> list[Archive]:
+        with Session(engine) as session:
+            statement = select(STArchiveModel)\
+                .where(STArchiveModel.user_id == user_id)
+            result = session.exec(statement)
+            
+            archive_models: list[STArchiveModel] = result.all()
+            
+            return Archive.from_STArchiveModel(archive_models)

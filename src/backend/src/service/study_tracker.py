@@ -1,4 +1,4 @@
-from domain.study_tracker import DateInterval, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, DateInterval, Event, Task, UnavailableScheduleBlock
 from exception import NotAvailableScheduleBlockCollision
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from datetime import datetime
@@ -60,3 +60,9 @@ def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[T
 
 def update_task_status(user_id: int, task_id: int, new_status: str):
     study_tracker_repo.update_task_status(user_id, task_id, new_status)
+    
+def create_archive(user_id: int, name: str):
+    study_tracker_repo.create_archive(user_id, name)
+    
+def get_archives(user_id: int) -> list[Archive]:
+    return study_tracker_repo.get_archives(user_id)

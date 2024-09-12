@@ -18,7 +18,7 @@ class CreateEventInputDto(BaseModel):
     tags: list[str]
     everyWeek: bool
 
-class CreateScheduleNotAvailableBlock(BaseModel):
+class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int
     startHour: int
     duration: int
@@ -42,3 +42,6 @@ class CreateTaskInputDto(BaseModel):
 
 class UpdateTaskStatus(BaseModel):
     newStatus: str
+    
+class CreateArchiveInputDto(BaseModel):
+    name: str

@@ -18,7 +18,8 @@ class UserModel(SQLModel, table=True):
     st_planning_day: "STWeekDayPlanningModel" = Relationship(back_populates="user")
     st_events: list["STEventModel"] = Relationship(back_populates="user")
     schedule_unavailable_blocks: list["STScheduleBlockNotAvailableModel"] = Relationship(back_populates="user")
-    st_tasks: list["STTaskModel"] = Relationship(back_populates="user")
+    st_tasks: list["STTaskModel"] = Relationship(back_populates="user")    
+    st_archives: list["STArchiveModel"] = Relationship(back_populates="user")
 
 class NoteModel(SQLModel, table=True):
     __tablename__ = "note"
@@ -206,3 +207,34 @@ class STTaskTagModel(SQLModel, table=True):
 
     # Relationship with STTaskModel
     task: "STTaskModel" = Relationship(back_populates="tags")
+
+class STArchiveModel(SQLModel, table=True):
+    __tablename__ = "st_archive"
+
+    name: str = Field(primary_key=True, default=None)
+    
+    files: list["STFileModel"] = Relationship(back_populates="archive")
+
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    user: UserModel = Relationship(back_populates="st_archives")
+
+class STFileModel(SQLModel, table=True):
+    __tablename__ = "st_file"
+
+    name: str = Field(primary_key=True)
+    text: str
+
+    # Foreign key: Composite key referencing st_task
+    archive_name: str = Field(primary_key=True)
+    user_id: int = Field(primary_key=True)
+
+    # Composite foreign key constraint
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['archive_name', 'user_id'],
+            ['st_archive.name', 'st_archive.user_id']
+        ),
+    )
+    
+    # Relationship with STTaskModel
+    archive: "STArchiveModel" = Relationship(back_populates="files")

@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from repository.sql.models.models import STEventModel
+from repository.sql.models.models import STArchiveModel, STEventModel, STFileModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto
 
 class Priority(Enum):
@@ -127,3 +127,35 @@ class Event():
                 )
             )
         return today_events
+    
+class File():
+    def __init__(self, name: str, text: str):
+        self.name=name
+        self.text=text
+        
+    @staticmethod
+    def from_STFileModel(file_models: list[STFileModel]) -> list['File']:
+        files: list[File] = []
+        for file_model in file_models:
+            files.append(File(
+                name=file_model.name,
+                text=file_model.text
+            ))
+            
+        return files
+    
+class Archive():
+    def __init__(self, name: str, files: list[File]):
+        self.name=name
+        self.files=files
+        
+    @staticmethod
+    def from_STArchiveModel(archive_models: list[STArchiveModel]) -> list['Archive']:
+        archives: list[Archive] = []
+        for archive_model in archive_models:
+            archives.append(Archive(
+                name=archive_model.name,
+                files=File.from_STFileModel(archive_model.files)
+            ))
+            
+        return archives
