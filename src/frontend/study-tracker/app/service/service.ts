@@ -341,6 +341,30 @@ async function getArchives(userId: number): Promise<Archive[]> {
         return Promise.reject(new Error('Archives could not be obtained!'))
 }
 
+async function createFile(userId: number, archiveName: string, name: string) {
+    const request = {
+        path: `study-tracker/users/${userId}/archives/${archiveName}`,
+        method: 'POST',
+        body: toBody({name}),
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('New file could not be created!'))
+}
+
+async function getFile(userId: number, archiveName: string, filename: string): Promise<File> {
+    // To simplify for now...
+    
+    const userArchives = await getArchives(userId)
+    const file = userArchives
+        .find((archive: Archive) => archive.name == archiveName)?.files
+        .find((file: File) => file.name == filename)
+
+    if (file == undefined)
+        return Promise.reject(new Error('File does not exist!'))
+    return file
+}
+
 export const service = {
     createUserOrLogin,
     selectShareProgressState,
@@ -359,5 +383,7 @@ export const service = {
     createNewTask,
     updateTaskStatus,
     createArchive,
-    getArchives
+    getArchives,
+    createFile,
+    getFile
 }

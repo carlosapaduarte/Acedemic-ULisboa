@@ -35,3 +35,6 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
     
     def get_archives(self, user_id: int) -> list[Archive]:
         pass
+    
+    def create_file(self, user_id: int, archive_name: str, name: str):
+        pass

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { Archive, File, service } from "~/service/service"
 import { utils } from "~/utils"
+import { Demo } from "../archives.$archiveName.files.$filename/editor"
+import { useNavigate } from "@remix-run/react"
 
 function useCreateArchiveView() {
     const [name, setName] = useState("")
@@ -18,7 +20,7 @@ function CreateArchiveView() {
 
     return (
         <div>
-            <label>Archive Name</label>
+            <label>New Archive Name</label>
             <input onChange={(e) => setName(e.target.value)} />
             <br/>
             <button onClick={createArchive}>
@@ -28,23 +30,46 @@ function CreateArchiveView() {
     )
 }
 
-function FileView({file}: {file: File}) {
+function useCreateFileView(archiveName: string) {
+    const [name, setName] = useState("")
+    
+    function createFile() {
+        const userId = utils.getUserId()
+        service.createFile(userId, archiveName, name)
+    }
+
+    return {name, setName, createFile}
+}
+
+function CreateFileView({archiveName} : {archiveName: string}) {
+    const {name, setName, createFile} = useCreateFileView(archiveName)
+
     return (
         <div>
-            <h1>File:</h1>
-            <span>Name: {file.name}</span>
-            <span>Text: {file.text}</span>
+            <label>New File Name</label>
+            <input onChange={(e) => setName(e.target.value)} />
+            <br/>
+            <button onClick={createFile}>
+                Create File
+            </button>
         </div>
     )
 }
 
 function ArchiveView({archive}: {archive: Archive}) {
+    const navigate = useNavigate();
+
     return (
         <div>
             <h1>Archive:</h1>
             <span>Name: {archive.name}</span>
-            {archive.files.map((file: File) => 
-                <FileView file={file} />
+            <br/>
+            <CreateFileView archiveName={archive.name}/>
+            {archive.files.map((file: File, index: number) => 
+                <div key={index}>
+                    <h1>File: {file.name}</h1>
+                    <button onClick={() => navigate(`/archives/${archive.name}/files/${file.name}`)}>Open File</button>
+                </div>
             )}
         </div>
     )
@@ -67,8 +92,8 @@ function ArchiveListView() {
 
     return (
         <div>
-            {archives.map((archive: Archive) => 
-                <div>
+            {archives.map((archive: Archive, index: number) => 
+                <div key={index}>
                     <ArchiveView archive={archive} />
                     <br/>
                 </div>

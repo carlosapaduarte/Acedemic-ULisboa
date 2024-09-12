@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 from domain.study_tracker import Archive, Event, Priority, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STAppUseModel, STArchiveModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import STAppUseModel, STArchiveModel, STFileModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
@@ -274,3 +274,21 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             archive_models: list[STArchiveModel] = result.all()
             
             return Archive.from_STArchiveModel(archive_models)
+        
+    def create_file(self, user_id: int, archive_name: str, name: str):
+        with Session(engine) as session:
+            statement = select(STArchiveModel)\
+                .where(STArchiveModel.user_id == user_id)\
+                .where(STArchiveModel.name == archive_name)
+            result = session.exec(statement)
+
+            archive_model = result.one()            
+            archive_model.files.append(STFileModel(
+                name=name,
+                text="",
+                archive_name=archive_name,
+                user_id=user_id
+            ))
+
+            session.add(archive_model)
+            session.commit()

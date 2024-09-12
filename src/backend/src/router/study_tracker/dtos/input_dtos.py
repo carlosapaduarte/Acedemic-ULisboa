@@ -45,3 +45,6 @@ class UpdateTaskStatus(BaseModel):
     
 class CreateArchiveInputDto(BaseModel):
     name: str
+    
+class CreateFileInputDto(BaseModel):
+    name: str
