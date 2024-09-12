@@ -26,14 +26,6 @@
     font-family: 'Chakra Petch', sans-serif;
 }
 
-.confirmButton {
-    height: 4rem;
-    width: 12rem;
-    background-color: var(--yellow);
-    font-weight: bold;
-    font-size: 1.5rem;
-}
-
 /*
 Something like this could be very interesting for animating.
 
@@ -50,9 +42,4 @@ Something like this could be very interesting for animating.
     .roundButton:hover {
         background-color: var(--secondary-85);
     }
-
-    .confirmButton:hover {
-        background-color: var(--yellow-85);
-    }
-
 }

@@ -2,8 +2,8 @@ import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
 import React, { useEffect } from "react";
 import styles from "./avatarSelectionPage.module.css";
-import { ConfirmButton } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
+import { CutButton } from "~/components/Button/Button";
 
 function createAvatars(): string[] {
     const avatars: string[] = [];
@@ -111,12 +111,12 @@ export default function AvatarSelectionPage(
                     avatars={avatars}
                 />
                 <div className={styles.confirmButtonContainer}>
-                    <ConfirmButton onClick={() => {
+                    <CutButton className={styles.confirmAvatarButton} onClick={() => {
                         if (selectedAvatar !== null)
                             onConfirmClick(avatars[selectedAvatar]);
                     }}>
                         {t("login:confirm_level")}
-                    </ConfirmButton>
+                    </CutButton>
                 </div>
             </div>
         </div>
