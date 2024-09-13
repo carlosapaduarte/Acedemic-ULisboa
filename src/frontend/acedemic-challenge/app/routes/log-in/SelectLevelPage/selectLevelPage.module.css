@@ -30,6 +30,8 @@
     /*font-size: clamp(1rem, 4vw, 1.25rem);*/
     font-size: 1rem;
 
+    padding: 0 1rem 0 1rem;
+
     font-weight: 300;
     color: white;
 }
@@ -37,7 +39,7 @@
 .levelListContainer {
     overflow: auto;
 
-    padding: 0 2rem 0 2rem;
+    flex-grow: 1;
 
     display: grid;
     grid-auto-rows: 1fr;
@@ -48,10 +50,13 @@
 .levelContainer {
     display: flex;
     flex-direction: row;
+    overflow: auto;
 }
 
 .levelImageContainer {
     /*height: clamp(5rem, 15vh, 12rem);*/
+    flex-shrink: 0;
+
     width: 9rem;
     aspect-ratio: 1 / 0.75;
 
