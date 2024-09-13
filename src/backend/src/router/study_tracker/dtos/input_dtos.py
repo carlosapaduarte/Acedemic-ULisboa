@@ -51,3 +51,6 @@ class CreateFileInputDto(BaseModel):
     
 class UpdateFileInputDto(BaseModel):
     content: str
+    
+class CreateCurricularUnitInputDto(BaseModel):
+    name: str

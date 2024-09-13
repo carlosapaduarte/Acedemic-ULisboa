@@ -20,6 +20,7 @@ class UserModel(SQLModel, table=True):
     schedule_unavailable_blocks: list["STScheduleBlockNotAvailableModel"] = Relationship(back_populates="user")
     st_tasks: list["STTaskModel"] = Relationship(back_populates="user")    
     st_archives: list["STArchiveModel"] = Relationship(back_populates="user")
+    st_curricular_units: list["STCurricularUnitModel"] = Relationship(back_populates="user")
 
 class NoteModel(SQLModel, table=True):
     __tablename__ = "note"
@@ -238,3 +239,35 @@ class STFileModel(SQLModel, table=True):
     
     # Relationship with STTaskModel
     archive: "STArchiveModel" = Relationship(back_populates="files")
+    
+class STCurricularUnitModel(SQLModel, table=True):
+    __tablename__ = "st_curricular_unit"
+
+    name: str = Field(primary_key=True, default=None)
+    
+    grades: list["STGradeModel"] = Relationship(back_populates="curricular_unit")
+
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    user: UserModel = Relationship(back_populates="st_curricular_units")
+    
+class STGradeModel(SQLModel, table=True):
+    __tablename__ = "st_grade"
+
+    id: int = Field(primary_key=True)
+    value: float
+    weight: float
+
+    # Foreign key: Composite key referencing st_task
+    curricular_unit_name: str = Field(primary_key=True)
+    user_id: int = Field(primary_key=True)
+
+    # Composite foreign key constraint
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['curricular_unit_name', 'user_id'],
+            ['st_curricular_unit.name', 'st_curricular_unit.user_id']
+        ),
+    )
+    
+    # Relationship with STTaskModel
+    curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")

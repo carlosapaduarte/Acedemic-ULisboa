@@ -1,4 +1,4 @@
-from domain.study_tracker import Archive, DateInterval, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Task, UnavailableScheduleBlock
 from exception import NotAvailableScheduleBlockCollision
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from datetime import datetime
@@ -72,3 +72,9 @@ def create_file(user_id: int, archive_name: str, name: str):
     
 def update_file_content(user_id: int, archive_name: str, filename: str, new_content: str):
     study_tracker_repo.update_file_content(user_id, archive_name, filename, new_content)
+    
+def get_curricular_units(user_id: int) -> list[CurricularUnit]:
+    return study_tracker_repo.get_curricular_units(user_id)
+
+def create_curricular_unit(user_id: int, name: str):
+    return study_tracker_repo.create_curricular_unit(user_id, name)

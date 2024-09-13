@@ -1,10 +1,10 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Archive, Event, Priority, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, Event, Priority, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STAppUseModel, STArchiveModel, STFileModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
@@ -307,3 +307,24 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(file_model)
             session.commit()
             session.refresh(file_model)
+            
+    def get_curricular_units(self, user_id: int) -> list[CurricularUnit]:
+        with Session(engine) as session:
+            statement = select(STCurricularUnitModel)\
+                .where(STCurricularUnitModel.user_id == user_id)
+            result = session.exec(statement)
+            
+            cu_models: list[STCurricularUnitModel] = result.all()
+            
+            return CurricularUnit.from_STCurricularUnitModel(cu_models)
+        
+    def create_curricular_unit(self, user_id: int, name: str):
+        with Session(engine) as session:
+            user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
+            user_model.st_curricular_units.append(STCurricularUnitModel(
+                user_id=user_id,
+                name=name,
+                grades=[]
+            ))
+            session.add(user_model)
+            session.commit()

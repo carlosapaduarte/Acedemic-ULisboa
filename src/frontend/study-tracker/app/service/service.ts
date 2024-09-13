@@ -385,6 +385,40 @@ async function updateFileContent(userId: number, archiveName: string, name: stri
         return Promise.reject(new Error('New file could not be created!'))
 }
 
+export type Grade = {
+    value: number,
+    weight: number
+}
+
+export type CurricularUnit = {
+    name: string,
+    grades: Grade[]
+}
+
+async function getCurricularUnits(userId: number): Promise<CurricularUnit[]> {
+    const request = {
+        path: `study-tracker/users/${userId}/curricular-units`,
+        method: 'GET'
+    }
+    const response: Response = await doFetch(request)
+    if (response.ok) {
+        const responseObject: CurricularUnit[] = await response.json() // TODO: how 
+        return responseObject
+    } else
+        return Promise.reject(new Error('Curricular Units could not be obtained!'))
+}
+
+async function createCurricularUnit(userId: number, name: string) {
+    const request = {
+        path: `study-tracker/users/${userId}/curricular-units`,
+        method: 'POST',
+        body: toBody({name}),
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('New Curricular Unit could not be created!'))
+}
+
 export const service = {
     createUserOrLogin,
     selectShareProgressState,
@@ -407,5 +441,7 @@ export const service = {
     getArchive,
     createFile,
     getFile,
-    updateFileContent
+    updateFileContent,
+    getCurricularUnits,
+    createCurricularUnit
 }

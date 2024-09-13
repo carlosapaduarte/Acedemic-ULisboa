@@ -42,8 +42,8 @@ function useAddEvent(startDate: Date, onNewEventCreated: () => void) {
             endDate,
             tags
         })
-        .then(() => onNewEventCreated())
-        .catch((error) => setError(error))
+            .then(() => onNewEventCreated())
+            .catch((error) => setError(error))
     }
 
     return { title, endDate, tags, setTitle, setEndDate, appendTag, createNewEvent }

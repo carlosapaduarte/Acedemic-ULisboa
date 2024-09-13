@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from domain.study_tracker import Archive, Event, File, Task
+from domain.study_tracker import Archive, CurricularUnit, Event, File, Grade, Task
 from utils import get_datetime_utc
 
 class UserTaskOutputDto(BaseModel):
@@ -98,3 +98,35 @@ class ArchiveOutputDto(BaseModel):
             ))
             
         return archive_output_dtos
+    
+class GradeOutputDto(BaseModel):
+    value: float
+    weight: float
+    
+    @staticmethod
+    def from_grades(grades: list[Grade]) -> list['GradeOutputDto']:
+        grade_output_dtos: list['GradeOutputDto'] = []
+        
+        for grade in grades:
+            grade_output_dtos.append(GradeOutputDto(
+                value=grade.value,
+                weight=grade.weight
+            ))
+            
+        return grade_output_dtos
+    
+class CurricularUnitOutputDto(BaseModel):
+    name: str
+    grades: list[GradeOutputDto]
+    
+    @staticmethod
+    def from_curricular_units(curricular_units: list[CurricularUnit]) -> list['CurricularUnitOutputDto']:
+        cu_output_dtos: list['CurricularUnitOutputDto'] = []
+        
+        for cu in curricular_units:
+            cu_output_dtos.append(CurricularUnitOutputDto(
+                name=cu.name,
+                grades=GradeOutputDto.from_grades(cu.grades)
+            ))
+            
+        return cu_output_dtos

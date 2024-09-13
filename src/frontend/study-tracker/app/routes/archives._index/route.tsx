@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { Archive, File, service } from "~/service/service"
 import { utils } from "~/utils"
-import { Editor } from "../archives.$archiveName.files.$filename/editor"
 import { useNavigate } from "@remix-run/react"
 
 function useCreateArchiveView(onArchiveCreated: () => void) {

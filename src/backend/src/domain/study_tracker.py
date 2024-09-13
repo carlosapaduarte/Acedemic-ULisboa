@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from repository.sql.models.models import STArchiveModel, STEventModel, STFileModel
+from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto
 
 class Priority(Enum):
@@ -159,3 +159,41 @@ class Archive():
             ))
             
         return archives
+    
+class Grade():
+    value: float
+    weight: float
+    
+    def __init__(self, value: float, weighting: float) -> None:
+        self.value=value
+        self.weight=weighting
+        
+    @staticmethod
+    def from_STGradeModel(grade_models: list[STGradeModel]) -> list['Grade']:
+        grades: list[Grade] = []
+        for grade_model in grade_models:
+            grades.append(Grade(
+                value=grade_model.value,
+                weighting=grade_model.weight
+            ))
+            
+        return grades
+    
+class CurricularUnit():
+    name: str
+    grades: list[Grade]
+    
+    def __init__(self, name: str, grades: list[Grade]) -> None:
+        self.name=name
+        self.grades=grades
+        
+    @staticmethod
+    def from_STCurricularUnitModel(cu_models: list[STCurricularUnitModel]) -> list['CurricularUnit']:
+        curricular_units: list[CurricularUnit] = []
+        for cu_model in cu_models:
+            curricular_units.append(CurricularUnit(
+                name=cu_model.name,
+                grades=Grade.from_STGradeModel(cu_model.grades)
+            ))
+            
+        return curricular_units

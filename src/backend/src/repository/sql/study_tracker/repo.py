@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from domain.study_tracker import Archive, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, Event, Task, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -57,4 +57,12 @@ class StudyTrackerRepo(ABC):
     
     @abstractmethod
     def update_file_content(self, user_id: int, archive_name: str, filename: str, new_content: str):
+        pass
+    
+    @abstractmethod
+    def get_curricular_units(self, user_id: int) -> list[CurricularUnit]:
+        pass
+    
+    @abstractmethod
+    def create_curricular_unit(self, user_id: int, name: str):
         pass

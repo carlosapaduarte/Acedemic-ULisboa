@@ -1,8 +1,8 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
 from domain.study_tracker import DateInterval, Event, Task, UnavailableScheduleBlock
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateFileInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
-from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateFileInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -98,3 +98,12 @@ def create_file(user_id: int, archive_name: str, dto: CreateFileInputDto):
 @router.put("/users/{user_id}/archives/{archive_name}/files/{filename}")
 def update_file_content(user_id: int, archive_name: str, filename: str, dto: UpdateFileInputDto):
     study_tracker_service.update_file_content(user_id, archive_name, filename, dto.content)
+    
+@router.get("/users/{user_id}/curricular-units")
+def get_curricular_units(user_id: int) ->  list[CurricularUnitOutputDto]:
+    curricular_units = study_tracker_service.get_curricular_units(user_id)
+    return CurricularUnitOutputDto.from_curricular_units(curricular_units)
+
+@router.post("/users/{user_id}/curricular-units")
+def create_curricular_units(user_id: int, dto: CreateCurricularUnitInputDto):
+    study_tracker_service.create_curricular_unit(user_id, dto.name)
