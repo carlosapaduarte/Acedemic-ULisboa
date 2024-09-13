@@ -1,5 +1,5 @@
 import styles from "./homeAppBar.module.css";
-import React from "react";
+import React, { useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import { useLogOut, useUserId } from "~/components/auth/Authn";
 import { CutButton } from "~/components/Button/Button";
@@ -49,6 +49,7 @@ function NavBarButton({ text, url }: { text: string, url: string }) {
 
 function Dropdown({ trigger }: { trigger: JSX.Element }) {
     const logout = useLogOut();
+    const [isPending, startTransition] = useTransition();
 
     return (<DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
@@ -58,7 +59,7 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
             <DropdownMenu.Portal>
                 <DropdownMenu.Content className={dropdownStyles.Content} sideOffset={5}>
                     <DropdownMenu.Item className={dropdownStyles.Item}
-                                       onClick={logout}>
+                                       onClick={() => startTransition(logout)}>
                         Logout
                     </DropdownMenu.Item>
 
