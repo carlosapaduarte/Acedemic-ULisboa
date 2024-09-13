@@ -24,6 +24,12 @@ html, body {
 body {
     background-color: var(--primary);
     font-family: var(--font-family1), sans-serif;
+
+    transition: background-color 300ms ease;
+}
+
+* {
+    transition: background-color 300ms ease;
 }
 
 .app {

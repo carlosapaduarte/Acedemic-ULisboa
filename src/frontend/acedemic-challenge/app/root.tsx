@@ -6,7 +6,15 @@ import { Footer } from "~/components/Footer";
 
 import "./global.css";
 import "./i18n";
+import "./themes.css";
 import { AppBar, AppBarProvider } from "~/components/AppBar/AppBar";
+import { useEffect, useState } from "react";
+import {
+    AppTheme,
+    getBodyThemeClassNames,
+    getLocalStorageTheme,
+    ThemeProvider
+} from "~/components/Theme/ThemeProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -38,9 +46,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function Root() {
+    const [isHydrated, setIsHydrated] = useState(false);
+    const [theme, setTheme] = useState<AppTheme>("default");
+
+    useEffect(() => {
+        const storedTheme = getLocalStorageTheme();
+
+        setTheme(storedTheme);
+
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        document.body.className = getBodyThemeClassNames(theme);
+    }, [theme]);
+
+    if (!isHydrated) {
+        return null;
+    }
+
     return (
         <AuthnContainer>
-            <App />
+            <ThemeProvider theme={theme} setTheme={setTheme}>
+                <App />
+            </ThemeProvider>
         </AuthnContainer>
     );
 }
