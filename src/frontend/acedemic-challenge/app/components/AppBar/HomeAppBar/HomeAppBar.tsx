@@ -83,7 +83,7 @@ export function GreetingsContainer() {
                 <Dropdown trigger={
                     <div className={`${styles.avatarContainer}`}>
                         <img
-                            src={"./test.webp"/*`./${userInfo.avatarFilename}`*/}
+                            src={`./avatars/avatar${(userId ?? 7) % 8}.png`/*`./${userInfo.avatarFilename}`*/}
                             height="100px"
                             alt={`User's Avatar`}
                         />

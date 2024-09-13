@@ -8,7 +8,7 @@ import { CutButton } from "~/components/Button/Button";
 function createAvatars(): string[] {
     const avatars: string[] = [];
     for (let u = 0; u < 30; u++) {
-        avatars.push("./test.webp"); // filename
+        avatars.push(`./avatars/avatar${u % 8}.png`); // filename
     }
     return avatars;
 }

@@ -22,6 +22,16 @@ Doesn't work, use SCSS
     overflow: auto;
 }
 
+@keyframes fade {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 .challengesListContainer {
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -37,6 +47,8 @@ Doesn't work, use SCSS
     align-content: start;
 
     gap: 0.5rem;
+
+    animation: fade 300ms cubic-bezier(0.87, 0, 0.13, 1);
 
     overflow: hidden;
 }
