@@ -292,3 +292,18 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
             session.add(archive_model)
             session.commit()
+            
+    def update_file_content(self, user_id: int, archive_name: str, filename: str, new_content: str):
+        with Session(engine) as session:
+            statement = select(STFileModel)\
+                .where(STFileModel.user_id == user_id)\
+                .where(STFileModel.archive_name == archive_name)\
+                .where(STFileModel.name == filename)
+                
+            result = session.exec(statement)
+            
+            file_model: STFileModel = result.one()
+            file_model.text = new_content
+            session.add(file_model)
+            session.commit()
+            session.refresh(file_model)

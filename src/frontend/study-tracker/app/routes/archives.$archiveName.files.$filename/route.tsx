@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { File, service } from "~/service/service"
 import { utils } from "~/utils";
+import { Editor } from "./editor";
 
 export default function FileView() {
     const setError = useSetError()
@@ -24,11 +25,11 @@ export default function FileView() {
         }
     }, [])
 
-    return file ?
+    return file && archiveName ?
         <div>
             <span>Name: {file.name}</span>
             <br/>
-            <span>Text: {file.text}</span>
+            <Editor archiveName={archiveName} file={file} />
         </div>
         :
         <></>

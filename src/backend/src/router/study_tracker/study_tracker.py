@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
 from domain.study_tracker import DateInterval, Event, Task, UnavailableScheduleBlock
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateFileInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateFileInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -94,3 +94,7 @@ def get_events(user_id: int) ->  list[ArchiveOutputDto]:
 @router.post("/users/{user_id}/archives/{archive_name}")
 def create_file(user_id: int, archive_name: str, dto: CreateFileInputDto):
     study_tracker_service.create_file(user_id, archive_name, dto.name)
+    
+@router.put("/users/{user_id}/archives/{archive_name}/files/{filename}")
+def update_file_content(user_id: int, archive_name: str, filename: str, dto: UpdateFileInputDto):
+    study_tracker_service.update_file_content(user_id, archive_name, filename, dto.content)

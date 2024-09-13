@@ -365,6 +365,17 @@ async function getFile(userId: number, archiveName: string, filename: string): P
     return file
 }
 
+async function updateFileContent(userId: number, archiveName: string, name: string, newContent: string) {
+    const request = {
+        path: `study-tracker/users/${userId}/archives/${archiveName}/files/${name}`,
+        method: 'PUT',
+        body: toBody({content: newContent}),
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('New file could not be created!'))
+}
+
 export const service = {
     createUserOrLogin,
     selectShareProgressState,
@@ -385,5 +396,6 @@ export const service = {
     createArchive,
     getArchives,
     createFile,
-    getFile
+    getFile,
+    updateFileContent
 }

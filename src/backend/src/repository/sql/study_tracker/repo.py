@@ -54,3 +54,7 @@ class StudyTrackerRepo(ABC):
     @abstractmethod
     def create_file(self, user_id: int, archive_name: str, name: str):
         pass
+    
+    @abstractmethod
+    def update_file_content(self, user_id: int, archive_name: str, filename: str, new_content: str):
+        pass

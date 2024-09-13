@@ -69,3 +69,6 @@ def get_archives(user_id: int) -> list[Archive]:
 
 def create_file(user_id: int, archive_name: str, name: str):
     study_tracker_repo.create_file(user_id, archive_name, name)
+    
+def update_file_content(user_id: int, archive_name: str, filename: str, new_content: str):
+    study_tracker_repo.update_file_content(user_id, archive_name, filename, new_content)

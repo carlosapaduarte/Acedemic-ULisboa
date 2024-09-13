@@ -48,3 +48,6 @@ class CreateArchiveInputDto(BaseModel):
     
 class CreateFileInputDto(BaseModel):
     name: str
+    
+class UpdateFileInputDto(BaseModel):
+    content: str
