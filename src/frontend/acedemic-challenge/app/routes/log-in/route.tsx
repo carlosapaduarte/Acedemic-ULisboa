@@ -7,6 +7,7 @@ import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelec
 import { useNavigate } from "@remix-run/react";
 import styles from "./login.module.css";
 import classNames from "classnames";
+import { useAppBar } from "~/components/AppBar/AppBar";
 
 type Views =
     | "userInfo"
@@ -73,6 +74,8 @@ function CurrentView() {
  * - redirects for calendar component.
  */
 export default function LoginPage() {
+    useAppBar("clean");
+
     return <div className={classNames(styles.loginPage)}>
         <CurrentView />
     </div>;

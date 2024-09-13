@@ -1,6 +1,7 @@
-@import "../../../page.module.css";
 
 .welcomePage {
+    padding: 0 2rem 0 2rem;
+
     width: 100%;
     height: 100%;
 
@@ -8,8 +9,58 @@
     flex-direction: column;
 }
 
+.welcomePage h2, h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--secondary);
+}
+
+.welcomePage h2 {
+    font-size: 1.5rem;
+}
+
+.welcomePage h3 {
+    font-size: 1.25rem;
+    color: white;
+}
+
+.welcomePage p {
+
+}
+
+.titleHeading {
+    font-size: 1.75rem;
+    font-weight: bold;
+    font-family: var(--font-family2), sans-serif;
+
+    color: var(--secondary);
+}
+
+.descriptionText {
+    flex-grow: 1;
+
+    margin-top: 0.5rem;
+
+    font-size: 0.9rem;
+    font-weight: 300;
+
+    color: white;
+}
+
+.navigationContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .proceedButton {
     margin-bottom: 1rem;
     margin-top: 1rem;
-    height: 4rem;
+    height: 3rem;
+    width: 8rem;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+    background-color: var(--yellow);
 }

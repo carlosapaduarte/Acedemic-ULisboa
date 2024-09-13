@@ -1,12 +1,14 @@
 import { CutButton } from "~/components/Button/Button";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
 import styles from "./appBar.module.css";
+import cleanAppBarStyles from "./cleanAppBar.module.css";
 
 import { useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 import { GreetingsContainer, NavBar } from "~/components/AppBar/HomeAppBar/HomeAppBar";
+import classNames from "classnames";
 
 type AppBarVariant = "default" | "home" | "clean";
 
@@ -29,20 +31,36 @@ export function AppBarProvider({ children }: { children: React.ReactNode }) {
     </AppBarContext.Provider>;
 }
 
+export function useAppBar(variant: AppBarVariant) {
+    const { setAppBarVariant } = useContext(AppBarContext);
+
+    useEffect(() => {
+        setAppBarVariant(variant);
+        return () => setAppBarVariant("default");
+    }, [setAppBarVariant]);
+}
+
 export function AppBar() {
     const { appBarVariant } = useContext(AppBarContext);
 
     const navigate = useNavigate();
 
     return (
-        <div className={appBarVariant === "home" ? homeAppBarStyles.appBar : styles.appBar}>
-            <CutButton
-                className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
-                onClick={() => navigate(-1)}
-            >
-                {"<"}
-            </CutButton>
-            {appBarVariant !== "home" && (
+        <div className={
+            classNames(
+                appBarVariant === "default" && styles.appBar,
+                appBarVariant === "home" && homeAppBarStyles.appBar,
+                appBarVariant === "clean" && cleanAppBarStyles.appBar
+            )}>
+            {appBarVariant !== "clean" && (
+                <CutButton
+                    className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
+                    onClick={() => navigate(-1)}
+                >
+                    {"<"}
+                </CutButton>
+            )}
+            {appBarVariant === "default" && (
                 <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
                     <CutButton className={styles.homeButton}>
                         Home
