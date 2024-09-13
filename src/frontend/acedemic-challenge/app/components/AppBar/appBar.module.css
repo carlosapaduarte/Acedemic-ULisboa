@@ -1,8 +1,12 @@
 .appBar {
-    flex: 0;
     width: 100%;
 
     padding: 1rem;
+
+    height: 100vh;
+    max-height: 80px;
+
+    transition: max-height 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
 
     display: grid;
     grid-template-columns: auto auto 1fr auto;
@@ -46,7 +50,6 @@
 
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
 .homeButton {

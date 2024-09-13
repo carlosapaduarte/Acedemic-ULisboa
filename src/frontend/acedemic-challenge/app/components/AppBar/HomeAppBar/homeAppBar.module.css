@@ -8,6 +8,8 @@
     grid-template-columns: auto 1fr auto;
     grid-template-rows: auto auto auto;
     align-items: flex-start;
+
+    max-height: 292px;
 }
 
 .settingsButtons {
@@ -26,7 +28,19 @@
     justify-content: center;
     gap: 1rem;
 
+    animation: fade 500ms;
+
     overflow: hidden;
+}
+
+@keyframes fade {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .helloQuote {
@@ -84,6 +98,8 @@
     .appBar {
         grid-template-rows: auto auto;
         justify-content: space-between;
+
+        max-height: 244px;
     }
 
     .greetingsContainer {
@@ -103,6 +119,8 @@
     .appBar {
         grid-template-columns: auto 1fr 1fr auto;
         grid-template-rows: auto;
+
+        max-height: 140px;
     }
 
     .greetingsContainer {
