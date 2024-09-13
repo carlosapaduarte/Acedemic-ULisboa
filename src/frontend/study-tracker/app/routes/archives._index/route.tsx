@@ -4,19 +4,20 @@ import { utils } from "~/utils"
 import { Editor } from "../archives.$archiveName.files.$filename/editor"
 import { useNavigate } from "@remix-run/react"
 
-function useCreateArchiveView() {
+function useCreateArchiveView(onArchiveCreated: () => void) {
     const [name, setName] = useState("")
     
     function createArchive() {
         const userId = utils.getUserId()
         service.createArchive(userId, name)
+            .then(onArchiveCreated)
     }
 
-    return {name, setName, createArchive}
+    return {setName, createArchive}
 }
 
-function CreateArchiveView() {
-    const {name, setName, createArchive} = useCreateArchiveView()
+function CreateArchiveView({onArchiveCreated} : {onArchiveCreated: () => void}) {
+    const {setName, createArchive} = useCreateArchiveView(onArchiveCreated)
 
     return (
         <div>
@@ -30,19 +31,20 @@ function CreateArchiveView() {
     )
 }
 
-function useCreateFileView(archiveName: string) {
+function useCreateFileView(archiveName: string, onFileCreated: () => void) {
     const [name, setName] = useState("")
     
     function createFile() {
         const userId = utils.getUserId()
         service.createFile(userId, archiveName, name)
+            .then(onFileCreated)
     }
 
     return {name, setName, createFile}
 }
 
-function CreateFileView({archiveName} : {archiveName: string}) {
-    const {name, setName, createFile} = useCreateFileView(archiveName)
+function CreateFileView({archiveName, onFileCreated} : {archiveName: string, onFileCreated: () => void}) {
+    const {name, setName, createFile} = useCreateFileView(archiveName, onFileCreated)
 
     return (
         <div>
@@ -56,15 +58,28 @@ function CreateFileView({archiveName} : {archiveName: string}) {
     )
 }
 
-function ArchiveView({archive}: {archive: Archive}) {
+function useArchiveView(initialArchive: Archive) {
+    const [archive, setArchive] = useState(initialArchive)
+    
+    function refreshArchive() {
+        const userId = utils.getUserId()
+        service.getArchive(userId, archive.name)
+            .then((archive: Archive) => setArchive(archive))
+    }
+
+    return {archive, refreshArchive}
+}
+
+function ArchiveView({initialArchive}: {initialArchive: Archive}) {
     const navigate = useNavigate();
+    const {archive, refreshArchive} = useArchiveView(initialArchive)
 
     return (
         <div>
             <h1>Archive:</h1>
             <span>Name: {archive.name}</span>
             <br/>
-            <CreateFileView archiveName={archive.name}/>
+            <CreateFileView archiveName={archive.name} onFileCreated={refreshArchive} />
             {archive.files.map((file: File, index: number) => 
                 <div key={index}>
                     <h1>File: {file.name}</h1>
@@ -78,36 +93,31 @@ function ArchiveView({archive}: {archive: Archive}) {
 function useArchiveListView() {
     const [archives, setArchives] = useState<Archive[]>([])    
 
-    useEffect(() => {
+    function refreshArchives() {
         const userId = utils.getUserId()
         service.getArchives(userId)
             .then((value: Archive[]) => setArchives(value))
+    }
+
+    useEffect(() => {
+        refreshArchives()
     }, [])
     
-    return {archives}
+    return {archives, refreshArchives}
 }
 
-function ArchiveListView() {
-    const {archives} = useArchiveListView()
+export default function ArchiveListView() {
+    const {archives, refreshArchives} = useArchiveListView()
 
     return (
         <div>
+            <CreateArchiveView onArchiveCreated={refreshArchives} />
             {archives.map((archive: Archive, index: number) => 
                 <div key={index}>
-                    <ArchiveView archive={archive} />
+                    <ArchiveView initialArchive={archive} />
                     <br/>
                 </div>
             )}
-        </div>
-    )
-}
-
-export default function Study() {
-    return (
-        <div>
-            <CreateArchiveView />
-            <br/>
-            <ArchiveListView />
         </div>
     )
 }

@@ -341,6 +341,15 @@ async function getArchives(userId: number): Promise<Archive[]> {
         return Promise.reject(new Error('Archives could not be obtained!'))
 }
 
+async function getArchive(userId: number, archiveName: string): Promise<Archive> {
+    // To simplify for now...
+    const archives = await getArchives(userId)
+    const archive = archives.find((archive: Archive) => archive.name == archiveName)
+    if (archive == undefined)
+        return Promise.reject(new Error('Archive does not exist!'))
+    return archive
+}
+
 async function createFile(userId: number, archiveName: string, name: string) {
     const request = {
         path: `study-tracker/users/${userId}/archives/${archiveName}`,
@@ -395,6 +404,7 @@ export const service = {
     updateTaskStatus,
     createArchive,
     getArchives,
+    getArchive,
     createFile,
     getFile,
     updateFileContent
