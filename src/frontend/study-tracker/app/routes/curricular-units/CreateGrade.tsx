@@ -17,6 +17,7 @@ function useCreateGrade(curricularUnit: string, onCuCreated: () => void) {
 
 export function CreateGrade({curricularUnit, onGradeCreated} : {curricularUnit: string, onGradeCreated: () => void}) {
     const {value, setValue, weight, setWeight, createGrade} = useCreateGrade(curricularUnit, onGradeCreated)
+    
     return (
         <div>
             <h1>Create Grade</h1>

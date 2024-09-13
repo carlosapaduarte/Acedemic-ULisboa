@@ -56,5 +56,5 @@ class CreateCurricularUnitInputDto(BaseModel):
     name: str
     
 class CreateGradeInputDto(BaseModel):
-    value: int
-    weight: int
+    value: float
+    weight: float
