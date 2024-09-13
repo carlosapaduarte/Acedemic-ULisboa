@@ -54,3 +54,7 @@ class UpdateFileInputDto(BaseModel):
     
 class CreateCurricularUnitInputDto(BaseModel):
     name: str
+    
+class CreateGradeInputDto(BaseModel):
+    value: int
+    weight: int

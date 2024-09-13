@@ -164,9 +164,9 @@ class Grade():
     value: float
     weight: float
     
-    def __init__(self, value: float, weighting: float) -> None:
+    def __init__(self, value: float, weight: float) -> None:
         self.value=value
-        self.weight=weighting
+        self.weight=weight
         
     @staticmethod
     def from_STGradeModel(grade_models: list[STGradeModel]) -> list['Grade']:
@@ -174,7 +174,7 @@ class Grade():
         for grade_model in grade_models:
             grades.append(Grade(
                 value=grade_model.value,
-                weighting=grade_model.weight
+                weight=grade_model.weight
             ))
             
         return grades

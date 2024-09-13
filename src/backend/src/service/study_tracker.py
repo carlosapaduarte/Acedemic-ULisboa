@@ -1,4 +1,4 @@
-from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Grade, Task, UnavailableScheduleBlock
 from exception import NotAvailableScheduleBlockCollision
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from datetime import datetime
@@ -78,3 +78,6 @@ def get_curricular_units(user_id: int) -> list[CurricularUnit]:
 
 def create_curricular_unit(user_id: int, name: str):
     return study_tracker_repo.create_curricular_unit(user_id, name)
+
+def create_grade(user_id: int, curricular_unit: str, grade: Grade):
+    return study_tracker_repo.create_grade(user_id, curricular_unit, grade)

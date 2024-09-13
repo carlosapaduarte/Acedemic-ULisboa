@@ -1,4 +1,4 @@
-from domain.study_tracker import Archive, CurricularUnit, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Task, UnavailableScheduleBlock
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
 class StudyTrackerMemRepo(StudyTrackerRepo):
@@ -46,4 +46,7 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
         pass
     
     def create_curricular_unit(self, user_id: int, name: str):
+        pass
+    
+    def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
         pass

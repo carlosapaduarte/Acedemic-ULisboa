@@ -3,8 +3,24 @@ import { useSetError } from "~/components/error/ErrorContainer";
 import { CurricularUnit, Grade, service } from "~/service/service";
 import { utils } from "~/utils";
 import { CreateCurricularUnit } from "./CreateCU";
+import { CreateGrade } from "./CreateGrade";
 
-function CurricularUnitView({curricularUnit} : {curricularUnit: CurricularUnit}) {
+function useCurricularUnitView(initialCurricularUnit: CurricularUnit) {
+    const setError = useSetError()
+    const [curricularUnit, setCurricularUnit] = useState<CurricularUnit>(initialCurricularUnit)
+
+    function refreshCurricularUnit() {
+        const userId = utils.getUserId()
+        service.getCurricularUnit(userId, initialCurricularUnit.name)
+            .then((cu: CurricularUnit) => setCurricularUnit(cu))
+            .catch((error) => setError(error))
+    }
+
+    return {curricularUnit, refreshCurricularUnit}
+}
+
+function CurricularUnitView({initialCurricularUnit} : {initialCurricularUnit: CurricularUnit}) {
+    const {curricularUnit, refreshCurricularUnit} = useCurricularUnitView(initialCurricularUnit)
     return (
         <div>
             <h1>Name: {curricularUnit.name}</h1>
@@ -15,6 +31,7 @@ function CurricularUnitView({curricularUnit} : {curricularUnit: CurricularUnit})
                     <span>Weight: {grade.weight}</span>
                 </div>
             )}
+            <CreateGrade curricularUnit={curricularUnit.name} onGradeCreated={refreshCurricularUnit} />
         </div>
     )
 }
@@ -44,7 +61,7 @@ export default function CurricularUnitListView() {
         <div>
             <CreateCurricularUnit onCuCreated={refreshCurricularUnits} />
             {cuList.map((cu) =>
-                <CurricularUnitView curricularUnit={cu} />        
+                <CurricularUnitView initialCurricularUnit={cu} />        
             )}
         </div>
     )

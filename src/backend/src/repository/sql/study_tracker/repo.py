@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from domain.study_tracker import Archive, CurricularUnit, Event, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Task, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -64,5 +64,5 @@ class StudyTrackerRepo(ABC):
         pass
     
     @abstractmethod
-    def create_curricular_unit(self, user_id: int, name: str):
+    def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
         pass

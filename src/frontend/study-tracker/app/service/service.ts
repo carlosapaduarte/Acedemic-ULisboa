@@ -408,11 +408,35 @@ async function getCurricularUnits(userId: number): Promise<CurricularUnit[]> {
         return Promise.reject(new Error('Curricular Units could not be obtained!'))
 }
 
+async function getCurricularUnit(userId: number, name: string): Promise<CurricularUnit> {
+    // To simplify for now...
+
+    const curricularUnitList = await getCurricularUnits(userId)
+    const curricularUnit = curricularUnitList
+        .find((cu: CurricularUnit) => cu.name == name)
+
+    if (curricularUnit == undefined)
+        return Promise.reject(new Error('Curricular Unit does not exist!'))
+    return curricularUnit
+
+}
+
 async function createCurricularUnit(userId: number, name: string) {
     const request = {
         path: `study-tracker/users/${userId}/curricular-units`,
         method: 'POST',
         body: toBody({name}),
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok)
+        return Promise.reject(new Error('New Curricular Unit could not be created!'))
+}
+
+async function createGrade(userId: number, curricularUnit: string, value: number, weight: number) {
+    const request = {
+        path: `study-tracker/users/${userId}/curricular-units/${curricularUnit}/grades`,
+        method: 'POST',
+        body: toBody({value, weight}),
     }
     const response: Response = await doFetch(request)
     if (!response.ok)
@@ -443,5 +467,7 @@ export const service = {
     getFile,
     updateFileContent,
     getCurricularUnits,
-    createCurricularUnit
+    getCurricularUnit,
+    createCurricularUnit,
+    createGrade
 }

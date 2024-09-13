@@ -21,3 +21,4 @@ class CommonsRepo(ABC):
     @abstractmethod
     def update_user_avatar(self, user_id: int, avatar_filename: str):
         pass
+    

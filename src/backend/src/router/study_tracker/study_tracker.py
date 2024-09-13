@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
-from domain.study_tracker import DateInterval, Event, Task, UnavailableScheduleBlock
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateFileInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from domain.study_tracker import DateInterval, Event, Grade, Task, UnavailableScheduleBlock
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -105,5 +105,12 @@ def get_curricular_units(user_id: int) ->  list[CurricularUnitOutputDto]:
     return CurricularUnitOutputDto.from_curricular_units(curricular_units)
 
 @router.post("/users/{user_id}/curricular-units")
-def create_curricular_units(user_id: int, dto: CreateCurricularUnitInputDto):
+def create_curricular_unit(user_id: int, dto: CreateCurricularUnitInputDto):
     study_tracker_service.create_curricular_unit(user_id, dto.name)
+    
+@router.post("/users/{user_id}/curricular-units/{curricular_unit}/grades")
+def create_grade(user_id: int, curricular_unit: str, dto: CreateGradeInputDto):
+    study_tracker_service.create_grade(user_id, curricular_unit, Grade(
+        value=dto.value,
+        weight=dto.weight
+    ))

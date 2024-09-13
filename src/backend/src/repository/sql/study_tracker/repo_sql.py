@@ -1,10 +1,10 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Archive, CurricularUnit, Event, Priority, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Priority, Task, UnavailableScheduleBlock
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 
@@ -192,7 +192,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     ) -> int:
         
         new_task_model = STTaskModel(
-            id=random.randint(1, 999999999), # For some reason, automatic ID is not working,,
+            id=random.randint(1, 999999999), # For some reason, automatic ID is not working
             title=task.title,
             description=task.description,
             deadline=task.deadline,
@@ -327,4 +327,24 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 grades=[]
             ))
             session.add(user_model)
+            session.commit()
+            
+    def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
+        with Session(engine) as session:
+            statement = select(STCurricularUnitModel)\
+                .where(STCurricularUnitModel.user_id == user_id)\
+                .where(STCurricularUnitModel.name == curricular_unit)
+            
+            result = session.exec(statement)
+            
+            curricular_unit_model: STCurricularUnitModel = result.one()
+            curricular_unit_model.grades.append(STGradeModel(
+                id=random.randint(1, 999999999), # For some reason, automatic ID is not working
+                value=grade.value,
+                weight=grade.weight,
+                curricular_unit_name=curricular_unit,
+                user_id=user_id
+            ))
+            
+            session.add(curricular_unit_model)
             session.commit()

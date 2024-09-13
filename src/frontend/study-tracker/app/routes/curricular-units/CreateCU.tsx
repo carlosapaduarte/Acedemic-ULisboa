@@ -18,6 +18,7 @@ export function CreateCurricularUnit({onCuCreated} : {onCuCreated: () => void}) 
     const {name, setName, createCurricularUnit} = useCreateCurricularUnit(onCuCreated)
     return (
         <div>
+            <h1>Create Curricular Unit</h1>
             <label>Name</label>
             <br/>
             <input onChange={(e) => setName(e.target.value)}/>
