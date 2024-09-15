@@ -23,8 +23,10 @@ function useWelcomePage() {
 function InfoPage1({ handleOnNextClick }: { handleOnNextClick: () => void }) {
     return (
         <>
-            <img src="public/study.png" alt="A girl using her tablet"
-                 className={styles.studyImage} />
+            <div className={styles.studyImageContainer}>
+                <img src="public/study.png" alt="A girl using her tablet"
+                     className={styles.studyImage} />
+            </div>
             <h1 className={styles.titleHeading}>
                 Boost your study.
             </h1>
@@ -56,8 +58,10 @@ function InfoPage2({ handleOnProceedClick }: { handleOnProceedClick: () => void 
                 per quis. Fusce ultrices mollis fusce pellentesque est rhoncus. Condimentum taciti gravida ante lacinia
                 nulla rhoncus.
             </p>
-            <img src="public/study2.png" alt="A boy writing in a paper"
-                 className={styles.studyImage} />
+            <div className={styles.studyImageContainer}>
+                <img src="public/study2.png" alt="A boy writing in a paper"
+                     className={styles.studyImage} />
+            </div>
             <div className={classNames(styles.navigationContainer)}>
                 <div style={{ color: "var(--secondary)" }}>
                     Placeholder

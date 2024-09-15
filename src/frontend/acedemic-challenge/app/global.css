@@ -33,15 +33,12 @@ body {
 }
 
 .app {
-    width: 100vw;
-    height: 100vh; /* Fallback height */
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
-}
-
-.app {
-    height: 100dvh; /* Preferred height, adjusts in mobile. Useful for this web app */
 }
 
 .mainContentContainer {
