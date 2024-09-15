@@ -1,4 +1,18 @@
 
+.defaultTheme, .purpleTheme {
+    --primary: #771480;
+    --secondary: #7DF4BE;
+    --purple-dark: #491351;
+}
+
 .blackTheme {
     --primary: #1a1a1a;
+    --secondary: #9eafdf;
+    --purple-dark: #e47c36;
+}
+
+.randomTheme {
+    --primary: #628395;
+    --secondary: #96897B;
+    --purple-dark: #DBAD6A;
 }

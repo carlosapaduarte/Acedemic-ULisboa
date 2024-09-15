@@ -1,23 +1,29 @@
 import { createContext } from "react";
 import classNames from "classnames";
 
-export type AppTheme = "default" | "purple" | "black";
+export type AppTheme = "purple" | "black" | "random";
+
+export namespace AppTheme {
+    export const values: AppTheme[] = ["purple", "black", "random"];
+    export const className: Record<AppTheme, string> = {
+        purple: "purpleTheme",
+        black: "blackTheme",
+        random: "randomTheme"
+    };
+    export const defaultTheme = "purple";
+}
 
 export const ThemeContext = createContext<{
     theme: AppTheme,
     setTheme: (theme: AppTheme) => void
 }>({
-    theme: "default",
+    theme: AppTheme.defaultTheme,
     setTheme: () => {
     }
 });
 
-export function getBodyThemeClassNames(theme: AppTheme) {
-    return classNames(
-        theme === "default" && "defaultTheme",
-        theme === "purple" && "purpleTheme",
-        theme === "black" && "blackTheme"
-    );
+export function getAppThemeClassNames(theme: AppTheme) {
+    return classNames(AppTheme.className[theme]);
 }
 
 export function getLocalStorageTheme(): AppTheme {
@@ -25,8 +31,8 @@ export function getLocalStorageTheme(): AppTheme {
     if (storedTheme) {
         return storedTheme;
     } else {
-        localStorage.setItem("theme", "default");
-        return "default";
+        localStorage.setItem("theme", AppTheme.defaultTheme.toString());
+        return AppTheme.defaultTheme;
     }
 }
 

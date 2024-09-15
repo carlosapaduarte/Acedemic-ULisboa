@@ -9,12 +9,7 @@ import "./i18n";
 import "./themes.css";
 import { AppBar, AppBarProvider } from "~/components/AppBar/AppBar";
 import { useEffect, useState } from "react";
-import {
-    AppTheme,
-    getBodyThemeClassNames,
-    getLocalStorageTheme,
-    ThemeProvider
-} from "~/components/Theme/ThemeProvider";
+import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -47,7 +42,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function Root() {
     const [isHydrated, setIsHydrated] = useState(false);
-    const [theme, setTheme] = useState<AppTheme>("default");
+    const [theme, setTheme] = useState<AppTheme>(AppTheme.defaultTheme);
 
     useEffect(() => {
         const storedTheme = getLocalStorageTheme();
@@ -58,7 +53,7 @@ export default function Root() {
     }, []);
 
     useEffect(() => {
-        document.body.className = getBodyThemeClassNames(theme);
+        document.body.className = getAppThemeClassNames(theme);
     }, [theme]);
 
     if (!isHydrated) {
