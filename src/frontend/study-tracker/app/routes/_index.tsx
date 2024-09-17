@@ -46,7 +46,7 @@ function useWelcomePage() {
         const cachedUserId = localStorage["userId"]; // TODO: use cache just for now
         navigate(`/dashboard/${cachedUserId}`);
       }
-  }, []);
+  }, [isLoggedIn]);
 
   const handleOnProceedClick = () => {
       if (!isLoggedIn) {

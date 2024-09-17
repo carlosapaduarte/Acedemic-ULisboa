@@ -1,6 +1,89 @@
 import { useState } from "react"
 import { useSetError } from "~/components/error/ErrorContainer"
 
+export function useTags() {
+    const [tags, setTags] = useState<string[]>([])
+
+    function appendTag(tag: string) {
+        let new_tags
+        if (tags == undefined)
+            new_tags = [tag]
+        else {
+            if (tags.includes(tag))
+                return
+            new_tags = [...tags]
+            new_tags.push(tag)
+        }
+        setTags(new_tags)
+    }
+
+    return {tags, appendTag}
+}
+
+type Category = {
+    name: string,
+    tags: string[]
+}
+
+const categories: Category[] = [
+{
+        name: "Estudo",
+        tags: ["Revisão", "Leitura", "Exercícios / Prática", "Preparação de provas"]
+    },
+    {
+        name: "Aulas",
+        tags: ["Presencial", "Online", "Tutorias / Dúvidas", "Reposição"]
+    },
+    {
+        name: "Trabalhos / Projetos",
+        tags: ["Apresentação", "Entrega", "Reunião de Grupo"]
+    },
+    {
+        name: "Pessoal",
+        tags: ["Aniversário", "Lazer", "Saúde"]
+    }
+]
+
+export function CategoryAndTagsPicker({onTagClick} : {onTagClick: (tag: string) => void}) {
+    const [category, setCategory] = useState<Category | undefined>(undefined)
+
+    function onTagClickHandler(tag: string) {
+        setCategory(undefined) // Allows to select new tag
+        onTagClick(tag)
+    }
+
+    return (
+        category == undefined ? 
+            <CategoryPicker onCategoryClick={setCategory} />
+        :
+        <TagPicker category={category} onTagClick={onTagClickHandler} />
+    )
+}
+
+function CategoryPicker({onCategoryClick} : {onCategoryClick: (cat: Category) => void}) {
+    return (
+        categories.map((cat: Category, index: number) => 
+            <div key={index}>
+                <button onClick={() => onCategoryClick(cat)}>
+                    {cat.name}
+                </button>
+            </div>
+        )
+    )
+}
+
+function TagPicker({category, onTagClick} : {category: Category, onTagClick: (tag: string) => void}) {
+    return (
+        category.tags.map((tag: string, index: number) => 
+            <div key={index}>
+                <button onClick={() => onTagClick(tag)}>
+                    {tag}
+                </button>
+            </div>
+        )
+    )
+}
+
 export const weekDays = [ 
     "Monday",
     "Tuesday",

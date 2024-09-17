@@ -6,7 +6,6 @@ import {
   ScrollRestoration,
   useNavigate,
 } from "@remix-run/react";
-import "./tailwind.css";
 import { AuthnContainer } from "./components/auth/Authn";
 
 export function Layout({ children }: { children: React.ReactNode }) {

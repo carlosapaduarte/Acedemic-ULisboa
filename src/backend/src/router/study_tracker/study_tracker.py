@@ -1,8 +1,8 @@
 from datetime import datetime
 from fastapi import APIRouter, Response
-from domain.study_tracker import UnavailableScheduleBlock
-from router.study_tracker.dtos.input_dtos import CreateNewStudyTrackerTaskInputDto, CreateScheduleNotAvailableBlock, SetStudyTrackerAppUseGoalsInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto
-from service import common as common_service
+from domain.study_tracker import DateInterval, Event, Grade, Task, UnavailableScheduleBlock
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -11,13 +11,42 @@ router = APIRouter(
 )
 
 @router.post("/users/{user_id}/tasks")
-def create_new_task(user_id: int, input_dto: CreateNewStudyTrackerTaskInputDto) -> Response:
-    study_tracker_service.create_new_study_tracker_task(
+def create_task(user_id: int, dto: CreateTaskInputDto) -> TaskCreatedOutputDto:
+    task_id = study_tracker_service.create_task(user_id, Task.fromCreateTaskInputDto(dto), dto.createEvent)
+    return TaskCreatedOutputDto(task_id=task_id)
+
+@router.get("/users/{user_id}/tasks")
+def get_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[UserTaskOutputDto]:
+    tasks: list[Task] = study_tracker_service.get_user_tasks(user_id, order_by_deadline_and_priority)
+    return UserTaskOutputDto.from_Tasks(tasks)
+
+@router.put("/users/{user_id}/tasks/{task_id}")
+def update_task_status(user_id: int, task_id: int, dto: UpdateTaskStatus):
+    study_tracker_service.update_task_status(user_id, task_id, dto.newStatus)
+
+@router.get("/users/{user_id}/events")
+def get_events(user_id: int, today: bool) -> list[EventOutputDto]:
+    #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
+    events: list[Event]
+    if today:
+        events = study_tracker_service.get_today_events(user_id)
+    else:
+        events = study_tracker_service.get_events(user_id)
+    return EventOutputDto.from_events(events)
+
+@router.post("/users/{user_id}/events")
+def create_event(user_id: int, dto: CreateEventInputDto) -> Response:
+    study_tracker_service.create_event(
         user_id, 
-        input_dto.title, 
-        datetime.fromtimestamp(input_dto.startDate),
-        datetime.fromtimestamp(input_dto.endDate),
-        input_dto.tags
+        Event(
+            title=dto.title,
+            date=DateInterval(
+                    start_date=datetime.fromtimestamp(dto.startDate),
+                    end_date=datetime.fromtimestamp(dto.endDate)
+                ),
+            tags=dto.tags,
+            every_week=dto.everyWeek
+        )
     )
     return Response()
     
@@ -32,16 +61,6 @@ def update_receive_notifications_pref(user_id: int, input_dto: UpdateStudyTracke
 @router.put("/users/{user_id}/week-planning-day")
 def update_week_planning_day(user_id: int, input_dto: UpdateStudyTrackerWeekPlanningDayInputDto):
     study_tracker_service.update_study_tracker_app_planning_day(user_id, input_dto.day, input_dto.hour)
-
-@router.get("/users/{user_id}/tasks")
-def get_tasks(user_id: int, today: bool):
-    # PROBLEM: it's returning with date one hour different
-
-    #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
-    if today:
-        return study_tracker_service.get_today_tasks(user_id)
-    else:
-        return study_tracker_service.get_tasks(user_id)
     
 def fix_weekday_from_javascript(weekday: int) -> int:
     # Temporary solution to convert javascript Date().getDay() into python datetime.date().weekday
@@ -52,7 +71,7 @@ def fix_weekday_from_javascript(weekday: int) -> int:
     return weekday - 1
     
 @router.post("/users/{user_id}/schedule/unavailable")
-def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvailableBlock) -> Response:
+def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvailableBlockInputDto) -> Response:
     study_tracker_service.create_schedule_not_available_block(
         user_id, 
         UnavailableScheduleBlock(
@@ -62,3 +81,36 @@ def create_schedule_not_available_block(user_id: int, dto: CreateScheduleNotAvai
         )
     )
     return Response()
+
+@router.post("/users/{user_id}/archives")
+def create_archive(user_id: int, dto: CreateArchiveInputDto):
+    study_tracker_service.create_archive(user_id, dto.name)
+    
+@router.get("/users/{user_id}/archives")
+def get_events(user_id: int) ->  list[ArchiveOutputDto]:
+    archives = study_tracker_service.get_archives(user_id)
+    return ArchiveOutputDto.from_archives(archives)
+
+@router.post("/users/{user_id}/archives/{archive_name}")
+def create_file(user_id: int, archive_name: str, dto: CreateFileInputDto):
+    study_tracker_service.create_file(user_id, archive_name, dto.name)
+    
+@router.put("/users/{user_id}/archives/{archive_name}/files/{filename}")
+def update_file_content(user_id: int, archive_name: str, filename: str, dto: UpdateFileInputDto):
+    study_tracker_service.update_file_content(user_id, archive_name, filename, dto.content)
+    
+@router.get("/users/{user_id}/curricular-units")
+def get_curricular_units(user_id: int) ->  list[CurricularUnitOutputDto]:
+    curricular_units = study_tracker_service.get_curricular_units(user_id)
+    return CurricularUnitOutputDto.from_curricular_units(curricular_units)
+
+@router.post("/users/{user_id}/curricular-units")
+def create_curricular_unit(user_id: int, dto: CreateCurricularUnitInputDto):
+    study_tracker_service.create_curricular_unit(user_id, dto.name)
+    
+@router.post("/users/{user_id}/curricular-units/{curricular_unit}/grades")
+def create_grade(user_id: int, curricular_unit: str, dto: CreateGradeInputDto):
+    study_tracker_service.create_grade(user_id, curricular_unit, Grade(
+        value=dto.value,
+        weight=dto.weight
+    ))

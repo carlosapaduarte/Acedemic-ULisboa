@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-import datetime
 
-from domain.study_tracker import StudyTrackerTask, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Task, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -9,19 +8,15 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def create_new_study_tracker_task(self, user_id: int, title: str, start_date: datetime, end_date: datetime, tag: str):
+    def create_event(self, user_id: int, event: Event):
         pass
 
     @abstractmethod
-    def get_study_tracker_today_tasks(self, user_id: int) -> list[StudyTrackerTask]:
+    def get_events(self, user_id: int, filter_today: bool) -> list[Event]:
         pass
 
     @abstractmethod
-    def get_study_tracker_tasks(self, user_id: int) -> list[StudyTrackerTask]:
-        pass
-
-    @abstractmethod
-    def update_user_study_tracker_use_goals(self, user_id: int, avatar_filename: str):
+    def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set[int]):
         pass
 
     @abstractmethod
@@ -34,4 +29,40 @@ class StudyTrackerRepo(ABC):
 
     @abstractmethod
     def get_not_available_schedule_blocks(self, user_id: int) -> list[UnavailableScheduleBlock]:
+        pass
+    
+    @abstractmethod
+    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
+        pass
+
+    @abstractmethod
+    def create_task(self, user_id: int, task: Task) -> int:
+        pass
+
+    @abstractmethod
+    def update_task_status(self, user_id: int, task_id: int, new_status: str):
+        pass
+    
+    @abstractmethod
+    def create_archive(self, user_id: int, name: str):
+        pass
+    
+    @abstractmethod
+    def get_archives(self, user_id: int) -> list[Archive]:
+        pass
+    
+    @abstractmethod
+    def create_file(self, user_id: int, archive_name: str, name: str):
+        pass
+    
+    @abstractmethod
+    def update_file_content(self, user_id: int, archive_name: str, filename: str, new_content: str):
+        pass
+    
+    @abstractmethod
+    def get_curricular_units(self, user_id: int) -> list[CurricularUnit]:
+        pass
+    
+    @abstractmethod
+    def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
         pass

@@ -11,7 +11,7 @@ class CommonsRepo(ABC):
         pass
 
     @abstractmethod
-    def get_user(self, id) -> User:
+    def get_user(self, id: int) -> User:
         pass
 
     @abstractmethod
@@ -21,3 +21,4 @@ class CommonsRepo(ABC):
     @abstractmethod
     def update_user_avatar(self, user_id: int, avatar_filename: str):
         pass
+    

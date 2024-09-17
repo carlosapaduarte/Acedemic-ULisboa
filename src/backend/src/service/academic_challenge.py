@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from repository.sql.academic_challenge.repo_sql import AcademicChallengeSqlRepo
 

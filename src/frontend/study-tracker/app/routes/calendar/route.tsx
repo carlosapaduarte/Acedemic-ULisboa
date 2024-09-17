@@ -3,7 +3,7 @@ import styles from "./calendar.module.css";
 import { CalendarMonthView } from "./MonthView";
 import { CalendarWeekView } from "./WeekView";
 import { CalendarDayView } from "./DayView";
-import { AddTask } from "./AddNewTask";
+import { AddEvent } from "./AddNewEvent";
 import { AddScheduleNotAvailableBlock } from "./AddScheduleNotAvailableBlock";
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -13,10 +13,10 @@ enum TimeGranularity {
 	MONTH, WEEK, DAY
 }
 
-function DailyTasks() {
+function DailyEvents() {
 	return (
 		<h1>
-			Daily tasks will be displayed here...
+			Daily events will be displayed here...
 		</h1>
 	)
 }
@@ -118,7 +118,7 @@ function useMyCalendar() {
 	}
 }
 
-function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (startDate: Date) => void}) {
+function Calendar({onAddNewEventClick} : {onAddNewEventClick: (startDate: Date) => void}) {
 	const {
 		selectedTimeGranularity,
 		baseDate,
@@ -131,11 +131,11 @@ function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (startDate: Date) =>
 	switch(selectedTimeGranularity) {
 		case TimeGranularity.MONTH: {
 			calendarComponent =
-				<CalendarMonthView dayProp={baseDate} onDayClick={(date: Date) => onAddNewTaskClick(date)}/>
+				<CalendarMonthView dayProp={baseDate} onDayClick={(date: Date) => onAddNewEventClick(date)}/>
 		}
 		break
 		case TimeGranularity.WEEK: calendarComponent = (
-			<CalendarWeekView baseDate={baseDate} onHourClick={(date: Date) => onAddNewTaskClick(date)} />
+			<CalendarWeekView baseDate={baseDate} onHourClick={(date: Date) => onAddNewEventClick(date)} />
 		)
 		break
 		case TimeGranularity.DAY: {
@@ -143,7 +143,7 @@ function Calendar({onAddNewTaskClick} : {onAddNewTaskClick: (startDate: Date) =>
 				<div>
 					<CalendarDayView date={baseDate} onHourClick={(hour: number) => {
 						baseDate.setHours(hour)
-						onAddNewTaskClick(baseDate)
+						onAddNewEventClick(baseDate)
 					}} />
 				</div>
 			)
@@ -174,20 +174,20 @@ function useCalendarPage() {
 export default function CalendarPage() {
 	const { startDate, setStartDate, clearStartDate } = useCalendarPage()
 
-	const isAddNewTaskViewTypeSelected = startDate != undefined
+	const isAddNewEventViewTypeSelected = startDate != undefined
 
-	const domToDisplay = isAddNewTaskViewTypeSelected ?
-		<AddTask startDate={startDate} onNewTaskCreated={clearStartDate}/>
+	const domToDisplay = isAddNewEventViewTypeSelected ?
+		<AddEvent startDate={startDate} onNewEventCreated={clearStartDate}/>
 		:
 		(
 			<div>
-				<Calendar onAddNewTaskClick={setStartDate}/>
+				<Calendar onAddNewEventClick={setStartDate}/>
 				<br/>
 				<h1>Add Unavailable Schedule Block</h1>
 				<br/>
 				<AddScheduleNotAvailableBlock />
 				<br/>
-				<DailyTasks />
+				<DailyEvents />
 				<br/>
 			</div>
 		)

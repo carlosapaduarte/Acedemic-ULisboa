@@ -1,11 +1,10 @@
 from domain.commons.user import User
 from datetime import datetime
 
-from domain.user import User, UserNote, CompletedGoal
+from domain.user import User
 from exception import NotFoundException
 from repository.sql.commons.repo import CommonsRepo
 
-from .user_repo import UserRepo
 
 class CommonsMemRepo(CommonsRepo):
 
@@ -13,7 +12,7 @@ class CommonsMemRepo(CommonsRepo):
         self.users = dict()
         super().__init__()
 
-    users = dict()
+    users: dict[int, User] = dict()
 
     def create_user(self, id: int, username: str):
         "Creates a user without avatar, notes and goals, in level 1, and share_progress set to false"
