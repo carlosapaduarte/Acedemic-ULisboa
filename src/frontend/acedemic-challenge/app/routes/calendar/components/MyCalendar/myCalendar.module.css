@@ -70,7 +70,7 @@
     align-items: center;
 
     --edge-size: 0.3rem;
-    background-color: var(--purple-dark);
+    background-color: var(--third-color);
 }
 
 .calendarDayText {

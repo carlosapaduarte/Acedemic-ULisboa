@@ -44,7 +44,7 @@
 }
 
 .avatarContainer.selected {
-    border-color: var(--yellow);
+    border-color: var(--fourth-color);
     transition: border-color 0.2s;
 }
 
@@ -62,7 +62,7 @@
     font-size: 1.5rem;
     font-weight: bold;
 
-    background-color: var(--yellow);
+    background-color: var(--fourth-color);
 }
 
 @media (hover: hover) {

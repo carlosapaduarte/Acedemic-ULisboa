@@ -2,7 +2,7 @@
 .roundButton {
     height: 4rem;
     width: 16rem;
-    background-color: var(--secondary);
+    background-color: var(--secondary-color);
     font-size: 1.25rem;
     font-weight: 500;
     line-height: 1.75rem;

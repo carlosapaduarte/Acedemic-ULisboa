@@ -67,16 +67,16 @@ Doesn't work, use SCSS
 
 .challengeBox {
     width: 100%;
-    background-color: var(--secondary);
+    background-color: var(--secondary-color);
     font-weight: bold;
 }
 
 .challengeBox.expanded {
-    background-color: var(--yellow);
+    background-color: var(--fourth-color);
 }
 
 .challengeBox.locked {
-    background-color: var(--purple-dark);
+    background-color: var(--third-color);
     color: white;
 }
 

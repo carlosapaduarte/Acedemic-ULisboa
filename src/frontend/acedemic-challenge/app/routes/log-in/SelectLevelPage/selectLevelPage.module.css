@@ -88,11 +88,11 @@
     font-weight: bold;
     text-wrap: nowrap;
 
-    background-color: var(--secondary);
+    background-color: var(--secondary-color);
 }
 
 .levelButton.selected {
-    background-color: var(--yellow);
+    background-color: var(--fourth-color);
 }
 
 .levelContentTextContainer {
@@ -128,7 +128,7 @@
     font-size: 1.5rem;
     font-weight: bold;
 
-    background-color: var(--yellow);
+    background-color: var(--fourth-color);
 }
 
 @media (hover: hover) {

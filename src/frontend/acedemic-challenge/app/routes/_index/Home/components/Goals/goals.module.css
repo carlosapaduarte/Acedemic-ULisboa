@@ -32,14 +32,14 @@
 }
 
 .addNoteButton {
-    background-color: var(--secondary);
+    background-color: var(--secondary-color);
     font-weight: bold;
     font-size: 1rem;
     flex-basis: 40%;
 }
 
 .completeGoalButton {
-    background-color: var(--yellow);
+    background-color: var(--fourth-color);
     font-weight: bold;
     font-size: 1rem;
     height: auto;

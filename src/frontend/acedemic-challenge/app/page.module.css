@@ -24,7 +24,7 @@
 .pageInnerContainer h1, h2, h3 {
     font-size: 2rem;
     font-weight: bold;
-    color: var(--secondary);
+    color: var(--secondary-color);
 }
 
 .pageInnerContainer h2 {

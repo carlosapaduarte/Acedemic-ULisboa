@@ -13,7 +13,7 @@
     grid-template-columns: auto auto 1fr auto;
     gap: 0.5rem;
 
-    background-color: var(--purple-dark);
+    background-color: var(--third-color);
     color: white;
 
     --edge-size: 1.5em;
@@ -31,7 +31,7 @@
     grid-column: 1;
     grid-row: 1;
 
-    background-color: var(--secondary);
+    background-color: var(--secondary-color);
     color: black;
     width: 4rem;
     height: 3rem;
@@ -54,7 +54,7 @@
 }
 
 .homeButton {
-    background-color: var(--secondary);
+    background-color: var(--secondary-color);
     color: black;
     width: 4rem;
     height: 3rem;

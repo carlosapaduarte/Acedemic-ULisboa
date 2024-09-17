@@ -1,14 +1,14 @@
 import { createContext } from "react";
 import classNames from "classnames";
 
-export type AppTheme = "purple" | "black" | "random";
+export type AppTheme = "purple" | "black" | "blue";
 
 export namespace AppTheme {
-    export const values: AppTheme[] = ["purple", "black", "random"];
+    export const values: AppTheme[] = ["purple", "black", "blue"];
     export const className: Record<AppTheme, string> = {
         purple: "purpleTheme",
         black: "blackTheme",
-        random: "randomTheme"
+        blue: "blueTheme"
     };
     export const defaultTheme = "purple";
 }
