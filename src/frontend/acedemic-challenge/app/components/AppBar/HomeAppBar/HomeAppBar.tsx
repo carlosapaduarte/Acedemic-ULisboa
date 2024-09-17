@@ -1,12 +1,13 @@
 import styles from "./homeAppBar.module.css";
 import React, { useTransition } from "react";
 import { useTranslation } from "react-i18next";
-import { useLogOut, useUserId } from "~/components/auth/Authn";
+import { useLogOut, useUserIdEvent } from "~/components/auth/Authn";
 import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import dropdownStyles from "./dropdown.module.css";
+import { service, UserInfo } from "~/service/service";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -71,19 +72,32 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
 }
 
 export function GreetingsContainer() {
+    const [username, setUsername] = React.useState<string | undefined>(undefined);
+    const [avatarFilename, setAvatarFilename] = React.useState<string | undefined>(undefined);
+
+    useUserIdEvent((userId) => {
+        service.fetchUserInfoFromApi(userId)
+            .then((userInfo: UserInfo) => {
+                setAvatarFilename(userInfo.avatarFilename);
+                setUsername(userInfo.username);
+            });
+    });
+
     let helloQuote = getHelloQuote();
-    const userId = useUserId();
 
     return (
         <div className={styles.greetingsContainer}>
             <h4 className={styles.helloQuote}>
-                <span>{helloQuote}, {userId ?? "loading..."}</span>
+                {username ?
+                    <span>{helloQuote}, {username}</span>
+                    : <span>Loading...</span>
+                }
             </h4>
             <div className={`${styles.avatarAndDropdownContainer}`}>
                 <Dropdown trigger={
                     <div className={`${styles.avatarContainer}`}>
                         <img
-                            src={`./avatars/avatar${(userId ?? 7) % 8}.png`/*`./${userInfo.avatarFilename}`*/}
+                            src={`${avatarFilename}`}
                             height="100px"
                             alt={`User's Avatar`}
                         />
