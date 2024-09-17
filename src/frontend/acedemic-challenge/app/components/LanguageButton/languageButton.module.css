@@ -43,9 +43,9 @@
 }
 
 .languageButton.pt-PT::after {
-    background-image: url('minimalist-ptPT.png');
+    background-image: url('../minimalist-ptPT.png');
 }
 
 .languageButton.en-GB::after {
-    background-image: url('minimalist-enGB.png');
+    background-image: url('../minimalist-enGB.png');
 }

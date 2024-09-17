@@ -7,7 +7,7 @@ import cleanAppBarStyles from "./cleanAppBar.module.css";
 
 import { useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
-import { GreetingsContainer, NavBar } from "~/components/AppBar/HomeAppBar/HomeAppBar";
+import { GreetingsContainer, NavBar } from "./HomeAppBar/HomeAppBar";
 import classNames from "classnames";
 
 type AppBarVariant = "default" | "home" | "clean";

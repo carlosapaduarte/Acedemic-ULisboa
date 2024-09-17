@@ -95,13 +95,13 @@ export function GreetingsContainer() {
             </h4>
             <div className={`${styles.avatarAndDropdownContainer}`}>
                 <Dropdown trigger={
-                    <div className={`${styles.avatarContainer}`}>
+                    <button className={`${styles.avatarContainer}`}>
                         <img
                             src={`${avatarFilename}`}
                             height="100px"
                             alt={`User's Avatar`}
                         />
-                    </div>
+                    </button>
                 } />
             </div>
         </div>

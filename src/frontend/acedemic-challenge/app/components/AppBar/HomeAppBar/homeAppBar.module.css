@@ -60,7 +60,7 @@
 }
 
 .avatarContainer {
-    cursor: pointer;
+    background-color: transparent;
 }
 
 .navBar {

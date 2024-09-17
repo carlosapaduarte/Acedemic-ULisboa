@@ -8,7 +8,11 @@ import React from "react";
 export function SettingsButton() {
     const navigate = useNavigate();
 
-    return <IconContext.Provider value={{ className: classNames(styles.settingsButton) }}>
-        <RiSettings5Fill onClick={() => navigate("/settings")} />
-    </IconContext.Provider>;
+    return (
+        <button className={classNames(styles.settingsButton)}>
+            <IconContext.Provider value={{ className: classNames(styles.settingsButtonIcon) }}>
+                <RiSettings5Fill onClick={() => navigate("/settings")} />
+            </IconContext.Provider>
+        </button>
+    );
 }

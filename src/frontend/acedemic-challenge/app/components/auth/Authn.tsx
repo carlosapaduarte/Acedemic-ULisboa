@@ -2,7 +2,7 @@ import * as React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Logger } from "tslog";
 import { service } from "~/service/service";
-import { useSetError } from "../error/ErrorContainer";
+import { useSetError } from "~/components/error/ErrorContainer";
 
 const logger = new Logger({ name: "Authn" });
 
@@ -82,7 +82,9 @@ export function useIsLoggedIn() {
 
 type UserIdCallback = (userId: number) => void;
 
-export function useUserId() { return useContext(LoggedInContext).userId }
+export function useUserId() {
+    return useContext(LoggedInContext).userId;
+}
 
 export function useUserIdEvent(callback: UserIdCallback): number | undefined {
     const { userId } = useContext(LoggedInContext);

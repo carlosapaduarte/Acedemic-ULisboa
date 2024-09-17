@@ -1,5 +1,5 @@
-import styles from "~/components/AppBar/HomeAppBar/homeAppBar.module.css";
-import { CutButton } from "~/components/Button/Button";
+import styles from "./languageButton.module.css";
+import { CutButton } from "../Button/Button";
 import React from "react";
 import { useTranslation } from "react-i18next";
 

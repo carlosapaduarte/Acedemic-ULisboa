@@ -1,13 +1,13 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
 import { AuthnContainer } from "~/components/auth/Authn";
-import { NotFoundPage } from "~/Pages/NotFoundPage";
-import { Footer } from "~/components/Footer";
+import { NotFoundPage } from "./Pages/NotFoundPage";
+import { Footer } from "~/components/Footer/Footer";
 
 import "./global.css";
 import "./i18n";
 import "./themes.css";
-import { AppBar, AppBarProvider } from "~/components/AppBar/AppBar";
+import { AppBar, AppBarProvider } from "./components/AppBar/AppBar";
 import { useEffect, useState } from "react";
 import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
 
