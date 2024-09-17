@@ -88,8 +88,6 @@ export function useUserIdEvent(callback: UserIdCallback): number | undefined {
     const { userId } = useContext(LoggedInContext);
 
     useEffect(() => {
-        console.log("Ran useUserIdEffect");
-
         if (userId !== undefined && callback) {
             callback(userId);
         }

@@ -61,6 +61,10 @@ function useMainDashboardContent(userId: number) {
 
     useEffect(() => {
         async function processUserInfo(userInfo: UserInfo) {
+            if (userInfo.batches.length == 0) {
+                return;
+            }
+
             // For simplification, use the first one
             const batchToDisplay = userInfo.batches[0];
             setBatchToDisplay(batchToDisplay);
