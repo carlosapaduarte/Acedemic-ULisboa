@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { DayGoals, Goal } from "~/challenges/types";
 import { service, UserInfo, UserNote } from "~/service/service";
 import { utils } from "~/utils";
-import { CalendarDay } from "~/components/MyCalendar";
+import { CalendarDay } from "~/routes/calendar/components/MyCalendar/MyCalendar";
 import { useUserId } from "~/components/auth/Authn";
 
 export function useCalendar() {

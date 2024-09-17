@@ -1,0 +1,72 @@
+
+.settingsPage {
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+
+    animation: fade 0.5s ease;
+
+    display: flex;
+    flex-direction: column;
+
+    color: white;
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.settingTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.themeOption {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.themeLabel {
+    flex: 0 0 50%;
+
+    margin-left: 0.5rem;
+
+    text-transform: capitalize;
+}
+
+.themePalette {
+    flex-grow: 1;
+
+    width: 10rem;
+    height: 3rem;
+
+    border-color: white;
+    border-width: 1px;
+    border-style: solid;
+
+    display: flex;
+}
+
+.themePaletteItem {
+    width: 100%;
+    height: 100%;
+}
+
+.themePaletteItem:nth-child(1) {
+    background-color: var(--primary-color);
+}
+
+.themePaletteItem:nth-child(2) {
+    background-color: var(--secondary-color);
+}
+
+.themePaletteItem:nth-child(3) {
+    background-color: var(--third-color);
+}

@@ -1,5 +1,5 @@
 {
-    "title": "Page not found",
     "description": "We couldn't find the page you were looking for.",
-    "go_to_home": "Go to Home"
+    "go_to_home": "Go to Home",
+    "title": "Page not found"
 }

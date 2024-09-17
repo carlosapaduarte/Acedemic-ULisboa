@@ -1,20 +1,21 @@
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import styles from "./button.module.css";
 
-type ButtonVariant = "cut" | "round";
+type ButtonVariant = "cut" | "round" | "none";
 
 // Map variants to classes
 const buttonVariantClassMap: Record<ButtonVariant, string> = {
     "cut": styles.cutButton,
     "round": styles.roundButton,
+    "none": ""
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    variant: ButtonVariant;
-    children: ReactNode;
+    variant?: ButtonVariant;
+    children?: ReactNode;
 }
 
-export function Button({ variant, children, ...buttonProps }: ButtonProps) {
+export function Button({ variant = "none", children, ...buttonProps }: ButtonProps) {
     const buttonClass: string = buttonVariantClassMap[variant];
 
     return (
@@ -28,7 +29,7 @@ export function Button({ variant, children, ...buttonProps }: ButtonProps) {
 }
 
 interface CutButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 export function CutButton({ children, ...buttonProps }: CutButtonProps) {
@@ -36,20 +37,6 @@ export function CutButton({ children, ...buttonProps }: CutButtonProps) {
         <Button
             variant="cut"
             {...buttonProps}
-            children={children}
-        />
-    );
-}
-
-interface ConfirmButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    children: ReactNode;
-}
-
-export function ConfirmButton({ children, ...buttonProps }: ConfirmButtonProps) {
-    return (
-        <CutButton
-            {...buttonProps}
-            className={`${styles.confirmButton} ${buttonProps.className}`}
             children={children}
         />
     );

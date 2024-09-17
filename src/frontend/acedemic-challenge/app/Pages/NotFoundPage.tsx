@@ -1,7 +1,7 @@
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import styles from "./notFoundPage.module.css";
-import { Button } from "~/components/Button";
+import { Button } from "~/components/Button/Button";
 
 /**
  * Page not found component.

@@ -1,8 +1,10 @@
 import { NotFoundPage } from "~/Pages/NotFoundPage";
+import classNames from "classnames";
+import styles from "../Pages/notFoundPage.module.css";
 
 export default function DefaultRoute() {
     return (
-        <div className="h-screen w-screen bg-primary">
+        <div className={classNames(styles.notFoundPage)}>
             <NotFoundPage />
         </div>
     );

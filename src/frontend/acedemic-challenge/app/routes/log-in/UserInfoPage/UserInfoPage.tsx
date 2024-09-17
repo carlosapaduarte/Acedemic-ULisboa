@@ -3,7 +3,7 @@ import { useSetError } from "~/components/error/ErrorContainer";
 import React, { useState } from "react";
 import { service } from "~/service/service";
 import styles from "./userInfoPage.module.css";
-import { Button } from "~/components/Button";
+import { Button } from "~/components/Button/Button";
 
 const MAX_USER_ID = 9999;
 

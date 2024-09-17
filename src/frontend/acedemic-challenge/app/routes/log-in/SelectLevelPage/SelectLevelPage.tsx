@@ -3,7 +3,7 @@ import { service } from "~/service/service";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./selectLevelPage.module.css";
-import { ConfirmButton, CutButton } from "~/components/Button";
+import { CutButton } from "~/components/Button/Button";
 
 export default function SelectLevelPage(
     {
@@ -32,14 +32,14 @@ export default function SelectLevelPage(
                     onLevelClick={setSelectedLevel}
                 />
                 <div className={styles.confirmButtonContainer}>
-                    <ConfirmButton className={`${styles.confirmLevelButton}`}
-                                   onClick={() => {
-                                       if (selectedLevel !== null)
-                                           onConfirmClick(selectedLevel);
-                                   }}
+                    <CutButton className={`${styles.confirmLevelButton}`}
+                               onClick={() => {
+                                   if (selectedLevel !== null)
+                                       onConfirmClick(selectedLevel);
+                               }}
                     >
                         {t("login:confirm_level")}
-                    </ConfirmButton>
+                    </CutButton>
                 </div>
             </div>
         </div>

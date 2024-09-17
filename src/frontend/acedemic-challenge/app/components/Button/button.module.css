@@ -2,7 +2,7 @@
 .roundButton {
     height: 4rem;
     width: 16rem;
-    background-color: var(--secondary);
+    background-color: var(--secondary-color);
     font-size: 1.25rem;
     font-weight: 500;
     line-height: 1.75rem;
@@ -10,7 +10,7 @@
 }
 
 .cutButton {
-    --edge-size: .5em;
+    --edge-size: .5rem;
     clip-path: polygon(
             var(--edge-size) 0,
             calc(100% - var(--edge-size)) 0,
@@ -24,14 +24,6 @@
 
     text-transform: uppercase;
     font-family: 'Chakra Petch', sans-serif;
-}
-
-.confirmButton {
-    height: 4rem;
-    width: 12rem;
-    background-color: var(--yellow);
-    font-weight: bold;
-    font-size: 1.5rem;
 }
 
 /*
@@ -50,9 +42,4 @@ Something like this could be very interesting for animating.
     .roundButton:hover {
         background-color: var(--secondary-85);
     }
-
-    .confirmButton:hover {
-        background-color: var(--yellow-85);
-    }
-
 }

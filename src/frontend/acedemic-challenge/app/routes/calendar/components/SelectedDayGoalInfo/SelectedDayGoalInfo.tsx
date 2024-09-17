@@ -2,6 +2,8 @@ import { DayGoals, Goal } from "~/challenges/types";
 import { utils } from "~/utils";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import styles from "../../calendarPage.module.css";
+import { CutButton } from "~/components/Button/Button";
 
 function useSelectedDayGoalInfo({ goals, selectedDay }: { goals: DayGoals[], selectedDay: Date }) {
     // TODO: only displaying one Goal!!! There could be more
@@ -28,30 +30,46 @@ export default function SelectedDayGoalInfo({ goals, selectedDay }: { goals: Day
     const { goalsToDisplay } = useSelectedDayGoalInfo({ goals, selectedDay });
     const { t } = useTranslation(["calendar"]);
 
-    if (goalsToDisplay.length != 0)
-        // Showing a single goal, for now
+    if (goalsToDisplay.length == 1) {
+        const goal = goalsToDisplay[0];
         return (
-            <div>
+            <>
+                <div className={`${styles.goalTextContainer}`}>
+                    <h2 className={`${styles.goalTitle}`}>
+                        {goal.title}
+                    </h2>
+                    <p className={`${styles.goalDescription}`}>
+                        {goal.description}
+                    </p>
+                </div>
+                <CutButton className={`${styles.seeMoreButton}`}>
+                    {t("calendar:see_more_button_text")}
+                </CutButton>
+            </>
+        );
+    } else if (goalsToDisplay.length > 1) {
+        return (
+            <>
                 {
                     goalsToDisplay.map((goal: Goal, index: number) =>
-                        <div key={index} style={{ overflow: "hidden", marginBottom: "3%" }}>
-                            <h6>
+                        <div key={index}>
+                            <h2 className={`${styles.goalTitle}`}>
                                 {goal.title}
-                            </h6>
-                            <p>
+                            </h2>
+                            <p className={`${styles.goalDescription}`}>
                                 {goal.description}
                             </p>
                         </div>
                     )
                 }
-            </div>
+            </>
         );
-    else
+    } else
         return (
-            <div style={{ marginBottom: "3%" }}>
-                <h6>
+            <div className={`${styles.noGoalsTextContainer}`}>
+                <h4 className={`${styles.noGoalsText}`}>
                     {t("calendar:no_goals_title")}
-                </h6>
+                </h4>
             </div>
         );
 }

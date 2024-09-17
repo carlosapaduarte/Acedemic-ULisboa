@@ -2,9 +2,14 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, 
 import type { MetaFunction } from "@remix-run/node";
 import { AuthnContainer } from "~/components/auth/Authn";
 import { NotFoundPage } from "~/Pages/NotFoundPage";
+import { Footer } from "~/components/Footer";
 
 import "./global.css";
 import "./i18n";
+import "./themes.css";
+import { AppBar, AppBarProvider } from "~/components/AppBar/AppBar";
+import { useEffect, useState } from "react";
+import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -36,18 +41,45 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function Root() {
+    const [isHydrated, setIsHydrated] = useState(false);
+    const [theme, setTheme] = useState<AppTheme>(AppTheme.defaultTheme);
+
+    useEffect(() => {
+        const storedTheme = getLocalStorageTheme();
+
+        setTheme(storedTheme);
+
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        document.body.className = getAppThemeClassNames(theme);
+    }, [theme]);
+
+    if (!isHydrated) {
+        return null;
+    }
+
     return (
         <AuthnContainer>
-            <App />
+            <ThemeProvider theme={theme} setTheme={setTheme}>
+                <App />
+            </ThemeProvider>
         </AuthnContainer>
     );
 }
 
 export function App() {
     return (
-        <div className="app">
-            <Outlet />
-        </div>
+        <AppBarProvider>
+            <div className="app">
+                <AppBar />
+                <div className="mainContentContainer">
+                    <Outlet />
+                </div>
+                <Footer />
+            </div>
+        </AppBarProvider>
     );
 }
 

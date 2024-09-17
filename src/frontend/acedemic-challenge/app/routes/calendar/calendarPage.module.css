@@ -1,0 +1,129 @@
+
+.calendarPage {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.mainContent {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.goalsContainerWrapper {
+    --edge-size: 1.5em;
+
+    width: 100%;
+    flex-grow: 1;
+
+    padding: calc(var(--edge-size) + 0.5rem) var(--edge-size) 0.5rem;
+
+    overflow: auto;
+
+    background-color: var(--fourth-color);
+
+    clip-path: polygon(
+            100% 0%,
+            100% calc(100% - var(--edge-size)),
+            calc(100% - var(--edge-size)) 100%,
+            var(--edge-size) 100%,
+            0 calc(100% - var(--edge-size)),
+            0 0,
+            var(--edge-size) var(--edge-size),
+            calc(100% - var(--edge-size)) var(--edge-size)
+    );
+}
+
+.goalsContainer {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.5rem;
+
+    overflow: auto;
+}
+
+.goalTextContainer {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: auto;
+}
+
+.goalTitle {
+    margin-bottom: 0.25em;
+
+    font-size: 1.5em;
+    font-weight: bold;
+
+    color: black;
+    font-family: var(--font-family2), sans-serif;
+    text-transform: uppercase;
+}
+
+.goalDescription {
+    width: 100%;
+    height: 100%;
+
+    overflow: auto;
+
+    font-size: 1em;
+    color: black;
+}
+
+/*Should have enough compatibility with every recent browser*/
+/*.goalDescription {
+    height: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}*/
+
+.seeMoreButton {
+    width: 100%;
+
+    font-size: 1em;
+    font-weight: bold;
+
+    background-color: black;
+    color: white;
+}
+
+.noGoalsTextContainer {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.noGoalsText {
+    font-size: 1em;
+    font-weight: bold;
+
+    color: black;
+}
+
+.loadingTextContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}

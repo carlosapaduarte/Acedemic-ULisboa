@@ -1,6 +1,6 @@
 {
-    "night": "Boa Noite",
-    "morning": "Bom Dia",
     "afternoon": "Boa Tarde",
-    "evening": "Boa Noite"
+    "evening": "Boa Noite",
+    "morning": "Bom Dia",
+    "night": "Boa Noite"
 }

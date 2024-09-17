@@ -5,6 +5,7 @@ import { service } from "~/service/service";
 import { useSetError } from "../error/ErrorContainer";
 
 const logger = new Logger({ name: "Authn" });
+
 type ContextType = {
     isLoggedIn: boolean | undefined;
     userId: number | undefined;
@@ -79,8 +80,22 @@ export function useIsLoggedIn() {
     return useContext(LoggedInContext).isLoggedIn;
 }
 
-export function useUserId() {
-    return useContext(LoggedInContext).userId;
+type UserIdCallback = (userId: number) => void;
+
+export function useUserId() { return useContext(LoggedInContext).userId }
+
+export function useUserIdEvent(callback: UserIdCallback): number | undefined {
+    const { userId } = useContext(LoggedInContext);
+
+    useEffect(() => {
+        console.log("Ran useUserIdEffect");
+
+        if (userId !== undefined && callback) {
+            callback(userId);
+        }
+    }, [userId]);
+
+    return userId;
 }
 
 export function useLogIn() {
