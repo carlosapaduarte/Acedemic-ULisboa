@@ -70,7 +70,7 @@ function getGoalsPerDay(level: LevelType): Goal[][] {
     return toReturn;
 }
 
-function getGoalsPerDayByStartDate(
+function getChallengesPerDayByStartDate(
     level: LevelType,
     startDate: Date
 ): Goal[][] {
@@ -87,5 +87,5 @@ export const utils = {
     sameDay,
     getUserGoals,
     getGoalsPerDay,
-    getChallengesPerDayByStartDate: getGoalsPerDayByStartDate
+    getChallengesPerDayByStartDate: getChallengesPerDayByStartDate
 };

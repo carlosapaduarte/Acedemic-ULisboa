@@ -102,6 +102,7 @@ Doesn't work, use SCSS
 
 .challengeBox .challengeExpandableContainer {
     transition: max-height 0.5s cubic-bezier(0.87, 0, 0.13, 1);
+    height: 1000vh;
     max-height: 0;
     overflow: auto;
 }

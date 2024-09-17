@@ -7,79 +7,65 @@ import { useUserIdEvent } from "~/components/auth/Authn";
 import styles from "./challengesPage.module.css";
 import { CutButton } from "~/components/Button/Button";
 import { Level1 } from "~/challenges/level_1";
+import classNames from "classnames";
 
-function ChallengeBox({ challengeIndex, challengeTitle, lastExpanded, expanded, reached, onChallengeClick }: {
-    challengeIndex: number,
-    challengeTitle: string,
-    lastExpanded: boolean,
-    expanded: boolean,
-    reached: boolean,
-    onChallengeClick: (challengeIndex: number) => void
-}) {
+/*
+* TODO Make sure it adheres to the WAIA-ARIA design pattern for the Accordion:
+*  https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
+* */
+function ChallengeBox(
+    { challengeIndex, challengeTitle, challengeDescription, lastExpanded, expanded, reached, onChallengeClick }: {
+        challengeIndex: number,
+        challengeTitle: string,
+        challengeDescription: string,
+        lastExpanded: boolean,
+        expanded: boolean,
+        reached: boolean,
+        onChallengeClick: (challengeIndex: number) => void
+    }
+) {
     return (
-        <div className={`
-        ${styles.challengeBoxContainer}
-        ${lastExpanded && reached ? styles.lastExpanded : ""}
-        ${expanded && reached ? styles.expanded : ""}
-        `}>
+        <div className={
+            classNames(
+                styles.challengeBoxContainer,
+                lastExpanded && reached ? styles.lastExpanded : "",
+                expanded && reached ? styles.expanded : ""
+            )}>
             <CutButton
-                className={`
-                ${styles.challengeBox} 
-                ${reached ? "" : styles.locked} 
-                ${expanded && reached ? styles.expanded : ""}
-            `}
+                className={classNames(
+                    styles.challengeBox,
+                    reached ? "" : styles.locked,
+                    expanded && reached ? styles.expanded : ""
+                )}
+                aria-expanded={reached ? (expanded) : undefined}
+                aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
                 onClick={() => onChallengeClick(challengeIndex)}>
                 {
                     reached ?
                         <div className={`${styles.challengeContainer}`}>
-                            <p className={`${styles.challengeTitle}`}>{challengeIndex + 1} - {challengeTitle}</p>
-                            <div className={`${styles.challengeExpandableContainer}`}>
+                            <p className={`${styles.challengeTitle}`}>
+                                <span className="visually-hidden">Challenge </span>
+                                {challengeIndex + 1} - {challengeTitle}
+                            </p>
+                            <div
+                                className={`${styles.challengeExpandableContainer}`}
+                                id={`challengeDescription-${challengeIndex}`}
+                                aria-hidden={!expanded}
+                            >
                                 <div className={`${styles.challengeDescription}`}>
-                                    Lorem ipsum odor amet, consectetuer adipiscing elit. Pharetra fusce primis
-                                    suspendisse
-                                    interdum pharetra cursus habitasse eu. Semper porttitor maecenas phasellus potenti
-                                    malesuada
-                                    quam maximus. Est lectus parturient netus justo convallis et. Pretium aenean vivamus
-                                    commodo
-                                    et dapibus viverra inceptos parturient primis. Natoque magna sapien; gravida rutrum
-                                    sapien
-                                    id gravida. Dolor nunc faucibus massa montes nam at habitant.Lorem ipsum odor amet,
-                                    consectetuer adipiscing elit. Pharetra fusce primis suspendisse
-                                    interdum pharetra cursus habitasse eu. Semper porttitor maecenas phasellus potenti
-                                    malesuada
-                                    quam maximus. Est lectus parturient netus justo convallis et. Pretium aenean vivamus
-                                    commodo
-                                    et dapibus viverra inceptos parturient primis. Natoque magna sapien; gravida rutrum
-                                    sapien
-                                    id gravida. Dolor nunc faucibus massa montes nam at habitant.Lorem ipsum odor amet,
-                                    consectetuer adipiscing elit. Pharetra fusce primis suspendisse
-                                    interdum pharetra cursus habitasse eu. Semper porttitor maecenas phasellus potenti
-                                    malesuada
-                                    quam maximus. Est lectus parturient netus justo convallis et. Pretium aenean vivamus
-                                    commodo
-                                    et dapibus viverra inceptos parturient primis. Natoque magna sapien; gravida rutrum
-                                    sapien
-                                    id gravida. Dolor nunc faucibus massa montes nam at habitant.
+                                    {challengeDescription}
                                 </div>
                             </div>
                         </div>
                         :
                         <div className={`${styles.challengeContainer}`}>
-                            <p className={`${styles.challengeTitle}`}>?</p>
+                            <p className={`${styles.challengeTitle}`}>
+                                <span className="visually-hidden">Locked challenge</span>
+                                ?
+                            </p>
                         </div>
                 }
             </CutButton>
-        </div>
-    );
-}
-
-function Title() {
-    const { t } = useTranslation(["goal_overview"]);
-    return (
-        <div style={{ marginBottom: "2%" }}>
-            <h2>
-                {t("goal_overview:title")}
-            </h2>
         </div>
     );
 }
@@ -109,6 +95,8 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
         setSelectedItem(index);
     }
 
+    console.log("Challenges: ", challenges);
+
     return (
         <div className={`${styles.challengesList}`}>
             {
@@ -118,6 +106,7 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
                         return <ChallengeBox key={index}
                                              challengeIndex={index}
                                              challengeTitle={Level1.getLevel1GoalList()[index].title}
+                                             challengeDescription={Level1.getLevel1GoalList()[index].description}
                                              lastExpanded={lastSelectedItem == index}
                                              expanded={selectedItem == index}
                                              reached={reached}
@@ -130,16 +119,20 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
 }
 
 function useChallenges() {
+    /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
+
     useUserIdEvent((userId) => {
         service.fetchUserInfoFromApi(userId)
             .then((userInfo: UserInfo) => {
-                const testStartDate = new Date();
-                testStartDate.setDate(testStartDate.getDate() - 10);
+                console.log("User info: ", userInfo);
 
-                const batchToDisplay = userInfo.batches[0];
+                const batchToDisplay = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
                 const level = batchToDisplay.level;
+                const startDate = new Date(batchToDisplay.startDate * 1000);
 
-                const challenges = utils.getChallengesPerDayByStartDate(level, testStartDate);
+                startDate.setDate(startDate.getDate() - 2);
+
+                const challenges = utils.getChallengesPerDayByStartDate(level, startDate);
                 setChallenges(challenges);
             });
     });
