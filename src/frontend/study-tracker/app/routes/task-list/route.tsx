@@ -5,7 +5,7 @@ import { utils } from "~/utils"
 import { TaskView } from "./Task"
 import { CreateTask } from "./CreateTask"
 
-function useTaskList() {
+export function useTaskList() {
     const [tasks, setTasks] = useState<Task[] | undefined>(undefined)
     const setError = useSetError()
 
@@ -19,11 +19,9 @@ function useTaskList() {
     return tasks
 }
 
-function TaskList({tasks, onNewTaskViewClick} : {tasks: Task[], onNewTaskViewClick: () => void}) {
+export function TaskList({tasks, onTaskClick} : {tasks: Task[], onTaskClick: (taskId: Task) => void}) {
     return (
         <div>
-            <button onClick={() => onNewTaskViewClick()}>Create New Task!</button>
-            <br/><br/>
             <h1>My Tasks</h1>
             {tasks?.map((task: Task, index: number) => 
                 <TaskView key={index} taskToDisplay={task} />
@@ -41,7 +39,12 @@ export default function TaskPage() {
     const [view, setView] = useState<TaskListView>("taskList")
 
     if (view == "taskList" && tasks)
-        return (<TaskList tasks={tasks} onNewTaskViewClick={() => setView("createNewTask")} />)
+        return (
+            <div>
+                <button onClick={() => setView("createNewTask")}>Create New Task!</button>
+                <TaskList tasks={tasks} onTaskClick={() => {}} />
+            </div>
+        )
     else
         return (<CreateTask onTaskCreated={() => setView("taskList")} />)
 }

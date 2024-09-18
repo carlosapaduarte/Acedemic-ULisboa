@@ -178,10 +178,25 @@ async function getUserEvents(userId: number, filterTodayEvents: boolean): Promis
     }
 }
 
-async function getUserRecurrentEvents(userId: number) {
+async function getUserRecurrentEvents(userId: number): Promise<Event[]> {
     // For simplicity, let's just get all events and filter here instead of in the backend
     const allEvents = await getUserEvents(userId, false)
     return allEvents.filter((event: Event) => event.everyWeek)
+}
+
+async function getStudyBlockHappeningNow(userId: number): Promise<Event | undefined> {
+
+    function containsStudyTag(tags: string[]): boolean {
+        return tags.includes("Revisão") || tags.includes("Leitura") || tags.includes("Exercícios / Prática") || tags.includes("Preparação de provas")
+    }
+
+    const recurrentEvents = await getUserRecurrentEvents(userId)
+
+    // Study blocks happening now!
+    const now = new Date()
+    return recurrentEvents.find((event: Event) =>
+        containsStudyTag(event.tags) && event.startDate < now && event.endDate > now
+    )
 }
 
 async function getUserTodayEvents(userId: number): Promise<Event[]> {
@@ -418,7 +433,6 @@ async function getCurricularUnit(userId: number, name: string): Promise<Curricul
     if (curricularUnit == undefined)
         return Promise.reject(new Error('Curricular Unit does not exist!'))
     return curricularUnit
-
 }
 
 async function createCurricularUnit(userId: number, name: string) {
@@ -454,6 +468,7 @@ export const service = {
     createNewEvent,
     getUserEvents,
     getUserRecurrentEvents,
+    getStudyBlockHappeningNow,
     getUserTodayEvents,
     createScheduleNotAvailableBlock,
     getTasks,
