@@ -6,46 +6,22 @@
     width: var(--width);
     height: calc(var(--width) / 1.5);
 
-    --edge-size: calc(var(--width) / 6);
-
     color: black;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
     background-color: white;
 
-    position: relative;
-    isolation: isolate;
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--secondary-text-color);
 }
 
-.languageButton::after,
-.languageButton::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-
-    scale: 95%;
-    --border-edge-size: calc(var(--edge-size));
-    clip-path: polygon(
-            var(--border-edge-size) 0,
-            calc(100% - var(--border-edge-size)) 0,
-            100% var(--border-edge-size),
-            100% calc(100% - var(--border-edge-size)),
-            calc(100% - var(--border-edge-size)) 100%,
-            var(--border-edge-size) 100%,
-            0 calc(100% - var(--border-edge-size)),
-            0 var(--border-edge-size)
-    );
-}
-
-.languageButton.pt-PT::after {
+.languageButton.pt-PT {
     background-image: url('../minimalist-ptPT.png');
 }
 
-.languageButton.en-GB::after {
+.languageButton.en-GB {
     background-image: url('../minimalist-enGB.png');
 }

@@ -1,4 +1,4 @@
-import { CutButton } from "~/components/Button/Button";
+import { Button } from "~/components/Button/Button";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
@@ -53,18 +53,18 @@ export function AppBar() {
                 appBarVariant === "clean" && cleanAppBarStyles.appBar
             )}>
             {appBarVariant !== "clean" && (
-                <CutButton
+                <Button
                     className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
                     onClick={() => navigate(-1)}
                 >
                     {"<"}
-                </CutButton>
+                </Button>
             )}
             {appBarVariant === "default" && (
                 <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
-                    <CutButton className={styles.homeButton}>
+                    <Button className={styles.homeButton}>
                         Home
-                    </CutButton>
+                    </Button>
                 </div>
             )}
             <div key="settingsButtons"

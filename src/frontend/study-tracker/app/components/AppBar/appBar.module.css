@@ -31,16 +31,19 @@
     grid-column: 1;
     grid-row: 1;
 
-    background-color: var(--secondary-color);
-    color: black;
     width: 4rem;
     height: 3rem;
+
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
 
     text-align: center;
     font-size: xx-large;
     font-weight: bold;
+    font-family: var(--font-family2), sans-serif;
+    text-transform: uppercase;
 
-    --edge-size: 0.75rem;
+    border-radius: 10px;
 }
 
 .homeButtonContainer {
@@ -54,16 +57,19 @@
 }
 
 .homeButton {
-    background-color: var(--secondary-color);
-    color: black;
     width: 4rem;
     height: 3rem;
+
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
 
     text-align: center;
     font-size: large;
     font-weight: bold;
+    font-family: var(--font-family2), sans-serif;
+    text-transform: uppercase;
 
-    --edge-size: 0.75rem;
+    border-radius: 10px;
 }
 
 .settingsButtons {
