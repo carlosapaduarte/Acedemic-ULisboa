@@ -21,28 +21,6 @@
     justify-content: center;
 }
 
-.pageInnerContainer h1, h2, h3 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--secondary-color);
-}
-
-.pageInnerContainer h2 {
-    font-size: 1.5rem;
-}
-
-.pageInnerContainer h3 {
-    font-size: 1.25rem;
-    color: white;
-}
-
-.pageInnerContainer p {
-    margin-top: 0.5rem;
-    font-size: 1rem;
-
-    color: white;
-}
-
 @media (min-width: 768px) {
     .pageContainer {
         height: 50%;

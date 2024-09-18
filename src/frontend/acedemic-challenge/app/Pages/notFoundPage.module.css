@@ -16,3 +16,11 @@
     margin-bottom: 1rem;
     margin-top: 1rem;
 }
+
+.pageInnerContainer h1, h2 {
+    color: var(--secondary-color);
+}
+
+.pageInnerContainer h3 {
+    color: var(--secondary-text-color);
+}

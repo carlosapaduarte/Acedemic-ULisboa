@@ -20,7 +20,7 @@ export default function UserInfoPage(
             <div className={styles.pageInnerContainer}>
                 {userId != undefined ? (
                     <>
-                        <h1>
+                        <h1 className={styles.titleText}>
                             User created!
                         </h1>
                         <Button variant={"round"} onClick={() => onAuthDone(userId)
@@ -30,7 +30,7 @@ export default function UserInfoPage(
                     </>
                 ) : (
                     <>
-                        <h1>
+                        <h1 className={styles.titleText}>
                             Create New User
                         </h1>
                         <Button variant={"round"} onClick={() => createUser()}>

@@ -1,0 +1,11 @@
+{
+    "confirm_level": "Confirm",
+    "level_1_description": "I lose focus and have disorganized study habits, resulting in low school performance",
+    "level_1_title": "Not Effective",
+    "level_2_description": "I struggle to keep a study routine, achieving solid but average grades",
+    "level_2_title": "Effective",
+    "level_3_description": "I study consistently, focus easily, and achieve top grades",
+    "level_3_title": "Highly Effective",
+    "select_avatar_initial_question": "Select your avatar",
+    "select_level_initial_question": "How effective have been your study habits lately?"
+}

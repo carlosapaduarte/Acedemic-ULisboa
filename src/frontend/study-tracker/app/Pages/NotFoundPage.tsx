@@ -17,7 +17,7 @@ export function NotFoundPage() {
                 <h2>
                     {t("not_found_page:title")}
                 </h2>
-                <h3>
+                <h3 className={styles.descriptionText}>
                     {t("not_found_page:description")}
                 </h3>
                 <Button variant={"round"} className={styles.goHomeButton}

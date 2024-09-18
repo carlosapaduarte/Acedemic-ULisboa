@@ -17,7 +17,7 @@ export default function ShareProgressPage(
     return (
         <div className={styles.pageContainer}>
             <div className={styles.pageInnerContainer}>
-                <h1>
+                <h1 className={styles.titleText}>
                     Do you want to share your progress?
                 </h1>
                 <br />

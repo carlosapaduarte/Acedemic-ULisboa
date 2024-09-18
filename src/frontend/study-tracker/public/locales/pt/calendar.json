@@ -1,0 +1,30 @@
+{
+    "months": {
+        "april": "Abril",
+        "august": "Agosto",
+        "december": "Dezembro",
+        "february": "Fevereiro",
+        "january": "Janeiro",
+        "july": "Julho",
+        "june": "Junho",
+        "march": "Março",
+        "may": "Maio",
+        "november": "Novembro",
+        "october": "Outubro",
+        "september": "Setembro"
+    },
+    "new_note_label": "Nota",
+    "next_month_but": "Próximo",
+    "no_goals_title": "Não há desafios para este dia...",
+    "prev_month_but": "Anterior",
+    "today": "Hoje",
+    "weekdays": {
+        "friday": "Sex",
+        "monday": "Seg",
+        "saturday": "Sáb",
+        "sunday": "Dom",
+        "thursday": "Qui",
+        "tuesday": "Ter",
+        "wednesday": "Qua"
+    }
+}

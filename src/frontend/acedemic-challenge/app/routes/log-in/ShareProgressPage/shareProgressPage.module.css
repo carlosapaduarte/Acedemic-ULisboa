@@ -1,5 +1,10 @@
 @import "../login.module.css";
 
+
+.titleText {
+    color: var(--secondary-color)
+}
+
 .shareProgressButton {
     height: 2rem;
 }
