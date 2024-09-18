@@ -1,52 +1,38 @@
-import React from "react";
+import { time } from "node:console";
+import React, { useEffect, useState } from "react";
 import useTimer from "react-timer-hook";
+import { SelectTime } from "./TimeSelection";
+import { Timer } from "./Timer";
 
-function MyTimer({ expiryTimestamp }: { expiryTimestamp: Date }) {
-    const {
-        totalSeconds,
-        seconds,
-        minutes,
-        hours,
-        days,
-        isRunning,
-        start,
-        pause,
-        resume,
-        restart
-    } = // @ts-ignore
-        useTimer({ expiryTimestamp, onExpire: () => console.warn("onExpire called") });
+export default function TimerPage() {
+    const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(undefined)
+    const [pauseStopDate, setPauseStopDate] = useState<Date | undefined>(undefined)
 
+    // This is the timer that is passed to the Timer component
+    const [timerStopDate, setTimerStopDate] = useState<Date | undefined>(undefined)
 
-    return (
-        <div style={{ textAlign: "center", padding: "1rem" }}>
-            <h1>react-timer-hook </h1>
-            <p>Timer Demo</p>
-            <div style={{ fontSize: "4rem" }}>
-                <span>{hours.toString().padStart(2, '0')}</span>:
-                <span>{minutes.toString().padStart(2, '0')}</span>:
-                <span>{seconds.toString().padStart(2, '0')}</span>
-            </div>
-            <p>{isRunning ? "Running" : "Not running"}</p>
-            <button onClick={start}>Start</button>
-            <button onClick={pause}>Pause</button>
-            <button onClick={resume}>Resume</button>
-            <button onClick={() => {
-                // Restarts to 5 minutes timer
-                const time = new Date();
-                time.setSeconds(time.getSeconds() + 300);
-                restart(time);
-            }}>Restart
-            </button>
-        </div>
-    );
-}
+    function onTimeSelected(studyStopDate: Date, pauseStopDate: Date) {
+        setStudyStopDate(studyStopDate)
+        setPauseStopDate(pauseStopDate)
 
-export default function App() {
-    const time = new Date();
-    time.setSeconds(time.getSeconds() + 600); // 10 minutes timer
-    return (
-        <div>
-            <MyTimer expiryTimestamp={time} />
-        </div>
-    );
+        setTimerStopDate(studyStopDate)
+    }
+
+    function onTimerFinish() {
+        if (timerStopDate == studyStopDate)
+            setTimerStopDate(pauseStopDate)
+        else
+            setTimerStopDate(undefined)
+    }
+
+    if (timerStopDate == undefined)
+        return (
+            <SelectTime onTimeSelected={onTimeSelected} />
+        )
+    else {
+        const title = timerStopDate == studyStopDate ? "Study Time" : "Pause Time"
+        return (
+            <Timer title={title} stopDate={timerStopDate} onStopClick={() => setStudyStopDate(undefined)} onFinish={onTimerFinish} />
+        );
+    }
 }

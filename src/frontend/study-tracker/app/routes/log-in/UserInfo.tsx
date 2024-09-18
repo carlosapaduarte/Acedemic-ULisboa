@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSetIsLoggedIn } from "~/components/auth/Authn";
+import { useIsLoggedIn } from "~/components/auth/Authn";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { service } from "~/service/service";
 
@@ -42,7 +42,7 @@ export function UserInfo({ onAuthDone }: { onAuthDone: (userId: number) => void 
 }
 
 function useUserInfo() {
-    const setIsLoggedIn = useSetIsLoggedIn();
+    const setIsLoggedIn = useIsLoggedIn()
     const setError = useSetError();
 
     // This function should redirect user to ULisboa authentication page,
