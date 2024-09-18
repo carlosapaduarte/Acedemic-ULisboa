@@ -1,0 +1,12 @@
+
+.settingsButton {
+    background-color: transparent;
+    color: unset;
+    border: none;
+}
+
+.settingsButtonIcon {
+    margin-top: -3px;
+    width: 32px;
+    height: 32px;
+}

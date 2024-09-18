@@ -1,0 +1,82 @@
+.appBar {
+    width: 100%;
+
+    padding: 1rem;
+
+    height: 1000vh;
+    max-height: 80px;
+
+    transition: max-height 300ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    gap: 0.5rem;
+
+    background-color: var(--third-color);
+    color: white;
+
+    --edge-size: 1.5em;
+
+    clip-path: polygon(
+            100% 0%,
+            100% calc(100% - var(--edge-size)),
+            calc(100% - var(--edge-size)) 100%,
+            var(--edge-size) 100%,
+            0 calc(100% - var(--edge-size)),
+            0 0);
+}
+
+.backButton {
+    grid-column: 1;
+    grid-row: 1;
+
+    background-color: var(--secondary-color);
+    color: black;
+    width: 4rem;
+    height: 3rem;
+
+    text-align: center;
+    font-size: xx-large;
+    font-weight: bold;
+
+    --edge-size: 0.75rem;
+}
+
+.homeButtonContainer {
+    grid-column: 2;
+    grid-row: 1;
+
+    margin-left: 0.5rem;
+
+    display: flex;
+    justify-content: center;
+}
+
+.homeButton {
+    background-color: var(--secondary-color);
+    color: black;
+    width: 4rem;
+    height: 3rem;
+
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+
+    --edge-size: 0.75rem;
+}
+
+.settingsButtons {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.settingsButtons {
+    grid-column: 4;
+    grid-row: 1;
+}
+
+.settingsButtons > * {
+    flex-shrink: 0;
+}
