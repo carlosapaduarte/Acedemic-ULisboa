@@ -8,8 +8,8 @@ import { utils } from "~/utils";
 import { TaskList, useTaskList } from "../task-list/route";
 import { SelectAssociatedTasks } from "./SelectAssociatedTasks";
 import { Event } from "~/service/service";
-import { CreateTask } from "../task-list/CreateTask";
 import { useSetError } from "~/components/error/ErrorContainer";
+import { CreateTaskView } from "../task-list/CreateTask";
 
 function useTimerSetup() {
     const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(undefined)
@@ -112,7 +112,7 @@ function StartTimerByStudyBlock({associatedTasks, happeningStudyBlock} :
             <TaskList tasks={associatedTasks} onTaskClick={() => {}} />
             <button onClick={() => setShowCreateTask(!showCreateTask)}>{newTaskButtonMsg}</button>
             {showCreateTask ?
-                <CreateTask onTaskCreated={() => {}} />
+                <CreateTaskView onTaskCreated={() => {}} />
                 :
                 <></>
             }

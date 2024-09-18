@@ -3,20 +3,24 @@ import { useSetError } from "~/components/error/ErrorContainer"
 import { service, Task } from "~/service/service"
 import { utils } from "~/utils"
 import { TaskView } from "./Task"
-import { CreateTask } from "./CreateTask"
+import { CreateTaskView } from "./CreateTask"
 
 export function useTaskList() {
     const [tasks, setTasks] = useState<Task[] | undefined>(undefined)
     const setError = useSetError()
 
     useEffect(() => {
+        refreshTasks()
+    }, [])
+
+    function refreshTasks() {
         const userId = utils.getUserId()
         service.getTasks(userId)
             .then((tasks: Task[]) => setTasks(tasks))
             .catch((error) => setError(error))
-    }, [])
+    }
 
-    return tasks
+    return {tasks, refreshTasks}
 }
 
 export function TaskList({tasks, onTaskClick} : {tasks: Task[], onTaskClick: (taskId: Task) => void}) {
@@ -35,8 +39,13 @@ type TaskListView =
     | "createNewTask"
 
 export default function TaskPage() {
-    const tasks = useTaskList()
+    const {tasks, refreshTasks} = useTaskList()
     const [view, setView] = useState<TaskListView>("taskList")
+
+    function onTaskCreated() {
+        refreshTasks()
+        setView("taskList")
+    }
 
     if (view == "taskList" && tasks)
         return (
@@ -46,5 +55,5 @@ export default function TaskPage() {
             </div>
         )
     else
-        return (<CreateTask onTaskCreated={() => setView("taskList")} />)
+        return (<CreateTaskView onTaskCreated={onTaskCreated}/>)
 }

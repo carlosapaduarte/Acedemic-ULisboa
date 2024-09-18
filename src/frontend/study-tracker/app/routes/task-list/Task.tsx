@@ -91,7 +91,7 @@ export function TaskView({taskToDisplay} : {taskToDisplay: Task}) {
                 <p>Priority: {task.data.priority}</p>
                 <p>Status: {task.data.status}</p>
                 <br/>
-                <h1>Sub Tasks:</h1>
+                <h2>Sub Tasks:</h2>
                 {task.subTasks.map((subTask: Task, index: number) => 
                     <div key={index}>
                         <TaskView taskToDisplay={subTask} />

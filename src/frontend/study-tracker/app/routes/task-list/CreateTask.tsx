@@ -1,9 +1,8 @@
 import { CategoryAndTagsPicker, useTags } from "~/routes/commons"
-import { CreateSubTask } from "./CreateSubTask"
 import { StatusPicker } from "./commons"
 import { utils } from "~/utils"
 import { ChangeEvent, useState } from "react"
-import { service, SubTask, Task } from "~/service/service"
+import { service, CreateTask, TaskData } from "~/service/service"
 import { useSetError } from "~/components/error/ErrorContainer"
 
 const priorityValues: string[] = [
@@ -27,25 +26,16 @@ function PriorityPicker({onPrioritySelect} : {onPrioritySelect: (priority: strin
 }
 
 function useCreateNewTask() {
-    const setError = useSetError()
-
     const [title, setTitle] = useState<string | undefined>(undefined)
     const [description, setDescription] = useState<string | undefined>(undefined)
     const [deadline, setDeadline] = useState<Date | undefined>(undefined)
     const [priority, setPriority] = useState<string | undefined>(undefined)
     const {tags, appendTag} = useTags()
     const [status, setStatus] = useState<string | undefined>(undefined)
-    const [subTasks, setSubTasks] = useState<SubTask[]>([])
+    const [subTasks, setSubTasks] = useState<CreateTask[]>([])
     const [createEvent, setCreateEvent] = useState<boolean>(false)
 
-    function createTask(task: Task, createEvent: boolean, onDone: () => void) {
-        const userId = utils.getUserId()
-        service.createNewTask(userId, task, createEvent)
-            .then(() => onDone())
-            .catch((error) => setError(error))
-    }
-
-    function appendSubSubTask(subTask: SubTask) {
+    function appendSubSubTask(subTask: CreateTask) {
         let newSubTasks
         if (subTasks == undefined)
             newSubTasks = [subTask]
@@ -81,12 +71,11 @@ function useCreateNewTask() {
         subTasks,
         createEvent,
         toggleCreateEvent,
-        appendSubSubTask,
-        createTask
+        appendSubSubTask
     }
 }
 
-export function CreateTask({onTaskCreated} : {onTaskCreated: () => void}) {
+export function CreateTaskForm({onConfirmClick} : {onConfirmClick: (newTaskInfo: CreateTask) => void}) {
     const {
         title, 
         setTitle, 
@@ -103,8 +92,7 @@ export function CreateTask({onTaskCreated} : {onTaskCreated: () => void}) {
         appendSubSubTask,
         subTasks,
         createEvent,
-        toggleCreateEvent,
-        createTask
+        toggleCreateEvent
     } = useCreateNewTask()
     
     const [displaySubTaskForm, setDisplaySubTaskForm] = useState<boolean>(false)
@@ -114,6 +102,11 @@ export function CreateTask({onTaskCreated} : {onTaskCreated: () => void}) {
     function onEndDateChangeHandler(e: ChangeEvent<HTMLInputElement>) {
         const selectedEndDate = new Date(e.target.value)
         setDeadline(selectedEndDate)
+    }
+
+    function onSubTaskConfirmClick(subTask: CreateTask) {
+        appendSubSubTask(subTask)
+        setDisplaySubTaskForm(false)
     }
 
     let deadlineFieldValue;
@@ -135,6 +128,7 @@ export function CreateTask({onTaskCreated} : {onTaskCreated: () => void}) {
                 onChange={onEndDateChangeHandler}
             />
             <PriorityPicker onPrioritySelect={setPriority} />
+            <br/>
             <CategoryAndTagsPicker onTagClick={appendTag}/>
             <StatusPicker onStatusSelect={setStatus} />
 
@@ -152,18 +146,41 @@ export function CreateTask({onTaskCreated} : {onTaskCreated: () => void}) {
             }
             
             {displaySubTaskForm ?
-                <CreateSubTask onConfirm={appendSubSubTask} />
+                <CreateTaskForm onConfirmClick={onSubTaskConfirmClick} />
                 :
                 <></>
             }
 
             {title && description && deadline && priority && tags && status && subTasks ?
-                <button onClick={() => createTask({title, description, deadline, priority, tags, status, subTasks}, createEvent, onTaskCreated)}>
+                <button onClick={() => onConfirmClick({
+                    taskData: {title, description, deadline, priority, tags, status},
+                    subTasks, 
+                    createEvent
+                })}>
                     Confirm!
                 </button>
                 :
                 <></>
             }
         </div>
+    )
+}
+
+export function CreateTaskView({onTaskCreated} : {onTaskCreated: () => void}) {
+    const setError = useSetError()
+    
+    function createTask(newTaskInfo: CreateTask, onDone: () => void) {
+        const userId = utils.getUserId()
+        service.createNewTask(userId, newTaskInfo)
+            .then(() => onDone())
+            .catch((error) => setError(error))
+    }
+
+    function onConfirmClick(newTaskInfo: CreateTask) {
+        createTask(newTaskInfo, onTaskCreated)
+    }
+
+    return (
+        <CreateTaskForm onConfirmClick={onConfirmClick} />
     )
 }

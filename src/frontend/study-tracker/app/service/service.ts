@@ -236,19 +236,24 @@ export type CreateTask = {
 }
 
 async function createNewTask(userId: number, newTaskInfo: CreateTask) {
-    const request = {
-        path: `study-tracker/users/${userId}/tasks`,
-        method: 'POST',
-        body: toBody({
+    console.log("Here")
+    function toNewTaskBodyBody(newTaskInfo: CreateTask): any {
+        return {
             title: newTaskInfo.taskData.title,
             description: newTaskInfo.taskData.description,
             deadline: newTaskInfo.taskData.deadline.getTime() / 1000, // Converts to number
-            priority: newTaskInfo.taskData.description,
+            priority: newTaskInfo.taskData.priority,
             tags: newTaskInfo.taskData.tags,
             status: newTaskInfo.taskData.status,
-            subTasks: newTaskInfo.subTasks,
+            subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTask) => toNewTaskBodyBody(subTaskInfo)),
             createEvent: newTaskInfo.createEvent
-        }),
+        }
+    }
+
+    const request = {
+        path: `study-tracker/users/${userId}/tasks`,
+        method: 'POST',
+        body: toBody(toNewTaskBodyBody(newTaskInfo)),
     }
     const response: Response = await doFetch(request)
     if (!response.ok)

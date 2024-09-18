@@ -53,10 +53,15 @@ export function CategoryAndTagsPicker({onTagClick} : {onTagClick: (tag: string) 
     }
 
     return (
-        category == undefined ? 
-            <CategoryPicker onCategoryClick={setCategory} />
-        :
-        <TagPicker category={category} onTagClick={onTagClickHandler} />
+        <div>
+            <h1>Select Tags</h1>
+            {category == undefined ? 
+                <CategoryPicker onCategoryClick={setCategory} />
+                :
+                <TagPicker category={category} onTagClick={onTagClickHandler} />
+            }
+        </div>
+        
     )
 }
 
