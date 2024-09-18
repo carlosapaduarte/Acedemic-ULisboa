@@ -16,7 +16,7 @@ type Views =
     | "selectAvatar"
     | "redirect";
 
-function LogIn() {
+export default function LogIn() {
     const [currentView, setCurrentView] = useState<Views>("userInfo");
     const [userId, setUserId] = useState<number | undefined>(undefined);
 
@@ -41,13 +41,13 @@ function LogIn() {
                 <ReceiveNotificationsPreferenceSelection
                     onProceed={() => setCurrentView("planDaySelection")}
                 />
-            )
+            );
         case "planDaySelection":
             return (
                 <PlanDaySelection
                     onProceed={() => setCurrentView("shareProgressSelection")}
                 />
-            )
+            );
         case "shareProgressSelection":
             return (
                 <ShareProgress
@@ -68,5 +68,3 @@ function LogIn() {
             return <h1>Should not have arrived here!</h1>;
     }
 }
-
-export default LogIn;
