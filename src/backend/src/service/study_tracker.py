@@ -1,5 +1,5 @@
 from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Grade, Task, UnavailableScheduleBlock
-from exception import NotAvailableScheduleBlockCollision
+from exception import NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from datetime import datetime
 
@@ -57,6 +57,14 @@ def create_task(user_id: int, task: Task, createAssociatedEvent: bool) -> int:
 
 def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
     return study_tracker_repo.get_tasks(user_id, order_by_deadline_and_priority)
+
+def get_user_task(user_id: int, task_id: int) -> Task:
+    # TODO: improve later
+    user_tasks = get_user_tasks(user_id, False)
+    for task in user_tasks:
+        if task.id == task_id:
+            return task
+    raise NotFoundException(user_id)
 
 def update_task_status(user_id: int, task_id: int, new_status: str):
     study_tracker_repo.update_task_status(user_id, task_id, new_status)

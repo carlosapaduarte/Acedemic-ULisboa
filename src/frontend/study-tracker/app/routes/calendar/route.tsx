@@ -56,7 +56,6 @@ function NavigateButtons({onButtonClick} : {onButtonClick: (action: Navigate) =>
 }
 
 function navigateOnMonth(oldDate: Date, action: Navigate): number {
-	console.log("Hello1")
 	switch (action) {
 		case Navigate.PREVIOUS : return oldDate.getMonth() - 1
 		case Navigate.NEXT : return oldDate.getMonth() + 1
@@ -65,7 +64,6 @@ function navigateOnMonth(oldDate: Date, action: Navigate): number {
 }
 
 function navigateOnWeek(oldDate: Date, action: Navigate): number {
-	console.log("Hello2")
 	switch (action) {
 		case Navigate.PREVIOUS : return oldDate.getDate() - 7
 		case Navigate.NEXT : return oldDate.getDate() + 7
@@ -74,7 +72,6 @@ function navigateOnWeek(oldDate: Date, action: Navigate): number {
 }
 
 function navigateOnDay(oldDate: Date, action: Navigate): number {
-	console.log("Hello3")
 	switch (action) {
 		case Navigate.PREVIOUS : return oldDate.getDate() - 1
 		case Navigate.NEXT : return oldDate.getDate() + 1

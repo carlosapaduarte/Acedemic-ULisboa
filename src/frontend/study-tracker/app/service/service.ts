@@ -235,8 +235,7 @@ export type CreateTask = {
     createEvent: boolean
 }
 
-async function createNewTask(userId: number, newTaskInfo: CreateTask) {
-    console.log("Here")
+async function createNewTask(userId: number, newTaskInfo: CreateTask): Promise<Task> {
     function toNewTaskBodyBody(newTaskInfo: CreateTask): any {
         return {
             title: newTaskInfo.taskData.title,
@@ -255,9 +254,14 @@ async function createNewTask(userId: number, newTaskInfo: CreateTask) {
         method: 'POST',
         body: toBody(toNewTaskBodyBody(newTaskInfo)),
     }
+
+    // Backend returns the newly created Task!
     const response: Response = await doFetch(request)
-    if (!response.ok)
-        return Promise.reject(new Error('New task could not be created!'))
+    if (response.ok) {
+        const responseObject: TaskDto = await response.json() // TODO: how 
+        return fromTaskDtoToTask(responseObject)
+    } else
+        return Promise.reject(new Error('Task could not be created!'))   
 }
 
 export type Task = {
@@ -293,7 +297,7 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
     }
 }
 
-async function getTasks(userId: number): Promise<Task[]> {
+async function getTasks(userId: number, filterUncompletedTasks: boolean): Promise<Task[]> {
     const request = {
         path: `study-tracker/users/${userId}/tasks?order_by_deadline_and_priority=true`,
         method: 'GET',
@@ -301,7 +305,13 @@ async function getTasks(userId: number): Promise<Task[]> {
     const response: Response = await doFetch(request)
     if (response.ok) {
         const responseObject: TaskDto[] = await response.json() // TODO: how 
-        return responseObject.map((taskDto: TaskDto) => fromTaskDtoToTask(taskDto))
+        const tasks = responseObject.map((taskDto: TaskDto) => fromTaskDtoToTask(taskDto))
+
+        // TODO: do filter on backend!
+        if (filterUncompletedTasks) 
+            return tasks.filter((task: Task) => task.data.status != "Tarefa Completa")
+        else
+            return tasks
     } else
         return Promise.reject(new Error('User tasks could not be obtained!'))   
 }
@@ -309,7 +319,7 @@ async function getTasks(userId: number): Promise<Task[]> {
 async function getTask(userId: number, taskId: number): Promise<Task> {
     // For now, just fetch all tasks and return the one that we want
 
-    const tasks = await getTasks(userId)
+    const tasks = await getTasks(userId, false)
     const task = tasks.find((task: Task) => task.id == taskId)
     if (task != undefined)
         return task

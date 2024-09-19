@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import APIRouter, Response
 from domain.study_tracker import DateInterval, Event, Grade, Task, UnavailableScheduleBlock
 from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
-from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, EventOutputDto, TaskCreatedOutputDto, UserTaskOutputDto
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, EventOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -11,9 +11,11 @@ router = APIRouter(
 )
 
 @router.post("/users/{user_id}/tasks")
-def create_task(user_id: int, dto: CreateTaskInputDto) -> TaskCreatedOutputDto:
+def create_task(user_id: int, dto: CreateTaskInputDto) -> UserTaskOutputDto:
+    # This route returns the newly created task!
     task_id = study_tracker_service.create_task(user_id, Task.fromCreateTaskInputDto(dto), dto.createEvent)
-    return TaskCreatedOutputDto(task_id=task_id)
+    task = study_tracker_service.get_user_task(user_id, task_id)
+    return UserTaskOutputDto.from_Task(task)
 
 @router.get("/users/{user_id}/tasks")
 def get_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[UserTaskOutputDto]:

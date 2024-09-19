@@ -50,7 +50,9 @@ function useTaskView(taskToCache: Task) {
 }
 
 // "TaskView" name is because there already exists a Task type in this project
-export function TaskView({taskToDisplay} : {taskToDisplay: Task}) {
+export function TaskView({taskToDisplay, onTaskStatusUpdated = undefined} : {taskToDisplay: Task, onTaskStatusUpdated: (() => void) | undefined}) {
+    // This function received a "onTaskStatusUpdated()" handler because, sometimes, it's handy for the caller to know that one of the tasks was updated!
+
     const {view, task, selectUpdateStatusView, selectTaskView, updateTask, updateTaskStatus} = useTaskView(taskToDisplay)
 
     function passedDeadline(): boolean {
@@ -61,6 +63,7 @@ export function TaskView({taskToDisplay} : {taskToDisplay: Task}) {
         updateTaskStatus(newStatus, () => {
             selectTaskView()
             updateTask()
+            onTaskStatusUpdated ? onTaskStatusUpdated() : {}
         })
     }
 
@@ -94,7 +97,7 @@ export function TaskView({taskToDisplay} : {taskToDisplay: Task}) {
                 <h2>Sub Tasks:</h2>
                 {task.subTasks.map((subTask: Task, index: number) => 
                     <div key={index}>
-                        <TaskView taskToDisplay={subTask} />
+                        <TaskView taskToDisplay={subTask} onTaskStatusUpdated={undefined} />
                         <br/>
                     </div>
                 )}

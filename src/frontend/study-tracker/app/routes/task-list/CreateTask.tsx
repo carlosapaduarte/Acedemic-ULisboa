@@ -2,7 +2,7 @@ import { CategoryAndTagsPicker, useTags } from "~/routes/commons"
 import { StatusPicker } from "./commons"
 import { utils } from "~/utils"
 import { ChangeEvent, useState } from "react"
-import { service, CreateTask, TaskData } from "~/service/service"
+import { service, CreateTask, TaskData, Task } from "~/service/service"
 import { useSetError } from "~/components/error/ErrorContainer"
 
 const priorityValues: string[] = [
@@ -166,13 +166,13 @@ export function CreateTaskForm({onConfirmClick} : {onConfirmClick: (newTaskInfo:
     )
 }
 
-export function CreateTaskView({onTaskCreated} : {onTaskCreated: () => void}) {
+export function CreateTaskView({onTaskCreated} : {onTaskCreated: (task: Task) => void}) {
     const setError = useSetError()
     
-    function createTask(newTaskInfo: CreateTask, onDone: () => void) {
+    function createTask(newTaskInfo: CreateTask, onDone: (task: Task) => void) {
         const userId = utils.getUserId()
         service.createNewTask(userId, newTaskInfo)
-            .then(() => onDone())
+            .then((task: Task) => onDone(task))
             .catch((error) => setError(error))
     }
 

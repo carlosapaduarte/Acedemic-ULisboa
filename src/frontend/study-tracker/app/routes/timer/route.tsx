@@ -5,11 +5,11 @@ import { SelectTime } from "./TimeSelection";
 import { Timer } from "./Timer";
 import { service, Task } from "~/service/service";
 import { utils } from "~/utils";
-import { TaskList, useTaskList } from "../task-list/route";
 import { SelectAssociatedTasks } from "./SelectAssociatedTasks";
 import { Event } from "~/service/service";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { CreateTaskView } from "../task-list/CreateTask";
+import { TaskList } from "../task-list/TaskList";
 
 function useTimerSetup() {
     const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(undefined)
@@ -68,7 +68,36 @@ function useAssociatedTasks() {
     }
 }
 
-function SetupAndStartTimer() {
+function AssociatedTaskListView({associatedTasks} : {associatedTasks: Task[]}) {
+    // Displays a list of tasks and button to create a new one.
+    // In each task, there is a button that allows to change it's status. Therefore, it's possible to mak it as concluded!
+
+    const [showCreateTask, setShowCreateTask] = useState(false)
+    const newTaskButtonMsg = showCreateTask ? "Cancel Task Creation" : "Create Task"
+
+    function onTaskCreated(task: Task) {
+        associatedTasks.push(task)
+        setShowCreateTask(false) // Closes new-task form
+    }
+    
+    return (
+        <div>
+            <TaskList tasks={associatedTasks} onTaskClick={undefined} onTaskStatusUpdated={undefined} />
+            <button onClick={() => setShowCreateTask(!showCreateTask)}>{newTaskButtonMsg}</button>
+            {showCreateTask ?
+                <CreateTaskView onTaskCreated={onTaskCreated} />
+                :
+                <></>
+            }
+        </div>
+    )
+}
+
+function SetupAndStartTimer({associatedTasks} : {associatedTasks: Task[]}) {
+    // Displays a Timer setup;
+    // Once the user selects the Study and Pause time, it begins to count;
+    // Along with the timer, it displays a list of tasks and button to create a new one.
+
     const {
         timerStopDate,
         onTimeSelected,
@@ -84,12 +113,18 @@ function SetupAndStartTimer() {
     else {
         const title = studyStopDate ? "(Study Time)" : "(Pause Time)"
         return (
-            <Timer title={title} stopDate={timerStopDate} onStopClick={() => setStudyStopDate(undefined)} onFinish={onTimerFinish} />
+            <div>
+                <Timer title={title} stopDate={timerStopDate} onStopClick={() => setStudyStopDate(undefined)} onFinish={onTimerFinish} />
+                <AssociatedTaskListView associatedTasks={associatedTasks} />
+            </div>
         )
     }
 }
 
 function StartTimerByStudyBlock({associatedTasks, happeningStudyBlock} : 
+    // Starts a timer that is schedule to end when the Study event finishes;
+    // Along with the timer, it displays a list of tasks and button to create a new one.
+
     {
         associatedTasks: Task[], 
         happeningStudyBlock: Event
@@ -100,33 +135,28 @@ function StartTimerByStudyBlock({associatedTasks, happeningStudyBlock} :
         onTimerFinish
     } = useTimerSetup()
     
-    const [showCreateTask, setShowCreateTask] = useState(false)
-
     // Title is the name of the current study block event, and if it's in study or pause time
     const timerTitleMsg = happeningStudyBlock.title + studyStopDate ? "(Study Time)" : "(Pause Time)"
-    const newTaskButtonMsg = showCreateTask ? "Cancel Task Creation" : "Create Task"
 
     return (
         <div>
             <Timer title={timerTitleMsg} stopDate={happeningStudyBlock.endDate} onStopClick={() => setStudyStopDate(undefined)} onFinish={onTimerFinish} />
-            <TaskList tasks={associatedTasks} onTaskClick={() => {}} />
-            <button onClick={() => setShowCreateTask(!showCreateTask)}>{newTaskButtonMsg}</button>
-            {showCreateTask ?
-                <CreateTaskView onTaskCreated={() => {}} />
-                :
-                <></>
-            }
-            
+            <AssociatedTaskListView associatedTasks={associatedTasks} />
         </div>
     );
 }
 
-function TimerPage({associatedTasks} : {associatedTasks: Task[]}) {
+function TimerAndAssociatedTasksView({associatedTasks} : {associatedTasks: Task[]}) {
+    // Checks if there is a Study block happening now;
+    // If yes, starts a timer that is schedule to end when the study block ends;
+    // Otherwise, displays a timer setup view, and once the user configures the time (Study and Pause time), starts the timer;
+    // In both cases, the associated tasks will be visible under the timer, along with a "create-task" button
+
     const happeningStudyBlock = useStudyBlock()
 
     // Means that there is no study block happening right now
     if (happeningStudyBlock == undefined) {
-        return(<SetupAndStartTimer />)
+        return(<SetupAndStartTimer associatedTasks={associatedTasks} />)
     }
     // There is a study time block happening now. Timer will be set to the end of the study time
     else {
@@ -144,8 +174,9 @@ export default function StudyPage() {
     // Select Associated Tasks!
     if (associatedTasks == undefined)
         return (<SelectAssociatedTasks onTasksSelected={onTasksSelected} />)
-    // Associated Tasks selected!
+    
+    // Associated Tasks selected! Start timer!
     else {
-        return(<TimerPage associatedTasks={associatedTasks} />)
+        return(<TimerAndAssociatedTasksView associatedTasks={associatedTasks} />)
     }
 }

@@ -1,26 +1,25 @@
 import { useState } from "react"
-import { TaskList, useTaskList } from "../task-list/route"
 import { Task } from "~/service/service"
+import { TaskList, useTaskList } from "../task-list/TaskList"
 
 export function SelectAssociatedTasks({onTasksSelected} : {onTasksSelected: (tasks: Task[]) => void}) {
-    const tasks = useTaskList()
+    // Lists tasks and allows to select pick those tasks (except Tasks that are concluded!)
+    // Operation is completed if user presses "Confirm" button
+
+    const {tasks, refreshTasks} = useTaskList(true)
     const [associatedTasks, setAssociatedTasks] = useState<Task[]>([])
 
     function onTaskSelected(task: Task) {
-        if (tasks) {
-            const newTasks = [...tasks]
-            newTasks.push(task)
-            setAssociatedTasks(newTasks)
-        }
-        else
-            setAssociatedTasks([task])
+        const newTasks = [...associatedTasks]
+        newTasks.push(task)
+        setAssociatedTasks(newTasks)
     }
 
     return tasks ?
         <div>
-            <h1>Select tasks to associate</h1>
-            <TaskList tasks={tasks} onTaskClick={onTaskSelected} />
-            <button onClick={() => onTasksSelected(associatedTasks)}>Confirm!</button>
+            <h1>Select tasks to associate!</h1>
+            <TaskList tasks={tasks} onTaskClick={onTaskSelected} onTaskStatusUpdated={() => refreshTasks()} />
+            <button onClick={() => onTasksSelected(associatedTasks)}>Confirm associated tasks!</button>
         </div>
         :
         <></>

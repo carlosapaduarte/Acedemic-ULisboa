@@ -40,9 +40,6 @@ class UserTaskOutputDto(BaseModel):
             status=task.status,
             subTasks=sub_tasks_output_dto
         )
-        
-class TaskCreatedOutputDto(BaseModel):
-    task_id: int
 
 class EventOutputDto(BaseModel):
     startDate: int
