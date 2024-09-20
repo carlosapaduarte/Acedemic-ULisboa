@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CreateTaskView } from "./CreateTask";
 import { TaskList, useTaskList } from "./TaskList";
 import styles from "./tasksPage.module.css";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 type TaskListView =
     | "taskList"
@@ -32,8 +33,10 @@ function renderPage() {
 
 export default function TaskPage() {
     return (
-        <div className={styles.tasksPage}>
-            {renderPage()}
-        </div>
+        <RequireAuthn>
+            <div className={styles.tasksPage}>
+                {renderPage()}
+            </div>
+        </RequireAuthn>
     );
 }
