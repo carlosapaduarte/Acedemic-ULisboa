@@ -111,8 +111,12 @@ export function GreetingsContainer() {
 export function NavBar() {
     return (
         <div className={`${styles.navBar}`}>
-            <NavBarButton text="Challenges" url={"/challenges"} />
             <NavBarButton text="Calendar" url={"/calendar"} />
+            <NavBarButton text="Schedule" url={"/calendar"} />
+            <NavBarButton text="Tasks" url={"/task-list"} />
+            <NavBarButton text="Notes" url={"/archives"} />
+            <NavBarButton text="Study!" url={"/timer"} />
+            <NavBarButton text="Statistics" url={"/statistics"} />
             <NavBarButton text="Badges" url={"/badges"} />
         </div>
     );

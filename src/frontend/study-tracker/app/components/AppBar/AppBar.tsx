@@ -7,10 +7,12 @@ import cleanAppBarStyles from "./cleanAppBar.module.css";
 
 import { useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
-import { GreetingsContainer, NavBar } from "./HomeAppBar/HomeAppBar";
+import { GreetingsContainer } from "./HomeAppBar/HomeAppBar";
 import classNames from "classnames";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { IconContext } from "react-icons";
 
-type AppBarVariant = "default" | "home" | "clean";
+export type AppBarVariant = "default" | "home" | "clean";
 
 type AppBarContextType = {
     appBarVariant: AppBarVariant;
@@ -40,45 +42,117 @@ export function useAppBar(variant: AppBarVariant) {
     }, [setAppBarVariant]);
 }
 
+
+function SideBarNavButton({ text, url, setIsSideBarOpen }: {
+    text: string,
+    url: string,
+    setIsSideBarOpen: (isOpen: boolean) => void
+}) {
+    const navigate = useNavigate();
+
+    return (
+        <div className={`${styles.sideBarNavButtonContainer}`}>
+            <Button variant={"round"}
+                    onClick={() => {
+                        setIsSideBarOpen(false);
+                        navigate(url);
+                    }}
+                    className={`${styles.sideBarNavButton}`}
+            >
+                <div className={`${styles.sideBarNavButtonIcon}`}>
+                    ICON
+                </div>
+                <div className={`${styles.sideBarNavButtonText}`}>
+                    {text}
+                </div>
+            </Button>
+        </div>
+    );
+}
+
+function SideBarContent({ setIsSideBarOpen }: { setIsSideBarOpen: (isOpen: boolean) => void }) {
+    return (
+        <>
+            <SideBarNavButton text="Calendar" url={"/calendar"} setIsSideBarOpen={setIsSideBarOpen} />
+            <SideBarNavButton text="Schedule" url={"/calendar"} setIsSideBarOpen={setIsSideBarOpen} />
+            <SideBarNavButton text="Tasks" url={"/task-list"} setIsSideBarOpen={setIsSideBarOpen} />
+            <SideBarNavButton text="Notes" url={"/archives"} setIsSideBarOpen={setIsSideBarOpen} />
+            <SideBarNavButton text="Study!" url={"/timer"} setIsSideBarOpen={setIsSideBarOpen} />
+            <SideBarNavButton text="Statistics" url={"/statistics"} setIsSideBarOpen={setIsSideBarOpen} />
+            <SideBarNavButton text="Badges" url={"/badges"} setIsSideBarOpen={setIsSideBarOpen} />
+        </>
+    );
+}
+
+function SideBar() {
+    const [isSideBarOpen, setIsSideBarOpen] = useState(false);
+
+    return (
+        <div aria-expanded={isSideBarOpen} className={styles.sideBar}>
+            <div className={styles.sideBarIconContainer}>
+                <button className={styles.sideBarIconButton} onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
+                    <IconContext.Provider value={{ className: classNames(styles.sideBarIcon) }}>
+                        <GiHamburgerMenu />
+                    </IconContext.Provider>
+                </button>
+            </div>
+            <div aria-hidden={!isSideBarOpen} className={classNames(styles.sideBarContentContainer)}>
+                <div className={styles.sideBarContent}>
+                    <SideBarContent setIsSideBarOpen={setIsSideBarOpen} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export function AppBar() {
     const { appBarVariant } = useContext(AppBarContext);
 
     const navigate = useNavigate();
 
     return (
-        <div className={
-            classNames(
-                appBarVariant === "default" && styles.appBar,
-                appBarVariant === "home" && homeAppBarStyles.appBar,
-                appBarVariant === "clean" && cleanAppBarStyles.appBar
-            )}>
-            {appBarVariant !== "clean" && (
-                <Button
-                    className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
-                    onClick={() => navigate(-1)}
-                >
-                    {"<"}
-                </Button>
-            )}
-            {appBarVariant === "default" && (
-                <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
-                    <Button className={styles.homeButton}>
-                        Home
+        <div className={classNames(
+            appBarVariant === "default" && styles.appBarContainer,
+            appBarVariant === "home" && homeAppBarStyles.appBarContainer,
+            appBarVariant === "clean" && cleanAppBarStyles.appBarContainer
+        )}>
+            <div className={
+                classNames(
+                    appBarVariant === "default" && styles.appBar,
+                    appBarVariant === "home" && homeAppBarStyles.appBar,
+                    appBarVariant === "clean" && cleanAppBarStyles.appBar
+                )}>
+                {appBarVariant !== "clean" && (
+                    <Button
+                        className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
+                        onClick={() => navigate(-1)}
+                    >
+                        {"<"}
                     </Button>
+                )}
+                {appBarVariant === "default" && (
+                    <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
+                        <Button className={styles.homeButton}>
+                            Home
+                        </Button>
+                    </div>
+                )}
+                <div key="settingsButtons"
+                     className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>
+                    <SettingsButton variant={appBarVariant} />
+                    <LanguageButton language={"pt-PT"} variant={appBarVariant} />
+                    <LanguageButton language={"en-GB"} variant={appBarVariant} />
                 </div>
-            )}
-            <div key="settingsButtons"
-                 className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>
-                <SettingsButton />
-                <LanguageButton language={"pt-PT"} />
-                <LanguageButton language={"en-GB"} />
+                {appBarVariant === "home" && (
+                    <>
+                        <GreetingsContainer />
+                        {/*<NavBar />*/}
+                    </>
+                )}
             </div>
-            {appBarVariant === "home" && (
-                <>
-                    <GreetingsContainer />
-                    <NavBar />
-                </>
-            )}
+            {appBarVariant !== "clean" &&
+                <SideBar />
+            }
         </div>
     );
 }

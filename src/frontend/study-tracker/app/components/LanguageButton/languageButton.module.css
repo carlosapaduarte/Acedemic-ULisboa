@@ -18,6 +18,10 @@
     border-color: var(--secondary-text-color);
 }
 
+.languageButton.clean {
+    border-color: var(--primary-text-color);
+}
+
 .languageButton.pt-PT {
     background-image: url('../minimalist-ptPT.png');
 }

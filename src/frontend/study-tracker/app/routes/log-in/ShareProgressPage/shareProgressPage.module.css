@@ -1,0 +1,13 @@
+@import "../login.module.css";
+
+
+.titleText {
+}
+
+.shareProgressButton {
+    height: 2rem;
+}
+
+.shareProgressButton.yes {
+    margin-bottom: 0.5rem;
+}

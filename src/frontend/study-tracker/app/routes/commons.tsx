@@ -1,23 +1,30 @@
-import { useState } from "react"
-import { useSetError } from "~/components/error/ErrorContainer"
+import { useState } from "react";
+import styles from "~/routes/task-list/tasksPage.module.css";
 
 export function useTags() {
-    const [tags, setTags] = useState<string[]>([])
+    const [tags, setTags] = useState<string[]>([]);
 
-    function appendTag(tag: string) {
-        let new_tags
+    function removeTag(tag: string) {
         if (tags == undefined)
-            new_tags = [tag]
-        else {
-            if (tags.includes(tag))
-                return
-            new_tags = [...tags]
-            new_tags.push(tag)
-        }
-        setTags(new_tags)
+            return;
+        const new_tags = tags.filter((t: string) => t != tag);
+        setTags(new_tags);
     }
 
-    return {tags, appendTag}
+    function appendTag(tag: string) {
+        let new_tags;
+        if (tags == undefined)
+            new_tags = [tag];
+        else {
+            if (tags.includes(tag))
+                return;
+            new_tags = [...tags];
+            new_tags.push(tag);
+        }
+        setTags(new_tags);
+    }
+
+    return { tags, appendTag, removeTag };
 }
 
 type Category = {
@@ -26,7 +33,7 @@ type Category = {
 }
 
 const categories: Category[] = [
-{
+    {
         name: "Estudo",
         tags: ["Revisão", "Leitura", "Exercícios / Prática", "Preparação de provas"]
     },
@@ -42,54 +49,88 @@ const categories: Category[] = [
         name: "Pessoal",
         tags: ["Aniversário", "Lazer", "Saúde"]
     }
-]
+];
 
-export function CategoryAndTagsPicker({onTagClick} : {onTagClick: (tag: string) => void}) {
-    const [category, setCategory] = useState<Category | undefined>(undefined)
+export function CategoryAndTagsPicker({ tags, removeTag, appendTag }: {
+    tags: string[],
+    removeTag: (tag: string) => void,
+    appendTag: (tag: string) => void
+}) {
+    const [category, setCategory] = useState<Category | undefined>(undefined);
 
     function onTagClickHandler(tag: string) {
-        setCategory(undefined) // Allows to select new tag
-        onTagClick(tag)
+        if (tags.includes(tag))
+            removeTag(tag);
+        else
+            appendTag(tag);
     }
 
     return (
         <div>
-            <h1>Select Tags</h1>
-            {category == undefined ? 
+            <h1 className={styles.createTaskTitle}>Tags</h1>
+            <h4>Current Tags</h4>
+            <div className={styles.currentTags}>
+                {
+                    tags.length == 0 ?
+                        <div>No tags selected yet.</div>
+                        :
+                        tags.map((tag: string, index: number) =>
+                            <div key={index} className={styles.currentTag}>
+                                {tag}
+                            </div>
+                        )}
+            </div>
+            <h4>Select Tags:</h4>
+            {category == undefined ?
                 <CategoryPicker onCategoryClick={setCategory} />
                 :
-                <TagPicker category={category} onTagClick={onTagClickHandler} />
+                <TagPicker tags={tags} category={category} onCategoryCloseClick={() => {
+                    setCategory(undefined);
+                }} onTagClick={onTagClickHandler} />
             }
         </div>
-        
-    )
+
+    );
 }
 
-function CategoryPicker({onCategoryClick} : {onCategoryClick: (cat: Category) => void}) {
+function CategoryPicker({ onCategoryClick }: { onCategoryClick: (cat: Category) => void }) {
     return (
-        categories.map((cat: Category, index: number) => 
+        categories.map((cat: Category, index: number) =>
             <div key={index}>
-                <button onClick={() => onCategoryClick(cat)}>
+                <button onClick={() => onCategoryClick(cat)} className={styles.openCategoryButton}>
                     {cat.name}
                 </button>
             </div>
         )
-    )
+    );
 }
 
-function TagPicker({category, onTagClick} : {category: Category, onTagClick: (tag: string) => void}) {
+function TagPicker(
+    { category, tags, onCategoryCloseClick, onTagClick }:
+        { category: Category, tags: string[], onCategoryCloseClick: () => void, onTagClick: (tag: string) => void }
+) {
     return (
-        category.tags.map((tag: string, index: number) => 
-            <div key={index}>
-                <button onClick={() => onTagClick(tag)}>
-                    {tag}
-                </button>
-            </div>
-        )
-    )
+        <div>
+            <button onClick={() => onCategoryCloseClick()} className={styles.openCategoryButton}>
+                {category.name} (Close)
+            </button>
+            {
+                category.tags.map((tag: string, index: number) =>
+                    <div key={index}>
+                        <input type={"checkbox"} id={`tag_${index}`} onClick={() => onTagClick(tag)}
+                               checked={tags.includes(tag)} />
+                        <label className={styles.tagLabel} htmlFor={`tag_${index}`}>
+                            {tag}
+                        </label>
+                    </div>
+                )
+            }
+        </div>
+
+    );
 }
 
-export const weekDays = [ 
+export const weekDays = [
     "Monday",
     "Tuesday",
     "Wednesday",
@@ -97,39 +138,44 @@ export const weekDays = [
     "Friday",
     "Saturday",
     "Sunday"
-]
+];
 
-function useWeekDayAndHourPicker() {
-    const [weekDay, setWeekDayInternal] = useState<number | undefined>(undefined)
-    const [hour, setHourInternal] = useState<number | undefined>(undefined)
+export function useWeekDayAndHourPicker() {
+    const [weekDay, setWeekDayInternal] = useState<number | undefined>(undefined);
+    const [hour, setHourInternal] = useState<number | undefined>(undefined);
 
-    function setWeekDay(weekDay: number) {
-        if (weekDay >= 0 && weekDay <= 6)
-            setWeekDayInternal(weekDay)
+    function setWeekDay(newWeekDay: number) {
+        if (newWeekDay == weekDay) {
+            setWeekDayInternal(undefined);
+            return;
+        }
+
+        if (newWeekDay >= 0 && newWeekDay <= 6)
+            setWeekDayInternal(newWeekDay);
     }
 
     function setHour(hour: number) {
         if (hour >= 0 && hour <= 23)
-            setHourInternal(hour)
+            setHourInternal(hour);
     }
 
-    return { weekDay, hour, setWeekDay, setHour }
+    return { weekDay, hour, setWeekDay, setHour };
 }
 
-function ConfirmButton({weekDay, hour, onConfirm} : 
-    {
-        weekDay: number, 
-        hour: number, 
-        onConfirm: (weekDayAndHour: WeekDayAndHour) => void
-    }) {
+function ConfirmButton({ weekDay, hour, onConfirm }:
+                           {
+                               weekDay: number,
+                               hour: number,
+                               onConfirm: (weekDayAndHour: WeekDayAndHour) => void
+                           }) {
     return (
         <div>
-            <br/>
-            <button onClick={() => onConfirm({weekDay, hour})}>
-                Confirm Here!    
+            <br />
+            <button onClick={() => onConfirm({ weekDay, hour })}>
+                Confirm Here!
             </button>
         </div>
-    )
+    );
 }
 
 export type WeekDayAndHour = {
@@ -137,12 +183,12 @@ export type WeekDayAndHour = {
     hour: number
 }
 
-export function WeekDayAndHourPicker({onConfirm} : {onConfirm: (weekDayAndHour: WeekDayAndHour) => void}) {
-    const { weekDay, hour, setWeekDay, setHour } = useWeekDayAndHourPicker()
- 
+export function WeekDayAndHourPicker({ onConfirm }: { onConfirm: (weekDayAndHour: WeekDayAndHour) => void }) {
+    const { weekDay, hour, setWeekDay, setHour } = useWeekDayAndHourPicker();
+
     return (
         <div>
-            {weekDays.map((key: string, index: number) => 
+            {weekDays.map((key: string, index: number) =>
                 <div key={index}>
                     <button onClick={() => setWeekDay(index)}>
                         {key}
@@ -150,18 +196,18 @@ export function WeekDayAndHourPicker({onConfirm} : {onConfirm: (weekDayAndHour: 
                 </div>
             )}
 
-            <br/>
+            <br />
 
-            <label>Hour</label>                
+            <label>Hour</label>
             <input type="number" min={0} max={23} onChange={(e) => setHour(Number(e.target.value))} />
-            
 
-            {(weekDay && hour) ? 
+
+            {(weekDay && hour) ?
                 <ConfirmButton weekDay={weekDay} hour={hour} onConfirm={onConfirm} />
                 :
                 <></>
             }
-            
+
         </div>
-    )
+    );
 }

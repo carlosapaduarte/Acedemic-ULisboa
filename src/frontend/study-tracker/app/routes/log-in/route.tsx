@@ -1,70 +1,82 @@
 import React, { useState } from "react";
-import { Navigate } from "react-router-dom";
-import { UserInfo } from "./UserInfo";
-import AppUseGoals from "./AppUseGoal";
-import { ReceiveNotificationsPreferenceSelection } from "./ReceiveNotificationsPrefSelection";
-import { PlanDaySelection } from "./PlanDaySelection";
-import { ShareProgress } from "./ShareProgress";
-import { Avatar } from "./Avatar";
+import { PlanDaySelectionPage } from "~/routes/log-in/PlanDaySelectionPage/PlanDaySelectionPage";
+import { ShareProgressPage } from "./ShareProgressPage/ShareProgressPage";
+import { useNavigate } from "@remix-run/react";
+import UserInfoPage from "./UserInfoPage/UserInfoPage";
+import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelectionPage";
+import { AppUsagesSelectionPage } from "~/routes/log-in/AppUsagesSelectionPage/AppUsagesSelectionPage";
+import {
+    ReceiveNotificationsSelectionPage
+} from "~/routes/log-in/ReceiveNotificationsSelectionPage/ReceiveNotificationsSelectionPage";
+
+import styles from "./login.module.css";
+import classNames from "classnames";
+import { useAppBar } from "~/components/AppBar/AppBar";
 
 type Views =
     | "userInfo"
-    | "appUseGoalSelection"
-    | "receiveNotificationsPreferenceSelection"
+    | "appUsagesSelection"
+    | "receiveNotificationsSelection"
     | "planDaySelection"
     | "shareProgressSelection"
-    | "selectAvatar"
-    | "redirect";
+    | "avatarSelection";
 
-export default function LogIn() {
+function CurrentView() {
     const [currentView, setCurrentView] = useState<Views>("userInfo");
     const [userId, setUserId] = useState<number | undefined>(undefined);
+    const navigate = useNavigate();
 
     switch (currentView) {
         case "userInfo":
             return (
-                <UserInfo
+                <UserInfoPage
                     onAuthDone={(userId) => {
-                        setCurrentView("appUseGoalSelection");
+                        setCurrentView("appUsagesSelection");
                         setUserId(userId);
                     }}
                 />
             );
-        case "appUseGoalSelection":
+        case "appUsagesSelection":
             return (
-                <AppUseGoals
-                    onProceed={() => setCurrentView("receiveNotificationsPreferenceSelection")}
+                <AppUsagesSelectionPage
+                    onProceed={() => setCurrentView("receiveNotificationsSelection")}
                 />
             );
-        case "receiveNotificationsPreferenceSelection":
+        case "receiveNotificationsSelection":
             return (
-                <ReceiveNotificationsPreferenceSelection
+                <ReceiveNotificationsSelectionPage
                     onProceed={() => setCurrentView("planDaySelection")}
                 />
             );
         case "planDaySelection":
             return (
-                <PlanDaySelection
+                <PlanDaySelectionPage
                     onProceed={() => setCurrentView("shareProgressSelection")}
                 />
             );
         case "shareProgressSelection":
             return (
-                <ShareProgress
+                <ShareProgressPage
                     userId={userId!}
-                    onShareSelected={() => setCurrentView("selectAvatar")}
+                    onShareSelected={() => setCurrentView("avatarSelection")}
                 />
             );
-        case "selectAvatar":
+        case "avatarSelection":
             return (
-                <Avatar
+                <AvatarSelectionPage
                     userId={userId!}
-                    onComplete={() => setCurrentView("redirect")}
+                    onComplete={() => navigate(`/`)}
                 />
             );
-        case "redirect":
-            return <Navigate to={`/dashboard/${userId}`} replace={true} />;
         default:
             return <h1>Should not have arrived here!</h1>;
     }
+}
+
+export default function LoginPage() {
+    useAppBar("clean");
+
+    return <div className={classNames(styles.loginPage)}>
+        <CurrentView />
+    </div>;
 }

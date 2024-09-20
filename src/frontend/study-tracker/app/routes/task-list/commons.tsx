@@ -1,3 +1,4 @@
+import styles from "~/routes/task-list/tasksPage.module.css";
 
 const statusValues: string[] = [
     "Tarefa Completa",
@@ -5,13 +6,13 @@ const statusValues: string[] = [
     "Tarefa parcialmente completa",
     "Tarefa incompleta",
     "Tarefa não iniciada"
-]
+];
 
-export function StatusPicker({onStatusSelect} : {onStatusSelect: (status: string) => void}) {
+export function StatusPicker({ onStatusSelect }: { onStatusSelect: (status: string) => void }) {
     return (
         <div>
-            <h1>Select Status:</h1>
-            {statusValues.map((status: string, index: number) => 
+            <h1 className={styles.createTaskTitle}>Select Status:</h1>
+            {statusValues.map((status: string, index: number) =>
                 <div key={index}>
                     <button onClick={() => onStatusSelect(status)}>
                         {status}
@@ -19,6 +20,6 @@ export function StatusPicker({onStatusSelect} : {onStatusSelect: (status: string
                 </div>
             )}
         </div>
-    )
+    );
 }
 

@@ -1,0 +1,10 @@
+@import "../login.module.css";
+
+
+.receiveNotificationsButton {
+    height: 2rem;
+}
+
+.receiveNotificationsButton.yes {
+    margin-bottom: 0.5rem;
+}

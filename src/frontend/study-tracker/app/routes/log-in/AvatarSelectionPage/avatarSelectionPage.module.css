@@ -1,0 +1,72 @@
+@import "../login.module.css";
+@import "../../../components/avatar.module.css";
+
+.avatarSelectionPageContainer {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatarSelectionPageInnerContainer {
+    padding: 1rem 2rem 2rem 2rem;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titleContainer {
+    margin-bottom: 5%;
+    margin-top: 3%;
+    display: flex;
+    justify-content: center;
+}
+
+.titleHeading {
+    font-size: 1.25rem;
+    color: var(--primary-text-color);
+    font-weight: 500;
+}
+
+.avatarListContainer {
+    flex-basis: 50%;
+    width: 100%;
+    overflow: auto;
+}
+
+.avatarGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(6.5rem, 25%), 1fr)); /* This 25% needs to be adjusted if gap is added (to maintain 4 columns in small screen)*/
+}
+
+.avatarContainer.selected {
+    border-color: var(--fourth-color);
+    transition: border-color 0.2s;
+}
+
+.confirmButtonContainer {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirmAvatarButton {
+    padding: 0.5rem;
+
+    font-size: 1.5rem;
+    font-weight: bold;
+
+    background-color: var(--fourth-color);
+}
+
+@media (hover: hover) {
+    .confirmButtonContainer button:hover {
+        background-color: var(--fourth-color);
+    }
+}

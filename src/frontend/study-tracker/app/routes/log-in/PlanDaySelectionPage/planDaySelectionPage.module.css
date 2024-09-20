@@ -1,0 +1,27 @@
+@import "../login.module.css";
+
+
+.titleText {
+    color: var(--secondary-color)
+}
+
+.selectableItemsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.5rem;
+}
+
+.weekDayButton {
+    height: 2rem;
+    width: 100%;
+}
+
+.weekDayButton[aria-selected="true"] {
+    border: blue 3px solid;
+    color: blue;
+}
+
+.hourLabel {
+    margin-right: 0.5rem;
+}

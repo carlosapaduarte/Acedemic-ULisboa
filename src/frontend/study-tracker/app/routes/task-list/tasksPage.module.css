@@ -1,0 +1,36 @@
+
+.tasksPage {
+    padding: 1rem;
+}
+
+.createTaskTitle {
+    font-size: 1.5rem;
+}
+
+.priorityLabel {
+    margin-left: 0.5rem;
+}
+
+.tagLabel {
+    margin-left: 0.5rem;
+}
+
+.currentTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.currentTag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--fourth-color);
+    border-radius: 0.25rem;
+}
+
+.openCategoryButton {
+    padding: 0.5rem;
+    background-color: lightblue;
+}

@@ -10,3 +10,9 @@
     width: 32px;
     height: 32px;
 }
+
+.settingsButtonIcon.clean {
+    stroke: var(--primary-text-color);
+    stroke-width: 1px;
+    stroke-linejoin: round;
+}
