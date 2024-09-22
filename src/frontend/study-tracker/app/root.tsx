@@ -5,6 +5,7 @@ import "./global.css";
 import "./i18n";
 import "./themes.css";
 import { AppBar, AppBarProvider } from "~/components/AppBar/AppBar";
+import * as React from "react";
 import { useEffect, useState } from "react";
 import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
 import { MetaFunction } from "@remix-run/node";
@@ -12,6 +13,8 @@ import { NotFoundPage } from "~/Pages/NotFoundPage";
 import { Footer } from "~/components/Footer/Footer";
 import { GlobalErrorContainer } from "./components/error/GlobalErrorContainer";
 import { GlobalErrorController } from "./components/error/GlobalErrorController";
+import { useTranslation } from "react-i18next";
+import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 export const meta: MetaFunction = () => {
     return [
@@ -74,14 +77,18 @@ export default function Root() {
 }
 
 export function App() {
+    const { t } = useTranslation(["error"]);
+
     return (
         <AppBarProvider>
             <div className="app">
                 <AppBar />
                 <div className="mainContentContainer">
-                    <GlobalErrorController>
-                        <Outlet />
-                    </GlobalErrorController>
+                    <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
+                        <GlobalErrorController>
+                            <Outlet />
+                        </GlobalErrorController>
+                    </ReactErrorBoundary>
                 </div>
                 <Footer />
             </div>
@@ -91,6 +98,8 @@ export function App() {
 
 export function ErrorBoundary() {
     const error = useRouteError();
+
+    const { t } = useTranslation(["error"]);
 
     if (isRouteErrorResponse(error)) {
         if (error.status === 404) {
@@ -109,10 +118,7 @@ export function ErrorBoundary() {
     } else if (error instanceof Error) {
         return (
             <div>
-                <h1>Error</h1>
-                <p>{error.message}</p>
-                <p>The stack trace is:</p>
-                <pre>{error.stack}</pre>
+                <h1>{t("error:title")}</h1>
             </div>
         );
     } else {
