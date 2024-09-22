@@ -2,7 +2,7 @@ import * as React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Logger } from "tslog";
 import { service } from "~/service/service";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
 const logger = new Logger({ name: "Authn" });
 
@@ -24,7 +24,7 @@ const LoggedInContext = createContext<ContextType>({
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>(undefined);
     const [userId, setUserId] = useState<number | undefined>(undefined);
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     function logIn(newUserId: number) {
         setUserId(newUserId);

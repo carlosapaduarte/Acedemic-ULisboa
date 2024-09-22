@@ -1,11 +1,11 @@
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { BinaryAnswer, service } from "~/service/service";
 import styles from "./receiveNotificationsSelectionPage.module.css";
 import { Button } from "~/components/Button/Button";
 import React from "react";
 
 export function ReceiveNotificationsSelectionPage({ onProceed }: { onProceed: () => void }) {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     function submitReceiveNotPref(answer: BinaryAnswer) {
         const userIdStr = localStorage["userId"];

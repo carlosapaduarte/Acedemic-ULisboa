@@ -1,11 +1,11 @@
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import styles from "./shareProgressPage.module.css";
 import { Button } from "~/components/Button/Button";
 import React from "react";
 
 function useShareProgressPage({ userId, onShareSelected }: { userId: number, onShareSelected: () => void }) {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     async function selectShareProgressState(shareProgress: boolean) {
         await service

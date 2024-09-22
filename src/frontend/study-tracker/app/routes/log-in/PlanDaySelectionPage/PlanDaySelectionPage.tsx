@@ -1,11 +1,11 @@
 import { service } from "~/service/service";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { useWeekDayAndHourPicker, weekDays } from "../../commons";
 import styles from "./planDaySelectionPage.module.css";
 import { Button } from "~/components/Button/Button";
 
 function usePlanDaySelection(onProceed: () => void) {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     function submitPlanDaySelection(weekDay: number, hour: number) {
         const userIdStr = localStorage["userId"];

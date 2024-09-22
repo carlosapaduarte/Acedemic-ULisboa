@@ -1,18 +1,18 @@
-import { useState } from "react"
-import { useSetError } from "~/components/error/ErrorContainer"
-import { service, Task } from "~/service/service"
-import { utils } from "~/utils"
-import { StatusPicker } from "./commons"
+import { useState } from "react";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { service, Task } from "~/service/service";
+import { utils } from "~/utils";
+import { StatusPicker } from "./commons";
 
-function Tags({tags} : {tags: string[]}) {
+function Tags({ tags }: { tags: string[] }) {
     return (
         <div>
             <p>Tags:</p>
-            {tags.map((tag: string, index: number) => 
+            {tags.map((tag: string, index: number) =>
                 <p key={index}>{tag}</p>
             )}
         </div>
-    )
+    );
 }
 
 type View =
@@ -20,62 +20,71 @@ type View =
     | "changeStatus"
 
 function useTaskView(taskToCache: Task) {
-    const setError = useSetError()
-    const [view, setView] = useState<View>("taskView")
-    const [task, setTask] = useState<Task>(taskToCache)
+    const setError = useSetGlobalError();
+    const [view, setView] = useState<View>("taskView");
+    const [task, setTask] = useState<Task>(taskToCache);
 
     function selectUpdateStatusView() {
-        setView("changeStatus")
+        setView("changeStatus");
     }
 
     function selectTaskView() {
-        setView("taskView")
+        setView("taskView");
     }
 
     function updateTask() {
-        const userId = utils.getUserId()
+        const userId = utils.getUserId();
         service.getTask(userId, task.id)
             .then((updatedTask: Task) => setTask(updatedTask))
-            .catch((error) => setError(error))
-    }
-    
-    function updateTaskStatus(newStatus: string, onDone: () => void) {
-        const userId = utils.getUserId()
-        service.updateTaskStatus(userId, task.id, newStatus)
-            .then(() => onDone())
-            .catch((error) => setError(error))
+            .catch((error) => setError(error));
     }
 
-    return {view, task, selectUpdateStatusView, selectTaskView, updateTask, updateTaskStatus}
+    function updateTaskStatus(newStatus: string, onDone: () => void) {
+        const userId = utils.getUserId();
+        service.updateTaskStatus(userId, task.id, newStatus)
+            .then(() => onDone())
+            .catch((error) => setError(error));
+    }
+
+    return { view, task, selectUpdateStatusView, selectTaskView, updateTask, updateTaskStatus };
 }
 
 // "TaskView" name is because there already exists a Task type in this project
-export function TaskView({taskToDisplay, onTaskStatusUpdated = undefined} : {taskToDisplay: Task, onTaskStatusUpdated: (() => void) | undefined}) {
+export function TaskView({ taskToDisplay, onTaskStatusUpdated = undefined }: {
+    taskToDisplay: Task,
+    onTaskStatusUpdated: (() => void) | undefined
+}) {
     // This function received a "onTaskStatusUpdated()" handler because, sometimes, it's handy for the caller to know that one of the tasks was updated!
 
-    const {view, task, selectUpdateStatusView, selectTaskView, updateTask, updateTaskStatus} = useTaskView(taskToDisplay)
+    const {
+        view,
+        task,
+        selectUpdateStatusView,
+        selectTaskView,
+        updateTask,
+        updateTaskStatus
+    } = useTaskView(taskToDisplay);
 
     function passedDeadline(): boolean {
-        return task.data.deadline < new Date()
+        return task.data.deadline < new Date();
     }
 
     function onNewStatusUpdateSelect(newStatus: string) {
         updateTaskStatus(newStatus, () => {
-            selectTaskView()
-            updateTask()
-            onTaskStatusUpdated ? onTaskStatusUpdated() : {}
-        })
+            selectTaskView();
+            updateTask();
+            onTaskStatusUpdated ? onTaskStatusUpdated() : {};
+        });
     }
 
     if (view == "changeStatus") {
         return (
             <div>
-                <StatusPicker onStatusSelect={onNewStatusUpdateSelect}/>
-                <br/><br/>
+                <StatusPicker onStatusSelect={onNewStatusUpdateSelect} />
+                <br /><br />
             </div>
-        )
-    }
-    else {
+        );
+    } else {
         return (
             <div>
                 <button onClick={selectUpdateStatusView}>
@@ -93,15 +102,15 @@ export function TaskView({taskToDisplay, onTaskStatusUpdated = undefined} : {tas
                 <Tags tags={task.data.tags} />
                 <p>Priority: {task.data.priority}</p>
                 <p>Status: {task.data.status}</p>
-                <br/>
+                <br />
                 <h2>Sub Tasks:</h2>
-                {task.subTasks.map((subTask: Task, index: number) => 
+                {task.subTasks.map((subTask: Task, index: number) =>
                     <div key={index}>
                         <TaskView taskToDisplay={subTask} onTaskStatusUpdated={undefined} />
-                        <br/>
+                        <br />
                     </div>
                 )}
             </div>
-        )
+        );
     }
 }

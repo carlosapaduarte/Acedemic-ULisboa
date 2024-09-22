@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import styles from "./appUsagesSelectionPage.module.css";
 import { Button } from "~/components/Button/Button";
@@ -22,7 +22,7 @@ function useAppUsagesSelection(
         onComplete: () => void;
     }) {
     const [selectedOptions, setSelectedOptions] = useState<Set<number>>(new Set([]));
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     function onInputValueChange(index: number) {
         const cur: Set<number> = new Set([...selectedOptions]);

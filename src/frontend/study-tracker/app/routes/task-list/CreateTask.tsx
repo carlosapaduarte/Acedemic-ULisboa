@@ -3,7 +3,7 @@ import { StatusPicker } from "./commons";
 import { utils } from "~/utils";
 import { ChangeEvent, useState } from "react";
 import { CreateTask, service, Task } from "~/service/service";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import styles from "./tasksPage.module.css";
 
 const priorityValues: string[] = [
@@ -175,7 +175,7 @@ export function CreateTaskForm({ onConfirmClick }: { onConfirmClick: (newTaskInf
 }
 
 export function CreateTaskView({ onTaskCreated }: { onTaskCreated: (task: Task) => void }) {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     function createTask(newTaskInfo: CreateTask, onDone: (task: Task) => void) {
         const userId = utils.getUserId();

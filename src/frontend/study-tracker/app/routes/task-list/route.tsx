@@ -8,7 +8,7 @@ type TaskListView =
     | "taskList"
     | "createNewTask"
 
-function renderPage() {
+function RenderPage() {
     const { tasks, refreshTasks } = useTaskList(false);
     const [view, setView] = useState<TaskListView>("taskList");
 
@@ -35,7 +35,7 @@ export default function TaskPage() {
     return (
         <RequireAuthn>
             <div className={styles.tasksPage}>
-                {renderPage()}
+                <RenderPage />
             </div>
         </RequireAuthn>
     );

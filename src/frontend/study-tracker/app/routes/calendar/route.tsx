@@ -5,7 +5,7 @@ import { utils } from "~/utils";
 import { Event, NewEventInfo, service } from "~/service/service";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CategoryAndTagsPicker, useTags } from "../commons";
 import styles from "./calendarPage.module.css";
 
@@ -23,7 +23,7 @@ type EventsView =
     | "recurringEvents"
 
 function useMyCalendar() {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [newEventTitleAndName, setNewEventTitleAndName] = useState<NewEventTitleAndDate>();

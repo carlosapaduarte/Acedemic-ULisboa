@@ -1,5 +1,5 @@
 import { useLogIn } from "~/components/auth/Authn";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import React, { useState } from "react";
 import { service } from "~/service/service";
 import styles from "./userInfoPage.module.css";
@@ -9,7 +9,7 @@ const MAX_USER_ID = 9999;
 
 function useUserInfoPage() {
     const logIn = useLogIn();
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token

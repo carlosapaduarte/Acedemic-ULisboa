@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import { utils } from "~/utils";
 import { CategoryAndTagsPicker, useTags } from "../commons";
@@ -36,7 +36,7 @@ export function AddEvent({ startDate, onNewEventCreated }: { startDate: Date, on
 }
 
 function useAddEvent(startDate: Date, onNewEventCreated: () => void) {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     const [title, setTitle] = useState<string>("");
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);

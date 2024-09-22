@@ -10,8 +10,8 @@ import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } 
 import { MetaFunction } from "@remix-run/node";
 import { NotFoundPage } from "~/Pages/NotFoundPage";
 import { Footer } from "~/components/Footer/Footer";
-import { ErrorContainer } from "./components/error/ErrorContainer";
-import { ErrorController } from "./components/error/ErrorController";
+import { GlobalErrorContainer } from "./components/error/GlobalErrorContainer";
+import { GlobalErrorController } from "./components/error/GlobalErrorController";
 
 export const meta: MetaFunction = () => {
     return [
@@ -63,13 +63,13 @@ export default function Root() {
     }
 
     return (
-        <ErrorContainer>
+        <GlobalErrorContainer>
             <AuthnContainer>
                 <ThemeProvider theme={theme} setTheme={setTheme}>
                     <App />
                 </ThemeProvider>
             </AuthnContainer>
-        </ErrorContainer>
+        </GlobalErrorContainer>
     );
 }
 
@@ -79,9 +79,9 @@ export function App() {
             <div className="app">
                 <AppBar />
                 <div className="mainContentContainer">
-                    <ErrorController>
+                    <GlobalErrorController>
                         <Outlet />
-                    </ErrorController>
+                    </GlobalErrorController>
                 </div>
                 <Footer />
             </div>

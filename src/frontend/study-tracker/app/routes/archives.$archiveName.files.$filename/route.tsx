@@ -1,36 +1,36 @@
 import { useParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { useSetError } from "~/components/error/ErrorContainer";
-import { File, service } from "~/service/service"
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { File, service } from "~/service/service";
 import { utils } from "~/utils";
 import { Editor } from "./editor";
 
 export default function FileView() {
-    const setError = useSetError()
-    
-    const params = useParams();
-    const archiveName = params.archiveName
-    const filename = params.filename
+    const setError = useSetGlobalError();
 
-    const [file, setFile] = useState<File | undefined>(undefined)
+    const params = useParams();
+    const archiveName = params.archiveName;
+    const filename = params.filename;
+
+    const [file, setFile] = useState<File | undefined>(undefined);
 
     useEffect(() => {
         if (archiveName == undefined || filename == undefined)
-            setError(new Error("Archive name and filename should not be null!"))
+            setError(new Error("Archive name and filename should not be null!"));
         else {
-            const userId = utils.getUserId()
+            const userId = utils.getUserId();
             service.getFile(userId, archiveName, filename)
                 .then((file: File) => setFile(file))
-                .catch((e: Error) => setError(e))
+                .catch((e: Error) => setError(e));
         }
-    }, [])
+    }, []);
 
     return file && archiveName ?
         <div>
             <span>Name: {file.name}</span>
-            <br/>
+            <br />
             <Editor archiveName={archiveName} file={file} />
         </div>
         :
-        <></>
+        <></>;
 }
