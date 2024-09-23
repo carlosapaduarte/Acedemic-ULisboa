@@ -99,8 +99,13 @@ export default function WelcomePage() {
     }
 
     return (
-        <div className={classNames(styles.welcomePage)}>
-            {renderInfoPage(currentPage, () => setCurrentPage(2), handleOnProceedClick)}
+        <div className={styles.sliderContainer}>
+            <div className={classNames(styles.welcomePage, styles.first, currentPage == 1 && styles.active)}>
+                <InfoPage1 handleOnNextClick={() => setCurrentPage(2)} />
+            </div>
+            <div className={classNames(styles.welcomePage, styles.second, currentPage == 2 && styles.active)}>
+                <InfoPage2 handleOnProceedClick={handleOnProceedClick} />
+            </div>
         </div>
     );
 }

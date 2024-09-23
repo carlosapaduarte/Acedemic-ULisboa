@@ -1,5 +1,16 @@
 
+.sliderContainer {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
 .welcomePage {
+    position: absolute;
+
     padding: 0 2rem 0 2rem;
 
     width: 100%;
@@ -7,6 +18,24 @@
 
     display: flex;
     flex-direction: column;
+
+    transition: transform 0.5s ease-in-out;
+}
+
+.welcomePage.first {
+    transform: translateX(-100%);
+}
+
+.welcomePage.first.active {
+    transform: translateX(0);
+}
+
+.welcomePage.second {
+    transform: translateX(100%);
+}
+
+.welcomePage.second.active {
+    transform: translateX(0);
 }
 
 .welcomePage h2, h3 {
