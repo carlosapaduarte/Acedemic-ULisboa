@@ -8,6 +8,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CategoryAndTagsPicker, useTags } from "../commons";
 import styles from "./calendarPage.module.css";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 const localizer = momentLocalizer(moment);
 
@@ -123,7 +124,7 @@ function useMyCalendar() {
     };
 }
 
-export default function MyCalendar() {
+function MyCalendar() {
     const {
         events,
         calendarView,
@@ -216,4 +217,12 @@ export default function MyCalendar() {
             }
         </div>
     );
+}
+
+export default function MyCalendarAuthControlled() {
+    return (
+        <RequireAuthn>
+            <MyCalendar/>
+        </RequireAuthn>
+    )
 }

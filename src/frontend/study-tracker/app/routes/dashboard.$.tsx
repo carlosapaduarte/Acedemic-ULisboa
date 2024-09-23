@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { service, Event } from "~/service/service";
 import { utils } from "~/utils";
 
@@ -43,15 +44,17 @@ function DailyEvents() {
     const { events } = useDailyEvents()
 
     return (
-        <div>
-            <h1>Today's Events!</h1>
-            {events?.map((events: Event, index: number) => 
-                <div key={index}>
-                    <p>{events.title}</p>
-                    <p>{events.tag}</p>
-                </div>
-            )}
-        </div>
+        <RequireAuthn>
+            <div>
+                <h1>Today's Events!</h1>
+                {events?.map((events: Event, index: number) => 
+                    <div key={index}>
+                        <p>{events.title}</p>
+                        <p>{events.tag}</p>
+                    </div>
+                )}
+            </div>
+        </RequireAuthn>
     )
 }
 

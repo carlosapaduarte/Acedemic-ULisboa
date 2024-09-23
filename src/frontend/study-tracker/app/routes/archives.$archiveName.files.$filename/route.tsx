@@ -4,8 +4,9 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { File, service } from "~/service/service";
 import { utils } from "~/utils";
 import { Editor } from "./editor";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
-export default function FileView() {
+function FileView() {
     const setError = useSetGlobalError();
 
     const params = useParams();
@@ -33,4 +34,12 @@ export default function FileView() {
         </div>
         :
         <></>;
+}
+
+export default function FileViewAuthControlled() {
+    return (
+        <RequireAuthn>
+            <FileView/>
+        </RequireAuthn>
+    )
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Archive, File, service } from "~/service/service"
 import { utils } from "~/utils"
 import { useNavigate } from "@remix-run/react"
+import { RequireAuthn } from "~/components/auth/RequireAuthn"
 
 function useCreateArchiveView(onArchiveCreated: () => void) {
     const [name, setName] = useState("")
@@ -105,7 +106,7 @@ function useArchiveListView() {
     return {archives, refreshArchives}
 }
 
-export default function ArchiveListView() {
+function ArchiveListView() {
     const {archives, refreshArchives} = useArchiveListView()
 
     return (
@@ -118,5 +119,13 @@ export default function ArchiveListView() {
                 </div>
             )}
         </div>
+    )
+}
+
+export default function ArchiveListViewAuthControlled() {
+    return (
+        <RequireAuthn>
+            <ArchiveListView/>
+        </RequireAuthn>
     )
 }

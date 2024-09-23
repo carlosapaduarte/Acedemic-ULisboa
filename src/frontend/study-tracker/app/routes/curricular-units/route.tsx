@@ -4,6 +4,7 @@ import { CurricularUnit, Grade, service } from "~/service/service";
 import { utils } from "~/utils";
 import { CreateCurricularUnit } from "./CreateCU";
 import { CreateGrade } from "./CreateGrade";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 function useCurricularUnitView(initialCurricularUnit: CurricularUnit) {
     const setError = useSetGlobalError();
@@ -66,7 +67,7 @@ function useCurricularUnitListView() {
     return { cuList, refreshCurricularUnits };
 }
 
-export default function CurricularUnitListView() {
+function CurricularUnitListView() {
     const { cuList, refreshCurricularUnits } = useCurricularUnitListView();
 
     return (
@@ -77,4 +78,12 @@ export default function CurricularUnitListView() {
             )}
         </div>
     );
+}
+
+export default function CurricularUnitListViewAuthControlled() {
+    return (
+        <RequireAuthn>
+            <CurricularUnitListView/>
+        </RequireAuthn>
+    )
 }

@@ -7,6 +7,7 @@ import { SelectAssociatedTasks } from "./SelectAssociatedTasks";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CreateTaskView } from "../task-list/CreateTask";
 import { TaskList } from "../task-list/TaskList";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 function useTimerSetup() {
     const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(undefined);
@@ -163,19 +164,23 @@ function TimerAndAssociatedTasksView({ associatedTasks }: { associatedTasks: Tas
     }
 }
 
-export default function StudyPage() {
+function StudyPage() {
     // In short, this component begins by asking the user to select a set of tasks to associate to the study time
     // If there is a study block now, it starts the timer to the end of the study block.
     // Otherwise, asks the user to select a study and pause time, first, and only then it starts the timer.
 
     const { associatedTasks, onTasksSelected } = useAssociatedTasks();
 
-    // Select Associated Tasks!
-    if (associatedTasks == undefined)
-        return (<SelectAssociatedTasks onTasksSelected={onTasksSelected} />);
+    return associatedTasks == undefined ?
+        <SelectAssociatedTasks onTasksSelected={onTasksSelected} />
+    :
+        <TimerAndAssociatedTasksView associatedTasks={associatedTasks} />
+}
 
-    // Associated Tasks selected! Start timer!
-    else {
-        return (<TimerAndAssociatedTasksView associatedTasks={associatedTasks} />);
-    }
+export default function StudyPageAuthControlled() {
+    return (
+        <RequireAuthn>
+            <StudyPage />
+        </RequireAuthn>
+    )
 }
