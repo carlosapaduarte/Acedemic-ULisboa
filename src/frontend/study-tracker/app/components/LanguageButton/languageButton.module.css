@@ -13,13 +13,15 @@
     background-color: white;
 
     border-radius: 5px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: var(--secondary-text-color);
+    outline: var(--secondary-text-color) solid 1px;
 }
 
 .languageButton.clean {
-    border-color: var(--primary-text-color);
+    outline-color: var(--primary-text-color);
+}
+
+.languageButton:focus {
+    outline: revert;
 }
 
 .languageButton.pt-PT {
