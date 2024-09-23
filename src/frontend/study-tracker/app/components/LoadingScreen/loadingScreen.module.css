@@ -1,0 +1,57 @@
+
+
+.loadingScreen {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-family2), sans-serif;
+}
+
+.contentContainer {
+    padding: 0 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.acedemicTextContainer {
+    display: flex;
+    align-items: center;
+}
+
+.aceText {
+    font-size: 3.5rem;
+    color: var(--secondary-color);
+    font-weight: 900;
+}
+
+.demicText {
+    font-size: 3rem;
+    color: var(--primary-text-color);
+}
+
+.trackerAndCheckboxContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.trackerText {
+    font-size: 2rem;
+    color: var(--primary-text-color);
+}
+
+.checkBox {
+    margin-left: 0.5rem;
+
+    width: 2.5rem;
+    height: 2.5rem;
+
+    border-radius: 5px;
+    border: 4px solid var(--secondary-color);
+}

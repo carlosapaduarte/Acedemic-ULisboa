@@ -15,6 +15,7 @@ import { GlobalErrorContainer } from "./components/error/GlobalErrorContainer";
 import { GlobalErrorController } from "./components/error/GlobalErrorController";
 import { useTranslation } from "react-i18next";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
+import { LoadingScreen } from "~/components/LoadingScreen/LoadingScreen";
 
 export const meta: MetaFunction = () => {
     return [
@@ -62,7 +63,9 @@ export default function Root() {
     }, [theme]);
 
     if (!isHydrated) {
-        return null;
+        return <div className="app">
+            <LoadingScreen />
+        </div>;
     }
 
     return (
