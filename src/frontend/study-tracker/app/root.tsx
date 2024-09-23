@@ -47,26 +47,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function Root() {
-    const [isHydrated, setIsHydrated] = useState(false);
     const [theme, setTheme] = useState<AppTheme>(AppTheme.defaultTheme);
 
     useEffect(() => {
         const storedTheme = getLocalStorageTheme();
 
         setTheme(storedTheme);
-
-        setIsHydrated(true);
     }, []);
 
     useEffect(() => {
         document.body.className = getAppThemeClassNames(theme);
     }, [theme]);
-
-    if (!isHydrated) {
-        return <div className="app">
-            <LoadingScreen />
-        </div>;
-    }
 
     return (
         <GlobalErrorContainer>
@@ -82,17 +73,30 @@ export default function Root() {
 export function App() {
     const { t } = useTranslation(["error"]);
 
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        setLoaded(true);
+    }, []);
+
     return (
         <AppBarProvider>
             <div className="app">
-                <AppBar />
-                <div className="mainContentContainer">
-                    <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
-                        <GlobalErrorController>
-                            <Outlet />
-                        </GlobalErrorController>
-                    </ReactErrorBoundary>
-                </div>
+                {loaded ?
+                    <>
+                        <AppBar />
+                        <div className="mainContentContainer">
+                            <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
+                                <GlobalErrorController>
+                                    <Outlet />
+                                </GlobalErrorController>
+                            </ReactErrorBoundary>
+                        </div>
+
+                    </>
+                    :
+                    <LoadingScreen />
+                }
                 <Footer />
             </div>
         </AppBarProvider>
