@@ -24,7 +24,7 @@ import { GlobalErrorContainer } from "./components/error/GlobalErrorContainer";
 import { GlobalErrorController } from "./components/error/GlobalErrorController";
 import { useTranslation } from "react-i18next";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
-import { LoadingScreen } from "~/components/LoadingScreen/LoadingScreen";
+import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
 import i18next from "~/i18next.server";
 import { useChangeLanguage } from "remix-i18next/react";
 
@@ -104,30 +104,28 @@ export default function Root() {
 export function App() {
     const { t } = useTranslation(["error"]);
 
-    const [loaded, setLoaded] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoaded(true);
+        const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 1000));
+
+        Promise.all([minLoadingTime]).then(() => {
+            setLoading(false);
+        });
     }, []);
 
     return (
         <AppBarProvider>
             <div className="app">
-                {loaded ?
-                    <>
-                        <AppBar />
-                        <div className="mainContentContainer">
-                            <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
-                                <GlobalErrorController>
-                                    <Outlet />
-                                </GlobalErrorController>
-                            </ReactErrorBoundary>
-                        </div>
-
-                    </>
-                    :
-                    <LoadingScreen />
-                }
+                <AppBar />
+                <div className="mainContentContainer">
+                    <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
+                        <GlobalErrorController>
+                            <Outlet />
+                        </GlobalErrorController>
+                    </ReactErrorBoundary>
+                </div>
+                <LoadingOverlay loading={loading} />
                 <Footer />
             </div>
         </AppBarProvider>
