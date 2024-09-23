@@ -20,7 +20,7 @@
     outline-color: var(--primary-text-color);
 }
 
-.languageButton:focus {
+.languageButton:focus-visible {
     outline: revert;
 }
 
