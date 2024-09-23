@@ -45,6 +45,6 @@ Something like this could be very interesting for animating.
 
 @media (hover: hover) {
     .roundButton:hover {
-        background-color: var(--third-color);
+        background-color: var(--secondary-color-hover);
     }
 }

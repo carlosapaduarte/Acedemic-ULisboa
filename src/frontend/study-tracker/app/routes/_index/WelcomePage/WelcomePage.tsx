@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import styles from "~/routes/_index/WelcomePage/welcomePage.module.css";
 import classNames from "classnames";
 import { useAppBar } from "~/components/AppBar/AppBar";
-import { Button } from "~/components/Button/Button";
 
 function useWelcomePage() {
     const isLoggedIn = useIsLoggedIn();
@@ -33,9 +32,9 @@ export default function WelcomePage() {
         <div className={classNames(styles.welcomePage)}>
             <h1>Welcome! <br /> Log in to continue</h1>
             <br />
-            <Button variant={"round"} onClick={handleOnProceedClick}>
+            <button className={styles.roundButton} onClick={handleOnProceedClick}>
                 Go to Login
-            </Button>
+            </button>
         </div>
     );
 }

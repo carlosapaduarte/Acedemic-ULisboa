@@ -3,7 +3,6 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import React, { useState } from "react";
 import { service } from "~/service/service";
 import styles from "./userInfoPage.module.css";
-import { Button } from "~/components/Button/Button";
 
 const MAX_USER_ID = 9999;
 
@@ -47,19 +46,19 @@ export default function UserInfoPage(
                         <h1 className={styles.titleText}>
                             User created!
                         </h1>
-                        <Button variant={"round"} onClick={() => onAuthDone(userId)
+                        <button className={styles.roundButton} onClick={() => onAuthDone(userId)
                         }>
                             Click here to advance
-                        </Button>
+                        </button>
                     </>
                 ) : (
                     <>
                         <h1 className={styles.titleText}>
                             Create New User
                         </h1>
-                        <Button variant={"round"} onClick={() => createUser()}>
+                        <button className={styles.roundButton} onClick={() => createUser()}>
                             Click To Create user
-                        </Button>
+                        </button>
                     </>
                 )}
             </div>

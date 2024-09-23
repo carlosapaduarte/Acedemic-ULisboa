@@ -1,8 +1,8 @@
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import styles from "./shareProgressPage.module.css";
-import { Button } from "~/components/Button/Button";
 import React from "react";
+import classNames from "classnames";
 
 function useShareProgressPage({ userId, onShareSelected }: { userId: number, onShareSelected: () => void }) {
     const setError = useSetGlobalError();
@@ -34,22 +34,22 @@ export function ShareProgressPage(
                     Do you want to share your progress?
                 </h1>
                 <br />
-                <Button variant={"round"}
-                        className={`${styles.shareProgressButton} ${styles.yes}`}
-                        onClick={() => {
-                            selectShareProgressState(true);
-                        }}
+                <button
+                    className={classNames(styles.roundButton, styles.shareProgressButton, styles.yes)}
+                    onClick={() => {
+                        selectShareProgressState(true);
+                    }}
                 >
                     Yes
-                </Button>
-                <Button variant={"round"}
-                        className={`${styles.shareProgressButton}`}
-                        onClick={() => {
-                            selectShareProgressState(false);
-                        }}
+                </button>
+                <button
+                    className={classNames(styles.roundButton, styles.shareProgressButton)}
+                    onClick={() => {
+                        selectShareProgressState(false);
+                    }}
                 >
                     No
-                </Button>
+                </button>
             </div>
         </div>
     );

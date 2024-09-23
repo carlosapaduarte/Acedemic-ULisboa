@@ -1,7 +1,7 @@
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import styles from "./notFoundPage.module.css";
-import { Button } from "~/components/Button/Button";
+import classNames from "classnames";
 
 /**
  * Page not found component.
@@ -20,13 +20,13 @@ export function NotFoundPage() {
                 <h3 className={styles.descriptionText}>
                     {t("not_found_page:description")}
                 </h3>
-                <Button variant={"round"} className={styles.goHomeButton}
+                <button className={classNames(styles.roundButton, styles.goHomeButton)}
                         onClick={() => navigate("/")
                             //startIcon={<HomeIcon/>}
                         }
                 >
                     {t("not_found_page:go_to_home")}
-                </Button>
+                </button>
             </div>
         </div>
     );

@@ -2,7 +2,7 @@ import { service } from "~/service/service";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { useWeekDayAndHourPicker, weekDays } from "../../commons";
 import styles from "./planDaySelectionPage.module.css";
-import { Button } from "~/components/Button/Button";
+import classNames from "classnames";
 
 function usePlanDaySelection(onProceed: () => void) {
     const setError = useSetGlobalError();
@@ -28,13 +28,13 @@ export function PlanDaySelectionPage({ onProceed }: { onProceed: () => void }) {
             <div className={styles.pageInnerContainer}>
                 <div className={styles.selectableItemsContainer}>
                     {weekDays.map((key: string, index: number) =>
-                        <Button key={index} variant={"round"}
-                                className={styles.weekDayButton}
+                        <button key={index}
+                                className={classNames(styles.roundButton, styles.weekDayButton)}
                                 onClick={() => setWeekDay(index)}
                                 aria-selected={weekDay == index}
                         >
                             {key}
-                        </Button>
+                        </button>
                     )}
 
                     <div>
@@ -43,10 +43,11 @@ export function PlanDaySelectionPage({ onProceed }: { onProceed: () => void }) {
                                onChange={(e) => setHour(Number(e.target.value))} />
                     </div>
 
-                    <Button variant={"round"} onClick={() => submitPlanDaySelection(weekDay!, hour!)}
+                    <button className={classNames(styles.roundButton)}
+                            onClick={() => submitPlanDaySelection(weekDay!, hour!)}
                             disabled={weekDay == undefined || hour == undefined}>
                         Confirm
-                    </Button>
+                    </button>
                 </div>
             </div>
         </div>

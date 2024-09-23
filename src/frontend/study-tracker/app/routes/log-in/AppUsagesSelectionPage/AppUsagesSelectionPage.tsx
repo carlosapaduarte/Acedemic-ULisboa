@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import styles from "./appUsagesSelectionPage.module.css";
-import { Button } from "~/components/Button/Button";
+import classNames from "classnames";
 
 const questions = [
     "Melhorar as minhas notas/classificações",
@@ -62,9 +62,10 @@ export function AppUsagesSelectionPage({ onProceed }: { onProceed: () => void })
                         </div>
                     )}
                     <div className={styles.submitSelectionButtonContainer}>
-                        <Button variant={"round"} className={styles.submitSelectionButton} onClick={submitAppUseGoals}>
+                        <button className={classNames(styles.roundButton, styles.submitSelectionButton)}
+                                onClick={submitAppUseGoals}>
                             Submit Selection
-                        </Button>
+                        </button>
                     </div>
                 </div>
             </div>

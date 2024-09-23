@@ -1,4 +1,3 @@
-import { Button } from "~/components/Button/Button";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
@@ -52,12 +51,11 @@ function SideBarNavButton({ text, url, setIsSideBarOpen }: {
 
     return (
         <div className={`${styles.sideBarNavButtonContainer}`}>
-            <Button variant={"round"}
-                    onClick={() => {
-                        setIsSideBarOpen(false);
-                        navigate(url);
-                    }}
-                    className={`${styles.sideBarNavButton}`}
+            <button onClick={() => {
+                setIsSideBarOpen(false);
+                navigate(url);
+            }}
+                    className={`${styles.roundButton} ${styles.sideBarNavButton}`}
             >
                 <div className={`${styles.sideBarNavButtonIcon}`}>
                     ICON
@@ -65,7 +63,7 @@ function SideBarNavButton({ text, url, setIsSideBarOpen }: {
                 <div className={`${styles.sideBarNavButtonText}`}>
                     {text}
                 </div>
-            </Button>
+            </button>
         </div>
     );
 }
@@ -123,18 +121,18 @@ export function AppBar() {
                     appBarVariant === "clean" && cleanAppBarStyles.appBar
                 )}>
                 {appBarVariant !== "clean" && (
-                    <Button
+                    <button
                         className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
                         onClick={() => navigate(-1)}
                     >
                         {"<"}
-                    </Button>
+                    </button>
                 )}
                 {appBarVariant === "default" && (
                     <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
-                        <Button className={styles.homeButton}>
+                        <button className={styles.homeButton}>
                             Home
-                        </Button>
+                        </button>
                     </div>
                 )}
                 <div key="settingsButtons"

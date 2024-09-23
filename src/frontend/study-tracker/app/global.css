@@ -9,6 +9,9 @@
     --third-color: #703f3a;
     --fourth-color: #587750;
     --fifth-color: #2e3192;
+
+    --secondary-color-hover: rgba(89, 46, 37, 0.6);
+
     --yellow-85: rgba(255, 230, 0, 0.85);
     --secondary-85: rgba(125, 244, 190, 0.85);
 

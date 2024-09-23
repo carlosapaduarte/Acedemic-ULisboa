@@ -1,3 +1,5 @@
+@import "../Button/button.module.css";
+
 .appBarContainer {
     position: relative;
     width: 100%;

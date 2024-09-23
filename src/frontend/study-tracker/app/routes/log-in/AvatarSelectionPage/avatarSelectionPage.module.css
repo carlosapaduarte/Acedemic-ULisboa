@@ -1,5 +1,6 @@
 @import "../login.module.css";
 @import "../../../components/avatar.module.css";
+@import "../../../components/Button/button.module.css";
 
 .avatarSelectionPageContainer {
     display: flex;

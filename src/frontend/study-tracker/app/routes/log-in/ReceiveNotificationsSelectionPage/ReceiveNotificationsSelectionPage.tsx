@@ -1,8 +1,8 @@
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { BinaryAnswer, service } from "~/service/service";
 import styles from "./receiveNotificationsSelectionPage.module.css";
-import { Button } from "~/components/Button/Button";
 import React from "react";
+import classNames from "classnames";
 
 export function ReceiveNotificationsSelectionPage({ onProceed }: { onProceed: () => void }) {
     const setError = useSetGlobalError();
@@ -20,14 +20,14 @@ export function ReceiveNotificationsSelectionPage({ onProceed }: { onProceed: ()
             <div className={styles.pageInnerContainer}>
                 <h1>Receive Notifications</h1>
                 <br />
-                <Button variant={"round"} className={`${styles.receiveNotificationsButton} ${styles.yes}`}
+                <button className={classNames(styles.roundButton, styles.receiveNotificationsButton, styles.yes)}
                         onClick={() => submitReceiveNotPref(BinaryAnswer.YES)}>
                     Yes
-                </Button>
-                <Button variant={"round"} className={`${styles.receiveNotificationsButton}`}
+                </button>
+                <button className={classNames(styles.roundButton, styles.receiveNotificationsButton)}
                         onClick={() => submitReceiveNotPref(BinaryAnswer.NO)}>
                     No
-                </Button>
+                </button>
             </div>
         </div>
     );

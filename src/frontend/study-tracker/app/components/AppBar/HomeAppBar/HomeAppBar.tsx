@@ -2,7 +2,6 @@ import styles from "./homeAppBar.module.css";
 import React, { useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import { useLogOut, useUserIdEvent } from "~/components/auth/Authn";
-import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -35,12 +34,12 @@ function NavBarButton({ text, url }: { text: string, url: string }) {
 
     return (
         <div className={`${styles.navBarButtonContainer}`}>
-            <CutButton
+            <button
                 onClick={() => navigate(url)}
-                className={`${styles.navBarButton}`}
+                className={`${styles.cutButton} ${styles.navBarButton}`}
             >
                 Icon
-            </CutButton>
+            </button>
             <div className={`${styles.navBarButtonText}`}>
                 {text}
             </div>

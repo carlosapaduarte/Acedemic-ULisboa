@@ -3,6 +3,7 @@
 
 @import "../../../page.module.css";
 @import "../appBar.module.css";
+@import "../../Button/button.module.css";
 
 .appBarContainer {
     max-height: 220px;

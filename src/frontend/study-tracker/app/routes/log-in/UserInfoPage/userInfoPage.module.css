@@ -1,4 +1,5 @@
 @import "../login.module.css";
+@import "../../../components/Button/button.module.css";
 
 .titleText {
 }
