@@ -26,3 +26,5 @@ gradle-app.setting
 
 # Node
 node_modules
+
+src/backend/.venv/
