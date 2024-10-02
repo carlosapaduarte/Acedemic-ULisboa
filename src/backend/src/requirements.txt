@@ -5,3 +5,4 @@ sqlmodel==0.0.21
 psycopg2==2.9.9
 pyjwt==2.9.0
 passlib[bcrypt]==1.7.4
+alembic==1.13.3
