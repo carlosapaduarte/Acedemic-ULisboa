@@ -1,12 +1,13 @@
 import styles from "./homeAppBar.module.css";
-import React, { useTransition } from "react";
+import React, { useEffect, useTransition } from "react";
 import { useTranslation } from "react-i18next";
-import { useLogOut, useUserIdEvent } from "~/components/auth/Authn";
+import { useLogOut } from "~/components/auth/Authn";
 import { useNavigate } from "@remix-run/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import dropdownStyles from "./dropdown.module.css";
 import { service, UserInfo } from "~/service/service";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -71,16 +72,20 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
 }
 
 export function GreetingsContainer() {
+    const setError = useSetGlobalError();
+
     const [username, setUsername] = React.useState<string | undefined>(undefined);
     const [avatarFilename, setAvatarFilename] = React.useState<string | undefined>(undefined);
 
-    useUserIdEvent((userId) => {
-        service.fetchUserInfoFromApi(userId)
+    useEffect(() => {
+        service.fetchUserInfoFromApi()
             .then((userInfo: UserInfo) => {
                 setAvatarFilename(userInfo.avatarFilename);
                 setUsername(userInfo.username);
-            });
-    });
+            })
+            .catch((e: Error) => setError(e));
+    }, []);
+
 
     let helloQuote = getHelloQuote();
 

@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import { service, UserInfo } from "~/service/service";
 import { utils } from "~/utils";
-import { useUserIdEvent } from "~/components/auth/Authn";
 import styles from "./challengesPage.module.css";
 import { CutButton } from "~/components/Button/Button";
 import { Level1 } from "~/challenges/level_1";
@@ -121,21 +120,19 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
 function useChallenges() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
 
-    useUserIdEvent((userId) => {
-        service.fetchUserInfoFromApi(userId)
-            .then((userInfo: UserInfo) => {
-                console.log("User info: ", userInfo);
+    service.fetchUserInfoFromApi()
+        .then((userInfo: UserInfo) => {
+            console.log("User info: ", userInfo);
 
-                const batchToDisplay = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
-                const level = batchToDisplay.level;
-                const startDate = new Date(batchToDisplay.startDate * 1000);
+            const batchToDisplay = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
+            const level = batchToDisplay.level;
+            const startDate = new Date(batchToDisplay.startDate * 1000);
 
-                startDate.setDate(startDate.getDate() - 2);
+            startDate.setDate(startDate.getDate() - 2);
 
-                const challenges = utils.getChallengesPerDayByStartDate(level, startDate);
-                setChallenges(challenges);
-            });
-    });
+            const challenges = utils.getChallengesPerDayByStartDate(level, startDate);
+            setChallenges(challenges);
+        });
 
     const [selectedChallenge, setSelectedChallenge] = useState<number | undefined>(undefined);
     const [goals, setChallenges] = useState<Goal[][] | undefined>(undefined);

@@ -3,11 +3,17 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service, Task } from "~/service/service";
 import { utils } from "~/utils";
 import { StatusPicker } from "./commons";
+import { useTranslation } from "react-i18next";
 
 function Tags({ tags }: { tags: string[] }) {
+    const { t } = useTranslation(["task"]);
+    
     return (
         <div>
-            <p>Tags:</p>
+            <p>
+                {t("task:select_me")}
+                Tags:
+            </p>
             {tags.map((tag: string, index: number) =>
                 <p key={index}>{tag}</p>
             )}
@@ -33,15 +39,13 @@ function useTaskView(taskToCache: Task) {
     }
 
     function updateTask() {
-        const userId = utils.getUserId();
-        service.getTask(userId, task.id)
+        service.getTask(task.id)
             .then((updatedTask: Task) => setTask(updatedTask))
             .catch((error) => setError(error));
     }
 
     function updateTaskStatus(newStatus: string, onDone: () => void) {
-        const userId = utils.getUserId();
-        service.updateTaskStatus(userId, task.id, newStatus)
+        service.updateTaskStatus(task.id, newStatus)
             .then(() => onDone())
             .catch((error) => setError(error));
     }

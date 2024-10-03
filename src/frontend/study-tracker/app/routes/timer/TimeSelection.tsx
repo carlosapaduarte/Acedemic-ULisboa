@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function useSelectTime(onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void) {
     const [studyMinutes, setStudyMinutes] = useState(25)
@@ -18,17 +19,25 @@ function useSelectTime(onTimeSelected: (studyStopDate: Date, pauseStopDate: Date
 }
 
 export function SelectTime({onTimeSelected} : {onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void}) {
+    const { t } = useTranslation(["study"])
+    
     const {studyMinutes, setStudyMinutes, pauseMinutes, setPauseMinutes, onConfirmButtonClick} = useSelectTime(onTimeSelected)
 
     return (
         <div>
-            <label>Study time (minutes)</label>
+            <label>
+                {t("study:select_study_minutes")}
+            </label>
             <input type="number" value={studyMinutes} min="0" onChange={(e) => setStudyMinutes((Number)(e.target.value))} />
 
-            <label>Pause time (minutes)</label>
+            <label>
+                {t("study:select_pause_minutes")}
+            </label>
             <input type="number" value={pauseMinutes} min="0" onChange={(e) => setPauseMinutes((Number)(e.target.value))} />
 
-            <button onClick={onConfirmButtonClick}>Confirm</button>
+            <button onClick={onConfirmButtonClick}>
+                {t("study:confirm")}
+            </button>
         </div>
     )
 }

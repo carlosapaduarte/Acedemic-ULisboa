@@ -3,15 +3,23 @@ from domain.commons.user import User
 
 class CommonsRepo(ABC):
     @abstractmethod
-    def create_user(self, id: int, username: str) :
+    def create_user(self, username: str, hashed_password: str) -> User:
         pass
 
     @abstractmethod
-    def exists_user(self, id: int) -> bool:
+    def exists_user_by_id(self, id: int) -> bool:
+        pass
+    
+    @abstractmethod
+    def exists_user_by_username(self, username: str) -> bool:
         pass
 
     @abstractmethod
-    def get_user(self, id: int) -> User:
+    def get_user_by_id(self, id: int) -> User | None:
+        pass
+    
+    @abstractmethod
+    def get_user_by_username(self, username: str) -> User | None:
         pass
 
     @abstractmethod

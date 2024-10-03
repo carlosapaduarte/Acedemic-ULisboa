@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from exception import NotFoundException, NotAvailableScheduleBlockCollision
+from exception import NotFoundException, NotAvailableScheduleBlockCollision, UsernameAlreadyExistsException
 from router.academic_challenge import academic_challenge
 from router.commons import common
 
@@ -34,11 +34,17 @@ app.add_middleware(
 )
 
 @app.exception_handler(NotFoundException)
-@app.exception_handler(NotFoundException)
 async def not_found_exception_handler(request: Request, exc: NotFoundException):
     return JSONResponse(
         status_code=404,
         content={"error": f"Not Found: {exc.user_id}"},
+    )
+    
+@app.exception_handler(UsernameAlreadyExistsException)
+async def username_already_exists_exception_handler(request: Request, exc: UsernameAlreadyExistsException):
+    return JSONResponse(
+        status_code=409,
+        content={"error": f"Username already taken!"},
     )
 
 @app.exception_handler(NotAvailableScheduleBlockCollision)

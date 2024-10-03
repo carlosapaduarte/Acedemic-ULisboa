@@ -1,42 +1,86 @@
 // This component could be used to define functions that interact with the Backend and other external services.
 
 import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
-import { doFetch, toBody } from "./fetch";
+import { doFetch, toJsonBody } from "./fetch";
 
 
 // For now, all of these functions will return the expected response.
 // If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
 // In my opinion, this eases error handling in the caller.
 
-// TODO: separate create-user and login tasks in the future
-async function createUserOrLogin(userId: number) {
+export type LoginResult = {
+    access_token: string,
+    token_type: string
+};
+
+/**
+ * Makes an API request, using credentials, to create a JWT token, which
+ * should be used on sub-sequenced calls, as an authorization mechanism.
+ */
+async function login(username: string, password: string) {
+    // NOTE: for now, this function will store the JWT in cache, for simplicity.
+    // TODO: think if there is another place to store the token.
+
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+
     const request = {
-        path: "commons/login",
-        method: "POST",
-        body: toBody({ id: userId })
-    };
-    const response: Response = await doFetch(request);
+        path: 'commons/token',
+        method: 'POST',
+        body: formData,
+    }
+
+    const response: Response = await doFetch(request)
     //console.log('Is logged in: ', response)
-    if (!response.ok)
-        return Promise.reject(new Error("User creation was not possible"));
+
+    if (response.ok) {
+        const responseObject: LoginResult = await response.json() // TODO: how 
+        localStorage["jwt"] = responseObject.access_token
+    } else
+        return Promise.reject(new Error('Login failed!'))
 }
 
-async function createBatch(userId: number, level: LevelType) {
+async function testTokenValidity() {
     const request = {
-        path: `academic-challenge/users/${userId}/batches`,
+        path: 'commons/test-token',
+        method: 'GET',
+    }
+    const response: Response = await doFetch(request)
+    if (!response.ok) {
+        return Promise.reject(new Error('Login failed!'))
+    }
+}
+
+async function createUser(username: string, password: string) {
+    const request = {
+        path: 'commons/create-user',
+        method: 'POST',
+        body: toJsonBody({username, password}),
+    }
+    const response: Response = await doFetch(request)
+    //console.log('Is logged in: ', response)
+
+    if (!response.ok)
+        return Promise.reject(new Error('User creation was not possible!'))
+}
+
+async function createBatch(level: LevelType) {
+    const request = {
+        path: `academic-challenge/users/me/batches`,
         method: "POST",
-        body: toBody({ level: level })
+        body: toJsonBody({ level: level })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
         return Promise.reject(new Error("Level selection failed!"));
 }
 
-async function selectShareProgressState(userId: number, shareProgress: boolean) {
+async function selectShareProgressState(shareProgress: boolean) {
     const request = {
-        path: `commons/users/${userId}/publish-state`,
+        path: `commons/users/me/publish-state`,
         method: "PUT",
-        body: toBody({ shareProgress })
+        body: toJsonBody({ shareProgress })
     };
     const response: Response = await doFetch(request);
     //console.log(response)
@@ -44,11 +88,11 @@ async function selectShareProgressState(userId: number, shareProgress: boolean) 
         return Promise.reject(new Error("Progress share preference selection failed!"));
 }
 
-async function selectAvatar(userId: number, avatarFilename: string) {
+async function selectAvatar(avatarFilename: string) {
     const request = {
-        path: `commons/users/${userId}/avatar`,
+        path: `commons/users/me/avatar`,
         method: "PUT",
-        body: toBody({ avatarFilename })
+        body: toJsonBody({ avatarFilename })
     };
     const response: Response = await doFetch(request);
     //console.log(response)
@@ -90,9 +134,9 @@ export type UserInfo = {
     batches: Batch[]
 };
 
-async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
+async function fetchUserInfoFromApi(): Promise<UserInfo> {
     const request = {
-        path: `commons/users/${userId}`,
+        path: `commons/users/me`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
@@ -104,11 +148,11 @@ async function fetchUserInfoFromApi(userId: number): Promise<UserInfo> {
         return Promise.reject(new Error("User info could not be obtained!"));
 }
 
-async function createNewUserNote(userId: number, text: string, userGoalDate: Date) {
+async function createNewUserNote(text: string, userGoalDate: Date) {
     const request = {
-        path: `academic-challenge/users/${userId}/notes`,
+        path: `academic-challenge/users/me/notes`,
         method: "POST",
-        body: toBody({ text, date: Math.trunc(userGoalDate.getTime() / 1000) }) // Send seconds from 1970
+        body: toJsonBody({ text, date: Math.trunc(userGoalDate.getTime() / 1000) }) // Send seconds from 1970
     };
 
     //console.log(request)
@@ -117,11 +161,11 @@ async function createNewUserNote(userId: number, text: string, userGoalDate: Dat
         return Promise.reject(new Error("Note creation failed!"));
 }
 
-async function markGoalAsCompleted(userId: number, batchId: number, goalId: number, goalDay: number) {
+async function markGoalAsCompleted(batchId: number, goalId: number, goalDay: number) {
     const request = {
-        path: `academic-challenge/users/${userId}/batches/${batchId}/completed-goals`,
+        path: `academic-challenge/users/me/batches/${batchId}/completed-goals`,
         method: "POST",
-        body: toBody({ goalId, goalDay })
+        body: toJsonBody({ goalId, goalDay })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -129,7 +173,9 @@ async function markGoalAsCompleted(userId: number, batchId: number, goalId: numb
 }
 
 export const service = {
-    createUserOrLogin,
+    login,
+    testTokenValidity,
+    createUser,
     createBatch,
     selectShareProgressState,
     selectAvatar,

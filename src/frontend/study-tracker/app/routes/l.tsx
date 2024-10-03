@@ -43,8 +43,7 @@ function useWelcomePage() {
         if (isLoggedIn) {
             console.log("User is logged-in. Re-directing to Dashboard page!");
 
-            const cachedUserId = localStorage["userId"]; // TODO: use cache just for now
-            navigate(`/dashboard/${cachedUserId}`);
+            navigate(`/dashboard`);
         }
     }, [isLoggedIn]);
 

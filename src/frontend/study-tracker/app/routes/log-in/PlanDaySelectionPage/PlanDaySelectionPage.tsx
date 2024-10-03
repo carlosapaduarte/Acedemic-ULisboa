@@ -3,14 +3,13 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { useWeekDayAndHourPicker, weekDays } from "../../commons";
 import styles from "./planDaySelectionPage.module.css";
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 function usePlanDaySelection(onProceed: () => void) {
     const setError = useSetGlobalError();
 
     function submitPlanDaySelection(weekDay: number, hour: number) {
-        const userIdStr = localStorage["userId"];
-        const userId = Number(userIdStr);
-        service.updateWeekPlanningDay(userId, weekDay, hour)
+        service.updateWeekPlanningDay(weekDay, hour)
             .then(() => onProceed())
             .catch((error) => setError(error));
     }
@@ -19,6 +18,8 @@ function usePlanDaySelection(onProceed: () => void) {
 }
 
 export function PlanDaySelectionPage({ onProceed }: { onProceed: () => void }) {
+    const { t } = useTranslation(["login"]);
+    
     const { submitPlanDaySelection } = usePlanDaySelection(onProceed);
 
     const { weekDay, hour, setWeekDay, setHour } = useWeekDayAndHourPicker();
@@ -46,7 +47,7 @@ export function PlanDaySelectionPage({ onProceed }: { onProceed: () => void }) {
                     <button className={classNames(styles.roundButton)}
                             onClick={() => submitPlanDaySelection(weekDay!, hour!)}
                             disabled={weekDay == undefined || hour == undefined}>
-                        Confirm
+                        {t("login:confirm_button_text")}
                     </button>
                 </div>
             </div>

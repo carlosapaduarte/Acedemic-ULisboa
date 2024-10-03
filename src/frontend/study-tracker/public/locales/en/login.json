@@ -1,11 +1,17 @@
 {
-    "confirm_level": "Confirm",
-    "level_1_description": "I lose focus and have disorganized study habits, resulting in low school performance",
-    "level_1_title": "Not Effective",
-    "level_2_description": "I struggle to keep a study routine, achieving solid but average grades",
-    "level_2_title": "Effective",
-    "level_3_description": "I study consistently, focus easily, and achieve top grades",
-    "level_3_title": "Highly Effective",
+    "authenticate_title": "Create New User or Login",
+    "username_field_name": "Username",
+    "password_field_name": "Password",
+    "register_button_title": "Register",
+    "login_button_title": "Login",
+    "authenticated_message": "Authenticated",
+    "advance_message": "Click here to advance...",
+    "usage_objectives_title": "Usage objectives",
+    "submit_selection_message": "Submit selection",
     "select_avatar_initial_question": "Select your avatar",
-    "select_level_initial_question": "How effective have been your study habits lately?"
+    "select_level_initial_question": "How effective have been your study habits lately?",
+    "receive_notification_title": "Receive notifications",
+    "yes_answer_option": "Yes",
+    "no_answer_option": "No",
+    "share_progress_question": "Do you want to share your progress?"
 }

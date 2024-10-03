@@ -3,3 +3,5 @@ pydantic==2.8.2
 SQLAlchemy==2.0.32
 sqlmodel==0.0.21
 psycopg2==2.9.9
+pyjwt==2.9.0
+passlib[bcrypt]==1.7.4

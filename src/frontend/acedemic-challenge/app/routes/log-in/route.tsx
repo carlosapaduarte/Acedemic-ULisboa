@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import UserInfoPage from "~/routes/log-in/UserInfoPage/UserInfoPage";
+import UserInfoPage, { AuthAction } from "~/routes/log-in/UserInfoPage/UserInfoPage";
 import ShareProgressPage from "~/routes/log-in/ShareProgressPage/ShareProgressPage";
 import QuizPage from "~/routes/log-in/QuizPage/QuizPage";
 import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
@@ -25,23 +25,23 @@ function CurrentView() {
         case "userInfo":
             return (
                 <UserInfoPage
-                    onAuthDone={(userId) => {
-                        setCurrentView("shareProgress");
-                        setUserId(userId);
+                    onAuthDone={(action: AuthAction) => {
+                        if (action == AuthAction.CREATE_USER)
+                            setCurrentView("shareProgress");
+                        else
+                            navigate(`/`);
                     }}
                 />
             );
         case "shareProgress":
             return (
                 <ShareProgressPage
-                    userId={userId!}
                     onShareSelected={() => setCurrentView("chooseLevel")}
                 />
             );
         case "chooseLevel":
             return (
                 <SelectLevelPage
-                    userId={userId!}
                     onLevelSelected={() => setCurrentView("selectAvatar")}
                     onStartQuizClick={() => setCurrentView("quiz")}
                 />
@@ -56,7 +56,6 @@ function CurrentView() {
         case "selectAvatar":
             return (
                 <AvatarSelectionPage
-                    userId={userId!}
                     onComplete={() => navigate(`/`)}
                 />
             );

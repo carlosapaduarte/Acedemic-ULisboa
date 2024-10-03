@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { PlanDaySelectionPage } from "~/routes/log-in/PlanDaySelectionPage/PlanDaySelectionPage";
 import { ShareProgressPage } from "./ShareProgressPage/ShareProgressPage";
 import { useNavigate } from "@remix-run/react";
-import UserInfoPage from "./UserInfoPage/UserInfoPage";
+import UserInfoPage, { AuthAction } from "./UserInfoPage/UserInfoPage";
 import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelectionPage";
 import { AppUsagesSelectionPage } from "~/routes/log-in/AppUsagesSelectionPage/AppUsagesSelectionPage";
 import {
@@ -23,16 +23,17 @@ type Views =
 
 function CurrentView() {
     const [currentView, setCurrentView] = useState<Views>("userInfo");
-    const [userId, setUserId] = useState<number | undefined>(undefined);
     const navigate = useNavigate();
 
     switch (currentView) {
         case "userInfo":
             return (
                 <UserInfoPage
-                    onAuthDone={(userId) => {
-                        setCurrentView("appUsagesSelection");
-                        setUserId(userId);
+                    onAuthDone={(action: AuthAction) => {
+                        if (action == AuthAction.CREATE_USER)
+                            setCurrentView("appUsagesSelection");
+                        else
+                            navigate(`/`);
                     }}
                 />
             );
@@ -57,14 +58,12 @@ function CurrentView() {
         case "shareProgressSelection":
             return (
                 <ShareProgressPage
-                    userId={userId!}
                     onShareSelected={() => setCurrentView("avatarSelection")}
                 />
             );
         case "avatarSelection":
             return (
                 <AvatarSelectionPage
-                    userId={userId!}
                     onComplete={() => navigate(`/`)}
                 />
             );

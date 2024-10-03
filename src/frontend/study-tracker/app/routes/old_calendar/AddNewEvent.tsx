@@ -43,9 +43,7 @@ function useAddEvent(startDate: Date, onNewEventCreated: () => void) {
     const { tags, appendTag, removeTag } = useTags();
 
     function createNewEvent(title: string, endDate: Date, tags: string[]) {
-        let userId = utils.getUserId();
-
-        service.createNewEvent(userId, {
+        service.createNewEvent({
             title,
             startDate,
             endDate,

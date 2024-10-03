@@ -8,6 +8,7 @@ class UserModel(SQLModel, table=True):
         
     id: int = Field(primary_key=True)
     username: str
+    hashed_password: str
     avatar_filename: str | None
     share_progress: bool | None
     receive_st_app_notifications: bool | None

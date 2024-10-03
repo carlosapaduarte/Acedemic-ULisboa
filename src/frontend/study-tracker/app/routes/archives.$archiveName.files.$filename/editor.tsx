@@ -51,8 +51,7 @@ export function Editor({archiveName, file} : {archiveName: string, file: File}) 
 		const html = editor?.getHTML()
 		if (html == undefined) 
 			return
-		const userId = utils.getUserId()
-		service.updateFileContent(userId, archiveName, file.name, html)
+		service.updateFileContent(archiveName, file.name, html)
 	}
 
 	return (

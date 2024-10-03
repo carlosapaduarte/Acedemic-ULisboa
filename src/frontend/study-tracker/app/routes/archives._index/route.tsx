@@ -3,13 +3,13 @@ import { Archive, File, service } from "~/service/service"
 import { utils } from "~/utils"
 import { useNavigate } from "@remix-run/react"
 import { RequireAuthn } from "~/components/auth/RequireAuthn"
+import { useTranslation } from "react-i18next"
 
 function useCreateArchiveView(onArchiveCreated: () => void) {
     const [name, setName] = useState("")
     
     function createArchive() {
-        const userId = utils.getUserId()
-        service.createArchive(userId, name)
+        service.createArchive(name)
             .then(onArchiveCreated)
     }
 
@@ -17,15 +17,19 @@ function useCreateArchiveView(onArchiveCreated: () => void) {
 }
 
 function CreateArchiveView({onArchiveCreated} : {onArchiveCreated: () => void}) {
+    const { t } = useTranslation(["notes"]);
+    
     const {setName, createArchive} = useCreateArchiveView(onArchiveCreated)
 
     return (
         <div>
-            <label>New Archive Name</label>
+            <label>
+                {t("notes:new_archive_name")}
+            </label>
             <input onChange={(e) => setName(e.target.value)} />
             <br/>
             <button onClick={createArchive}>
-                Create Archive
+                {t("notes:create_archive")}
             </button>
         </div>
     )
@@ -35,8 +39,7 @@ function useCreateFileView(archiveName: string, onFileCreated: () => void) {
     const [name, setName] = useState("")
     
     function createFile() {
-        const userId = utils.getUserId()
-        service.createFile(userId, archiveName, name)
+        service.createFile(archiveName, name)
             .then(onFileCreated)
     }
 
@@ -44,15 +47,19 @@ function useCreateFileView(archiveName: string, onFileCreated: () => void) {
 }
 
 function CreateFileView({archiveName, onFileCreated} : {archiveName: string, onFileCreated: () => void}) {
+    const { t } = useTranslation(["notes"]);
+
     const {name, setName, createFile} = useCreateFileView(archiveName, onFileCreated)
 
     return (
         <div>
-            <label>New File Name</label>
+            <label>
+                {t("notes:filename")}
+            </label>
             <input onChange={(e) => setName(e.target.value)} />
             <br/>
             <button onClick={createFile}>
-                Create File
+                {t("notes:create_file_confirmation")}
             </button>
         </div>
     )
@@ -62,8 +69,7 @@ function useArchiveView(initialArchive: Archive) {
     const [archive, setArchive] = useState(initialArchive)
     
     function refreshArchive() {
-        const userId = utils.getUserId()
-        service.getArchive(userId, archive.name)
+        service.getArchive(archive.name)
             .then((archive: Archive) => setArchive(archive))
     }
 
@@ -71,19 +77,27 @@ function useArchiveView(initialArchive: Archive) {
 }
 
 function ArchiveView({initialArchive}: {initialArchive: Archive}) {
+    const { t } = useTranslation(["notes"]);
+
     const navigate = useNavigate();
     const {archive, refreshArchive} = useArchiveView(initialArchive)
 
     return (
         <div>
-            <h1>Archive:</h1>
-            <span>Name: {archive.name}</span>
+            <h1>
+                {t("notes:archive_list")}
+            </h1>
+            <span>
+                {t("notes:archive_name")} {archive.name}
+            </span>
             <br/>
             <CreateFileView archiveName={archive.name} onFileCreated={refreshArchive} />
             {archive.files.map((file: File, index: number) => 
                 <div key={index}>
-                    <h1>File: {file.name}</h1>
-                    <button onClick={() => navigate(`/archives/${archive.name}/files/${file.name}`)}>Open File</button>
+                    <h1>{t("notes:file_name")} {file.name}</h1>
+                    <button onClick={() => navigate(`/archives/${archive.name}/files/${file.name}`)}>
+                        {t("notes:open_file")}
+                    </button>
                 </div>
             )}
         </div>
@@ -94,8 +108,7 @@ function useArchiveListView() {
     const [archives, setArchives] = useState<Archive[]>([])    
 
     function refreshArchives() {
-        const userId = utils.getUserId()
-        service.getArchives(userId)
+        service.getArchives()
             .then((value: Archive[]) => setArchives(value))
     }
 

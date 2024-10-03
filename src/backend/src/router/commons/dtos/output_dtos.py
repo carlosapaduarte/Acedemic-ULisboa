@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from domain.commons.user import User
 from router.academic_challenge.dtos.output_dtos import BatchDto, UserNoteDto
 
+class LoginOutputDto(BaseModel):
+    id: int
 
 class UserOutputDto(BaseModel):
     id: int

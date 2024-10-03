@@ -8,14 +8,12 @@ const logger = new Logger({ name: "Authn" });
 
 type ContextType = {
     isLoggedIn: boolean | undefined;
-    userId: number | undefined;
-    logIn: (userId: number) => void;
+    logIn: () => void;
     logOut: () => void;
 };
 const LoggedInContext = createContext<ContextType>({
     isLoggedIn: false,
-    userId: undefined,
-    logIn: (userId: number) => {
+    logIn: () => {
     },
     logOut: () => {
     }
@@ -23,45 +21,35 @@ const LoggedInContext = createContext<ContextType>({
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>(undefined);
-    const [userId, setUserId] = useState<number | undefined>(undefined);
-    const setError = useSetGlobalError();
 
-    function logIn(newUserId: number) {
-        setUserId(newUserId);
+    function logIn() {
         setIsLoggedIn(true);
-        localStorage["userId"] = newUserId;
     }
 
     function logOut() {
         console.log("Logging out...");
-        setUserId(undefined);
+        localStorage.removeItem("jwt");
         setIsLoggedIn(false);
-        localStorage.removeItem("userId");
     }
 
     useEffect(() => {
         async function fetchUser() {
-            // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
-            // For now, this will ease development...
-            // After Oauth, we need to think of a new solution
-            const storedUserId = localStorage["userId"];
+            const jtw = localStorage["jwt"];
 
-            if (storedUserId == undefined) {
+            if (jtw == undefined) {
                 logger.debug("User is not logged in");
                 setIsLoggedIn(false);
                 return;
             }
 
-            logger.debug("User has id stored");
-            setUserId(Number(storedUserId));
+            logger.debug("User has jtw stored");
 
-            await service
-                .createUserOrLogin(storedUserId) // if user ID is invalid, returns false
+            service.testTokenValidity()
                 .then(() => {
                     logger.debug("User is logged in");
-                    setIsLoggedIn(true);
+                    setIsLoggedIn(true)
                 })
-                .catch((error) => setError(error));
+                .catch(() => setIsLoggedIn(false))
         }
 
         fetchUser();
@@ -69,7 +57,7 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
 
     return (
         <LoggedInContext.Provider
-            value={{ isLoggedIn: isLoggedIn, userId: userId, logIn: logIn, logOut: logOut }}
+            value={{ isLoggedIn: isLoggedIn, logIn: logIn, logOut: logOut }}
         >
             {children}
         </LoggedInContext.Provider>
@@ -78,24 +66,6 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
 
 export function useIsLoggedIn() {
     return useContext(LoggedInContext).isLoggedIn;
-}
-
-type UserIdCallback = (userId: number) => void;
-
-export function useUserId() {
-    return useContext(LoggedInContext).userId;
-}
-
-export function useUserIdEvent(callback: UserIdCallback): number | undefined {
-    const { userId } = useContext(LoggedInContext);
-
-    useEffect(() => {
-        if (userId !== undefined && callback) {
-            callback(userId);
-        }
-    }, [userId]);
-
-    return userId;
 }
 
 export function useLogIn() {

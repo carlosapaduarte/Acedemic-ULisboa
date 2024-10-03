@@ -7,8 +7,7 @@ function useCreateGrade(curricularUnit: string, onCuCreated: () => void) {
     const [weight, setWeight] = useState<number | undefined>(undefined)
 
     function createGrade(value: number, weight: number) {
-        const userId = utils.getUserId()
-        service.createGrade(userId, curricularUnit, value, weight)
+        service.createGrade(curricularUnit, value, weight)
             .then(onCuCreated)
     }
 

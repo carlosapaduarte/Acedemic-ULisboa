@@ -1,0 +1,12 @@
+{
+    "associate_tasks": "Seleciona tarefas para associar!",
+    "confirm_associated_tasks": "Confirmar tarefas associadas!",
+    "timer_title": "Cronómetro",
+    "timer_start": "Iniciar",
+    "timer_pause": "Pausar",
+    "timer_resume": "Continuar",
+    "timer_stop": "Parar",
+    "select_study_minutes": "Tempo de estudo (minutos)",
+    "select_pause_minutes": "Tempo de pausa (minutos)",
+    "confirm": "Confirmar"
+}

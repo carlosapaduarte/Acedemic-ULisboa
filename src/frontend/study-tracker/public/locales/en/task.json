@@ -1,0 +1,15 @@
+{
+    "create_new_task": "Create New Task!",
+    "loading": "Loading...",
+    "my_tasks_list_title": "My Tasks",
+    "select_me": "Select Me!",
+    "tags_list_title": "Tags:",
+    "priority_picker_title": "Select Priority:",
+    "create_task_title": "Create Task:",
+    "title_label": "Title: ",
+    "description_label": "Description: ",
+    "deadline_label": "Deadline: ",
+    "create_event_label": "Create associated Event",
+    "add_sub_task": "Add Sub Task",
+    "confirm": "Confirm!"
+}

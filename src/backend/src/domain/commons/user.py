@@ -22,7 +22,8 @@ class User:
     def __init__(
             self,
             id: int, 
-            username: str, 
+            username: str,
+            hashed_password: str,
             avatar_filename: str | None, 
             share_progress: bool | None,
             user_notes: list[UserNote],
@@ -30,6 +31,7 @@ class User:
     ) -> None:
         self.id = id
         self.username = username
+        self.hashed_password = hashed_password
         self.avatar_filename = avatar_filename
         self.share_progress = share_progress
         self.user_notes = user_notes

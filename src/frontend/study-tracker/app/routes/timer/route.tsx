@@ -44,8 +44,7 @@ function useStudyBlock() {
     const [happeningStudyBlock, setHappeningStudyBlock] = useState<Event | undefined>();
 
     useEffect(() => {
-        const userId = utils.getUserId();
-        service.getStudyBlockHappeningNow(userId)
+        service.getStudyBlockHappeningNow()
             .then((event: Event | undefined) => setHappeningStudyBlock(event))
             .catch((error) => setError(error));
     }, []);

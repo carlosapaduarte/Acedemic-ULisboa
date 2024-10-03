@@ -9,6 +9,8 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CategoryAndTagsPicker, useTags } from "../commons";
 import styles from "./calendarPage.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const localizer = momentLocalizer(moment);
 
@@ -55,8 +57,7 @@ function useMyCalendar() {
     }
 
     function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
-        const userId = utils.getUserId();
-        service.getUserRecurrentEvents(userId)
+        service.getUserRecurrentEvents()
             .then((events: Event[]) => {
                 const calendarEvents: CalendarEvent[] = [];
                 calendarDisplayedDates.forEach((displayedDate: Date) => {
@@ -85,8 +86,7 @@ function useMyCalendar() {
     }
 
     function refreshUserEvents() {
-        const userId = utils.getUserId();
-        service.getUserEvents(userId, false)
+        service.getUserEvents(false)
             .then((events: Event[]) => {
                 //console.log(events)
                 const calendarEvents: CalendarEvent[] = events.map((event: Event) => {
@@ -102,8 +102,7 @@ function useMyCalendar() {
     }
 
     function createNewEvent(event: NewEventInfo, onDone: () => void) {
-        const userId = utils.getUserId();
-        service.createNewEvent(userId, event)
+        service.createNewEvent(event)
             .then(onDone)
             .catch((error) => setError(error));
     }
@@ -139,6 +138,8 @@ function MyCalendar() {
         createNewEvent,
         toggleEventsView
     } = useMyCalendar();
+    const { t } = useTranslation(["calendar"]);
+    
     const { tags, appendTag, removeTag } = useTags();
 
     // This is invoked when the user uses the mouse to create a new event
@@ -196,9 +197,13 @@ function MyCalendar() {
 
             <button onClick={toggleEventsView}>
                 {eventsView == "allEvents" ?
-                    (<span>Click To Display Only Recurring Events</span>)
+                    (<span>
+                        {t("calendar:display_only_recurring_events_button")}
+                    </span>)
                     :
-                    (<span>Click To Display All Events</span>)
+                    (<span>
+                        {t("calendar:display_all_events_button")}
+                    </span>)
                 }
             </button>
 
@@ -207,9 +212,11 @@ function MyCalendar() {
                     <CategoryAndTagsPicker tags={[]} appendTag={appendTag} removeTag={removeTag} />
                     <input type="checkbox" id="scales" name="scales" value={isNewEventRecurrent.toString()}
                            onChange={(e) => setIsNewEventRecurrent((Boolean)(e.target.value))} />
-                    <label>Every Week</label>
+                    <label>
+                        {t("calendar:very_week_label")}
+                    </label>
                     <button onClick={() => onCreateEventClickHandler(newEventTitleAndName)}>
-                        Confirm!
+                        {t("calendar:confirm_button")}
                     </button>
                 </div>
                 :

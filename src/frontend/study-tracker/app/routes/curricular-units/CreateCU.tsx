@@ -6,8 +6,7 @@ function useCreateCurricularUnit(onCuCreated: () => void) {
     const [name, setName] = useState<string | undefined>(undefined)
 
     function createCurricularUnit(name: string) {
-        const userId = utils.getUserId()
-        service.createCurricularUnit(userId, name)
+        service.createCurricularUnit(name)
             .then(onCuCreated)
     }
 

@@ -3,6 +3,7 @@ import { TaskView } from "./Task";
 import { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
+import { useTranslation } from "react-i18next";
 
 export function useTaskList(filterUncompletedTasks: boolean) {
     const [tasks, setTasks] = useState<Task[] | undefined>(undefined);
@@ -13,8 +14,7 @@ export function useTaskList(filterUncompletedTasks: boolean) {
     }, []);
 
     function refreshTasks() {
-        const userId = utils.getUserId();
-        service.getTasks(userId, filterUncompletedTasks)
+        service.getTasks(filterUncompletedTasks)
             .then((tasksUpdated: Task[]) => setTasks(tasksUpdated))
             .catch((error) => setError(error));
     }
@@ -27,13 +27,19 @@ export function TaskList({ tasks, onTaskClick, onTaskStatusUpdated = undefined }
     onTaskClick: ((taskId: Task) => void) | undefined,
     onTaskStatusUpdated: (() => void) | undefined
 }) {
+    const { t } = useTranslation(["task"]);
+    
     return (
         <div>
-            <h1>My Tasks</h1>
+            <h1>
+                {t("task:my_tasks_list_title")}
+            </h1>
             {tasks?.map((task: Task, index: number) =>
                 <div key={index}>
                     {onTaskClick ?
-                        <button onClick={() => onTaskClick(task)}>Select Me!</button>
+                        <button onClick={() => onTaskClick(task)}>
+                            {t("task:tags_list_title")}
+                        </button>
                         :
                         <></>
                     }

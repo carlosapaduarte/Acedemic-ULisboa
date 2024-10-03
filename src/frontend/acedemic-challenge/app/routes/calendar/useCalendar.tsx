@@ -4,11 +4,9 @@ import { DayGoals, Goal } from "~/challenges/types";
 import { service, UserInfo, UserNote } from "~/service/service";
 import { utils } from "~/utils";
 import { CalendarDay } from "~/routes/calendar/components/MyCalendar/MyCalendar";
-import { useUserId } from "~/components/auth/Authn";
 
 export function useCalendar() {
     const setError = useSetError();
-    const userId = useUserId();
 
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [goals, setGoals] = useState<DayGoals[] | undefined>(undefined);
@@ -23,24 +21,22 @@ export function useCalendar() {
 
     async function fetchUserCurrentDayAndLoadGoals() {
         try {
-            if (userId != undefined) {
-                const userInfo: UserInfo = await service.fetchUserInfoFromApi(userId);
+            const userInfo: UserInfo = await service.fetchUserInfoFromApi();
 
-                // For simplification, use the first one
-                const batchToDisplay = userInfo.batches[0]
-                const level = batchToDisplay.level
-                const startDate = new Date(2024, 7, 10, 12, 22, 22, 22)
-                //const startDate = new Date(batchToDisplay.startDate * 1000) // Feel free to change for testing
-                const userGoals = utils.getUserGoals(level, startDate)
+            // For simplification, use the first one
+            const batchToDisplay = userInfo.batches[0]
+            const level = batchToDisplay.level
+            const startDate = new Date(2024, 7, 10, 12, 22, 22, 22)
+            //const startDate = new Date(batchToDisplay.startDate * 1000) // Feel free to change for testing
+            const userGoals = utils.getUserGoals(level, startDate)
 
-                //console.log("User Goals: ", userGoals)
+            //console.log("User Goals: ", userGoals)
 
-                console.log("User goals: ", userGoals, "Start date: ", startDate, "User notes ", userInfo.userNotes);
+            console.log("User goals: ", userGoals, "Start date: ", startDate, "User notes ", userInfo.userNotes);
 
-                setStartDate(startDate);
-                setGoals(userGoals);
-                setUserNotes(userInfo.userNotes);
-            }
+            setStartDate(startDate);
+            setGoals(userGoals);
+            setUserNotes(userInfo.userNotes);
         } catch (error: any) {
             setError(error);
         }
@@ -48,7 +44,7 @@ export function useCalendar() {
 
     useEffect(() => {
         fetchUserCurrentDayAndLoadGoals();
-    }, [userId]);
+    }, []);
 
     // Builds an object to display events in FullCalendar
     function buildEvents(goals: DayGoals[], userGoals: UserNote[]): any {
@@ -121,11 +117,7 @@ export function useCalendar() {
     };
 
     const onConfirmNewNoteSubmitClickHandler = (noteText: string) => {
-        if (userId == undefined) {
-            console.log("onConfirmNewNoteSubmitClickHandler - User not logged in");
-            return;
-        }
-        service.createNewUserNote(userId, noteText, selectedDate) // TODO: handle error later
+        service.createNewUserNote(noteText, selectedDate) // TODO: handle error later
             .then(() => fetchUserCurrentDayAndLoadGoals()) // TODO: improve later
             .catch((error) => setError(error));
     };

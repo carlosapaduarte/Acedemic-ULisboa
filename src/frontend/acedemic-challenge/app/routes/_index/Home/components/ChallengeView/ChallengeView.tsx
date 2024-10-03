@@ -1,4 +1,3 @@
-import { useUserId } from "~/components/auth/Authn";
 import React, { useEffect, useState } from "react";
 import { DayGoals, Goal } from "~/challenges/types";
 import { Batch, CompletedGoal, service, UserInfo, UserNote } from "~/service/service";
@@ -38,7 +37,7 @@ function getTodayCompletedGoals(batch: Batch): number[] {
         }).map((completedGoal) => completedGoal.id);
 }
 
-function useMainDashboardContent(userId: number) {
+function useMainDashboardContent() {
     // In reality, there could be multiple Goals per day!!!
 
     const setError = useSetError();
@@ -108,7 +107,7 @@ function useMainDashboardContent(userId: number) {
         setLoadingGoalsAndNotes(true);
 
         // TODO: in future, request only today's goals
-        const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(userId);
+        const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi();
         //console.log('User Info: ', userInfo)
 
         setLoadingGoalsAndNotes(false);
@@ -141,7 +140,7 @@ function useMainDashboardContent(userId: number) {
         const elapsedDays = Math.round((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
         const goalIndex = elapsedDays + 1;
 
-        await service.markGoalAsCompleted(userId, batch.id, goal.id, goalIndex)
+        await service.markGoalAsCompleted(batch.id, goal.id, goalIndex)
             .then(() => {
                 fetchUserInfo(); // Updates state again
             }) // this triggers a new refresh. TODO: improve later
@@ -172,7 +171,7 @@ function useMainDashboardContent(userId: number) {
     };
 }
 
-function MainContent({ userId }: { userId: number }) {
+function MainContent() {
     const {
         userInfo,
         daysSinceStart,
@@ -187,7 +186,7 @@ function MainContent({ userId }: { userId: number }) {
         onAddNewNoteClickHandler,
         onConfirmNewNoteSubmitClickHandler,*/
         onMarkCompleteClickHandler
-    } = useMainDashboardContent(userId);
+    } = useMainDashboardContent();
     /*console.log(userInfo?.avatarFilename);*/
     if (userInfo && daysSinceStart && todayGoals && todayCompletedGoals && todayNotes && batchToDisplay) {
         return (
@@ -235,25 +234,17 @@ function MainContent({ userId }: { userId: number }) {
 }
 
 export function ChallengeView() {
-    const userId = useUserId();
 
     return (
         <div className={styles.challengeViewContainer}>
-            {userId
-                ? <>
-                    <MainContent userId={userId} />
-                    {/*<Button variant={"round"}
-                            className={styles.logoutButton}
-                            onClick={() => {
-                                logOut();
-                                navigate("/");
-                            }}
-                    >Log out</Button>*/}
-                </>
-                : <div className={styles.loadingTextContainer}>
-                    <h1>Loading...</h1>
-                </div>
-            }
+            <MainContent />
+                {/*<Button variant={"round"}
+                        className={styles.logoutButton}
+                        onClick={() => {
+                            logOut();
+                            navigate("/");
+                        }}
+                >Log out</Button>*/}
         </div>
     );
 }

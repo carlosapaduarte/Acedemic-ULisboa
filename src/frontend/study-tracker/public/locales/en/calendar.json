@@ -27,5 +27,9 @@
         "thursday": "Thu",
         "tuesday": "Tue",
         "wednesday": "Wed"
-    }
+    },
+    "confirm_button": "Confirm",
+    "very_week_label": "Every Week",
+    "display_only_recurring_events_button": "Click To Display Only Recurring Events",
+    "display_all_events_button": "Click To Display All Events"
 }

@@ -13,8 +13,7 @@ function useAddScheduleNotAvailableBlock() {
     }
 
     function createNotAvailableBlock(weekDayAndHour: WeekDayAndHour, duration: number) {
-        const userId = utils.getUserId();
-        service.createScheduleNotAvailableBlock(userId, {
+        service.createScheduleNotAvailableBlock({
             weekDay: weekDayAndHour.weekDay,
             startHour: weekDayAndHour.hour,
             duration

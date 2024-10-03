@@ -22,8 +22,7 @@ function useCurricularUnitView(initialCurricularUnit: CurricularUnit) {
     }, [curricularUnit]);
 
     function refreshCurricularUnit() {
-        const userId = utils.getUserId();
-        service.getCurricularUnit(userId, initialCurricularUnit.name)
+        service.getCurricularUnit(initialCurricularUnit.name)
             .then((cu: CurricularUnit) => setCurricularUnit(cu))
             .catch((error) => setError(error));
     }
@@ -54,8 +53,7 @@ function useCurricularUnitListView() {
     const [cuList, setCuList] = useState<CurricularUnit[]>([]);
 
     function refreshCurricularUnits() {
-        const userId = utils.getUserId();
-        service.getCurricularUnits(userId)
+        service.getCurricularUnits()
             .then((cus: CurricularUnit[]) => setCuList(cus))
             .catch((error) => setError(error));
     }

@@ -3,6 +3,8 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import styles from "./appUsagesSelectionPage.module.css";
 import classNames from "classnames";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const questions = [
     "Melhorar as minhas notas/classificações",
@@ -15,10 +17,8 @@ const questions = [
 
 function useAppUsagesSelection(
     {
-        userId,
         onComplete
     }: {
-        userId: number;
         onComplete: () => void;
     }) {
     const [selectedOptions, setSelectedOptions] = useState<Set<number>>(new Set([]));
@@ -34,7 +34,7 @@ function useAppUsagesSelection(
     }
 
     function submitAppUseGoals() {
-        service.updateAppUseGoals(userId, selectedOptions)
+        service.updateAppUseGoals(selectedOptions)
             .then(() => onComplete())
             .catch((error) => setError(error));
     }
@@ -46,13 +46,15 @@ function useAppUsagesSelection(
 }
 
 export function AppUsagesSelectionPage({ onProceed }: { onProceed: () => void }) {
+    const { t } = useTranslation(["login"]);
+    
     const { onInputValueChange, submitAppUseGoals } =
-        useAppUsagesSelection({ userId: Number(localStorage["userId"]), onComplete: onProceed });
+        useAppUsagesSelection({ onComplete: onProceed });
 
     return (
         <div className={styles.pageContainer}>
             <div className={styles.pageInnerContainer}>
-                <h1>Objetivo de Utilização</h1>
+                <h1>{t("login:usage_objectives_title")}</h1>
                 <div className={styles.optionsContainer}>
                     {questions.map((question: string, index: number) =>
                         <div key={index}>
@@ -64,7 +66,7 @@ export function AppUsagesSelectionPage({ onProceed }: { onProceed: () => void })
                     <div className={styles.submitSelectionButtonContainer}>
                         <button className={classNames(styles.roundButton, styles.submitSelectionButton)}
                                 onClick={submitAppUseGoals}>
-                            Submit Selection
+                            {t("login:submit_selection_message")}
                         </button>
                     </div>
                 </div>

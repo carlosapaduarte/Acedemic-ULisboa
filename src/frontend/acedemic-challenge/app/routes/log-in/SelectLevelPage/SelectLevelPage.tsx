@@ -7,17 +7,14 @@ import { CutButton } from "~/components/Button/Button";
 
 export default function SelectLevelPage(
     {
-        userId,
         onLevelSelected,
         onStartQuizClick
     }: {
-        userId: number;
         onLevelSelected: () => void;
         onStartQuizClick: () => void;
     }) {
     const { onConfirmClick, selectedLevel, setSelectedLevel } =
         useSelectLevelPage({
-            userId: userId,
             onLevelSelected: onLevelSelected,
             onStartQuizClick: onStartQuizClick
         });
@@ -47,8 +44,7 @@ export default function SelectLevelPage(
 }
 
 function useSelectLevelPage(
-    { userId, onLevelSelected, onStartQuizClick }: {
-        userId: number;
+    { onLevelSelected, onStartQuizClick }: {
         onLevelSelected: () => void;
         onStartQuizClick: () => void;
     }) {
@@ -60,7 +56,7 @@ function useSelectLevelPage(
 
     async function onConfirmClickHandler(level: LevelType) {
         await service
-            .createBatch(userId, level) // returns if was successful or not
+            .createBatch(level) // returns if was successful or not
             .then(() => onLevelSelected())
             .catch((error) => setError(error));
     }

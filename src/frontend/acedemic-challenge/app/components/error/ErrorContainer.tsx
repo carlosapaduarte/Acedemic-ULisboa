@@ -3,12 +3,13 @@ import {createContext, useContext, useState} from 'react'
 
 type ContextType = {
     error: Error | undefined
-    setError: (error: Error) => void
+    setError: (error: Error | undefined) => void
 }
 const LoggedInContext = createContext<ContextType>({
     error: undefined,
-    setError: (error: Error ) => { }
-})
+    setError: (error: Error | undefined) => {
+    }
+});
 
 export function ErrorContainer({ children }: { children: React.ReactNode }) {
     const [error, setError] = useState<Error | undefined>(undefined)

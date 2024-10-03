@@ -20,6 +20,13 @@
             "go_to_home": "Go to Home"
         },
         "login": {
+            "authenticate_title": "Create New User or Login",
+            "username_field_name": "Username",
+            "password_field_name": "Password",
+            "register_button_title": "Register",
+            "login_button_title": "Login",
+            "authenticated_message": "Authenticated",
+            "advance_message": "Click here to advance...",
             "select_level_initial_question": "How effective has been your study habits lately?",
             "level_1_title": "Not Effective",
             "level_2_title": "Effective",
@@ -75,6 +82,13 @@
             "go_to_home": "Vá para a Página Inicial"
         },
         "login": {
+            "authenticate_title": "Cria uma nova conta, ou faz Login",
+            "username_field_name": "Username",
+            "password_field_name": "Password",
+            "register_button_title": "Criar Conta!",
+            "login_button_title": "Login!",
+            "authenticated_message": "Autenticado",
+            "advance_message": "Clica para avançar...",
             "initial_question": "O quão eficaz têm sido os teus hábitos de estudo ultimamente?",
             "level_1_title": "Não Eficaz",
             "level_2_title": "Eficaz",

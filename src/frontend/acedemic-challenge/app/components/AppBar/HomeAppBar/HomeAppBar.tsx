@@ -1,7 +1,7 @@
 import styles from "./homeAppBar.module.css";
-import React, { useTransition } from "react";
+import React, { useEffect, useTransition } from "react";
 import { useTranslation } from "react-i18next";
-import { useLogOut, useUserIdEvent } from "~/components/auth/Authn";
+import { useLogOut } from "~/components/auth/Authn";
 import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -75,13 +75,13 @@ export function GreetingsContainer() {
     const [username, setUsername] = React.useState<string | undefined>(undefined);
     const [avatarFilename, setAvatarFilename] = React.useState<string | undefined>(undefined);
 
-    useUserIdEvent((userId) => {
-        service.fetchUserInfoFromApi(userId)
+    useEffect(() => {
+        service.fetchUserInfoFromApi()
             .then((userInfo: UserInfo) => {
                 setAvatarFilename(userInfo.avatarFilename);
                 setUsername(userInfo.username);
             });
-    });
+    }, []);
 
     let helloQuote = getHelloQuote();
 

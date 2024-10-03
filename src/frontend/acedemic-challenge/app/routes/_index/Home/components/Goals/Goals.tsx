@@ -2,7 +2,7 @@ import { Goal } from "~/challenges/types";
 import { CutButton } from "~/components/Button/Button";
 import React from "react";
 
-import styles from "./Goals.module.css";
+import styles from "./goals.module.css";
 import { useTranslation } from "react-i18next";
 
 export default function Goals({ currentDayNumber, goals, completedGoals, onMarkComplete }: {

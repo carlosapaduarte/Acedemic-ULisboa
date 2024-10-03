@@ -6,13 +6,11 @@ import { Button } from "~/components/Button/Button";
 
 export default function ShareProgressPage(
     {
-        userId,
         onShareSelected
     }: {
-        userId: number;
         onShareSelected: () => void;
     }) {
-    const { selectShareProgressState } = useShareProgressPage({ userId, onShareSelected });
+    const { selectShareProgressState } = useShareProgressPage({ onShareSelected });
 
     return (
         <div className={styles.pageContainer}>
@@ -42,12 +40,12 @@ export default function ShareProgressPage(
     );
 }
 
-function useShareProgressPage({ userId, onShareSelected }: { userId: number, onShareSelected: () => void }) {
+function useShareProgressPage({ onShareSelected }: { onShareSelected: () => void }) {
     const setError = useSetError();
 
     async function selectShareProgressState(shareProgress: boolean) {
         await service
-            .selectShareProgressState(userId, shareProgress)
+            .selectShareProgressState(shareProgress)
             .then(() => onShareSelected())
             .catch((error) => setError(error));
     }

@@ -1,0 +1,15 @@
+{
+    "create_new_task": "Criar nova tarefa!",
+    "loading": "Carregando...",
+    "my_tasks_list_title": "As minhas tarefas",
+    "select_me": "Clica-me!",
+    "tags_list_title": "Tags:",
+    "priority_picker_title": "Selecionar prioridade:",
+    "create_task_title": "Criar tarefa:",
+    "title_label": "Título: ",
+    "description_label": "Descrição: ",
+    "deadline_label": "Prazo: ",
+    "create_event_label": "Criar evento associado",
+    "add_sub_task": "Adicionar subtarefa",
+    "confirm": "Confirmar!"
+}

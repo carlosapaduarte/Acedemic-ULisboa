@@ -3,13 +3,14 @@ import { service } from "~/service/service";
 import styles from "./shareProgressPage.module.css";
 import React from "react";
 import classNames from "classnames";
+import { t } from "i18next";
 
-function useShareProgressPage({ userId, onShareSelected }: { userId: number, onShareSelected: () => void }) {
+function useShareProgressPage({ onShareSelected }: { onShareSelected: () => void }) {
     const setError = useSetGlobalError();
 
     async function selectShareProgressState(shareProgress: boolean) {
         await service
-            .selectShareProgressState(userId, shareProgress)
+            .selectShareProgressState(shareProgress)
             .then(() => onShareSelected())
             .catch((error) => setError(error));
     }
@@ -19,19 +20,17 @@ function useShareProgressPage({ userId, onShareSelected }: { userId: number, onS
 
 export function ShareProgressPage(
     {
-        userId,
         onShareSelected
     }: {
-        userId: number;
         onShareSelected: () => void;
     }) {
-    const { selectShareProgressState } = useShareProgressPage({ userId, onShareSelected });
+    const { selectShareProgressState } = useShareProgressPage({ onShareSelected });
 
     return (
         <div className={styles.pageContainer}>
             <div className={styles.pageInnerContainer}>
                 <h1 className={styles.titleText}>
-                    Do you want to share your progress?
+                    {t("login:share_progress_question")}
                 </h1>
                 <br />
                 <button
@@ -40,7 +39,7 @@ export function ShareProgressPage(
                         selectShareProgressState(true);
                     }}
                 >
-                    Yes
+                    {t("login:yes_answer_option")}
                 </button>
                 <button
                     className={classNames(styles.roundButton, styles.shareProgressButton)}
@@ -48,7 +47,7 @@ export function ShareProgressPage(
                         selectShareProgressState(false);
                     }}
                 >
-                    No
+                    {t("login:no_answer_option")}
                 </button>
             </div>
         </div>

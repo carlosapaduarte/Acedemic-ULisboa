@@ -5,8 +5,11 @@ import { File, service } from "~/service/service";
 import { utils } from "~/utils";
 import { Editor } from "./editor";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
+import { useTranslation } from "react-i18next";
 
 function FileView() {
+    const { t } = useTranslation(["notes"]);
+    
     const setError = useSetGlobalError();
 
     const params = useParams();
@@ -19,8 +22,7 @@ function FileView() {
         if (archiveName == undefined || filename == undefined)
             setError(new Error("Archive name and filename should not be null!"));
         else {
-            const userId = utils.getUserId();
-            service.getFile(userId, archiveName, filename)
+            service.getFile(archiveName, filename)
                 .then((file: File) => setFile(file))
                 .catch((e: Error) => setError(e));
         }
@@ -28,7 +30,7 @@ function FileView() {
 
     return file && archiveName ?
         <div>
-            <span>Name: {file.name}</span>
+            <span>{t("notes:file_name")} {file.name}</span>
             <br />
             <Editor archiveName={archiveName} file={file} />
         </div>

@@ -15,10 +15,8 @@ function createAvatars(): string[] {
 
 function useAvatarSelection(
     {
-        userId,
         onComplete
     }: {
-        userId: number;
         onComplete: () => void;
     }) {
     const setError = useSetError();
@@ -27,7 +25,7 @@ function useAvatarSelection(
 
     async function onConfirmClickHandler(avatarFilename: string) {
         await service
-            .selectAvatar(userId, avatarFilename)
+            .selectAvatar(avatarFilename)
             .then(() => onComplete())
             .catch((error) => setError(error));
     }
@@ -88,15 +86,12 @@ function AvatarList(
 
 export default function AvatarSelectionPage(
     {
-        userId,
         onComplete
     }: {
-        userId: number;
         onComplete: () => void;
     }) {
     const { onConfirmClick, selectedAvatar, setSelectedAvatar, avatars } =
         useAvatarSelection({
-            userId: userId,
             onComplete: onComplete
         });
     const { t } = useTranslation(["login"]);

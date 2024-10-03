@@ -32,8 +32,7 @@ function useDailyEvents() {
     const [events, setEvents] = useState<Event[] | undefined>(undefined)
 
     useEffect(() => {
-        let userId = utils.getUserId()
-        service.getUserTodayEvents(userId)
+        service.getUserTodayEvents()
             .then((events: Event[]) => setEvents(events))
     }, [])
 
@@ -50,7 +49,7 @@ function DailyEvents() {
                 {events?.map((events: Event, index: number) => 
                     <div key={index}>
                         <p>{events.title}</p>
-                        <p>{events.tag}</p>
+                        <p>{events.tags}</p>
                     </div>
                 )}
             </div>

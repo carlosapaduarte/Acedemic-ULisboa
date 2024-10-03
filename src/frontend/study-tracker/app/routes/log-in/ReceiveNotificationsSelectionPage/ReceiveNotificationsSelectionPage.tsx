@@ -3,14 +3,15 @@ import { BinaryAnswer, service } from "~/service/service";
 import styles from "./receiveNotificationsSelectionPage.module.css";
 import React from "react";
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 export function ReceiveNotificationsSelectionPage({ onProceed }: { onProceed: () => void }) {
+    const { t } = useTranslation(["login"]);
+    
     const setError = useSetGlobalError();
 
     function submitReceiveNotPref(answer: BinaryAnswer) {
-        const userIdStr = localStorage["userId"];
-        const userId = Number(userIdStr);
-        service.updateReceiveNotificationsPreference(userId, answer)
+        service.updateReceiveNotificationsPreference(answer)
             .then(() => onProceed())
             .catch((error) => setError(error));
     }
@@ -18,15 +19,15 @@ export function ReceiveNotificationsSelectionPage({ onProceed }: { onProceed: ()
     return (
         <div className={styles.pageContainer}>
             <div className={styles.pageInnerContainer}>
-                <h1>Receive Notifications</h1>
+                <h1>{t("login:receive_notification_title")}</h1>
                 <br />
                 <button className={classNames(styles.roundButton, styles.receiveNotificationsButton, styles.yes)}
                         onClick={() => submitReceiveNotPref(BinaryAnswer.YES)}>
-                    Yes
+                    {t("login:yes_answer_option")}
                 </button>
                 <button className={classNames(styles.roundButton, styles.receiveNotificationsButton)}
                         onClick={() => submitReceiveNotPref(BinaryAnswer.NO)}>
-                    No
+                    {t("login:no_answer_option")}
                 </button>
             </div>
         </div>

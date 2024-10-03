@@ -3,11 +3,11 @@ import { createContext, useContext, useState } from "react";
 
 type ContextType = {
     globalError: Error | undefined
-    setGlobalError: (error: Error) => void
+    setGlobalError: (error: Error | undefined) => void
 }
 const LoggedInContext = createContext<ContextType>({
     globalError: undefined,
-    setGlobalError: (error: Error) => {
+    setGlobalError: (error: Error | undefined) => {
     }
 });
 
