@@ -12,6 +12,7 @@ import styles from "./calendarPage.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { CreateEventModal } from "./CreateEvent/CreateEvent";
 import { useTranslation } from "react-i18next";
+import { EditEventModal } from "./CreateEvent/EditEvent";
 
 const localizer = momentLocalizer(moment);
 
@@ -144,25 +145,44 @@ function MyCalendar() {
         createNewEvent,
         toggleEventsView
     } = useMyCalendar();
+    const [edittedEventStartDate, setEdittedEventStartDate] = useState<Date>(new Date());
+    const [edittedEventEndDate, setEdittedEventEndDate] = useState<Date>(new Date());
+    const [edittedEventTitle, setEdittedEventTitle] = useState<string | undefined>(undefined);
+
+    const [isEdittedEventRecurrent, setIsEdittedEventRecurrent] = useState<boolean>(false);
+
     const { t } = useTranslation(["calendar"]);
 
     const { tags, appendTag, removeTag } = useTags();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
+    const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
 
     // This is invoked when the user uses the mouse to create a new event
     const handleSelectSlot = useCallback(
         ({ start, end }: { start: Date, end: Date }) => {
             setNewEventStartDate(start);
             setNewEventEndDate(end);
-            setIsModalOpen(true);
+            setIsCreateEventModalOpen(true);
         }, []);
 
     // This is invoked when the user clicks on an event
     const handleSelectEvent = useCallback(
-        (event: CalendarEvent) => window.alert(`Title: ${event.title}\nTags: ${event.resource?.tags}`),
-        []
-    );
+        (event: CalendarEvent) => {
+            if (event.title != undefined) {
+                setEdittedEventTitle(event.title as string);
+            }
+            if (event.start != undefined) {
+                setEdittedEventStartDate(event.start);
+            }
+            if (event.end != undefined) {
+                setEdittedEventEndDate(event.end);
+            }
+
+            setIsEditEventModalOpen(true);
+
+            console.log("My event: ", event);
+        }, []);
 
     // This is invoked when the user navigates across months/weeks/days with React-Big-Calendar button
     const onRangeChange = useCallback((range: Date[] | { start: Date; end: Date; }) => {
@@ -181,14 +201,25 @@ function MyCalendar() {
     return (
         <div className={styles.calendarPageContainer}>
             <CreateEventModal
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
+                isModalOpen={isCreateEventModalOpen}
+                setIsModalOpen={setIsCreateEventModalOpen}
                 newEventTitle={newEventTitle}
                 setNewEventTitle={setNewEventTitle}
                 newEventStartDate={newEventStartDate}
                 setNewEventStartDate={setNewEventStartDate}
                 newEventEndDate={newEventEndDate}
                 setNewEventEndDate={setNewEventEndDate}
+                refreshUserEvents={refreshUserEvents}
+            />
+            <EditEventModal
+                isModalOpen={isEditEventModalOpen}
+                setIsModalOpen={setIsEditEventModalOpen}
+                eventTitle={edittedEventTitle}
+                setEventTitle={setEdittedEventTitle}
+                eventStartDate={edittedEventStartDate}
+                setEventStartDate={setEdittedEventStartDate}
+                eventEndDate={edittedEventEndDate}
+                setEventEndDate={setEdittedEventEndDate}
                 refreshUserEvents={refreshUserEvents}
             />
             <button onClick={toggleEventsView}>
