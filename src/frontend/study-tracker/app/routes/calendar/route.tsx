@@ -179,7 +179,7 @@ function MyCalendar() {
 
     // Title and dates set. Now it's time to choose tags!
     return (
-        <>
+        <div className={styles.calendarPageContainer}>
             <CreateEventModal
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
@@ -217,7 +217,7 @@ function MyCalendar() {
                     popup={true}
                 />
             </div>
-        </>
+        </div>
     );
 }
 
