@@ -10,6 +10,14 @@ class StudyTrackerRepo(ABC):
     @abstractmethod
     def create_event(self, user_id: int, event: Event):
         pass
+    
+    @abstractmethod
+    def update_event(self, user_id: int, event_id: int, event: Event):
+        pass
+    
+    @abstractmethod
+    def delete_event(self, user_id: int, event_id: int):
+        pass
 
     @abstractmethod
     def get_events(self, user_id: int, filter_today: bool) -> list[Event]:

@@ -2,6 +2,7 @@ import random
 from sqlmodel import Session, select
 
 from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Priority, Task, UnavailableScheduleBlock
+from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
 from repository.sql.models.models import STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
@@ -80,7 +81,67 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             for tag_model in tags_model:
                 session.add(tag_model)
                 session.commit()
+                
+    def update_event(self, user_id: int, event_id: int, event: Event):
+        with Session(engine) as session:            
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)\
+                .where(STEventModel.id == event_id)
+                
+            result = session.exec(statement)            
+            event_model = result.first()
+            
+            if event_model == None:
+                raise NotFoundException(user_id)
+            
+            event_model.title = event.title
+            event_model.start_date = event.date.start_date
+            event_model.end_date = event.date.end_date
+        
+            session.add(event_model)
+            session.commit()
+            session.refresh(event_model)
+            
+            # First, delete all existent tags  
+            for tag in event_model.tags:
+                session.delete(tag)
+            
+            session.commit()
 
+            # Now, add new ones
+            tags_model: list[STEventTagModel] = []
+            for tag in event.tags:
+                tags_model.append(STEventTagModel(
+                    user_id=user_id,
+                    tag=tag,
+                    event_id=event_model.id,
+                    event=event_model
+                ))
+
+            for tag_model in tags_model:
+                session.add(tag_model)
+                session.commit()
+
+    def delete_event(self, user_id: int, event_id: int):
+        with Session(engine) as session:
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)\
+                .where(STEventModel.id == event_id)
+                
+            result = session.exec(statement)            
+            event_model = result.first()
+            
+            if event_model is None:
+                raise NotFoundException(user_id)
+            
+            # First, delete all existent tags  
+            for tag in event_model.tags:
+                session.delete(tag)
+                
+            session.delete(event_model)
+            session.commit()
+            
+            
     @staticmethod
     def is_today(date_1: datetime) -> bool:
         today = datetime.today()

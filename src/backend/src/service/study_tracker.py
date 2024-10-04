@@ -24,6 +24,13 @@ def does_not_collide_with_unavailable_block(
 def create_event(user_id: int, event: Event):
     does_not_collide_with_unavailable_block(user_id, event.date)
     study_tracker_repo.create_event(user_id, event)
+    
+def update_event(user_id: int, event_id: int, event: Event):
+    does_not_collide_with_unavailable_block(user_id, event.date)
+    study_tracker_repo.update_event(user_id, event_id, event)
+
+def delete_event(user_id: int, event_id: int):
+    study_tracker_repo.delete_event(user_id, event_id)
 
 def update_receive_notifications_pref(user_id: int, receive: bool):
     study_tracker_repo.update_receive_notifications_pref(user_id, receive)

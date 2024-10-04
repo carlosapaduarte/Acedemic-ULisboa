@@ -69,6 +69,35 @@ def create_event(
         )
     )
     return Response()
+
+@router.put("/users/me/events/{event_id}")
+def update_event(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    event_id: int,
+    dto: CreateEventInputDto
+) -> Response:
+    study_tracker_service.update_event(
+        user_id,
+        event_id,
+        Event(
+            title=dto.title,
+            date=DateInterval(
+                    start_date=datetime.fromtimestamp(dto.startDate),
+                    end_date=datetime.fromtimestamp(dto.endDate)
+                ),
+            tags=dto.tags,
+            every_week=dto.everyWeek
+        )
+    )
+    return Response()
+
+@router.delete("/users/me/events/{event_id}")
+def delete_event(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    event_id: int,
+) -> Response:
+    study_tracker_service.delete_event(user_id, event_id)
+    return Response()
     
 @router.put("/users/me/use-goals")
 def update_app_use_goals(
