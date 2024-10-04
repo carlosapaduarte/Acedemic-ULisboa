@@ -46,23 +46,32 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [loginLoading, setLoginLoading] = useState(false);
 
-    const authenticateButtonDisabled = username.length <= 0 || password.length <= 0;
+    const authenticateButtonDisabled = username.length <= 0 || password.length <= 0 || loginLoading;
 
     function onCreateUserClick() {
         if (authenticateButtonDisabled) {
             return;
         }
-        createUser(username, password);
-        onActionClicked(AuthAction.CREATE_USER);
+
+        setLoginLoading(true);
+        createUser(username, password).then(() => {
+            onActionClicked(AuthAction.CREATE_USER)
+            setLoginLoading(false);
+        });
     }
 
     function onLoginCreate() {
         if (authenticateButtonDisabled) {
             return;
         }
-        login(username, password);
-        onActionClicked(AuthAction.LOGIN);
+
+        setLoginLoading(true);
+        login(username, password).then(() => {
+            onActionClicked(AuthAction.LOGIN)
+            setLoginLoading(false);
+        });
     }
 
     return (
@@ -104,6 +113,10 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
                     onPress={onLoginCreate}>
                 {t("login:login_button_title")}
             </Button>
+
+            <h2>
+                {loginLoading ? "Logging in..." : ""}
+            </h2>
         </>
     );
 }
@@ -114,26 +127,13 @@ export default function UserInfoPage(
     }: {
         onAuthDone: (action: AuthAction) => void;
     }) {
-    const { t } = useTranslation(["login"]);
-
     const isLoggedIn = useIsLoggedIn();
-
-    const [actionPerformed, setActionPerformed] = useState<AuthAction | undefined>(undefined);
 
     return (
         <div className={styles.pageContainer}>
             <div className={styles.pageInnerContainer}>
-                {isLoggedIn ? (
-                    <>
-                        <h1 className={styles.titleText}>
-                            {t("login:authenticated_message")}
-                        </h1>
-                        <button className={styles.roundButton} onClick={() => onAuthDone(actionPerformed!)}>
-                            {t("login:authenticated_message")}
-                        </button>
-                    </>
-                ) : (
-                    <Authenticate onActionClicked={setActionPerformed} />
+                {isLoggedIn ? null : (
+                    <Authenticate onActionClicked={(action) => onAuthDone(action)} />
                 )}
             </div>
         </div>
