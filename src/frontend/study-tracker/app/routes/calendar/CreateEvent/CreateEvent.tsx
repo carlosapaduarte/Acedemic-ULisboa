@@ -2,7 +2,7 @@ import { Button, Dialog, Input, Label, Modal, TextField } from "react-aria-compo
 import classNames from "classnames";
 import "./createEventReactAriaModal.css";
 import styles from "./createEvent.module.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { service } from "~/service/service";
 
 const possibleTags = [
@@ -29,6 +29,105 @@ const TitleSection = React.memo(function TitleSection({ title, setTitle }: {
             </TextField>
         </div>
     );
+});
+
+const DateSection = React.memo(function DeadlineSection(
+    { newEventStartDate, setNewEventStartDate, newEventEndDate, setNewEventEndDate }:
+        {
+            newEventStartDate: Date,
+            setNewEventStartDate: (startDate: Date) => void,
+            newEventEndDate: Date,
+            setNewEventEndDate: (endDate: Date) => void
+        }
+) {
+    const [startDate, setStartDate] = useState(newEventStartDate.toISOString().split("T")[0]);
+    const [endDate, setEndDate] = useState(newEventEndDate.toISOString().split("T")[0]);
+    const [startTime, setStartTime] = useState(newEventStartDate.toTimeString().slice(0, 5));
+    const [endTime, setEndTime] = useState(newEventEndDate.toTimeString().slice(0, 5));
+
+    useEffect(() => {
+        const [startDateYear, startDateMonth, startDateDay] = startDate.split('-');
+        const [endDateYear, endDateMonth, endDateDay] = endDate.split('-');
+
+        const [startHours, startMinutes] = startTime.split(':');
+        const [endHours, endMinutes] = endTime.split(':');
+
+        const newStartDate = new Date(
+            parseInt(startDateYear),
+            parseInt(startDateMonth) - 1,
+            parseInt(startDateDay),
+            parseInt(startHours),
+            parseInt(startMinutes)
+        );
+
+        const newEndDate = new Date(
+            parseInt(endDateYear),
+            parseInt(endDateMonth) - 1,
+            parseInt(endDateDay),
+            parseInt(endHours),
+            parseInt(endMinutes)
+        );
+
+        setNewEventStartDate(newStartDate);
+        setNewEventEndDate(newEndDate);
+    }, [startDate, endDate, startTime, endTime]);
+
+    return (
+        <div className={styles.dateSectionContainer}>
+            <div aria-label={`Date`} className={styles.deadlineInputsContainer}>
+                <TextField>
+                    <Label className={styles.formSectionTitle}>Start Date</Label>
+                    <Input type={"date"}
+                            aria-label={"Start date"}
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className={classNames(styles.dateInput)} />
+                </TextField>
+                <TextField>
+                    <Label className={styles.formSectionTitle}>Start Time</Label>
+                    <Input type={"time"}
+                           aria-label={"Start time"}
+                           value={startTime}
+                           onChange={(e) => setStartTime(e.target.value)}
+                           className={classNames(styles.timeInput)} />
+                </TextField>
+                <TextField>
+                    <Label className={styles.formSectionTitle}>End Date</Label>
+                    <Input type={"date"}
+                           aria-label={"End date"}
+                           value={endDate}
+                           onChange={(e) => setEndDate(e.target.value)}
+                           className={classNames(styles.dateInput)} />
+                </TextField>
+                <TextField>
+                    <Label className={styles.formSectionTitle}>End Time</Label>
+                    <Input type={"time"}
+                           aria-label={"End time"}
+                           value={endTime}
+                           onChange={(e) => setEndTime(e.target.value)}
+                           className={classNames(styles.timeInput)} />
+                </TextField>
+            </div>
+        </div>
+    );
+});
+
+const IsRecurrentSection = React.memo(function IsRecurrentSection(
+    { isNewEventRecurrent, setIsNewEventRecurrent }: {
+        isNewEventRecurrent: boolean,
+        setIsNewEventRecurrent: (value: (((prevState: boolean) => boolean) | boolean)) => void
+    }
+) {
+    return <div className={styles.recurrentEventSectionContainer}>
+        <h2 className={styles.formSectionTitle}>Recurrence</h2>
+        <TextField className={styles.recurrentEventSectionCheckboxField}>
+            <Input className={styles.checkboxInput}
+                   type="checkbox"
+                   value={isNewEventRecurrent.toString()}
+                   onChange={(e) => setIsNewEventRecurrent((Boolean)(e.target.value))} />
+            <Label className={styles.formSectionTitle}>Every Week</Label>
+        </TextField>
+    </div>;
 });
 
 const TagSection = React.memo(function TagSection({ selectedTags, setSelectedTags }: {
@@ -61,24 +160,6 @@ const TagSection = React.memo(function TagSection({ selectedTags, setSelectedTag
     );
 });
 
-const IsRecurrentSection = React.memo(function IsRecurrentSection(
-    { isNewEventRecurrent, setIsNewEventRecurrent }: {
-        isNewEventRecurrent: boolean,
-        setIsNewEventRecurrent: (value: (((prevState: boolean) => boolean) | boolean)) => void
-    }
-) {
-    return <div className={styles.recurrentEventSectionContainer}>
-        <h2 className={styles.formSectionTitle}>Recurrence</h2>
-        <TextField className={styles.recurrentEventSectionCheckboxField}>
-            <Input className={styles.checkboxInput}
-                   type="checkbox"
-                   value={isNewEventRecurrent.toString()}
-                   onChange={(e) => setIsNewEventRecurrent((Boolean)(e.target.value))} />
-            <Label className={styles.formSectionTitle}>Every Week</Label>
-        </TextField>
-    </div>;
-});
-
 function CreateEventForm(
     {
         newEventTitle, setNewEventTitle, newEventStartDate, setNewEventStartDate, newEventEndDate,
@@ -100,6 +181,11 @@ function CreateEventForm(
     return (
         <div className={styles.newEventForm}>
             <TitleSection title={newEventTitle} setTitle={setNewEventTitle} />
+            <DateSection newEventStartDate={newEventStartDate}
+                         setNewEventStartDate={setNewEventStartDate}
+                         newEventEndDate={newEventEndDate}
+                         setNewEventEndDate={setNewEventEndDate}
+            />
             <IsRecurrentSection isNewEventRecurrent={isNewEventRecurrent}
                                 setIsNewEventRecurrent={setIsNewEventRecurrent} />
             <TagSection selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
