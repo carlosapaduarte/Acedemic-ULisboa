@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import UserInfoPage, { AuthAction } from "~/routes/log-in/UserInfoPage/UserInfoPage";
+import React, { useEffect, useState } from "react";
+import AuthenticationPage, { AuthAction } from "~/routes/log-in/AuthenticationPage/AuthenticationPage";
 import ShareProgressPage from "~/routes/log-in/ShareProgressPage/ShareProgressPage";
 import QuizPage from "~/routes/log-in/QuizPage/QuizPage";
 import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
@@ -8,23 +8,32 @@ import { useNavigate } from "@remix-run/react";
 import styles from "./login.module.css";
 import classNames from "classnames";
 import { useAppBar } from "~/components/AppBar/AppBar";
+import { useIsLoggedIn } from "~/components/auth/Authn";
 
 type Views =
-    | "userInfo"
+    | "authentication"
     | "shareProgress"
     | "chooseLevel"
     | "quiz"
     | "selectAvatar";
 
 function CurrentView() {
-    const [currentView, setCurrentView] = useState<Views>("userInfo");
-    const [userId, setUserId] = useState<number | undefined>(undefined);
+    const [currentView, setCurrentView] = useState<Views>("authentication");
     const navigate = useNavigate();
+    const isLoggedIn = useIsLoggedIn();
+
+    const [userId, setUserId] = useState<number | undefined>(undefined);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate(`/`);
+        }
+    }, [isLoggedIn]);
 
     switch (currentView) {
-        case "userInfo":
+        case "authentication":
             return (
-                <UserInfoPage
+                <AuthenticationPage
                     onAuthDone={(action: AuthAction) => {
                         if (action == AuthAction.CREATE_USER)
                             setCurrentView("shareProgress");

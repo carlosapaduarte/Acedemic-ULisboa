@@ -47,7 +47,7 @@ export function PlanDaySelectionPage({ onProceed }: { onProceed: () => void }) {
                     <button className={classNames(styles.roundButton)}
                             onClick={() => submitPlanDaySelection(weekDay!, hour!)}
                             disabled={weekDay == undefined || hour == undefined}>
-                        {t("login:confirm_button_text")}
+                        {t("login:confirm")}
                     </button>
                 </div>
             </div>

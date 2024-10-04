@@ -2,6 +2,7 @@
     "advance_message": "Click here to advance...",
     "authenticate_title": "Create New User or Login",
     "authenticated_message": "Authenticated",
+    "confirm": "Confirm",
     "login_button_title": "Login",
     "no_answer_option": "No",
     "password_field_name": "Password",

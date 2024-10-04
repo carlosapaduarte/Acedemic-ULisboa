@@ -2,6 +2,7 @@
     "advance_message": "Clica aqui para continuar...",
     "authenticate_title": "Criar nova conta ou fazer Login",
     "authenticated_message": "Autenticado",
+    "confirm": "Confirmar",
     "login_button_title": "Entrar",
     "no_answer_option": "Não",
     "password_field_name": "Senha",

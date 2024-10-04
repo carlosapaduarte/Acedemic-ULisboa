@@ -1,7 +1,7 @@
 import { useIsLoggedIn, useLogIn } from "~/components/auth/Authn";
 import { useState } from "react";
 import { service } from "~/service/service";
-import styles from "./userInfoPage.module.css";
+import styles from "./authenticationPage.module.css";
 import { useSetError } from "~/components/error/ErrorContainer";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Label, TextField } from "react-aria-components";
@@ -57,7 +57,7 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
 
         setLoginLoading(true);
         createUser(username, password).then(() => {
-            onActionClicked(AuthAction.CREATE_USER)
+            onActionClicked(AuthAction.CREATE_USER);
             setLoginLoading(false);
         });
     }
@@ -69,7 +69,7 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
 
         setLoginLoading(true);
         login(username, password).then(() => {
-            onActionClicked(AuthAction.LOGIN)
+            onActionClicked(AuthAction.LOGIN);
             setLoginLoading(false);
         });
     }
@@ -121,7 +121,7 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
     );
 }
 
-export default function UserInfoPage(
+export default function AuthenticationPage(
     {
         onAuthDone
     }: {
