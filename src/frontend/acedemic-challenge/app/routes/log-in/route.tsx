@@ -11,6 +11,7 @@ import { useAppBar } from "~/components/AppBar/AppBar";
 import { useIsLoggedIn } from "~/components/auth/Authn";
 
 type Views =
+    | "initial"
     | "authentication"
     | "shareProgress"
     | "chooseLevel"
@@ -18,25 +19,35 @@ type Views =
     | "selectAvatar";
 
 function CurrentView() {
-    const [currentView, setCurrentView] = useState<Views>("authentication");
+    const [currentView, setCurrentView] = useState<Views>("initial");
     const navigate = useNavigate();
     const isLoggedIn = useIsLoggedIn();
 
     const [userId, setUserId] = useState<number | undefined>(undefined);
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if (isLoggedIn == undefined) {
+            return;
+        }
+
+        if (isLoggedIn && currentView == "initial") {
             navigate(`/`);
+        }
+
+        if (!isLoggedIn && currentView == "initial") {
+            setCurrentView("authentication");
         }
     }, [isLoggedIn]);
 
     switch (currentView) {
+        case "initial":
+            return null;
         case "authentication":
             return (
                 <AuthenticationPage
                     onAuthDone={(action: AuthAction) => {
                         if (action == AuthAction.CREATE_USER)
-                            setCurrentView("shareProgress");
+                            setCurrentView("chooseLevel");
                         else
                             navigate(`/`);
                     }}

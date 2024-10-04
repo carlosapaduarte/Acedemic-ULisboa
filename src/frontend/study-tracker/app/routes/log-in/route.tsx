@@ -15,6 +15,7 @@ import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useIsLoggedIn } from "~/components/auth/Authn";
 
 type Views =
+    | "initial"
     | "authentication"
     | "appUsagesSelection"
     | "receiveNotificationsSelection"
@@ -23,17 +24,27 @@ type Views =
     | "avatarSelection";
 
 function CurrentView() {
-    const [currentView, setCurrentView] = useState<Views>("authentication");
+    const [currentView, setCurrentView] = useState<Views>("initial");
     const navigate = useNavigate();
     const isLoggedIn = useIsLoggedIn();
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if (isLoggedIn == undefined) {
+            return;
+        }
+
+        if (isLoggedIn && currentView == "initial") {
             navigate(`/`);
+        }
+
+        if (!isLoggedIn && currentView == "initial") {
+            setCurrentView("authentication");
         }
     }, [isLoggedIn]);
 
     switch (currentView) {
+        case "initial":
+            return null;
         case "authentication":
             return (
                 <AuthenticationPage
@@ -48,7 +59,7 @@ function CurrentView() {
         case "appUsagesSelection":
             return (
                 <AppUsagesSelectionPage
-                    onProceed={() => setCurrentView("receiveNotificationsSelection")}
+                    onProceed={() => setCurrentView("avatarSelection")}
                 />
             );
         case "receiveNotificationsSelection":
