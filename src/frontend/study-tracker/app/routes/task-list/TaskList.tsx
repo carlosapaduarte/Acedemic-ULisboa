@@ -2,8 +2,9 @@ import { service, Task } from "~/service/service";
 import { TaskView } from "./Task";
 import { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { utils } from "~/utils";
 import { useTranslation } from "react-i18next";
+
+import styles from "./tasksPage.module.css";
 
 export function useTaskList(filterUncompletedTasks: boolean) {
     const [tasks, setTasks] = useState<Task[] | undefined>(undefined);
@@ -28,12 +29,10 @@ export function TaskList({ tasks, onTaskClick, onTaskStatusUpdated = undefined }
     onTaskStatusUpdated: (() => void) | undefined
 }) {
     const { t } = useTranslation(["task"]);
-    
+
     return (
         <div>
-            <h1>
-                {t("task:my_tasks_list_title")}
-            </h1>
+            <h1 className={styles.tasksListTitle}>{t("task:my_tasks_list_title")}</h1>
             {tasks?.map((task: Task, index: number) =>
                 <div key={index}>
                     {onTaskClick ?

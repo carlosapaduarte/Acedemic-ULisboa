@@ -1,0 +1,140 @@
+@import "../tasksPage.module.css";
+@import "../../../components/Button/button.module.css";
+@import "./SlotToWork/slotToWork.module.css";
+@import "../../../components/FormModal/formModal.module.css";
+
+.createNewTaskButton {
+    composes: roundButton;
+    height: unset;
+    width: unset;
+
+    margin-top: 0.5rem;
+    padding: 0.25rem;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.newTaskModalContainer {
+    composes: modalContainer;
+}
+
+.newTaskTitleText {
+    composes: mainFormModalTitleText;
+}
+
+.newTaskFormContainer {
+    composes: formContainer;
+}
+
+.newTaskForm {
+    composes: form;
+}
+
+.finishCreatingTaskButtonContainer {
+    padding: 0 1rem;
+
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.finishCreatingTaskButton {
+    composes: roundButton;
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    height: 2rem;
+    width: 100%;
+
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.formSectionTitle {
+}
+
+.formInput {
+}
+
+.dateInput {
+}
+
+.timeInput {
+}
+
+.titleSectionContainer {
+}
+
+.slotsToWorkSectionContainer {
+}
+
+.deadlineSectionContainer {
+}
+
+.prioritySectionContainer {
+}
+
+.tagsSectionContainer {
+}
+
+.deadlineInputsContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.closeButton {
+    composes: roundButton formCloseButton;
+}
+
+.priorityValuesContainer {
+    height: 2rem;
+    width: 100%;
+
+    border-radius: 8px;
+    border: 2px solid var(--secondary-color);
+
+    display: flex;
+    flex-direction: row;
+
+    overflow: hidden;
+}
+
+.priorityButton {
+    composes: roundButton;
+    width: 100%;
+    height: 100%;
+
+    font-size: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+
+    border-radius: 0;
+
+    transition: background-color 0.2s;
+
+    &[aria-selected="true"] {
+        background-color: var(--fourth-color);
+
+        &.lowPriority {
+            background-color: var(--fourth-color);
+        }
+
+        &.mediumPriority {
+            background-color: #dc9510;
+            color: var(--primary-text-color);
+        }
+
+        &.highPriority {
+            background-color: #ac0909;
+        }
+    }
+}
+
+.tagsContainer {
+}
+
+.tag {
+    composes: roundButton;
+}

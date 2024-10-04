@@ -2,14 +2,13 @@ import { useParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { File, service } from "~/service/service";
-import { utils } from "~/utils";
 import { Editor } from "./editor";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { useTranslation } from "react-i18next";
 
 function FileView() {
     const { t } = useTranslation(["notes"]);
-    
+
     const setError = useSetGlobalError();
 
     const params = useParams();
@@ -41,7 +40,7 @@ function FileView() {
 export default function FileViewAuthControlled() {
     return (
         <RequireAuthn>
-            <FileView/>
+            <FileView />
         </RequireAuthn>
-    )
+    );
 }

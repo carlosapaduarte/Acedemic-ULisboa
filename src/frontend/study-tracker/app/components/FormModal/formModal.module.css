@@ -1,0 +1,120 @@
+
+.modalContainer {
+    width: 100%;
+    height: 100%;
+
+    padding: 1rem 0 1rem 0;
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.mainFormModalTitleText {
+    padding: 0 1rem;
+
+    color: var(--secondary-text-color);
+    font-size: 1.25rem;
+    font-weight: 400;
+
+    margin-bottom: 1rem;
+}
+
+.formContainer {
+    padding: 0.5rem 1rem;
+
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 90%;
+    width: 100%;
+
+    overflow: auto;
+
+    box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, 0.2),
+    inset 0 -4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formCloseButton {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    height: 2rem;
+    width: 5rem;
+}
+
+.formSectionTitle {
+    color: var(--secondary-text-color);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.formInput {
+    width: 100%;
+    min-height: 2rem;
+
+    padding: 0.25rem;
+
+    border-radius: 8px;
+    border: 0;
+
+    background-color: var(--primary-color);
+}
+
+.checkboxInput {
+    min-height: 2rem;
+
+    background-color: var(--primary-color);
+}
+
+.dateInput {
+    composes: formInput;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+.timeInput {
+    composes: formInput;
+    width: 100%;
+}
+
+.tagsContainer {
+    padding: 0.5rem;
+    width: 100%;
+
+    border-radius: 8px;
+    border: 2px solid var(--secondary-color);
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    overflow: hidden;
+}
+
+.tag {
+    width: unset;
+    height: unset;
+
+    padding: 0.25rem 0.5rem;
+
+    font-size: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+
+    &[aria-selected="true"] {
+        background-color: var(--fourth-color);
+
+        @media (hover: hover) {
+            &:hover {
+                background-color: var(--fourth-color-hover);
+            }
+        }
+    }
+}

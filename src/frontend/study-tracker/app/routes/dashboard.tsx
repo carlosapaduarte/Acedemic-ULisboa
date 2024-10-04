@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
-import { service, Event } from "~/service/service";
-import { utils } from "~/utils";
+import { Event, service } from "~/service/service";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -10,43 +9,43 @@ function get_welcome_message() {
     const hourOfDay = new Date().getHours();
     switch (true) {
         case hourOfDay < 5:
-            return "Good Night!"
+            return "Good Night!";
         case hourOfDay < 12:
-            return "Good Morning!"
+            return "Good Morning!";
         case hourOfDay < 17:
-            return "Good Afternoon!"
+            return "Good Afternoon!";
         case hourOfDay < 20:
-            return "Good Evening!"
+            return "Good Evening!";
         default:
-            return "Good Night!"
+            return "Good Night!";
     }
 }
 
 function WeekGoal() {
     return (
         <p><b>Don't forget to do "week-goal" this week!</b></p>
-    )
+    );
 }
 
 function useDailyEvents() {
-    const [events, setEvents] = useState<Event[] | undefined>(undefined)
+    const [events, setEvents] = useState<Event[] | undefined>(undefined);
 
     useEffect(() => {
         service.getUserTodayEvents()
-            .then((events: Event[]) => setEvents(events))
-    }, [])
+            .then((events: Event[]) => setEvents(events));
+    }, []);
 
-    return { events }
+    return { events };
 }
 
 function DailyEvents() {
-    const { events } = useDailyEvents()
+    const { events } = useDailyEvents();
 
     return (
         <RequireAuthn>
             <div>
                 <h1>Today's Events!</h1>
-                {events?.map((events: Event, index: number) => 
+                {events?.map((events: Event, index: number) =>
                     <div key={index}>
                         <p>{events.title}</p>
                         <p>{events.tags}</p>
@@ -54,7 +53,7 @@ function DailyEvents() {
                 )}
             </div>
         </RequireAuthn>
-    )
+    );
 }
 
 function WeekSchedule() {
@@ -62,13 +61,13 @@ function WeekSchedule() {
 
     return (
         <h1>TO BE DISPLAYED...</h1>
-    )
+    );
 }
 
 function WeekStats() {
     return (
         <h1>STATS TO BE DISPLAYED...</h1>
-    )
+    );
 }
 
 export default function Dashboard() {
@@ -77,10 +76,10 @@ export default function Dashboard() {
             <h1>Dashboard</h1>
             <img src="test.webp" alt="Avatar" />
             <p>{get_welcome_message()}</p>
-            <WeekGoal/>
-            <DailyEvents/>
-            <WeekSchedule/>
-            <WeekStats/>
+            <WeekGoal />
+            <DailyEvents />
+            <WeekSchedule />
+            <WeekStats />
         </div>
-    )
+    );
 }

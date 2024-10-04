@@ -13,7 +13,7 @@ import { AuthnContainer } from "~/components/auth/Authn";
 
 import "./global.css";
 import "./themes.css";
-import { AppBar, AppBarProvider } from "~/components/AppBar/AppBar";
+import { AppBar } from "~/components/AppBar/AppBar";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
@@ -27,6 +27,7 @@ import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
 import i18next from "~/i18next.server";
 import { useChangeLanguage } from "remix-i18next/react";
+import { AppBarProvider } from "~/components/AppBar/AppBarProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -45,7 +46,7 @@ export let handle = {
     // will need to load. This key can be a single string or an array of strings.
     // TIP: In most cases, you should set this to your defaultNS from your i18n config
     // or if you did not set one, set it to the i18next default namespace "translation"
-    i18n: ["common"]
+    i18n: ["common", "error"]
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {

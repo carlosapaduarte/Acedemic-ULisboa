@@ -4,7 +4,7 @@ import classNames from "classnames";
 import styles from "./settingsButton.module.css";
 import { RiSettings5Fill } from "react-icons/ri";
 import React from "react";
-import { AppBarVariant } from "~/components/AppBar/AppBar";
+import { AppBarVariant } from "~/components/AppBar/AppBarProvider";
 
 export function SettingsButton({ variant = "default" }: { variant?: AppBarVariant }) {
     const navigate = useNavigate();

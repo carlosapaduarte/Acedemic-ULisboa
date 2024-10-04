@@ -61,6 +61,7 @@
         "i18next-browser-languagedetector": "^8.0.0",
         "postcss": "^8.4.38",
         "react-i18next": "^15.0.2",
+        "sass-embedded": "^1.79.4",
         "typescript": "^5.1.6",
         "vite": "^5.1.0",
         "vite-tsconfig-paths": "^4.2.1"

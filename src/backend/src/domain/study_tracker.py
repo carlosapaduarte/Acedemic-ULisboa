@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel
-from router.study_tracker.dtos.input_dtos import CreateTaskInputDto
+from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, SlotToWorkInputDto
 
 class Priority(Enum):
     URGENTE = 1
@@ -15,6 +15,25 @@ class Priority(Enum):
         if priority == "urgente":
             return Priority.URGENTE
         raise
+    
+class SlotToWork():
+    def __init__(
+        self, 
+        start_time: datetime, 
+        end_time: datetime
+    ) -> None:
+        self.start_time = start_time
+        self.end_time = end_time
+        
+    @staticmethod
+    def fromSlotToWorkInputDto(slots_dto: list[SlotToWorkInputDto]) -> 'list[SlotToWork]':
+        slots: list[SlotToWork] = []
+        for slot_dto in slots_dto:
+            slots.append(SlotToWork(
+                start_time=datetime.fromtimestamp(slot_dto.startTime),
+                end_time=datetime.fromtimestamp(slot_dto.endTime)
+            ))
+        return slots
         
 class Task():
     def __init__(

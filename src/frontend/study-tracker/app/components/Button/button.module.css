@@ -6,13 +6,30 @@
     color: var(--secondary-text-color);
     font-size: 1.25rem;
     font-weight: 500;
-    line-height: 1.75rem;
     border-radius: 0.25rem;
+
+    &:disabled {
+        opacity: 0.5;
+    }
+
+    @media (hover: hover) {
+        &:hover {
+            background-color: var(--secondary-color-hover);
+        }
+    }
 }
 
-.roundButton:disabled {
-    opacity: 0.5;
+/*
+Something like this could be very interesting for animating.
+
+.roundButton {
+    position: relative;
+    top: 0;
+    transition: all ease 0.3s;
 }
+.roundButton:active {
+    top: 3px;
+}*/
 
 .cutButton {
     --edge-size: .5rem;
@@ -29,22 +46,4 @@
 
     text-transform: uppercase;
     font-family: 'Chakra Petch', sans-serif;
-}
-
-/*
-Something like this could be very interesting for animating.
-
-.roundButton {
-    position: relative;
-    top: 0;
-    transition: all ease 0.3s;
-}
-.roundButton:active {
-    top: 3px;
-}*/
-
-@media (hover: hover) {
-    .roundButton:hover {
-        background-color: var(--secondary-color-hover);
-    }
 }

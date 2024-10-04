@@ -1,7 +1,7 @@
-from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Grade, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from exception import NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
-from datetime import datetime
+
 
 study_tracker_repo = StudyTrackerSqlRepo()
 
@@ -37,21 +37,21 @@ def get_events(user_id: int) -> list[Event]:
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
 
-def create_event_from_task(user_id: int, task: Task):
+def create_event_from_task(user_id: int, task: Task, slot: SlotToWork):
     associatedEvent = Event(
         title=task.title,
         date=DateInterval(
-            start_date=datetime.now(),
-            end_date=task.deadline
+            start_date=slot.start_time,
+            end_date=slot.end_time
         ),
         tags=task.tags,
         every_week=False
     )
     create_event(user_id, associatedEvent)
 
-def create_task(user_id: int, task: Task, createAssociatedEvent: bool) -> int:
-    if createAssociatedEvent:
-        create_event_from_task(user_id, task)
+def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
+    for slot in slotsToWork:
+        create_event_from_task(user_id, task, slot)
         
     return study_tracker_repo.create_task(user_id, task)
 

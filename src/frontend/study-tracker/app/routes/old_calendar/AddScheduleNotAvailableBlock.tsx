@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { service } from "~/service/service";
-import { utils } from "~/utils";
 import { WeekDayAndHour, WeekDayAndHourPicker } from "../commons";
 
 function useAddScheduleNotAvailableBlock() {

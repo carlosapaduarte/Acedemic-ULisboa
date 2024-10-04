@@ -1,0 +1,68 @@
+@import "../../../components/Button/button.module.css";
+@import "../../../components/FormModal/formModal.module.css";
+
+
+.newEventModalContainer {
+    composes: modalContainer;
+}
+
+.newEventTitleText {
+    composes: mainFormModalTitleText;
+}
+
+.newEventFormContainer {
+    composes: formContainer;
+}
+
+.newEventForm {
+    composes: form;
+}
+
+.finishCreatingEventButtonContainer {
+    padding: 0 1rem;
+
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.finishCreatingEventButton {
+    composes: roundButton;
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    height: 2rem;
+    width: 100%;
+
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.titleSectionContainer {
+}
+
+.tagsSectionContainer {
+}
+
+.recurrentEventSectionContainer {
+}
+
+.recurrentEventSectionCheckboxField {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkboxInput {
+    width: 2rem;
+}
+
+.closeButton {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    height: 2rem;
+    width: 5rem;
+}

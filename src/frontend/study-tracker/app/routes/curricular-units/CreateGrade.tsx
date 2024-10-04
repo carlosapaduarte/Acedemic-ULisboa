@@ -1,33 +1,35 @@
-import { useState } from "react"
-import { service } from "~/service/service"
-import { utils } from "~/utils"
+import { useState } from "react";
+import { service } from "~/service/service";
 
 function useCreateGrade(curricularUnit: string, onCuCreated: () => void) {
-    const [value, setValue] = useState<number | undefined>(undefined)
-    const [weight, setWeight] = useState<number | undefined>(undefined)
+    const [value, setValue] = useState<number | undefined>(undefined);
+    const [weight, setWeight] = useState<number | undefined>(undefined);
 
     function createGrade(value: number, weight: number) {
         service.createGrade(curricularUnit, value, weight)
-            .then(onCuCreated)
+            .then(onCuCreated);
     }
 
-    return {value, setValue, weight, setWeight, createGrade}
+    return { value, setValue, weight, setWeight, createGrade };
 }
 
-export function CreateGrade({curricularUnit, onGradeCreated} : {curricularUnit: string, onGradeCreated: () => void}) {
-    const {value, setValue, weight, setWeight, createGrade} = useCreateGrade(curricularUnit, onGradeCreated)
-    
+export function CreateGrade({ curricularUnit, onGradeCreated }: {
+    curricularUnit: string,
+    onGradeCreated: () => void
+}) {
+    const { value, setValue, weight, setWeight, createGrade } = useCreateGrade(curricularUnit, onGradeCreated);
+
     return (
         <div>
             <h1>Create Grade</h1>
             <label>Value</label>
-            <br/>
-            <input type="number" onChange={(e) => setValue(Number(e.target.value))}/>
-            <br/>
+            <br />
+            <input type="number" onChange={(e) => setValue(Number(e.target.value))} />
+            <br />
             <label>Weight</label>
-            <br/>
-            <input type="number" onChange={(e) => setWeight(Number(e.target.value))}/>
-            
+            <br />
+            <input type="number" onChange={(e) => setWeight(Number(e.target.value))} />
+
             {value && weight ?
                 <button onClick={() => createGrade(value, weight)}>
                     Confirm
@@ -36,5 +38,5 @@ export function CreateGrade({curricularUnit, onGradeCreated} : {curricularUnit: 
                 <></>
             }
         </div>
-    )
+    );
 }

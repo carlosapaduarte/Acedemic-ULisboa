@@ -1,25 +1,19 @@
 import { Calendar, Event as CalendarEvent, momentLocalizer, View, Views } from "react-big-calendar";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
-import { utils } from "~/utils";
+import React, { useCallback, useEffect, useState } from "react";
 import { Event, NewEventInfo, service } from "~/service/service";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "./calendar.css";
+import "./CreateEvent/createEventReactAriaModal.css";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { CategoryAndTagsPicker, useTags } from "../commons";
+import { useTags } from "../commons";
 import styles from "./calendarPage.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
-import { t } from "i18next";
+import { CreateEventModal } from "./CreateEvent/CreateEvent";
 import { useTranslation } from "react-i18next";
 
 const localizer = momentLocalizer(moment);
-
-// This type is used to store Event info before User get's the opportunity to select tags
-type NewEventTitleAndDate = {
-    title: string,
-    start: Date,
-    end: Date,
-}
 
 type EventsView =
     | "allEvents"
@@ -29,7 +23,11 @@ function useMyCalendar() {
     const setError = useSetGlobalError();
 
     const [events, setEvents] = useState<CalendarEvent[]>([]);
-    const [newEventTitleAndName, setNewEventTitleAndName] = useState<NewEventTitleAndDate>();
+
+    const [newEventStartDate, setNewEventStartDate] = useState<Date>(new Date());
+    const [newEventEndDate, setNewEventEndDate] = useState<Date>(new Date());
+    const [newEventTitle, setNewEventTitle] = useState<string | undefined>(undefined);
+
     const [isNewEventRecurrent, setIsNewEventRecurrent] = useState<boolean>(false);
 
     const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
@@ -116,8 +114,12 @@ function useMyCalendar() {
         setIsNewEventRecurrent,
         setDisplayedDates,
         refreshUserEvents,
-        newEventTitleAndName,
-        setNewEventTitleAndName,
+        newEventStartDate,
+        setNewEventStartDate,
+        newEventEndDate,
+        setNewEventEndDate,
+        newEventTitle,
+        setNewEventTitle,
         createNewEvent,
         toggleEventsView
     };
@@ -133,22 +135,27 @@ function MyCalendar() {
         setIsNewEventRecurrent,
         setDisplayedDates,
         refreshUserEvents,
-        newEventTitleAndName,
-        setNewEventTitleAndName,
+        newEventStartDate,
+        setNewEventStartDate,
+        newEventEndDate,
+        setNewEventEndDate,
+        newEventTitle,
+        setNewEventTitle,
         createNewEvent,
         toggleEventsView
     } = useMyCalendar();
     const { t } = useTranslation(["calendar"]);
-    
+
     const { tags, appendTag, removeTag } = useTags();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // This is invoked when the user uses the mouse to create a new event
     const handleSelectSlot = useCallback(
-        ({ start, end }) => {
-            const title: string | null = window.prompt("New Event Name");
-            if (title) {
-                setNewEventTitleAndName({ title, start, end });
-            }
+        ({ start, end }: { start: Date, end: Date }) => {
+            setNewEventStartDate(start);
+            setNewEventEndDate(end);
+            setIsModalOpen(true);
         }, []);
 
     // This is invoked when the user clicks on an event
@@ -158,43 +165,32 @@ function MyCalendar() {
     );
 
     // This is invoked when the user navigates across months/weeks/days with React-Big-Calendar button
-    const onRangeChange = useCallback((range) => {
-        //console.log(range)
+    const onRangeChange = useCallback((range: Date[] | { start: Date; end: Date; }) => {
+        if (!(range instanceof Array)) {
+            setDisplayedDates([range.start, range.end]);
+        }
 
-        setDisplayedDates(range);
+        setDisplayedDates(range as Date[]);
     }, [eventsView, calendarView]);
 
-
-    function onCreateEventClickHandler(eventInfo: NewEventTitleAndDate) {
-        createNewEvent({
-            title: eventInfo.title,
-            startDate: eventInfo.start,
-            endDate: eventInfo.end,
-            tags,
-            everyWeek: isNewEventRecurrent
-        }, () => {
-            setNewEventTitleAndName(undefined); // Values used, discard now...
-            refreshUserEvents();
-        });
-    }
+    const onView = useCallback((newView: any) => {
+        setCalendarView(newView);
+    }, [setCalendarView]);
 
     // Title and dates set. Now it's time to choose tags!
     return (
-        <div className={styles.calendarContainer}>
-            <Calendar
-                localizer={localizer}
-                events={events}
-                startAccessor="start"
-                endAccessor="end"
-                onSelectEvent={handleSelectEvent}
-                onSelectSlot={handleSelectSlot}
-                selectable
-                onRangeChange={onRangeChange}
-                view={calendarView}
-                onView={(newView) => setCalendarView(newView)}
-                style={{ height: 500 }}
+        <>
+            <CreateEventModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                newEventTitle={newEventTitle}
+                setNewEventTitle={setNewEventTitle}
+                newEventStartDate={newEventStartDate}
+                setNewEventStartDate={setNewEventStartDate}
+                newEventEndDate={newEventEndDate}
+                setNewEventEndDate={setNewEventEndDate}
+                refreshUserEvents={refreshUserEvents}
             />
-
             <button onClick={toggleEventsView}>
                 {eventsView == "allEvents" ?
                     (<span>
@@ -206,30 +202,29 @@ function MyCalendar() {
                     </span>)
                 }
             </button>
-
-            {newEventTitleAndName ?
-                <div>
-                    <CategoryAndTagsPicker tags={[]} appendTag={appendTag} removeTag={removeTag} />
-                    <input type="checkbox" id="scales" name="scales" value={isNewEventRecurrent.toString()}
-                           onChange={(e) => setIsNewEventRecurrent((Boolean)(e.target.value))} />
-                    <label>
-                        {t("calendar:very_week_label")}
-                    </label>
-                    <button onClick={() => onCreateEventClickHandler(newEventTitleAndName)}>
-                        {t("calendar:confirm_button")}
-                    </button>
-                </div>
-                :
-                <></>
-            }
-        </div>
+            <div className={styles.calendarContainer}>
+                <Calendar
+                    localizer={localizer}
+                    events={events}
+                    startAccessor="start"
+                    endAccessor="end"
+                    onSelectEvent={handleSelectEvent}
+                    onSelectSlot={handleSelectSlot}
+                    selectable={"ignoreEvents"}
+                    onRangeChange={onRangeChange}
+                    view={calendarView}
+                    onView={onView}
+                    popup={true}
+                />
+            </div>
+        </>
     );
 }
 
 export default function MyCalendarAuthControlled() {
     return (
         <RequireAuthn>
-            <MyCalendar/>
+            <MyCalendar />
         </RequireAuthn>
-    )
+    );
 }

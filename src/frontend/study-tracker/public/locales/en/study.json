@@ -1,12 +1,12 @@
 {
     "associate_tasks": "Select tasks to associate!",
+    "confirm": "Confirm",
     "confirm_associated_tasks": "Confirm associated tasks!",
-    "timer_title": "Timer",
-    "timer_start": "Start",
+    "select_pause_minutes": "Pause time (minutes)",
+    "select_study_minutes": "Study time (minutes)",
     "timer_pause": "Pause",
     "timer_resume": "Resume",
+    "timer_start": "Start",
     "timer_stop": "Stop",
-    "select_study_minutes": "Study time (minutes)",
-    "select_pause_minutes": "Pause time (minutes)",
-    "confirm": "Confirm"
+    "timer_title": "Timer"
 }

@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 import { SelectTime } from "./TimeSelection";
 import { Timer } from "./Timer";
 import { Event, service, Task } from "~/service/service";
-import { utils } from "~/utils";
 import { SelectAssociatedTasks } from "./SelectAssociatedTasks";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { CreateTaskView } from "../task-list/CreateTask";
 import { TaskList } from "../task-list/TaskList";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
@@ -81,11 +79,12 @@ function AssociatedTaskListView({ associatedTasks }: { associatedTasks: Task[] }
         <div>
             <TaskList tasks={associatedTasks} onTaskClick={undefined} onTaskStatusUpdated={undefined} />
             <button onClick={() => setShowCreateTask(!showCreateTask)}>{newTaskButtonMsg}</button>
-            {showCreateTask ?
+            {/*{showCreateTask ?
                 <CreateTaskView onTaskCreated={onTaskCreated} />
-                :
-                <></>
-            }
+                :*/}
+            <></>
+            {/*
+            }*/}
         </div>
     );
 }
@@ -172,8 +171,8 @@ function StudyPage() {
 
     return associatedTasks == undefined ?
         <SelectAssociatedTasks onTasksSelected={onTasksSelected} />
-    :
-        <TimerAndAssociatedTasksView associatedTasks={associatedTasks} />
+        :
+        <TimerAndAssociatedTasksView associatedTasks={associatedTasks} />;
 }
 
 export default function StudyPageAuthControlled() {
@@ -181,5 +180,5 @@ export default function StudyPageAuthControlled() {
         <RequireAuthn>
             <StudyPage />
         </RequireAuthn>
-    )
+    );
 }

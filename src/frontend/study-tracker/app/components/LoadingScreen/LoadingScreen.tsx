@@ -3,16 +3,19 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Footer } from "~/components/Footer/Footer";
 
+const LOADING_OVERLAY_FULL_REMOVAL_DELAY = 1500;
+
 export function LoadingOverlay({ loading }: { loading: boolean }) {
     const [showOverlay, setShowOverlay] = useState(true);
 
     useEffect(() => {
         if (!loading) {
             const overlay = document.querySelector(`.${styles.loadingOverlay}`);
-            console.log(styles.loadingOverlay);
+            const checkBox = document.querySelector(`.${styles.checkBox}`);
             if (overlay) {
                 overlay.classList.add(styles.fadeOut);
-                setTimeout(() => setShowOverlay(false), 1000);
+                if (checkBox) checkBox.classList.add(styles.checked);
+                setTimeout(() => setShowOverlay(false), LOADING_OVERLAY_FULL_REMOVAL_DELAY);
             }
         }
     }, [loading]);

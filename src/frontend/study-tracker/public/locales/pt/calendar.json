@@ -1,4 +1,7 @@
 {
+    "confirm_button": "Confirmar",
+    "display_all_events_button": "Clicar para mostrar todos os Eventos",
+    "display_only_recurring_events_button": "Clicar para mostrar só Eventos recorrentes",
     "months": {
         "april": "Abril",
         "august": "Agosto",
@@ -17,7 +20,9 @@
     "next_month_but": "Próximo",
     "no_goals_title": "Não há desafios para este dia...",
     "prev_month_but": "Anterior",
+    "see_more_button_text": "Clicar para ver mais",
     "today": "Hoje",
+    "very_week_label": "Todas as semanas",
     "weekdays": {
         "friday": "Sex",
         "monday": "Seg",

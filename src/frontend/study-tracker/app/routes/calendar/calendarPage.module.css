@@ -1,6 +1,6 @@
 
-
 .calendarContainer {
+    height: 100%;
     animation: fade 300ms ease;
 }
 

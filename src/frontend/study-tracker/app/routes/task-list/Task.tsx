@@ -1,19 +1,17 @@
 import { useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service, Task } from "~/service/service";
-import { utils } from "~/utils";
 import { StatusPicker } from "./commons";
+import styles from "./tasksPage.module.css";
+import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
 function Tags({ tags }: { tags: string[] }) {
     const { t } = useTranslation(["task"]);
-    
+
     return (
         <div>
-            <p>
-                {t("task:select_me")}
-                Tags:
-            </p>
+            <p>Tags:</p>
             {tags.map((tag: string, index: number) =>
                 <p key={index}>{tag}</p>
             )}
@@ -69,6 +67,8 @@ export function TaskView({ taskToDisplay, onTaskStatusUpdated = undefined }: {
         updateTaskStatus
     } = useTaskView(taskToDisplay);
 
+    const [checked, setChecked] = useState(false);
+
     function passedDeadline(): boolean {
         return task.data.deadline < new Date();
     }
@@ -91,12 +91,32 @@ export function TaskView({ taskToDisplay, onTaskStatusUpdated = undefined }: {
     } else {
         return (
             <div>
-                <button onClick={selectUpdateStatusView}>
-                    Change Status
-                </button>
-                <p>Id: {task.id}</p>
-                <p>Title: {task.data.title}</p>
-                <p>Description: {task.data.description}</p>
+                <div aria-checked={task.data.status == "finished"} className={
+                    classNames(
+                        styles.checkboxAndTitleContainer
+                    )
+                }>
+                    <button className={classNames(
+                        styles.checkBox,
+                        task.data.status == "finished" && styles.checked)
+                    }
+                            onClick={() => {
+                                if (task.data.status == "finished") {
+                                    onNewStatusUpdateSelect("not_finished");
+                                } else {
+                                    onNewStatusUpdateSelect("finished");
+                                }
+                            }}>
+                    </button>
+                    <p className={
+                        classNames(
+                            styles.taskTitle,
+                            task.data.status == "finished" && styles.strikeThrough
+                        )
+                    }>
+                        {task.data.title}</p>
+                </div>
+                {/*<p>Description: {task.data.description}</p>
                 {passedDeadline() ?
                     <p>Passed Deadline!!!</p>
                     :
@@ -113,7 +133,7 @@ export function TaskView({ taskToDisplay, onTaskStatusUpdated = undefined }: {
                         <TaskView taskToDisplay={subTask} onTaskStatusUpdated={undefined} />
                         <br />
                     </div>
-                )}
+                )}*/}
             </div>
         );
     }

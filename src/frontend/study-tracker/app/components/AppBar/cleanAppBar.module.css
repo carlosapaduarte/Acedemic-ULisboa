@@ -1,6 +1,10 @@
 @import "appBar.module.css";
 
 
+.appBarContainer {
+    max-height: 80px;
+}
+
 .appBar {
     background-color: unset;
 }

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CurricularUnit, Grade, service } from "~/service/service";
-import { utils } from "~/utils";
 import { CreateCurricularUnit } from "./CreateCU";
 import { CreateGrade } from "./CreateGrade";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
@@ -81,7 +80,7 @@ function CurricularUnitListView() {
 export default function CurricularUnitListViewAuthControlled() {
     return (
         <RequireAuthn>
-            <CurricularUnitListView/>
+            <CurricularUnitListView />
         </RequireAuthn>
-    )
+    );
 }

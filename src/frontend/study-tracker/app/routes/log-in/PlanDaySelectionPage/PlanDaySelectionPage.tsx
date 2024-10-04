@@ -19,7 +19,7 @@ function usePlanDaySelection(onProceed: () => void) {
 
 export function PlanDaySelectionPage({ onProceed }: { onProceed: () => void }) {
     const { t } = useTranslation(["login"]);
-    
+
     const { submitPlanDaySelection } = usePlanDaySelection(onProceed);
 
     const { weekDay, hour, setWeekDay, setHour } = useWeekDayAndHourPicker();

@@ -1,4 +1,7 @@
 {
+    "confirm_button": "Confirm",
+    "display_all_events_button": "Click To Display All Events",
+    "display_only_recurring_events_button": "Click To Display Only Recurring Events",
     "months": {
         "april": "April",
         "august": "August",
@@ -19,6 +22,7 @@
     "prev_month_but": "Previous Month",
     "see_more_button_text": "Click to see more",
     "today": "Today",
+    "very_week_label": "Every Week",
     "weekdays": {
         "friday": "Fri",
         "monday": "Mon",
@@ -27,9 +31,5 @@
         "thursday": "Thu",
         "tuesday": "Tue",
         "wednesday": "Wed"
-    },
-    "confirm_button": "Confirm",
-    "very_week_label": "Every Week",
-    "display_only_recurring_events_button": "Click To Display Only Recurring Events",
-    "display_all_events_button": "Click To Display All Events"
+    }
 }

@@ -1,10 +1,10 @@
 {
-    "new_archive_name": "Archive name",
-    "create_archive": "Create new Archive",
-    "filename": "File Name",
-    "create_file_confirmation": "Create File",
     "archive_list": "My Archives:",
     "archive_name": "Name:",
+    "create_archive": "Create new Archive",
+    "create_file_confirmation": "Create File",
     "file_name": "File:",
+    "filename": "File Name",
+    "new_archive_name": "Archive name",
     "open_file": "Open File"
 }

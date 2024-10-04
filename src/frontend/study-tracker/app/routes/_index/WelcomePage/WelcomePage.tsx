@@ -3,7 +3,7 @@ import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import styles from "~/routes/_index/WelcomePage/welcomePage.module.css";
 import classNames from "classnames";
-import { useAppBar } from "~/components/AppBar/AppBar";
+import { useAppBar } from "~/components/AppBar/AppBarProvider";
 
 function useWelcomePage() {
     const isLoggedIn = useIsLoggedIn();

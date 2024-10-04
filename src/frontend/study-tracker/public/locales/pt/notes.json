@@ -1,10 +1,10 @@
 {
-    "new_archive_name": "Nome do arquivo",
-    "create_archive": "Criar Novo arquivo",
-    "filename": "Nome do documento",
-    "create_file_confirmation": "Criar ficheiro",
     "archive_list": "Os meus arquivos:",
     "archive_name": "Nome:",
+    "create_archive": "Criar Novo arquivo",
+    "create_file_confirmation": "Criar ficheiro",
     "file_name": "Documento:",
+    "filename": "Nome do documento",
+    "new_archive_name": "Nome do arquivo",
     "open_file": "Abrir documento"
 }

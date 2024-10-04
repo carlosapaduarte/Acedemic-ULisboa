@@ -2,7 +2,6 @@ import * as React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Logger } from "tslog";
 import { service } from "~/service/service";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
 const logger = new Logger({ name: "Authn" });
 
@@ -47,9 +46,9 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
             service.testTokenValidity()
                 .then(() => {
                     logger.debug("User is logged in");
-                    setIsLoggedIn(true)
+                    setIsLoggedIn(true);
                 })
-                .catch(() => setIsLoggedIn(false))
+                .catch(() => setIsLoggedIn(false));
         }
 
         fetchUser();

@@ -1,0 +1,31 @@
+.checkBox {
+    margin-left: 0.5rem;
+
+    width: 2.5rem;
+    height: 2.5rem;
+
+    border-radius: 5px;
+    border: 4px solid var(--secondary-color);
+
+    position: relative;
+}
+
+.checkBox::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    width: 150%;
+    height: 150%;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+    background-image: url("../tracker-checkmark.png");
+
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.5s ease;
+}
+
+.checkBox.checked::after {
+    /* Reveal from left to right */
+    clip-path: inset(0 0 0 0);
+}

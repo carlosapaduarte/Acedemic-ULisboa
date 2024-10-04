@@ -3,7 +3,6 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import styles from "./appUsagesSelectionPage.module.css";
 import classNames from "classnames";
-import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 
 const questions = [
@@ -47,7 +46,7 @@ function useAppUsagesSelection(
 
 export function AppUsagesSelectionPage({ onProceed }: { onProceed: () => void }) {
     const { t } = useTranslation(["login"]);
-    
+
     const { onInputValueChange, submitAppUseGoals } =
         useAppUsagesSelection({ onComplete: onProceed });
 

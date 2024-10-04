@@ -11,7 +11,7 @@ import {
 
 import styles from "./login.module.css";
 import classNames from "classnames";
-import { useAppBar } from "~/components/AppBar/AppBar";
+import { useAppBar } from "~/components/AppBar/AppBarProvider";
 
 type Views =
     | "userInfo"
