@@ -117,7 +117,7 @@ export function NavBar() {
         <div className={`${styles.navBar}`}>
             <NavBarButton text="Calendar" url={"/calendar"} />
             <NavBarButton text="Schedule" url={"/calendar"} />
-            <NavBarButton text="Tasks" url={"/task-list"} />
+            <NavBarButton text="Tasks" url={"/tasks"} />
             <NavBarButton text="Notes" url={"/archives"} />
             <NavBarButton text="Study!" url={"/timer"} />
             <NavBarButton text="Statistics" url={"/statistics"} />

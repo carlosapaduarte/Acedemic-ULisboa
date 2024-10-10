@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Button, Dialog, Input, Label, TextField } from "react-aria-components";
 import styles from "./slotToWork.module.css";
 import classNames from "classnames";
-import { SecondModalContext } from "~/routes/task-list/CreateTask/SecondModalContext";
+import { SecondModalContext } from "~/routes/tasks/CreateTask/SecondModalContext";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
 

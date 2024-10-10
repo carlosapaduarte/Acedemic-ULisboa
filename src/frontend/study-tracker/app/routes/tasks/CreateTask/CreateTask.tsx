@@ -7,7 +7,7 @@ import { Button, Dialog, DialogTrigger, Modal } from "react-aria-components";
 import "./createTaskReactAriaModal.css";
 import styles from "./createTask.module.css";
 import classNames from "classnames";
-import { CreateTaskForm } from "~/routes/task-list/CreateTask/CreateTaskForm/CreateTaskForm";
+import { CreateTaskForm } from "~/routes/tasks/CreateTask/CreateTaskForm/CreateTaskForm";
 import { SecondModalContext } from "./SecondModalContext";
 import { useTranslation } from "react-i18next";
 

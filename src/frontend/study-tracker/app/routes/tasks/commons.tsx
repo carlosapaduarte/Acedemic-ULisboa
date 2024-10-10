@@ -1,4 +1,4 @@
-import styles from "~/routes/task-list/tasksPage.module.css";
+import styles from "~/routes/tasks/tasksPage.module.css";
 
 const statusValues: string[] = [
     "Tarefa Completa",

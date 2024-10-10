@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "~/routes/task-list/tasksPage.module.css";
+import styles from "~/routes/tasks/tasksPage.module.css";
 
 export function useTags() {
     const [tags, setTags] = useState<string[]>([]);

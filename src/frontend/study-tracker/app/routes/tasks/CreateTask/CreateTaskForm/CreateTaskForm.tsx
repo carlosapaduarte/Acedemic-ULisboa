@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "../createTask.module.css";
 import { Button, Input, Label, TextField } from "react-aria-components";
-import { SlotToWork } from "~/routes/task-list/CreateTask/SlotToWork/SlotToWork";
+import { SlotToWork } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 

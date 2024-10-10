@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Task } from "~/service/service";
-import { TaskList, useTaskList } from "../task-list/TaskList";
+import { TaskList, useTaskList } from "~/routes/tasks/TaskList";
 import { useTranslation } from "react-i18next";
 
 export function SelectAssociatedTasks({ onTasksSelected }: { onTasksSelected: (tasks: Task[]) => void }) {

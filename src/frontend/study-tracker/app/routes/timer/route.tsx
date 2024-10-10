@@ -4,7 +4,7 @@ import { Timer } from "./Timer";
 import { Event, service, Task } from "~/service/service";
 import { SelectAssociatedTasks } from "./SelectAssociatedTasks";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { TaskList } from "../task-list/TaskList";
+import { TaskList } from "~/routes/tasks/TaskList";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 function useTimerSetup() {

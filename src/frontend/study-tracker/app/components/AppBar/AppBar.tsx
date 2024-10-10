@@ -55,7 +55,7 @@ function SideBarNavigationMenu({ setIsSideBarOpen }: { setIsSideBarOpen: (isOpen
                               setIsSideBarOpen={setIsSideBarOpen} />
             <SideBarNavButton text="Schedule" url={"/calendar"} iconUrl={"schedule_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Tasks" url={"/task-list"} iconUrl={"tasks_icon.png"}
+            <SideBarNavButton text="Tasks" url={"/tasks"} iconUrl={"tasks_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
             <SideBarNavButton text="Notes" url={"/archives"} iconUrl={"notes_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
