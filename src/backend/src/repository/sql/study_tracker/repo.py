@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Task, UnavailableScheduleBlock
 
@@ -73,4 +74,12 @@ class StudyTrackerRepo(ABC):
     
     @abstractmethod
     def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
+        pass
+    
+    @abstractmethod
+    def create_daily_energy_stat(self, user_id: int, date: datetime, energy_level: int):
+        pass
+    
+    @abstractmethod
+    def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
         pass

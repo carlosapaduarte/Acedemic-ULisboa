@@ -562,6 +562,34 @@ async function createGrade(curricularUnit: string, value: number, weight: number
         return Promise.reject(new Error("New Curricular Unit could not be created!"));
 }
 
+async function createDailyEnergyStat(energyLevel: number) {
+    const today = new Date()
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-energy`,
+        method: "POST",
+        body: toJsonBody({
+            date: today.getTime() / 1000, 
+            energyLevel 
+        })
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Energy level daily statistic could not be submitted!"));
+}
+
+async function getTaskDistributionStats(): Promise<any> {
+    const request = {
+        path: `study-tracker/users/me/statistics/time-by-event-tag`,
+        method: "GET",
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: CurricularUnit[] = await response.json(); // TODO: how
+        return responseObject;
+    } else
+    return Promise.reject(new Error("Could not obtain task distribution statistics!"));
+}
+
 export const service = {
     login,
     testTokenValidity,
@@ -591,5 +619,7 @@ export const service = {
     getCurricularUnits,
     getCurricularUnit,
     createCurricularUnit,
-    createGrade
+    createGrade,
+    createDailyEnergyStat,
+    getTaskDistributionStats
 };

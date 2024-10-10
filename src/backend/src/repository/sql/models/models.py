@@ -22,6 +22,7 @@ class UserModel(SQLModel, table=True):
     st_tasks: list["STTaskModel"] = Relationship(back_populates="user")    
     st_archives: list["STArchiveModel"] = Relationship(back_populates="user")
     st_curricular_units: list["STCurricularUnitModel"] = Relationship(back_populates="user")
+    user_daily_energy_level: list["DailyEnergyLevelModel"] = Relationship(back_populates="user")
 
 class NoteModel(SQLModel, table=True):
     __tablename__ = "note"
@@ -272,3 +273,12 @@ class STGradeModel(SQLModel, table=True):
     
     # Relationship with STTaskModel
     curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")
+    
+class DailyEnergyLevelModel(SQLModel, table=True):
+    __tablename__ = "daily_energy_level"
+
+    date: datetime = Field(primary_key=True, default=None)
+    energy_level: int
+
+    user_id: int = Field(foreign_key="user.id")    
+    user: UserModel = Relationship(back_populates="user_daily_energy_level")

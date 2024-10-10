@@ -1,3 +1,4 @@
+from datetime import datetime
 from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from exception import NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
@@ -96,3 +97,9 @@ def create_curricular_unit(user_id: int, name: str):
 
 def create_grade(user_id: int, curricular_unit: str, grade: Grade):
     return study_tracker_repo.create_grade(user_id, curricular_unit, grade)
+
+def create_daily_energy_stat(user_id: int, date: datetime, energy_level: int):
+    return study_tracker_repo.create_daily_energy_stat(user_id, date, energy_level)
+
+def get_task_distribution_statistics(user_id: int) -> dict[int, dict[int, dict[str, int]]]:
+    return study_tracker_repo.get_time_spent_by_tag(user_id)        

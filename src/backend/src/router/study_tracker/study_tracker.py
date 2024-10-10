@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStat, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, EventOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -198,3 +198,19 @@ def create_grade(
         value=dto.value,
         weight=dto.weight
     ))
+    
+@router.post("/users/me/statistics/daily-energy")
+def create_daily_energy_stat(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    dto: CreateDailyEnergyStat
+):
+    study_tracker_service.create_daily_energy_stat(
+        user_id, 
+        datetime.fromtimestamp(dto.date), 
+        dto.energyLevel
+    )
+@router.get("/users/me/statistics/time-by-event-tag")
+def get_task_distribution_statistics(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) ->  dict[int, dict[int, dict[str, int]]]:
+    return study_tracker_service.get_task_distribution_statistics(user_id)

@@ -5,9 +5,10 @@ from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Priority
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import DailyEnergyLevelModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
+from utils import get_datetime_utc
 
 engine = database.get_engine()
 
@@ -409,3 +410,55 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             session.add(curricular_unit_model)
             session.commit()
+            
+    def create_daily_energy_stat(self, user_id: int, date: datetime, energy_level: int):
+        with Session(engine) as session:
+            daily_energy_stat = DailyEnergyLevelModel(
+                date=date,
+                energy_level=energy_level,
+                user_id=user_id
+            )
+            
+            session.add(daily_energy_stat)
+            session.commit()
+            
+            
+    @staticmethod
+    def compute_elapsed_minutes(date1: datetime, date2: datetime) -> int:
+        return (int) ((get_datetime_utc(date1) - get_datetime_utc(date2)) / 60)
+            
+    def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
+        # TODO: events that repeat every week
+        
+        with Session(engine) as session:
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)
+            
+            result = session.exec(statement)
+            events: list[STEventModel] = result.all()
+            
+            stats: dict[int, dict[int, dict[str, int]]] = {}
+
+            for event in events:
+                start_date = event.start_date
+                elapsed_minutes = StudyTrackerSqlRepo.compute_elapsed_minutes(event.end_date, start_date)
+                
+                year = start_date.year
+                week = event.start_date.isocalendar().week
+                            
+                tags = event.tags
+                for tag in tags:
+                    tag_name = tag.tag
+                    
+                    if stats.get(year) is None:
+                        stats[year] = {}
+                        
+                    if stats[year].get(week) is None:
+                        stats[year][week] = {}
+                        
+                    if stats[year][week].get(tag_name) is None:
+                        stats[year][week][tag_name] = 0
+                        
+                    stats[year][week][tag_name] += elapsed_minutes
+
+            return stats
