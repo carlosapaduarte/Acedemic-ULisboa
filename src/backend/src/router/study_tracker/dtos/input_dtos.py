@@ -42,7 +42,7 @@ class CreateTaskInputDto(BaseModel):
     tags: list[str]
     status: str
     subTasks: list['CreateTaskInputDto']
-    slotsToWork: list[SlotToWorkInputDto]
+    slotsToWork: list[SlotToWorkInputDto] | None = []
 
 class UpdateTaskStatus(BaseModel):
     newStatus: str

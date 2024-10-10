@@ -7,7 +7,7 @@ from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, SlotToWorkI
 class Priority(Enum):
     URGENTE = 1
     IMPORTANTE = 2
-    
+
     @staticmethod
     def from_str(priority: str) -> 'Priority':
         if priority == "importante":
@@ -15,18 +15,18 @@ class Priority(Enum):
         if priority == "urgente":
             return Priority.URGENTE
         raise
-    
+
 class SlotToWork():
     def __init__(
-        self, 
-        start_time: datetime, 
+        self,
+        start_time: datetime,
         end_time: datetime
     ) -> None:
         self.start_time = start_time
         self.end_time = end_time
-        
+
     @staticmethod
-    def fromSlotToWorkInputDto(slots_dto: list[SlotToWorkInputDto]) -> 'list[SlotToWork]':
+    def from_slot_to_work_input_dto(slots_dto: list[SlotToWorkInputDto]) -> 'list[SlotToWork]':
         slots: list[SlotToWork] = []
         for slot_dto in slots_dto:
             slots.append(SlotToWork(
@@ -34,16 +34,16 @@ class SlotToWork():
                 end_time=datetime.fromtimestamp(slot_dto.endTime)
             ))
         return slots
-        
+
 class Task():
     def __init__(
             self,
             id: int | None,
-            title: str, 
-            description: str, 
-            deadline: datetime, 
-            priority: str, 
-            tags: list[str], 
+            title: str,
+            description: str,
+            deadline: datetime,
+            priority: str,
+            tags: list[str],
             sub_tasks: list['Task'],
             status: str="Tarefa não iniciada", # Default value
     ) -> None:
@@ -55,12 +55,12 @@ class Task():
         self.tags=tags
         self.sub_tasks=sub_tasks
         self.status=status
-        
+
     @staticmethod
-    def fromCreateTaskInputDto(task_dto: CreateTaskInputDto) -> 'Task':
+    def from_create_task_input_dto(task_dto: CreateTaskInputDto) -> 'Task':
         sub_tasks: list['Task'] = []
         for sub_task in task_dto.subTasks:
-            sub_tasks.append(Task.fromCreateTaskInputDto(sub_task))
+            sub_tasks.append(Task.from_create_task_input_dto(sub_task))
         return Task(
             id=None,
             title=task_dto.title,
@@ -76,13 +76,13 @@ class UnavailableScheduleBlock():
     def __init__(self, week_day: int, start_hour: int, duration: int):
         self.week_day=week_day
         self.start_hour=start_hour
-        self.duration=duration 
-        
+        self.duration=duration
+
 class DateInterval():
-    def __init__(self, start_date: datetime, end_date: datetime): 
+    def __init__(self, start_date: datetime, end_date: datetime):
          self.start_date=start_date
          self.end_date=end_date
-         
+
     def collides_with_unavailable_block(self, block: UnavailableScheduleBlock):
         block_start_hour = block.start_hour
         block_end_hour = block.start_hour + block.duration
@@ -97,7 +97,7 @@ class DateInterval():
             return True
         if event_start_hour > block_start_hour and event_start_hour < block_end_hour:
             return True
-        
+
         return False
 
 """
@@ -146,12 +146,12 @@ class Event():
                 )
             )
         return today_events
-    
+
 class File():
     def __init__(self, name: str, text: str):
         self.name=name
         self.text=text
-        
+
     @staticmethod
     def from_STFileModel(file_models: list[STFileModel]) -> list['File']:
         files: list[File] = []
@@ -160,14 +160,14 @@ class File():
                 name=file_model.name,
                 text=file_model.text
             ))
-            
+
         return files
-    
+
 class Archive():
     def __init__(self, name: str, files: list[File]):
         self.name=name
         self.files=files
-        
+
     @staticmethod
     def from_STArchiveModel(archive_models: list[STArchiveModel]) -> list['Archive']:
         archives: list[Archive] = []
@@ -176,17 +176,17 @@ class Archive():
                 name=archive_model.name,
                 files=File.from_STFileModel(archive_model.files)
             ))
-            
+
         return archives
-    
+
 class Grade():
     value: float
     weight: float
-    
+
     def __init__(self, value: float, weight: float) -> None:
         self.value=value
         self.weight=weight
-        
+
     @staticmethod
     def from_STGradeModel(grade_models: list[STGradeModel]) -> list['Grade']:
         grades: list[Grade] = []
@@ -195,17 +195,17 @@ class Grade():
                 value=grade_model.value,
                 weight=grade_model.weight
             ))
-            
+
         return grades
-    
+
 class CurricularUnit():
     name: str
     grades: list[Grade]
-    
+
     def __init__(self, name: str, grades: list[Grade]) -> None:
         self.name=name
         self.grades=grades
-        
+
     @staticmethod
     def from_STCurricularUnitModel(cu_models: list[STCurricularUnitModel]) -> list['CurricularUnit']:
         curricular_units: list[CurricularUnit] = []
@@ -214,5 +214,5 @@ class CurricularUnit():
                 name=cu_model.name,
                 grades=Grade.from_STGradeModel(cu_model.grades)
             ))
-            
+
         return curricular_units

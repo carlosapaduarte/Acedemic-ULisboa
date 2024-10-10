@@ -18,7 +18,7 @@ def create_task(
     dto: CreateTaskInputDto
 ) -> UserTaskOutputDto:
     # This route returns the newly created task!
-    task_id = study_tracker_service.create_task(user_id, Task.fromCreateTaskInputDto(dto), SlotToWork.fromSlotToWorkInputDto(dto.slotsToWork))
+    task_id = study_tracker_service.create_task(user_id, Task.from_create_task_input_dto(dto), SlotToWork.from_slot_to_work_input_dto(dto.slotsToWork))
     task = study_tracker_service.get_user_task(user_id, task_id)
     return UserTaskOutputDto.from_Task(task)
 
@@ -57,7 +57,7 @@ def create_event(
     dto: CreateEventInputDto
 ) -> Response:
     study_tracker_service.create_event(
-        user_id, 
+        user_id,
         Event(
             title=dto.title,
             date=DateInterval(
@@ -98,7 +98,7 @@ def delete_event(
 ) -> Response:
     study_tracker_service.delete_event(user_id, event_id)
     return Response()
-    
+
 @router.put("/users/me/use-goals")
 def update_app_use_goals(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -119,22 +119,22 @@ def update_week_planning_day(
     input_dto: UpdateStudyTrackerWeekPlanningDayInputDto
 ):
     study_tracker_service.update_study_tracker_app_planning_day(user_id, input_dto.day, input_dto.hour)
-    
+
 def fix_weekday_from_javascript(weekday: int) -> int:
     # Temporary solution to convert javascript Date().getDay() into python datetime.date().weekday
     # A better solution should be fixing this in the frontend!
-    
+
     if weekday == 0:
         return 6
     return weekday - 1
-    
+
 @router.post("/users/me/schedule/unavailable")
 def create_schedule_not_available_block(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateScheduleNotAvailableBlockInputDto
 ) -> Response:
     study_tracker_service.create_schedule_not_available_block(
-        user_id, 
+        user_id,
         UnavailableScheduleBlock(
             week_day=fix_weekday_from_javascript(dto.weekDay),
             start_hour=dto.startHour,
@@ -149,7 +149,7 @@ def create_archive(
     dto: CreateArchiveInputDto
 ):
     study_tracker_service.create_archive(user_id, dto.name)
-    
+
 @router.get("/users/me/archives")
 def get_archives(
     user_id: Annotated[int, Depends(get_current_user_id)]
@@ -164,7 +164,7 @@ def create_file(
     dto: CreateFileInputDto
 ):
     study_tracker_service.create_file(user_id, archive_name, dto.name)
-    
+
 @router.put("/users/me/archives/{archive_name}/files/{filename}")
 def update_file_content(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -173,7 +173,7 @@ def update_file_content(
     dto: UpdateFileInputDto
 ):
     study_tracker_service.update_file_content(user_id, archive_name, filename, dto.content)
-    
+
 @router.get("/users/me/curricular-units")
 def get_curricular_units(
     user_id: Annotated[int, Depends(get_current_user_id)]
@@ -187,7 +187,7 @@ def create_curricular_unit(
     dto: CreateCurricularUnitInputDto
 ):
     study_tracker_service.create_curricular_unit(user_id, dto.name)
-    
+
 @router.post("/users/me/curricular-units/{curricular_unit}/grades")
 def create_grade(
     user_id: Annotated[int, Depends(get_current_user_id)],
