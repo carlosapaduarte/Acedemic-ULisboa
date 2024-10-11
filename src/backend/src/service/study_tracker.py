@@ -60,12 +60,33 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
         
     return study_tracker_repo.create_task(user_id, task)
 
-def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool) -> list[Task]:
-    return study_tracker_repo.get_tasks(user_id, order_by_deadline_and_priority, filter_uncompleted_tasks)
+def get_user_daily_tasks_progress(user_id: int) -> float:
+    daily_tasks = study_tracker_repo.get_tasks(user_id, False, False, True)
+    
+    completed = 0    
+    for task in daily_tasks:
+        if task.status == "Tarefa Completa":
+            completed += 1
+            
+    return completed / len(daily_tasks)
+    
+
+def get_user_tasks(
+    user_id: int,
+    order_by_deadline_and_priority: bool, 
+    filter_uncompleted_tasks: bool, 
+    filter_deadline_is_today: bool    
+) -> list[Task]:
+    return study_tracker_repo.get_tasks(
+        user_id, 
+        order_by_deadline_and_priority, 
+        filter_uncompleted_tasks, 
+        filter_deadline_is_today
+    )
 
 def get_user_task(user_id: int, task_id: int) -> Task:
     # TODO: improve later
-    user_tasks = get_user_tasks(user_id, False, False)
+    user_tasks = get_user_tasks(user_id, False, False, False)
     for task in user_tasks:
         if task.id == task_id:
             return task

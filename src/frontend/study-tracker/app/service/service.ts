@@ -395,6 +395,22 @@ async function getTasks(filterUncompletedTasks: boolean): Promise<Task[]> {
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
 
+type DailyTasksProgress = {
+    progress: number
+}
+async function getDailyTasksProgress(): Promise<number> {
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-tasks-progress`,
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject = await response.json()
+        return responseObject.progress
+    } else
+        return Promise.reject(new Error("User tasks could not be obtained!"));
+}
+
 async function getTask(taskId: number): Promise<Task> {
     // For now, just fetch all tasks and return the one that we want
 
@@ -609,5 +625,6 @@ export const service = {
     createCurricularUnit,
     createGrade,
     createDailyEnergyStat,
-    getTaskDistributionStats
+    getTaskDistributionStats,
+    getDailyTasksProgress
 };

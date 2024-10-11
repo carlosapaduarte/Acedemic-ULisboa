@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from domain.study_tracker import Archive, CurricularUnit, Event, File, Grade, Task
 from utils import get_datetime_utc
 
+class DailyTasksProgress(BaseModel):
+    progress: float
+
 class UserTaskOutputDto(BaseModel):
     id: int
     title: str

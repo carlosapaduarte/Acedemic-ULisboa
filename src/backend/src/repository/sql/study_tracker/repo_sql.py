@@ -242,7 +242,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         """
         
             
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool) -> list[Task]:
+    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool, filter_deadline_is_today: bool) -> list[Task]:
         with Session(engine) as session:
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
@@ -273,6 +273,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             if order_by_deadline_and_priority:
                 tasks.sort(key=lambda task: task.deadline)
                 tasks.sort(key=lambda task: Priority.from_str(task.priority).value)
+                
+            # Ideally, we would use another where statement. Yet, this was not working for me...
+            if filter_deadline_is_today:
+                for task in tasks:
+                    if (not StudyTrackerSqlRepo.is_today(task.deadline)):
+                        tasks.remove(task)
                 
             return tasks
         
