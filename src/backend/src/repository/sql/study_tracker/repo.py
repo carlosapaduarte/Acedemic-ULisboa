@@ -21,7 +21,7 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def get_events(self, user_id: int, filter_today: bool) -> list[Event]:
+    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool) -> list[Event]:
         pass
 
     @abstractmethod
@@ -41,7 +41,7 @@ class StudyTrackerRepo(ABC):
         pass
     
     @abstractmethod
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
+    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool) -> list[Task]:
         pass
 
     @abstractmethod

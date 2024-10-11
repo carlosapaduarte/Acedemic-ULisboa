@@ -25,9 +25,10 @@ def create_task(
 @router.get("/users/me/tasks")
 def get_tasks(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    order_by_deadline_and_priority: bool
+    orderByDeadlineAndPriority: bool,
+    filterUncompletedTasks: bool
 ) -> list[UserTaskOutputDto]:
-    tasks: list[Task] = study_tracker_service.get_user_tasks(user_id, order_by_deadline_and_priority)
+    tasks: list[Task] = study_tracker_service.get_user_tasks(user_id, orderByDeadlineAndPriority, filterUncompletedTasks)
     return UserTaskOutputDto.from_Tasks(tasks)
 
 @router.put("/users/me/tasks/{task_id}")
@@ -41,14 +42,11 @@ def update_task_status(
 @router.get("/users/me/events")
 def get_events(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    today: bool
+    today: bool,
+    recurrentEvents: bool
 ) -> list[EventOutputDto]:
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
-    events: list[Event]
-    if today:
-        events = study_tracker_service.get_today_events(user_id)
-    else:
-        events = study_tracker_service.get_events(user_id)
+    events = study_tracker_service.get_events(user_id, today, recurrentEvents)
     return EventOutputDto.from_events(events)
 
 @router.post("/users/me/events")

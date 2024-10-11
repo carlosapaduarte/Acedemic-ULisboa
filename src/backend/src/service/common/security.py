@@ -19,7 +19,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # openssl rand -hex 32
 SECRET_KEY = "0a6c8420bba8707111d0270935f0dd58557b1fa178852d28a57aa93b877715e0"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 300
+ACCESS_TOKEN_EXPIRE_MINUTES = 9999
 
 
 class TokenData(BaseModel):

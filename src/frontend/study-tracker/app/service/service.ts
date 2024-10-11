@@ -151,7 +151,7 @@ async function fetchUserInfo(): Promise<UserInfo> {
     const response: Response = await doFetch(request);
 
     if (response.ok) {
-        const responseObject: UserInfo = await response.json(); // TODO: how
+        const responseObject: UserInfo = await response.json();
         return responseObject;
     } else
         return Promise.reject(new Error("User info could not be obtained!"));
@@ -242,15 +242,15 @@ export type Event = {
     everyWeek: boolean
 }
 
-async function getUserEvents(filterTodayEvents: boolean): Promise<Event[]> {
+async function getUserEvents(filterTodayEvents: boolean, filterRecurrentEvents: boolean): Promise<Event[]> {
     const request = {
-        path: `study-tracker/users/me/events?today=${filterTodayEvents}`,
+        path: `study-tracker/users/me/events?today=${filterTodayEvents}&recurrentEvents=${filterRecurrentEvents}`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
 
     if (response.ok) {
-        const responseObject: EventDto[] = await response.json(); // TODO: how
+        const responseObject: EventDto[] = await response.json()
         return responseObject.map((eventDto: EventDto) => {
             return {
                 startDate: new Date(eventDto.startDate * 1000),
@@ -268,19 +268,13 @@ async function getUserEvents(filterTodayEvents: boolean): Promise<Event[]> {
     }
 }
 
-async function getUserRecurrentEvents(): Promise<Event[]> {
-    // For simplicity, let's just get all events and filter here instead of in the backend
-    const allEvents = await getUserEvents(false);
-    return allEvents.filter((event: Event) => event.everyWeek);
-}
-
 async function getStudyBlockHappeningNow(): Promise<Event | undefined> {
 
     function containsStudyTag(tags: string[]): boolean {
         return tags.includes("Revisão") || tags.includes("Leitura") || tags.includes("Exercícios / Prática") || tags.includes("Preparação de provas");
     }
 
-    const recurrentEvents = await getUserRecurrentEvents();
+    const recurrentEvents = await getUserEvents(false, true);
 
     // Study blocks happening now!
     const now = new Date();
@@ -290,7 +284,7 @@ async function getStudyBlockHappeningNow(): Promise<Event | undefined> {
 }
 
 async function getUserTodayEvents(): Promise<Event[]> {
-    return getUserEvents(true);
+    return getUserEvents(true, false);
 }
 
 export type CreateScheduleNotAvailableBlock = {
@@ -348,7 +342,7 @@ async function createNewTask(newTaskInfo: CreateTask): Promise<Task> {
     // Backend returns the newly created Task!
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: TaskDto = await response.json(); // TODO: how
+        const responseObject: TaskDto = await response.json()
         return fromTaskDtoToTask(responseObject);
     } else
         return Promise.reject(new Error("Task could not be created!"));
@@ -389,19 +383,14 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
 
 async function getTasks(filterUncompletedTasks: boolean): Promise<Task[]> {
     const request = {
-        path: `study-tracker/users/me/tasks?order_by_deadline_and_priority=true`,
+        path: `study-tracker/users/me/tasks?orderByDeadlineAndPriority=true&filterUncompletedTasks=${filterUncompletedTasks}`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: TaskDto[] = await response.json(); // TODO: how
+        const responseObject: TaskDto[] = await response.json()
         const tasks = responseObject.map((taskDto: TaskDto) => fromTaskDtoToTask(taskDto));
-
-        // TODO: do filter on backend!
-        if (filterUncompletedTasks)
-            return tasks.filter((task: Task) => task.data.status != "Tarefa Completa");
-        else
-            return tasks;
+        return tasks;
     } else
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
@@ -455,7 +444,7 @@ async function getArchives(): Promise<Archive[]> {
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: Archive[] = await response.json(); // TODO: how
+        const responseObject: Archive[] = await response.json()
         return responseObject;
     } else
         return Promise.reject(new Error("Archives could not be obtained!"));
@@ -522,7 +511,7 @@ async function getCurricularUnits(): Promise<CurricularUnit[]> {
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: CurricularUnit[] = await response.json(); // TODO: how
+        const responseObject: CurricularUnit[] = await response.json()
         return responseObject;
     } else
         return Promise.reject(new Error("Curricular Units could not be obtained!"));
@@ -584,7 +573,7 @@ async function getTaskDistributionStats(): Promise<any> {
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: CurricularUnit[] = await response.json(); // TODO: how
+        const responseObject: CurricularUnit[] = await response.json()
         return responseObject;
     } else
     return Promise.reject(new Error("Could not obtain task distribution statistics!"));
@@ -602,7 +591,6 @@ export const service = {
     updateWeekPlanningDay,
     createNewEvent,
     getUserEvents,
-    getUserRecurrentEvents,
     getStudyBlockHappeningNow,
     getUserTodayEvents,
     createScheduleNotAvailableBlock,

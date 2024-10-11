@@ -36,11 +36,8 @@ def delete_event(user_id: int, event_id: int):
 def update_receive_notifications_pref(user_id: int, receive: bool):
     study_tracker_repo.update_receive_notifications_pref(user_id, receive)
 
-def get_today_events(user_id: int) -> list[Event]:
-    return study_tracker_repo.get_events(user_id, True)
-
-def get_events(user_id: int) -> list[Event]:
-    return study_tracker_repo.get_events(user_id, False)
+def get_events(user_id: int, today: bool, recurrentEvents: bool) -> list[Event]:
+    return study_tracker_repo.get_events(user_id, today, recurrentEvents)
 
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
@@ -63,12 +60,12 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
         
     return study_tracker_repo.create_task(user_id, task)
 
-def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
-    return study_tracker_repo.get_tasks(user_id, order_by_deadline_and_priority)
+def get_user_tasks(user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool) -> list[Task]:
+    return study_tracker_repo.get_tasks(user_id, order_by_deadline_and_priority, filter_uncompleted_tasks)
 
 def get_user_task(user_id: int, task_id: int) -> Task:
     # TODO: improve later
-    user_tasks = get_user_tasks(user_id, False)
+    user_tasks = get_user_tasks(user_id, False, False)
     for task in user_tasks:
         if task.id == task_id:
             return task

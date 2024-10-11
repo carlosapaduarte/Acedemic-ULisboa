@@ -148,9 +148,14 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         today = datetime.today()
         return date_1.year == today.year and date_1.month == today.month and date_1.day == today.day
 
-    def get_events(self, user_id: int, filter_today: bool) -> list[Event]:
+    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool) -> list[Event]:
         with Session(engine) as session:
-            statement = select(STEventModel).where(STEventModel.user_id == user_id)
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)\
+                    
+            if recurrentEvents:
+                statement = statement.where(STEventModel.every_week == True)
+            
             results = session.exec(statement)
             
             # Ideally, we would use another where statement. Yet, this was not working for me...
@@ -220,15 +225,43 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             status=task_model.status,
             sub_tasks=subtasks
         )
+    
+    """
+    @staticmethod
+    def is_task_or_son_completed(task: STTaskModel):
+        # Returns True if task is completed or one of it's sons is completed
+        
+        if (task.status == "Tarefa Completa"):
+            return True
+        
+        for task in task.subtasks:
+            if StudyTrackerSqlRepo.is_task_or_son_completed(task):
+                return True
+
+        return False
+        """
+        
             
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
+    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool) -> list[Task]:
         with Session(engine) as session:
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
-                .where(STTaskModel.parent_task_id == None) # This is important to not mess parent with child tasks. Remember that each task will also grab it's child tasks (subtasks)
+                .where(STTaskModel.parent_task_id == None)\
+                
+            if filter_uncompleted_tasks:
+                statement = statement\
+                    .where(STTaskModel.status == "Tarefa Completa")
+
             result = session.exec(statement)
             
             task_models: list[STTaskModel] = result.all()
+            
+            """
+            if filter_uncompleted_tasks:
+                for task_model in task_models:
+                    if not StudyTrackerSqlRepo.is_task_or_son_completed(task_model):
+                        task_models.remove(task_model)
+            """
             
             # Retrieve Tasks
             tasks: list[Task] = []
