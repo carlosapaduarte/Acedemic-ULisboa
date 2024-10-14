@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
 from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel
@@ -216,3 +216,11 @@ class CurricularUnit():
             ))
 
         return curricular_units
+
+class DailyEnergyStatus():
+    date_: date
+    level: int
+
+    def __init__(self, date: date, level: int) -> None:
+        self.date_=date
+        self.level=level

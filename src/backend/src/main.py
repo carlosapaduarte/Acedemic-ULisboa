@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from exception import NotFoundException, NotAvailableScheduleBlockCollision, UsernameAlreadyExistsException
+from exception import AlreadyExistsException, NotFoundException, NotAvailableScheduleBlockCollision, UsernameAlreadyExistsException
 from router.academic_challenge import academic_challenge
 from router.commons import common
 
@@ -56,4 +56,11 @@ async def not_available_schedule_block_collision_exception_handler(request: Requ
     return JSONResponse(
         status_code=409, # Conflict
         content={"error": "Event collides with an existent not-available schedule block"},
+    )
+    
+@app.exception_handler(AlreadyExistsException)
+async def already_exists_exception_handler(request: Request, exc: AlreadyExistsException):
+    return JSONResponse(
+        status_code=409, # Conflict
+        content={"error": "Resource already exists"},
     )

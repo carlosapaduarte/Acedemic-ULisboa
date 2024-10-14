@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service"
+import { EnergyStats } from "./Energy";
 
 function WeekStats({week, stats} : {week: string, stats: any}) {
     return (
@@ -35,7 +36,7 @@ function YearStats({year, stats} : {year: string, stats: any}) {
     )
 }
 
-export default function TaskDistribution() {
+function TaskDistribution() {
     const setError = useSetGlobalError();
     const [stats, setStats] = useState<any | undefined>(undefined)
 
@@ -56,6 +57,15 @@ export default function TaskDistribution() {
                 :
                 <></>
             }
+        </>
+    )
+}
+
+export default function Statistics() {
+    return (
+        <>
+                <h1>Statistics</h1>
+                <EnergyStats />
         </>
     )
 }

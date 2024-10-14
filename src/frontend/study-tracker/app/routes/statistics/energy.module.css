@@ -1,0 +1,59 @@
+.statsContainer {
+    width: 80%;
+    margin: auto;
+
+    box-sizing: border-box; 
+    border: 3px solid;
+
+    border-color: var(--secondary-color);
+
+    border-radius: 5%;
+}
+
+.statTitle {
+    width: 10%;
+    offset-position: 61px 8px;
+    offset-path: ray(90deg);
+    background-color: var(--secondary-color);
+    padding: 0.5%;
+
+    font-weight: bolder;
+    color: white;
+    text-align: center;
+
+    --edge-size: .5rem;
+    clip-path: polygon(
+            var(--edge-size) 0,
+            calc(100% - var(--edge-size)) 0,
+            100% var(--edge-size),
+            100% calc(100% - var(--edge-size)),
+            calc(100% - var(--edge-size)) 100%,
+            var(--edge-size) 100%,
+            0 calc(100% - var(--edge-size)),
+            0 var(--edge-size)
+    );
+
+    text-transform: uppercase;
+    font-family: 'Chakra Petch', sans-serif;
+}
+
+.todayEnergyStatusTitle {
+    margin-left: 1%;
+    font-weight: bolder;
+}
+
+.verWellColor {
+    color: green;
+}
+
+.wellColor {
+    color: yellowgreen;
+}
+
+.goodColor {
+    color: yellow;
+}
+
+.badColor {
+    color: red;
+}

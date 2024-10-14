@@ -595,6 +595,34 @@ async function getTaskDistributionStats(): Promise<any> {
     return Promise.reject(new Error("Could not obtain task distribution statistics!"));
 }
 
+export type DailyEnergyStatus = {
+    date: Date,
+    level: number
+}
+type DailyEnergyStatusDto = {
+    date: number,
+    level: number
+}
+async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
+    function toDomain(value: DailyEnergyStatusDto): DailyEnergyStatus {
+        return {
+            date: new Date(value.date * 1000),
+            level: value.level
+        }
+    }
+
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-energy-status`,
+        method: "GET",
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: DailyEnergyStatusDto[] = await response.json()
+        return responseObject.map((value) => toDomain(value))
+    } else
+        return Promise.reject(new Error("Could not obtain user energy history!"));
+}
+
 export const service = {
     login,
     testTokenValidity,
@@ -626,5 +654,6 @@ export const service = {
     createGrade,
     createDailyEnergyStat,
     getTaskDistributionStats,
-    getDailyTasksProgress
+    getDailyTasksProgress,
+    fetchEnergyHistory
 };

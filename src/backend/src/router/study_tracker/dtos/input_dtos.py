@@ -63,6 +63,6 @@ class CreateGradeInputDto(BaseModel):
     value: float
     weight: float
     
-class CreateDailyEnergyStat(BaseModel):
+class CreateDailyEnergyStatus(BaseModel):
     date: float
-    energyLevel: int
+    level: int

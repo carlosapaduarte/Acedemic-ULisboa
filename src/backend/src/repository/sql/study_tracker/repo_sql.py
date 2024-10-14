@@ -1,14 +1,15 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Priority, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import DailyEnergyLevelModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import DailyEnergyStatusModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from utils import get_datetime_utc
+from datetime import date
 
 engine = database.get_engine()
 
@@ -450,16 +451,46 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(curricular_unit_model)
             session.commit()
             
-    def create_daily_energy_stat(self, user_id: int, date: datetime, energy_level: int):
+    def create_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
         with Session(engine) as session:
-            daily_energy_stat = DailyEnergyLevelModel(
-                date=date,
-                energy_level=energy_level,
+            daily_energy_stat = DailyEnergyStatusModel(
+                date_=status.date_,
+                level=status.level,
                 user_id=user_id
             )
             
             session.add(daily_energy_stat)
             session.commit()
+            
+    def is_today_energy_status_created(self, user_id: int) -> bool:
+        today = date.today()
+        with Session(engine) as session:
+            statement = select(DailyEnergyStatusModel)\
+                .where(DailyEnergyStatusModel.user_id == user_id)\
+                .where(DailyEnergyStatusModel.date_ == today) # Not working!
+                
+            result = session.exec(statement)
+            model: DailyEnergyStatusModel | None = result.first()
+            return model is not None
+            
+    def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:
+        with Session(engine) as session:
+            statement = select(DailyEnergyStatusModel)\
+                .where(DailyEnergyStatusModel.user_id == user_id)
+                
+            result = session.exec(statement)
+            daily_energy_history_models: list[DailyEnergyStatusModel] = result.all()
+            
+            daily_energy_history: list[DailyEnergyStatus] = []
+            for stat_model in daily_energy_history_models:
+                daily_energy_history.append(
+                    DailyEnergyStatus(
+                        date=stat_model.date_,
+                        level=stat_model.level
+                    )
+                )
+                
+            return daily_energy_history
             
             
     @staticmethod

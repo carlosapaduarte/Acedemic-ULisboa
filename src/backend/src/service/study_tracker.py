@@ -1,6 +1,5 @@
-from datetime import datetime
-from domain.study_tracker import Archive, CurricularUnit, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
-from exception import NotAvailableScheduleBlockCollision, NotFoundException
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
+from exception import AlreadyExistsException, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 
 
@@ -62,13 +61,17 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
 
 def get_user_daily_tasks_progress(user_id: int) -> float:
     daily_tasks = study_tracker_repo.get_tasks(user_id, False, False, True)
+    number_of_daily_tasks = len(daily_tasks)
+    
+    if number_of_daily_tasks is 0:
+        return 0
     
     completed = 0    
     for task in daily_tasks:
         if task.status == "Tarefa Completa":
             completed += 1
             
-    return completed / len(daily_tasks)
+    return completed / number_of_daily_tasks
     
 
 def get_user_tasks(
@@ -116,8 +119,14 @@ def create_curricular_unit(user_id: int, name: str):
 def create_grade(user_id: int, curricular_unit: str, grade: Grade):
     return study_tracker_repo.create_grade(user_id, curricular_unit, grade)
 
-def create_daily_energy_stat(user_id: int, date: datetime, energy_level: int):
-    return study_tracker_repo.create_daily_energy_stat(user_id, date, energy_level)
+def create_daily_energy_status(user_id: int, status: DailyEnergyStatus):
+    if not study_tracker_repo.is_today_energy_status_created(user_id):
+        study_tracker_repo.create_daily_energy_status(user_id, status)
+    else:
+        raise AlreadyExistsException()
+
+def get_daily_energy_history(user_id: int) -> list[DailyEnergyStatus]:
+    return study_tracker_repo.get_daily_energy_history(user_id)
 
 def get_task_distribution_statistics(user_id: int) -> dict[int, dict[int, dict[str, int]]]:
-    return study_tracker_repo.get_time_spent_by_tag(user_id)        
+    return study_tracker_repo.get_time_spent_by_tag(user_id)

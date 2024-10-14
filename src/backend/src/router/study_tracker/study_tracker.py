@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response
-from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
+from domain.study_tracker import DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStat, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
-from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyTasksProgress, EventOutputDto, UserTaskOutputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgress, EventOutputDto, UserTaskOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -18,7 +18,11 @@ def create_task(
     dto: CreateTaskInputDto
 ) -> UserTaskOutputDto:
     # This route returns the newly created task!
-    task_id = study_tracker_service.create_task(user_id, Task.from_create_task_input_dto(dto), SlotToWork.from_slot_to_work_input_dto(dto.slotsToWork))
+    task_id = study_tracker_service.create_task(
+        user_id,
+        Task.from_create_task_input_dto(dto),
+        SlotToWork.from_slot_to_work_input_dto(dto.slotsToWork)
+    )
     task = study_tracker_service.get_user_task(user_id, task_id)
     return UserTaskOutputDto.from_Task(task)
 
@@ -204,16 +208,26 @@ def create_grade(
         weight=dto.weight
     ))
     
-@router.post("/users/me/statistics/daily-energy")
+@router.post("/users/me/statistics/daily-energy-status")
 def create_daily_energy_stat(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    dto: CreateDailyEnergyStat
+    dto: CreateDailyEnergyStatus
 ):
-    study_tracker_service.create_daily_energy_stat(
+    study_tracker_service.create_daily_energy_status(
         user_id, 
-        datetime.fromtimestamp(dto.date), 
-        dto.energyLevel
+        DailyEnergyStatus(
+            datetime.fromtimestamp(dto.date),
+            dto.level
+        )
     )
+@router.get("/users/me/statistics/daily-energy-status")
+def get_daily_energy_history(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) ->  list[DailyEnergyStatusOutputDto]:
+    history = study_tracker_service.get_daily_energy_history(user_id)
+    return DailyEnergyStatusOutputDto.from_domain(history)
+
+
 @router.get("/users/me/statistics/time-by-event-tag")
 def get_task_distribution_statistics(
     user_id: Annotated[int, Depends(get_current_user_id)]

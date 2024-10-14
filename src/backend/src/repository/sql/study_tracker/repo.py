@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Task, UnavailableScheduleBlock
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -77,7 +77,15 @@ class StudyTrackerRepo(ABC):
         pass
     
     @abstractmethod
-    def create_daily_energy_stat(self, user_id: int, date: datetime, energy_level: int):
+    def create_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
+        pass
+    
+    @abstractmethod
+    def is_today_energy_status_created(self, user_id: int) -> bool:
+        pass
+    
+    @abstractmethod
+    def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:
         pass
     
     @abstractmethod
