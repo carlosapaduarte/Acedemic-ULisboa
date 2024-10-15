@@ -1,5 +1,5 @@
 .statsContainer {
-    width: 80%;
+    width: 50%;
     margin: auto;
 
     box-sizing: border-box; 
@@ -11,15 +11,17 @@
 }
 
 .statTitle {
-    width: 10%;
-    offset-position: 61px 8px;
-    offset-path: ray(90deg);
+    width: 15%;
+    position: relative;
+    top: -10px;
+    left: -3px;
     background-color: var(--secondary-color);
     padding: 0.5%;
+    text-align: center;
 
     font-weight: bolder;
     color: white;
-    text-align: center;
+    font-size: large;
 
     --edge-size: .5rem;
     clip-path: polygon(
@@ -56,4 +58,33 @@
 
 .badColor {
     color: red;
+}
+
+.todayDate {
+    text-align: end;
+    margin-right: 2%;
+    color: var(--secondary-color);
+    offset-position: 49% 10%;
+    offset-path: ray(90deg);
+}
+
+.historyFirstContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2%;
+}
+
+.historyTitle {
+    font-size: x-large;
+    font-weight: bolder;
+}
+
+.seeFullHistoryText {
+    color: var(--secondary-color);
+}
+
+.historyStatusAndDate {
+    display: flex;
+    justify-content: space-evenly;
 }
