@@ -1,11 +1,11 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import DailyEnergyStatusModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import DailyEnergyStatusModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel, WeekStudyTimeModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from utils import get_datetime_utc
@@ -532,3 +532,38 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     stats[year][week][tag_name] += elapsed_minutes
 
             return stats
+        
+    def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:
+        with Session(engine) as session:
+            statement = select(WeekStudyTimeModel)\
+                .where(WeekStudyTimeModel.user_id == user_id)\
+                    
+            result = session.exec(statement)
+            week_study_time_history: list[WeekStudyTimeModel] = result.all()
+            return WeekTimeStudy.from_STCurricularUnitModel(week_study_time_history)
+            
+            
+    
+    def increment_week_study_time(self, user_id: int, week_and_year: WeekAndYear, minutes: int):
+        with Session(engine) as session:
+            statement = select(WeekStudyTimeModel)\
+                .where(WeekStudyTimeModel.user_id == user_id)\
+                .where(WeekStudyTimeModel.year == week_and_year.year)\
+                .where(WeekStudyTimeModel.week == week_and_year.week)
+                    
+            result = session.exec(statement)
+            week_study_time_model: WeekStudyTimeModel | None = result.first()
+            
+            if week_study_time_model is None:
+                new_model = WeekStudyTimeModel(
+                    year=week_and_year.year,
+                    week=week_and_year.week,
+                    minutes=minutes,
+                    user_id=user_id
+                )
+                session.add(new_model)
+                session.commit()
+            else:
+                week_study_time_model.minutes += minutes
+                session.add(week_study_time_model)
+                session.commit()

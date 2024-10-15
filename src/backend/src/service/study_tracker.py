@@ -1,4 +1,4 @@
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 from exception import AlreadyExistsException, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 
@@ -128,5 +128,11 @@ def create_daily_energy_status(user_id: int, status: DailyEnergyStatus):
 def get_daily_energy_history(user_id: int) -> list[DailyEnergyStatus]:
     return study_tracker_repo.get_daily_energy_history(user_id)
 
-def get_task_distribution_statistics(user_id: int) -> dict[int, dict[int, dict[str, int]]]:
+def get_task_time_distribution(user_id: int) -> dict[int, dict[int, dict[str, int]]]:
     return study_tracker_repo.get_time_spent_by_tag(user_id)
+
+def get_total_time_study_per_week(user_id: int) -> list[WeekTimeStudy]:
+    return study_tracker_repo.get_total_time_study_per_week(user_id)
+
+def increment_week_study_time(user_id: int, week_and_year: WeekAndYear, minutes: int):
+    study_tracker_repo.increment_week_study_time(user_id, week_and_year, minutes)

@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response
-from domain.study_tracker import DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
+from domain.study_tracker import DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
-from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgress, EventOutputDto, UserTaskOutputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, IncreaseWeekStudyTime, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgress, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -220,6 +220,7 @@ def create_daily_energy_stat(
             dto.level
         )
     )
+    
 @router.get("/users/me/statistics/daily-energy-status")
 def get_daily_energy_history(
     user_id: Annotated[int, Depends(get_current_user_id)]
@@ -229,7 +230,28 @@ def get_daily_energy_history(
 
 
 @router.get("/users/me/statistics/time-by-event-tag")
-def get_task_distribution_statistics(
+def get_task_time_distribution(
     user_id: Annotated[int, Depends(get_current_user_id)]
 ) ->  dict[int, dict[int, dict[str, int]]]:
-    return study_tracker_service.get_task_distribution_statistics(user_id)
+    return study_tracker_service.get_task_time_distribution(user_id)
+
+@router.get("/users/me/statistics/time-study")
+def get_total_time_study_per_week(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) ->  list[WeekTimeStudyOutputDto]:
+    domain = study_tracker_service.get_total_time_study_per_week(user_id)
+    return WeekTimeStudyOutputDto.from_domain(domain)
+
+@router.put("/users/me/statistics/time-study")
+def increment_week_study_time(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    dto: IncreaseWeekStudyTime
+):
+    study_tracker_service.increment_week_study_time(
+        user_id, 
+        WeekAndYear(
+            year=dto.year,
+            week=dto.week
+        ),
+        dto.minutes
+    )

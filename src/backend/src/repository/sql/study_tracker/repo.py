@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -90,4 +90,12 @@ class StudyTrackerRepo(ABC):
     
     @abstractmethod
     def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
+        pass
+    
+    @abstractmethod
+    def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:
+        pass
+    
+    @abstractmethod
+    def increment_week_study_time(self, user_id: int, week_and_year: WeekAndYear, minutes: int):
         pass

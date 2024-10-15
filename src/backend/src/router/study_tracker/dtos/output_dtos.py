@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task, WeekTimeStudy
 from utils import get_datetime_utc, get_datetime_utc_from_date
 
 class DailyTasksProgress(BaseModel):
@@ -143,6 +143,24 @@ class DailyEnergyStatusOutputDto(BaseModel):
                 DailyEnergyStatusOutputDto(
                     date=get_datetime_utc_from_date(status.date_),
                     level=status.level
+                )
+            )
+        return dtos
+    
+class WeekTimeStudyOutputDto(BaseModel):
+    year: int
+    week: int
+    minutes: int
+    
+    @staticmethod
+    def from_domain(domain: list[WeekTimeStudy]) -> list["WeekTimeStudyOutputDto"]:
+        dtos: list[WeekTimeStudyOutputDto] = []
+        for record in domain:
+            dtos.append(
+                WeekTimeStudyOutputDto(
+                    year=record.week_and_year.year,
+                    week=record.week_and_year.week,    
+                    minutes=record.minutes
                 )
             )
         return dtos

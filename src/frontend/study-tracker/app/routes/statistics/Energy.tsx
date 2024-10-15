@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "./energy.module.css";
+import styles from "./statistics.module.css";
 import { useEffect, useState } from "react"
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer"
 import { DailyEnergyStatus, service } from "~/service/service"
@@ -9,17 +9,23 @@ function EnergyStatus({status} : {status: DailyEnergyStatus}) {
     return (
         <div>
             <p>(O)</p>
-            <span>Today, {status.date.getDate()} {status.date.toLocaleString('default', { month: 'long' })}</span>
+            <span>{status.date.getDate()} {status.date.toLocaleString('default', { month: 'long' }).substring(0, 3).toUpperCase()}</span>
         </div>
     )
 }
 
-function EnergyStatusHistory({energyHistory} : {energyHistory: DailyEnergyStatus[]}) {
+function EnergyStatusHistory({energyHistory, onSeeFullHistoryClick} : 
+    {
+        energyHistory: DailyEnergyStatus[], 
+        onSeeFullHistoryClick: () => void
+    }) {
     return (
         <>
             <div className={styles.historyFirstContainer}>
                 <span className={styles.historyTitle}>History</span>
-                <span className={styles.seeFullHistoryText}>(O) See full history</span>
+                <button className={styles.seeFullHistoryText}>
+                    (O) See full history
+                </button>
             </div>
 
             <div className={styles.historyStatusAndDate}>
@@ -49,7 +55,7 @@ function TodayDate() {
     const today = new Date()
     return (
         <div className={styles.todayDate}>
-            Today, {today.getDate()} {today.toLocaleString('default', { month: 'long' })}
+            TODAY, {today.getDate()} {today.toLocaleString('default', { month: 'long' })}
         </div>
     )
 }
@@ -101,6 +107,11 @@ export function EnergyStats() {
         energyHistory, 
         getTodayEnergyStatus
     } = useEnergyStats()
+
+    function onSeeFullHistoryClickHandler() {
+        // VIEW NOT YET AVAILABLE
+    }
+
     return (
         <>
             <div className={styles.statsContainer}>
@@ -111,7 +122,7 @@ export function EnergyStats() {
                 
                 <br/><br/>
 
-                <EnergyStatusHistory energyHistory={energyHistory ? energyHistory.slice(0, 6) : []} />
+                <EnergyStatusHistory energyHistory={energyHistory ? energyHistory.slice(0, 6) : []} onSeeFullHistoryClick={onSeeFullHistoryClickHandler} />
             </div>
         </>
     )

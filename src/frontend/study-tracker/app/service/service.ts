@@ -623,6 +623,32 @@ async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
         return Promise.reject(new Error("Could not obtain user energy history!"));
 }
 
+async function getTotalTimeStudyThisWeek() {
+    const request = {
+        path: `study-tracker/users/me/statistics/time-study`,
+        method: "GET",
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: DailyEnergyStatusDto[] = await response.json()
+        return responseObject.map((value) => toDomain(value))
+    } else
+        return Promise.reject(new Error("Could not obtain total time study this week!"));
+}
+
+async function incrementStudyTimeInWeek(year: number, week: number, minutes: number) {
+    const request = {
+        path: `study-tracker/users/me/statistics/time-study`,
+        method: "POST",
+        body: toJsonBody({
+            year, week, minutes
+        })
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not update study time!"));
+}
+
 export const service = {
     login,
     testTokenValidity,
@@ -655,5 +681,6 @@ export const service = {
     createDailyEnergyStat,
     getTaskDistributionStats,
     getDailyTasksProgress,
-    fetchEnergyHistory
+    fetchEnergyHistory,
+    incrementStudyTimeInWeek
 };

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service"
 import { EnergyStats } from "./Energy";
+import { FocusStats } from "./Focus";
 
 function WeekStats({week, stats} : {week: string, stats: any}) {
     return (
@@ -66,6 +67,8 @@ export default function Statistics() {
         <>
                 <h1>Statistics</h1>
                 <EnergyStats />
+                <br/><br/>
+                <FocusStats />
         </>
     )
 }

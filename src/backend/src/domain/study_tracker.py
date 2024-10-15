@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from enum import Enum
 
-from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel
+from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel, WeekStudyTimeModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, SlotToWorkInputDto
 
 class Priority(Enum):
@@ -224,3 +224,33 @@ class DailyEnergyStatus():
     def __init__(self, date: date, level: int) -> None:
         self.date_=date
         self.level=level
+
+class WeekAndYear():
+    year: int
+    week: int
+    
+    def __init__(self, year: int, week: int) -> None:
+        self.year=year
+        self.week=week
+        
+class WeekTimeStudy():
+    week_and_year: WeekAndYear
+    minutes: int
+    
+    def __init__(self, week_and_year: WeekAndYear, minutes: int) -> None:
+        self.week_and_year=week_and_year
+        self.minutes=minutes
+        
+    @staticmethod
+    def from_STCurricularUnitModel(models: list[WeekStudyTimeModel]) -> list['WeekTimeStudy']:
+        curricular_units: list[WeekTimeStudy] = []
+        for model in models:
+            curricular_units.append(WeekTimeStudy(
+                week_and_year=WeekAndYear(
+                    year=model.year,
+                    week=model.week
+                ),
+                minutes=model.minutes
+            ))
+            
+        return curricular_units

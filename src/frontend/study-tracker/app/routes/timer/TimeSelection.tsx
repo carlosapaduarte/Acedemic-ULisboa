@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { service } from "~/service/service";
+import { utils } from "~/utils";
 
 function useSelectTime(onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void) {
     const [studyMinutes, setStudyMinutes] = useState(25);
@@ -13,6 +15,10 @@ function useSelectTime(onTimeSelected: (studyStopDate: Date, pauseStopDate: Date
         pauseStopDate.setMinutes(pauseStopDate.getMinutes() + pauseMinutes);
 
         onTimeSelected(studyStopDate, pauseStopDate);
+
+        const today = new Date()
+
+        service.incrementStudyTimeInWeek(today.getFullYear(), utils.getWeekNumber(today), studyMinutes)
     }
 
     return { studyMinutes, setStudyMinutes, pauseMinutes, setPauseMinutes, onConfirmButtonClick };

@@ -24,6 +24,7 @@ class UserModel(SQLModel, table=True):
     st_archives: list["STArchiveModel"] = Relationship(back_populates="user")
     st_curricular_units: list["STCurricularUnitModel"] = Relationship(back_populates="user")
     daily_energy_status: list["DailyEnergyStatusModel"] = Relationship(back_populates="user")
+    week_study_time: list["WeekStudyTimeModel"] = Relationship(back_populates="user")
 
 class NoteModel(SQLModel, table=True):
     __tablename__ = "note"
@@ -283,3 +284,13 @@ class DailyEnergyStatusModel(SQLModel, table=True):
 
     user_id: int = Field(foreign_key="user.id")    
     user: UserModel = Relationship(back_populates="daily_energy_status")
+    
+class WeekStudyTimeModel(SQLModel, table=True):
+    __tablename__ = "week_study_time"
+
+    year: int = Field(primary_key=True, default=None)
+    week: int = Field(primary_key=True, default=None)
+    minutes: int
+
+    user_id: int = Field(foreign_key="user.id")    
+    user: UserModel = Relationship(back_populates="week_study_time")
