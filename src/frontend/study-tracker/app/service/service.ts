@@ -1,5 +1,6 @@
 // This component could be used to define functions that interact with the Backend
 
+import { List } from "postcss/lib/list";
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 
@@ -623,22 +624,27 @@ async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
         return Promise.reject(new Error("Could not obtain user energy history!"));
 }
 
-async function getTotalTimeStudyThisWeek() {
+export type WeekTimeStudy = {
+    year: number,
+    week: number,
+    minutes: number
+}
+async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
     const request = {
-        path: `study-tracker/users/me/statistics/time-study`,
+        path: `study-tracker/users/me/statistics/study-time`,
         method: "GET",
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: DailyEnergyStatusDto[] = await response.json()
-        return responseObject.map((value) => toDomain(value))
+        const responseObject: WeekTimeStudy[] = await response.json()
+        return responseObject
     } else
         return Promise.reject(new Error("Could not obtain total time study this week!"));
 }
 
 async function incrementStudyTimeInWeek(year: number, week: number, minutes: number) {
     const request = {
-        path: `study-tracker/users/me/statistics/time-study`,
+        path: `study-tracker/users/me/statistics/study-time`,
         method: "POST",
         body: toJsonBody({
             year, week, minutes
@@ -682,5 +688,6 @@ export const service = {
     getTaskDistributionStats,
     getDailyTasksProgress,
     fetchEnergyHistory,
+    getStudyTimeByWeek,
     incrementStudyTimeInWeek
 };

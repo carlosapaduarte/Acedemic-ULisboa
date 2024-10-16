@@ -1,6 +1,8 @@
-import { service } from "~/service/service";
+import { service, WeekTimeStudy } from "~/service/service";
 import styles from "./statistics.module.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { utils } from "~/utils";
 
 function ThisWeekDate() {
     const today = new Date()
@@ -25,32 +27,65 @@ function ThisWeekDate() {
     )
 }
 
-function ThisWeekFocusStats({} : {}) {
+function ThisWeekFocusStats({weekStats} : {weekStats: WeekTimeStudy}) {
+    function toHoursAndMinutesStr(totalMinutes: number): string {
+        const hours = Math.trunc(totalMinutes / 60)
+        const minutes = totalMinutes - hours * 60
+        return `${hours} hours and ${minutes} minutes`
+    }
+
     return (
         <>
             <ThisWeekDate />
-            <span>Total time study</span>
-            <span>blablabla</span>
+            <span className={styles.focusContainerCurWeekStatisticTitle}>Total time study</span>
+            <br/><br/>
+            <span className={styles.focusContainerCurWeekStatisticValue}>{toHoursAndMinutesStr(weekStats.minutes)}</span>
 
-            <span>Average attention span</span>
-            <span>blablabla</span>
+            <br/><br/>
+
+            <span className={styles.focusContainerCurWeekStatisticTitle}>Average attention span</span>
+            <br/><br/>
+            <span className={styles.focusContainerCurWeekStatisticValue}>blablabla</span>
         </>
     )
 }
 
 function useFocusStats() {
+    const setError = useSetGlobalError();
+    const [studyTimeByWeek, setStudyTimeByWeek] = useState<WeekTimeStudy[] | undefined>(undefined)
+    
     useEffect(() => {
-        service.getTotalTimeStudyThisWeek()
+        service.getStudyTimeByWeek()
+            .then((res) => setStudyTimeByWeek(res))
+            .catch((error) => setError(error));
     }, [])
+
+    function getCurrentWeekStudyTime(): WeekTimeStudy | undefined {
+        const today = new Date()
+        const currentWeekNumber = utils.getWeekNumber(today)
+        return studyTimeByWeek?.find((value: WeekTimeStudy) => 
+            value.year == today.getFullYear() && value.week == currentWeekNumber
+        )
+    }
+
+    return {studyTimeByWeek, getCurrentWeekStudyTime}
 }
 
 export function FocusStats() {
+    const {studyTimeByWeek, getCurrentWeekStudyTime} = useFocusStats()
+
+    const curWeekStats = getCurrentWeekStudyTime()
+
     return (
         <div className={styles.statsContainer}>
-            <div className={styles.statTitle}>
+            <div className={styles.statsContainerTitle}>
                 (O) Focus
             </div>
-            <ThisWeekFocusStats />
+            {curWeekStats ?
+                <ThisWeekFocusStats weekStats={curWeekStats} />
+                :
+                <></>
+            }
         </div>
     )
 }

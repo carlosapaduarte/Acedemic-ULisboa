@@ -1,4 +1,5 @@
 .statsContainer {
+    padding: 15px;
     width: 50%;
     margin: auto;
 
@@ -10,13 +11,13 @@
     border-radius: 10px;
 }
 
-.statTitle {
-    width: 15%;
+.statsContainerTitle {
+    width: 20%;
     position: relative;
-    top: -10px;
-    left: -3px;
+    top: -25px;
+    left: -17px;
     background-color: var(--secondary-color);
-    padding: 0.5%;
+    padding: 0.7%;
     text-align: center;
 
     font-weight: bolder;
@@ -73,7 +74,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2%;
 }
 
 .historyTitle {
@@ -89,4 +89,14 @@
 .historyStatusAndDate {
     display: flex;
     justify-content: space-evenly;
+}
+
+.focusContainerCurWeekStatisticTitle {
+    color: var(--secondary-color);
+    font-weight: bolder;
+    font-size: x-large;
+}
+
+.focusContainerCurWeekStatisticValue {
+    font-size: larger;
 }

@@ -115,7 +115,7 @@ export function EnergyStats() {
     return (
         <>
             <div className={styles.statsContainer}>
-                <div className={styles.statTitle}>
+                <div className={styles.statsContainerTitle}>
                     (O) Energy
                 </div>
                 <TodayEnergyStatus status={getTodayEnergyStatus()} />

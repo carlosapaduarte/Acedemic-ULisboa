@@ -235,14 +235,14 @@ def get_task_time_distribution(
 ) ->  dict[int, dict[int, dict[str, int]]]:
     return study_tracker_service.get_task_time_distribution(user_id)
 
-@router.get("/users/me/statistics/time-study")
-def get_total_time_study_per_week(
+@router.get("/users/me/statistics/study-time")
+def get_study_time_by_week(
     user_id: Annotated[int, Depends(get_current_user_id)]
 ) ->  list[WeekTimeStudyOutputDto]:
     domain = study_tracker_service.get_total_time_study_per_week(user_id)
     return WeekTimeStudyOutputDto.from_domain(domain)
 
-@router.put("/users/me/statistics/time-study")
+@router.put("/users/me/statistics/study-time")
 def increment_week_study_time(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: IncreaseWeekStudyTime
