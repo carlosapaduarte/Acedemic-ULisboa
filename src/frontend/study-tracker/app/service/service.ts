@@ -627,11 +627,12 @@ async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
 export type WeekTimeStudy = {
     year: number,
     week: number,
-    minutes: number
+    total: number, // in minutes
+    averageBySession: number // in minutes
 }
 async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
     const request = {
-        path: `study-tracker/users/me/statistics/study-time`,
+        path: `study-tracker/users/me/statistics/week-study-time`,
         method: "GET",
     };
     const response: Response = await doFetch(request);
@@ -642,15 +643,26 @@ async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
         return Promise.reject(new Error("Could not obtain total time study this week!"));
 }
 
-async function incrementWeekStudyTime(year: number, week: number, minutes: number) {
+async function incrementWeekStudyTime(year: number, week: number, time: number) {
     const request = {
-        path: `study-tracker/users/me/statistics/study-time`,
+        path: `study-tracker/users/me/statistics/week-study-time/total`,
         method: "PUT",
-        body: toJsonBody({year, week, minutes})
+        body: toJsonBody({year, week, time})
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
         return Promise.reject(new Error("Could not update study time!"));
+}
+
+async function updateWeekAverageAttentionSpan(year: number, week: number, time: number) {
+    const request = {
+        path: `study-tracker/users/me/statistics/week-study-time/average-per-session`,
+        method: "PUT",
+        body: toJsonBody({year, week, time})
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not update week average study attention span!"));
 }
 
 export const service = {
@@ -687,5 +699,6 @@ export const service = {
     getDailyTasksProgress,
     fetchEnergyHistory,
     getStudyTimeByWeek,
-    incrementWeekStudyTime
+    incrementWeekStudyTime,
+    updateWeekAverageAttentionSpan
 };

@@ -150,7 +150,8 @@ class DailyEnergyStatusOutputDto(BaseModel):
 class WeekTimeStudyOutputDto(BaseModel):
     year: int
     week: int
-    minutes: int
+    total: int
+    averageBySession: float
     
     @staticmethod
     def from_domain(domain: list[WeekTimeStudy]) -> list["WeekTimeStudyOutputDto"]:
@@ -160,7 +161,8 @@ class WeekTimeStudyOutputDto(BaseModel):
                 WeekTimeStudyOutputDto(
                     year=record.week_and_year.year,
                     week=record.week_and_year.week,    
-                    minutes=record.minutes
+                    total=record.total,
+                    averageBySession=record.average_by_session
                 )
             )
         return dtos

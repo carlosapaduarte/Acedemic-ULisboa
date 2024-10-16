@@ -290,7 +290,9 @@ class WeekStudyTimeModel(SQLModel, table=True):
 
     year: int = Field(primary_key=True, default=None)
     week: int = Field(primary_key=True, default=None)
-    minutes: int
+    total: int
+    average_by_session: float
+    n_of_sessions: int
 
     user_id: int = Field(foreign_key="user.id")    
     user: UserModel = Relationship(back_populates="week_study_time")

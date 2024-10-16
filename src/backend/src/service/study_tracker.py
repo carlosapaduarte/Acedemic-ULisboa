@@ -136,3 +136,6 @@ def get_total_time_study_per_week(user_id: int) -> list[WeekTimeStudy]:
 
 def increment_week_study_time(user_id: int, week_and_year: WeekAndYear, minutes: int):
     study_tracker_repo.increment_week_study_time(user_id, week_and_year, minutes)
+    
+def update_week_time_average_study_time(user_id: int, week_and_year: WeekAndYear, study_session_time: int):
+    study_tracker_repo.update_week_time_average_study_time(user_id, week_and_year, study_session_time)

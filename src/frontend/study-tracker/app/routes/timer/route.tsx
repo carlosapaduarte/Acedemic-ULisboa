@@ -26,9 +26,18 @@ function useTimerSetup() {
 
     function onStudySessionMinuteElapsed() {
         const today = new Date()
-        console.log(utils.getWeekNumber(today))
         service.incrementWeekStudyTime(today.getFullYear(), utils.getWeekNumber(today), 1) // Increments by one, each minutes it passes.
             .catch((error) => setError(error));
+    }
+
+    function onStopClick(minutesElapsed: number) {
+        const today = new Date()
+        service.updateWeekAverageAttentionSpan(today.getFullYear(), utils.getWeekNumber(today), minutesElapsed)
+            .catch((error) => setError(error));
+
+        setStudyStopDate(undefined)
+        setPauseStopDate(undefined)
+        setTimerStopDate(undefined)
     }
 
     function onTimerFinish() {
@@ -42,8 +51,8 @@ function useTimerSetup() {
         timerStopDate,
         onTimeSelected,
         studyStopDate,
-        setStudyStopDate,
         onStudySessionMinuteElapsed,
+        onStopClick,
         onTimerFinish
     }
 }
@@ -114,8 +123,8 @@ function SetupAndStartTimer({ associatedTasks }: { associatedTasks: Task[] }) {
         timerStopDate,
         onTimeSelected,
         studyStopDate,
-        setStudyStopDate,
         onStudySessionMinuteElapsed,
+        onStopClick,
         onTimerFinish
     } = useTimerSetup();
 
@@ -131,7 +140,7 @@ function SetupAndStartTimer({ associatedTasks }: { associatedTasks: Task[] }) {
                     title={title} 
                     onMinuteElapsed={timerStopDate ? onStudySessionMinuteElapsed : () => {}}
                     stopDate={timerStopDate} 
-                    onStopClick={() => setStudyStopDate(undefined)}
+                    onStopClick={onStopClick}
                     onFinish={onTimerFinish} 
                 />
                 <AssociatedTaskListView associatedTasks={associatedTasks} />
@@ -152,8 +161,8 @@ function StartTimerByStudyBlock({ associatedTasks, happeningStudyBlock }:
         timerStopDate,
         onTimeSelected,
         studyStopDate,
-        setStudyStopDate,
         onStudySessionMinuteElapsed,
+        onStopClick,
         onTimerFinish
     } = useTimerSetup();
 
@@ -162,11 +171,11 @@ function StartTimerByStudyBlock({ associatedTasks, happeningStudyBlock }:
 
     return (
         <div>
-            <Timer 
+            <Timer
                 title={timerTitleMsg}
                 onMinuteElapsed={onStudySessionMinuteElapsed}
                 stopDate={happeningStudyBlock.endDate}
-                onStopClick={() => setStudyStopDate(undefined)}
+                onStopClick={onStopClick}
                 onFinish={onTimerFinish} 
             />
             <AssociatedTaskListView associatedTasks={associatedTasks} />

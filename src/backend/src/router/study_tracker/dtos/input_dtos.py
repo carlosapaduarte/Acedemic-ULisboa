@@ -67,7 +67,7 @@ class CreateDailyEnergyStatus(BaseModel):
     date: float
     level: int
     
-class IncreaseWeekStudyTime(BaseModel):
+class UpdateWeekStudyTime(BaseModel):
     year: int
     week: int
-    minutes: int
+    time: int # in minutes

@@ -39,13 +39,13 @@ function ThisWeekFocusStats({weekStats} : {weekStats: WeekTimeStudy}) {
             <ThisWeekDate />
             <span className={styles.focusContainerCurWeekStatisticTitle}>Total time study</span>
             <br/><br/>
-            <span className={styles.focusContainerCurWeekStatisticValue}>{toHoursAndMinutesStr(weekStats.minutes)}</span>
+            <span className={styles.focusContainerCurWeekStatisticValue}>{toHoursAndMinutesStr(weekStats.total)}</span>
 
             <br/><br/>
 
             <span className={styles.focusContainerCurWeekStatisticTitle}>Average attention span</span>
             <br/><br/>
-            <span className={styles.focusContainerCurWeekStatisticValue}>blablabla</span>
+            <span className={styles.focusContainerCurWeekStatisticValue}>{weekStats.averageBySession} minutes</span>
         </>
     )
 }

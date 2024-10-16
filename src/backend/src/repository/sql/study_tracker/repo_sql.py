@@ -558,12 +558,38 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 new_model = WeekStudyTimeModel(
                     year=week_and_year.year,
                     week=week_and_year.week,
-                    minutes=minutes,
+                    total=minutes,
+                    average_by_session=0,
+                    n_of_sessions=0,
                     user_id=user_id
                 )
                 session.add(new_model)
                 session.commit()
             else:
-                week_study_time_model.minutes += minutes
+                week_study_time_model.total += minutes
+                session.add(week_study_time_model)
+                session.commit()
+                
+    def update_week_time_average_study_time(self, user_id: int, week_and_year: WeekAndYear, study_session_time: int):
+        with Session(engine) as session:
+            statement = select(WeekStudyTimeModel)\
+                .where(WeekStudyTimeModel.user_id == user_id)\
+                .where(WeekStudyTimeModel.year == week_and_year.year)\
+                .where(WeekStudyTimeModel.week == week_and_year.week)
+                    
+            result = session.exec(statement)
+            week_study_time_model: WeekStudyTimeModel | None = result.first()
+            
+            if week_study_time_model is None:
+                raise # TODO!
+            else:
+                if week_study_time_model.average_by_session is 0:
+                    new_average = study_session_time    
+                else:
+                    new_average = ((week_study_time_model.average_by_session * week_study_time_model.n_of_sessions) + study_session_time) / (week_study_time_model.n_of_sessions + 1)
+                    new_average = round(new_average, 1)
+                
+                week_study_time_model.average_by_session = new_average
+                week_study_time_model.n_of_sessions += 1
                 session.add(week_study_time_model)
                 session.commit()
