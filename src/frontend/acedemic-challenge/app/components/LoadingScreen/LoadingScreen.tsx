@@ -38,8 +38,8 @@ function LoadingScreen() {
                     <h1 className={styles.aceText}>ACE</h1>
                     <h1 className={styles.demicText}>DEMIC</h1>
                 </div>
-                <div className={styles.trackerAndCheckboxContainer}>
-                    <h1 className={styles.trackerText}>TRACKER</h1>
+                <div className={styles.challengeAndCheckboxContainer}>
+                    <h1 className={styles.challengeText}>CHALLENGE</h1>
                     <div className={styles.checkBox} style={{marginLeft: "0.5rem"}}>
                     </div>
                 </div>

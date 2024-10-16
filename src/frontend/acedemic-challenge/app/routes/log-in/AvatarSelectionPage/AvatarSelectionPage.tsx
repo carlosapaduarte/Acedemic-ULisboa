@@ -1,4 +1,4 @@
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import React, { useEffect } from "react";
 import styles from "./avatarSelectionPage.module.css";
@@ -19,7 +19,7 @@ function useAvatarSelection(
     }: {
         onComplete: () => void;
     }) {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
     const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
     const [avatars, setAvatars] = React.useState<string[]>([]);
 

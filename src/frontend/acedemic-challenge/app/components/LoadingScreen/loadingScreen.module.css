@@ -1,0 +1,77 @@
+
+.loadingOverlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 100000;
+    background-color: var(--primary-color);
+}
+
+.loadingOverlay.fadeOut {
+    animation: fadeOut 0.5s forwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes fadeOut {
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+.loadingScreen {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-family2), sans-serif;
+}
+
+.contentContainer {
+    padding: 0 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.acedemicTextContainer {
+    display: flex;
+    align-items: center;
+}
+
+.aceText {
+    font-size: 3.5rem;
+    color: var(--secondary-color);
+    font-weight: 900;
+}
+
+.demicText {
+    font-size: 3rem;
+    color: var(--primary-text-color);
+}
+
+.challengeAndCheckboxContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.challengeText {
+    font-size: 2rem;
+    color: var(--primary-text-color);
+}

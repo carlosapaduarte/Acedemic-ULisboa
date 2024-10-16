@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DayGoals, Goal } from "~/challenges/types";
 import { Batch, CompletedGoal, service, UserInfo, UserNote } from "~/service/service";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { Level1 } from "~/challenges/level_1";
 import { Level2 } from "~/challenges/level_2";
 import { Level3 } from "~/challenges/level_3";
@@ -40,7 +40,7 @@ function getTodayCompletedGoals(batch: Batch): number[] {
 function useMainDashboardContent() {
     // In reality, there could be multiple Goals per day!!!
 
-    const setError = useSetError();
+    const setError = useSetGlobalError();
     const [newNoteText, setNewNoteText] = useState("");
 
     const [userInfo, setUserInfo] = useState<UserInfo>();

@@ -1,4 +1,4 @@
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { useEffect, useState } from "react";
 import { DayGoals, Goal } from "~/challenges/types";
 import { service, UserInfo, UserNote } from "~/service/service";
@@ -6,7 +6,7 @@ import { utils } from "~/utils";
 import { CalendarDay } from "~/routes/calendar/components/MyCalendar/MyCalendar";
 
 export function useCalendar() {
-    const setError = useSetError();
+    const setError = useSetGlobalError();
 
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [goals, setGoals] = useState<DayGoals[] | undefined>(undefined);
