@@ -1,9 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useTimer from "react-timer-hook";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { service } from "~/service/service";
+import { utils } from "~/utils";
 
-export function Timer({ title, stopDate, onStopClick, onFinish }: {
+export function Timer({ title, onMinuteElapsed, stopDate, onStopClick, onFinish}: {
     title: string,
+    onMinuteElapsed: () => void
     stopDate: Date,
     onStopClick: () => void,
     onFinish: () => void
@@ -23,11 +27,21 @@ export function Timer({ title, stopDate, onStopClick, onFinish }: {
         restart
     } = // @ts-ignore
         useTimer({ expiryTimestamp: stopDate, onExpire: onFinish });
+    
+    // Just a simple variable to help to figure when to call onMinuteElapsed()
+    const [count, setCount] = useState(0)
 
     // This should not be necessary, but, whenever argument [stopDate] changes, the counter doesn't restart, despite the change in [stopDate]
     useEffect(() => {
         restart(stopDate);
-    }, [stopDate]);
+    }, [stopDate])
+
+    useEffect(() => {
+        if (count >= 2)
+            onMinuteElapsed()
+        else
+            setCount(count + 1)
+    }, [minutes])
 
     return (
         <div style={{ textAlign: "center", padding: "1rem" }}>

@@ -642,13 +642,11 @@ async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
         return Promise.reject(new Error("Could not obtain total time study this week!"));
 }
 
-async function incrementStudyTimeInWeek(year: number, week: number, minutes: number) {
+async function incrementWeekStudyTime(year: number, week: number, minutes: number) {
     const request = {
         path: `study-tracker/users/me/statistics/study-time`,
-        method: "POST",
-        body: toJsonBody({
-            year, week, minutes
-        })
+        method: "PUT",
+        body: toJsonBody({year, week, minutes})
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -689,5 +687,5 @@ export const service = {
     getDailyTasksProgress,
     fetchEnergyHistory,
     getStudyTimeByWeek,
-    incrementStudyTimeInWeek
+    incrementWeekStudyTime
 };

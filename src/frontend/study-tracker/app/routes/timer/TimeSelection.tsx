@@ -15,10 +15,6 @@ function useSelectTime(onTimeSelected: (studyStopDate: Date, pauseStopDate: Date
         pauseStopDate.setMinutes(pauseStopDate.getMinutes() + pauseMinutes);
 
         onTimeSelected(studyStopDate, pauseStopDate);
-
-        const today = new Date()
-
-        service.incrementStudyTimeInWeek(today.getFullYear(), utils.getWeekNumber(today), studyMinutes)
     }
 
     return { studyMinutes, setStudyMinutes, pauseMinutes, setPauseMinutes, onConfirmButtonClick };
