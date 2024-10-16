@@ -77,7 +77,12 @@ function AssociatedTaskListView({ associatedTasks }: { associatedTasks: Task[] }
 
     return (
         <div>
-            <TaskList tasks={associatedTasks} onTaskClick={undefined} onTaskStatusUpdated={undefined} />
+            <TaskList tasks={associatedTasks}
+                      onTaskClick={() => {
+                      }}
+                      onTaskStatusUpdated={() => {
+                      }}
+            />
             <button onClick={() => setShowCreateTask(!showCreateTask)}>{newTaskButtonMsg}</button>
             {/*{showCreateTask ?
                 <CreateTaskView onTaskCreated={onTaskCreated} />

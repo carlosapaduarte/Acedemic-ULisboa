@@ -1,4 +1,4 @@
-import { useTags } from "~/routes/commons";
+
 import React, { useMemo, useState } from "react";
 import { CreateTask, service, Task } from "~/service/service";
 
@@ -10,6 +10,7 @@ import classNames from "classnames";
 import { CreateTaskForm } from "~/routes/tasks/CreateTask/CreateTaskForm/CreateTaskForm";
 import { SecondModalContext } from "./SecondModalContext";
 import { useTranslation } from "react-i18next";
+import { useTags } from "~/hooks/useTags";
 
 
 function useCreateNewTask() {
@@ -161,7 +162,7 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
                                         taskData: {
                                             title,
                                             description: description ?? "",
-                                            deadline: deadline ?? new Date(),
+                                            deadline: deadline,
                                             priority: "importante", // TODO: change in backend to have "low", "medium", and "high" priorities
                                             tags,
                                             status: status ?? "unfinished"
@@ -215,7 +216,7 @@ export function CreateTaskButton({ onTaskCreated }: { onTaskCreated: (task: Task
     return (
         <ModalWrapper onTaskCreated={onTaskCreated}>
             <Button className={classNames(styles.createNewTaskButton)}>
-                {t("task:create_new_task")}
+                + {t("task:create_new_task")}
             </Button>
         </ModalWrapper>
     );

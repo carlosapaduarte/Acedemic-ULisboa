@@ -200,6 +200,14 @@
     text-transform: uppercase;
 
     border-radius: 10px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+        height: 100%;
+    }
 }
 
 .settingsButtons {

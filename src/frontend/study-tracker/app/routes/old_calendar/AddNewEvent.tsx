@@ -2,7 +2,8 @@ import { ChangeEvent, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import { utils } from "~/utils";
-import { CategoryAndTagsPicker, useTags } from "../commons";
+import { useTags } from "~/hooks/useTags";
+import { CategoryAndTagsPicker } from "~/components/CategoryAndTagsPicker/CategoryAndTagsPicker";
 
 export function AddEvent({ startDate, onNewEventCreated }: { startDate: Date, onNewEventCreated: () => void }) {
     const {
@@ -47,7 +48,8 @@ function useAddEvent(startDate: Date, onNewEventCreated: () => void) {
             title,
             startDate,
             endDate,
-            tags
+            tags,
+            everyWeek: false
         })
             .then(() => onNewEventCreated())
             .catch((error) => setError(error));

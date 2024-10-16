@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Task } from "~/service/service";
-import { TaskList, useTaskList } from "~/routes/tasks/TaskList";
+import { TaskList } from "~/routes/tasks/TaskList";
 import { useTranslation } from "react-i18next";
+import { useTaskList } from "~/routes/tasks/useTaskList";
 
 export function SelectAssociatedTasks({ onTasksSelected }: { onTasksSelected: (tasks: Task[]) => void }) {
     // Lists tasks and allows to select pick those tasks (except Tasks that are concluded!)

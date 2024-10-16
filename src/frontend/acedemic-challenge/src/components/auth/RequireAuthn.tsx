@@ -10,7 +10,7 @@ export function RequireAuthn({children}: { children: React.ReactNode }): React.R
     const location = useLocation()
 
     if (isLoggedIn === undefined) {
-        logger.debug("Waiting for authentication information")
+        /*logger.debug("Waiting for authentication information")*/
         return <></>
     } else if (isLoggedIn) {
         logger.debug("User is logged in")

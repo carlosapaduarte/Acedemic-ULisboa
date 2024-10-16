@@ -1,11 +1,7 @@
 @import "../../components/Checkbox/checkbox.module.css";
 
 .tasksPage {
-    padding: 1rem;
-}
-
-.tasksListTitle {
-    font-size: 1.5rem;
+    padding: 1rem clamp(1rem, 10vw - 1rem, 6rem);
 }
 
 .createTaskTitle {
@@ -38,44 +34,4 @@
 .openCategoryButton {
     padding: 0.5rem;
     background-color: lightblue;
-}
-
-.checkboxAndTitleContainer {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.checkBox {
-    flex-grow: 0;
-    flex-shrink: 0;
-    margin-left: 0;
-    width: 1.5rem;
-    height: 1.5rem;
-
-    background-color: var(--primary-color);
-
-    border-width: 2px;
-
-    box-sizing: border-box;
-}
-
-.checkBox::after {
-    bottom: -3px;
-    left: 0;
-
-    background-repeat: no-repeat;
-    background-position: left center;
-    background-size: contain;
-}
-
-.taskTitle {
-    padding-left: 10px;
-
-    font-size: 1.25rem;
-    flex-grow: 1;
-}
-
-.taskTitle.strikeThrough {
-    text-decoration: line-through;
 }

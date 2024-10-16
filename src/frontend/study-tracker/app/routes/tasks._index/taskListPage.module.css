@@ -1,0 +1,17 @@
+
+.taskListPage {
+    animation: fade 300ms ease;
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.tasksListTitle {
+    font-size: 1.5rem;
+}

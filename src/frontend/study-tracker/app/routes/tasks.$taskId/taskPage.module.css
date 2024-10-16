@@ -1,0 +1,82 @@
+@import "@/components/Checkbox/checkbox.module.css";
+
+.taskPage {
+    animation: fade 300ms ease;
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.mainTaskContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkboxAndTitleContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.taskTitle {
+    flex-grow: 1;
+
+    font-size: 1.5rem;
+    font-weight: 900;
+
+    &.finished {
+        /*text-decoration: line-through;*/
+    }
+}
+
+.mainTaskCheckbox {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.editButton {
+    flex: 0 0 auto;
+
+    width: 4rem;
+    height: 4rem;
+
+    background-color: var(--secondary-color);
+
+    border-radius: 50%;
+
+    &:hover {
+        background-color: var(--secondary-color-hover);
+    }
+}
+
+.description {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.noDescription {
+    font-size: 1rem;
+    font-weight: 700;
+    opacity: 0.5;
+}
+
+.noDeadline {
+    opacity: 0.5;
+}
+
+.noTags {
+    opacity: 0.5;
+}
+
+.noSubtasks {
+    font-size: 1rem;
+    font-weight: 700;
+    opacity: 0.5;
+}

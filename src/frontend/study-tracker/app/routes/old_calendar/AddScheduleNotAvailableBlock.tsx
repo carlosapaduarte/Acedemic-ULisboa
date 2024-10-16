@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { WeekDayHourPicker } from "~/components/WeekDayHourPicker/WeekDayHourPicker";
+import { WeekDayAndHour } from "~/hooks/useWeekDayHourPicker/useWeekDayHourPicker";
 import { service } from "~/service/service";
-import { WeekDayAndHour, WeekDayAndHourPicker } from "../commons";
 
 function useAddScheduleNotAvailableBlock() {
     const [weekDayAndHour, setWeekDayAndHour] = useState<WeekDayAndHour | undefined>(undefined);
@@ -54,7 +55,7 @@ export function AddScheduleNotAvailableBlock() {
 
     return (
         <div>
-            <WeekDayAndHourPicker onConfirm={setWeekDayAndHour} />
+            <WeekDayHourPicker onConfirm={setWeekDayAndHour} />
             <DurationPicker onDurationChange={setDuration} />
             {weekDayAndHour && duration ?
                 <button onClick={() => createNotAvailableBlockAndClearValues(weekDayAndHour, duration)}>

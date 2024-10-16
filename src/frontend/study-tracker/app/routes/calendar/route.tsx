@@ -7,12 +7,12 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar.css";
 import "./CreateEvent/createEventReactAriaModal.css";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { useTags } from "../commons";
 import styles from "./calendarPage.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { CreateEventModal } from "./CreateEvent/CreateEvent";
 import { useTranslation } from "react-i18next";
 import { EditEventModal } from "./CreateEvent/EditEvent";
+import { useTags } from "~/hooks/useTags";
 
 const localizer = momentLocalizer(moment);
 

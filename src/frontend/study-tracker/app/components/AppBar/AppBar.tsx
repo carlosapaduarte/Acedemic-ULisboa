@@ -51,19 +51,19 @@ function SideBarNavButton({ text, url, iconUrl, setIsSideBarOpen }: {
 function SideBarNavigationMenu({ setIsSideBarOpen }: { setIsSideBarOpen: (isOpen: boolean) => void }) {
     return (
         <>
-            <SideBarNavButton text="Calendar" url={"/calendar"} iconUrl={"calendar_icon.png"}
+            <SideBarNavButton text="Calendar" url={"/calendar"} iconUrl={"icons/calendar_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Schedule" url={"/calendar"} iconUrl={"schedule_icon.png"}
+            <SideBarNavButton text="Schedule" url={"/calendar"} iconUrl={"icons/schedule_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Tasks" url={"/tasks"} iconUrl={"tasks_icon.png"}
+            <SideBarNavButton text="Tasks" url={"/tasks"} iconUrl={"icons/tasks_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Notes" url={"/archives"} iconUrl={"notes_icon.png"}
+            <SideBarNavButton text="Notes" url={"/archives"} iconUrl={"icons/notes_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Study!" url={"/timer"} iconUrl={"study_icon.png"}
+            <SideBarNavButton text="Study!" url={"/timer"} iconUrl={"icons/study_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Statistics" url={"/statistics"} iconUrl={"statistics_icon.png"}
+            <SideBarNavButton text="Statistics" url={"/statistics"} iconUrl={"icons/statistics_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Badges" url={"/badges"} iconUrl={"badges_icon.png"}
+            <SideBarNavButton text="Badges" url={"/badges"} iconUrl={"icons/badges_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
         </>
     );
@@ -129,7 +129,7 @@ export function AppBar() {
                 {appBarVariant === "default" && (
                     <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
                         <button className={styles.homeButton}>
-                            Home
+                            <img src="/icons/home_icon.svg" alt="Home Icon" />
                         </button>
                     </div>
                 )}

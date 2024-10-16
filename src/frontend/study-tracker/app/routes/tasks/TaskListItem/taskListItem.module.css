@@ -1,0 +1,55 @@
+
+.checkboxAndTitleContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkboxContainer {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.checkboxAndTitleContainer .checkboxContainer .listCheckbox {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 2px;
+}
+
+.taskTitleContainer {
+    max-width: 100%;
+    flex-grow: 1;
+
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+
+    display: flex;
+
+    background-color: transparent;
+    border-radius: 0.25rem;
+
+    overflow: hidden;
+
+    &.strikeThrough {
+        text-decoration: line-through;
+    }
+
+    &:hover {
+        text-decoration: underline;
+        background-color: #dc9510;
+    }
+
+    &:hover.strikeThrough {
+        text-decoration: underline line-through;
+    }
+}
+
+.taskTitle {
+    max-width: 100%;
+    text-align: left;
+    font-size: 1rem;
+
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

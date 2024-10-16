@@ -1,9 +1,9 @@
 import { service } from "~/service/service";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { useWeekDayAndHourPicker, weekDays } from "../../commons";
 import styles from "./planDaySelectionPage.module.css";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
+import { useWeekDayHourPicker, weekDays } from "~/hooks/useWeekDayHourPicker/useWeekDayHourPicker";
 
 function usePlanDaySelection(onProceed: () => void) {
     const setError = useSetGlobalError();
@@ -22,7 +22,7 @@ export function PlanDaySelectionPage({ onProceed }: { onProceed: () => void }) {
 
     const { submitPlanDaySelection } = usePlanDaySelection(onProceed);
 
-    const { weekDay, hour, setWeekDay, setHour } = useWeekDayAndHourPicker();
+    const { weekDay, hour, setWeekDay, setHour } = useWeekDayHourPicker();
 
     return (
         <div className={styles.pageContainer}>

@@ -17,7 +17,7 @@
     margin-top: 1rem;
 }
 
-.pageInnerContainer h1, h2 {
+.pageInnerContainer h1, .pageInnerContainer h2 {
     color: var(--secondary-color);
 }
 
