@@ -9,23 +9,26 @@ function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[
     return (
         <div className={styles.focusWeeksContainer}>
             {
-                weekStudyTimeHistory.slice(0, 3).map((weekData, index) => {
-                    const date = utils.getDateFromWeekNumber(weekData.year, weekData.week)
-                    return (
-                        <div key={index} className={styles.focusWeekContainer}>
-                            <div className={styles.focusWeekLabel}>
-                                <span className={styles.containerHeaderDate}>
-                                    {getWeekIntervalStr(date)}
-                                </span>
-                            </div>
-                            <div className={styles.focusWeekProgressBarContainer}>
-                                <div className={styles.focusWeekProgressBar}
-                                    style={{ "--bar-width": `${weekData.total / maxHours * 100}%` } as React.CSSProperties}>
+                weekStudyTimeHistory
+                    .sort((week1: WeekTimeStudy, week2: WeekTimeStudy) => week1.week + week2.week) // latest weeks first
+                    .slice(0, 3).map((weekData, index) => {
+                        const date = utils.getDateFromWeekNumber(weekData.year, weekData.week)
+                        const weekStudyTimeTarget = weekData.target
+                        return (
+                            <div key={index} className={styles.focusWeekContainer}>
+                                <div className={styles.focusWeekLabel}>
+                                    <span className={styles.containerHeaderDate}>
+                                        {getWeekIntervalStr(date)}
+                                    </span>
+                                </div>
+                                <div className={styles.focusWeekProgressBarContainer}>
+                                    <div className={styles.focusWeekProgressBar}
+                                        style={{ "--bar-width": `${weekData.total / weekStudyTimeTarget * 100}%` } as React.CSSProperties}>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )
-                })
+                        )
+                    })
             }
         </div>
     )
