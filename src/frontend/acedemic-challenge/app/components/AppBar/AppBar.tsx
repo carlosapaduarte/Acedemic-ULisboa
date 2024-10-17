@@ -63,7 +63,7 @@ export function AppBar() {
             {appBarVariant === "default" && (
                 <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
                     <CutButton className={styles.homeButton}>
-                        Home
+                        <img src="/icons/home_icon.svg" alt="Home Icon" />
                     </CutButton>
                 </div>
             )}

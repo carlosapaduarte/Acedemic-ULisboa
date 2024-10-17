@@ -54,16 +54,25 @@
 }
 
 .homeButton {
-    background-color: var(--secondary-color);
-    color: black;
     width: 4rem;
     height: 3rem;
+
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
 
     text-align: center;
     font-size: large;
     font-weight: bold;
 
     --edge-size: 0.75rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+        height: 100%;
+    }
 }
 
 .settingsButtons {
