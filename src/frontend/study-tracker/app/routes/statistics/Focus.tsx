@@ -3,6 +3,7 @@ import styles from "./statistics.module.css";
 import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
+import classNames from "classnames";
 
 function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
     const maxHours = 200;
@@ -13,7 +14,7 @@ function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[
                     const date = utils.getDateFromWeekNumber(weekData.year, weekData.week)
                     return (
                         <div key={index} className={styles.focusWeekContainer}>
-                            <div>
+                            <div className={styles.focusWeekLabel}>
                                 <span className={styles.containerHeaderDate}>
                                     {getWeekIntervalStr(date)}
                                 </span>
@@ -135,7 +136,7 @@ export function FocusStats() {
 
     return (
         <div className={styles.statsContainer}>
-            <div className={styles.historyTitleAndSeeMore}>
+            <div className={styles.statsContainerTitleAndDateDiv}>
                 <div className={styles.statsContainerTitle}>
                     (O) Focus
                 </div>

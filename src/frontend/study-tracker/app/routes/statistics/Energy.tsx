@@ -54,7 +54,7 @@ function levelToColor(level: number): string {
 function TodayDate() {
     const today = new Date();
     return (
-        <div className={styles.todayDate}>
+        <div className={styles.containerHeaderDate}>
             TODAY, {today.getDate()} {today.toLocaleString("default", { month: "long" })}
         </div>
     );
@@ -63,8 +63,6 @@ function TodayDate() {
 function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }) {
     return (
         <>
-            <TodayDate />
-            <br /><br />
             {status ?
                 <span className={classNames(levelToColor(status.level), styles.todayEnergyStatusTitle)}>
                     (SYMBOL) I feel {levelToStr(status.level)}
@@ -115,9 +113,13 @@ export function EnergyStats() {
     return (
         <>
             <div className={styles.statsContainer}>
-                <div className={styles.statsContainerTitle}>
-                    (O) Energy
+                <div className={styles.statsContainerTitleAndDateDiv}>
+                    <div className={styles.statsContainerTitle}>
+                        (O) Energy
+                    </div>
+                    <TodayDate />
                 </div>
+                
                 <TodayEnergyStatus status={getTodayEnergyStatus()} />
 
                 <br /><br />
