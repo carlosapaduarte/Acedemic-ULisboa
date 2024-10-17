@@ -49,8 +49,8 @@ function getWeekNumber(date: Date): number {
 
 // d1 should be greater than d2
 function elapsedMinutes(d1: Date, d2: Date): number {
-    const diff = d1.getTime() - d2.getTime()
-    return Math.trunc(diff / 1000 / 60) // Converts to minutes
+    const diff = d1.getTime() - d2.getTime();
+    return Math.trunc(diff / 1000 / 60); // Converts to minutes
 }
 
 export const utils = {

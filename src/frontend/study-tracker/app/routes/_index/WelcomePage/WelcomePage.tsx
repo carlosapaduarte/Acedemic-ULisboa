@@ -32,7 +32,7 @@ export default function WelcomePage() {
         <div className={classNames(styles.welcomePage)}>
             <h1>
                 {t("welcome_page:hello_message")}
-                <br /> 
+                <br />
                 {t("welcome_page:login_to_continue")}
             </h1>
             <br />

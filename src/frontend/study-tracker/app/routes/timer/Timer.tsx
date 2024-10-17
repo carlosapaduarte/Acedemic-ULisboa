@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useTimer from "react-timer-hook";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { service } from "~/service/service";
 import { utils } from "~/utils";
 
-export function Timer({ title, onMinuteElapsed, stopDate, onStopClick, onFinish}: {
+export function Timer({ title, onMinuteElapsed, stopDate, onStopClick, onFinish }: {
     title: string,
     onMinuteElapsed: () => void
     stopDate: Date,
@@ -14,7 +12,7 @@ export function Timer({ title, onMinuteElapsed, stopDate, onStopClick, onFinish}
 }) {
     const { t } = useTranslation(["study"]);
 
-    const [startDate, setStartDate] = useState(new Date())
+    const [startDate, setStartDate] = useState(new Date());
 
     const {
         totalSeconds,
@@ -29,28 +27,28 @@ export function Timer({ title, onMinuteElapsed, stopDate, onStopClick, onFinish}
         restart
     } = // @ts-ignore
         useTimer({ expiryTimestamp: stopDate, onExpire: onFinish });
-    
+
     // Just a simple variable to help to figure when to call onMinuteElapsed()
-    const [count, setCount] = useState(0)
+    const [count, setCount] = useState(0);
 
     // This should not be necessary, but, whenever argument [stopDate] changes, the counter doesn't restart, despite the change in [stopDate]
     useEffect(() => {
         restart(stopDate);
-    }, [stopDate])
+    }, [stopDate]);
 
     // Each minutes it passes, calls onMinuteElapsed()
     useEffect(() => {
         if (count >= 2)
-            onMinuteElapsed()
+            onMinuteElapsed();
         else
-            setCount(count + 1)
-    }, [minutes])
+            setCount(count + 1);
+    }, [minutes]);
 
     function onStopClickHandler() {
-        const now = new Date()
-        const minutesElapsed = utils.elapsedMinutes(now, startDate)
-        setStartDate(now)
-        onStopClick(minutesElapsed)
+        const now = new Date();
+        const minutesElapsed = utils.elapsedMinutes(now, startDate);
+        setStartDate(now);
+        onStopClick(minutesElapsed);
     }
 
     return (

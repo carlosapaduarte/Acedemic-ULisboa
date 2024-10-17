@@ -6,37 +6,38 @@ import { service } from "~/service/service";
 
 function useHowMuchEnergyQuestionPage(onQuestionSubmitted: () => void) {
     const setError = useSetGlobalError();
-    const [level, setLevel] = useState(1)
+    const [level, setLevel] = useState(1);
 
     function onConfirmPressHandler() {
         service.createDailyEnergyStat(level)
-            .then(() => {})
+            .then(() => {
+            })
             .catch((error) => setError(error));
 
-            onQuestionSubmitted()
+        onQuestionSubmitted();
     }
 
-    return {level, setLevel, onConfirmPressHandler}
+    return { level, setLevel, onConfirmPressHandler };
 }
 
 
-export function HowMuchEnergyQuestionPage({onComplete} : {onComplete: () => void}) {
+export function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => void }) {
     const { t } = useTranslation(["statistics"]);
-    const {level, setLevel, onConfirmPressHandler} = useHowMuchEnergyQuestionPage(onComplete)
+    const { level, setLevel, onConfirmPressHandler } = useHowMuchEnergyQuestionPage(onComplete);
 
     return (
         <>
             <h1>
                 {t("statistics:energy_question")}
             </h1>
-            
-            <br/>
-            
+
+            <br />
+
             <TextField autoFocus>
                 <Label>
                     {t("statistics:energy_level")}
                 </Label>
-                <Input 
+                <Input
                     value={level}
                     required type="number"
                     min={1}
@@ -45,15 +46,15 @@ export function HowMuchEnergyQuestionPage({onComplete} : {onComplete: () => void
                 />
             </TextField>
 
-            <br/>
+            <br />
 
             <Button onPress={onConfirmPressHandler}>
                 {t("statistics:save")}
             </Button>
-            <br/>
+            <br />
             <Button onPress={onComplete}>
                 {t("statistics:skip")}
             </Button>
-        </>        
+        </>
     );
 }

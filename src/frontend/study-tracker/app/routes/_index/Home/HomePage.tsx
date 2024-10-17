@@ -1,4 +1,3 @@
-import { Logger } from "tslog";
 import React, { useEffect, useState } from "react";
 import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
@@ -7,24 +6,24 @@ import { HowMuchEnergyQuestionPage } from "./EnergyQuestion";
 
 export default function HomePage() {
     const { t } = useTranslation(["home"]);
-    const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(undefined)
+    const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(undefined);
 
     useAppBar("home");
 
     useEffect(() => {
-        const prompted: Date = new Date(localStorage["lastEnergyQuestionPromptedDate"])
-        const today = new Date()
+        const prompted: Date = new Date(localStorage["lastEnergyQuestionPromptedDate"]);
+        const today = new Date();
         if (
             prompted == undefined ||
-            today.getFullYear() > prompted.getFullYear() || 
+            today.getFullYear() > prompted.getFullYear() ||
             today.getMonth() > prompted.getMonth() ||
             today.getDay() > prompted.getDay()
         ) {
-            setDisplayDailyEnergyQuestion(true)
-            localStorage["lastEnergyQuestionPromptedDate"] = today
+            setDisplayDailyEnergyQuestion(true);
+            localStorage["lastEnergyQuestionPromptedDate"] = today;
         } else
-            setDisplayDailyEnergyQuestion(false)
-    }, [])
+            setDisplayDailyEnergyQuestion(false);
+    }, []);
 
 
     return (
@@ -36,7 +35,7 @@ export default function HomePage() {
                     {t("home:main_question")}
                 </div>
             }
-            
+
         </div>
     );
 }

@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { service } from "~/service/service";
-import { utils } from "~/utils";
 
 function useSelectTime(onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void) {
     const [studyMinutes, setStudyMinutes] = useState(25);
