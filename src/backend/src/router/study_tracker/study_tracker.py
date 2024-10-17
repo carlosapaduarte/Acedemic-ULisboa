@@ -61,7 +61,7 @@ def get_events(
     recurrentEvents: bool,
 ) -> list[EventOutputDto]:
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
-    events = study_tracker_service.get_events(user_id, today, recurrentEvents, False)
+    events = study_tracker_service.get_events(user_id, today, recurrentEvents, False, None)
     return EventOutputDto.from_events(events)
 
 @router.post("/users/me/events")

@@ -10,7 +10,7 @@ function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[
         <div className={styles.focusWeeksContainer}>
             {
                 weekStudyTimeHistory
-                    .sort((week1: WeekTimeStudy, week2: WeekTimeStudy) => week1.week + week2.week) // latest weeks first
+                    .sort((week1: WeekTimeStudy, week2: WeekTimeStudy) => week1.week - week2.week) // latest weeks first. TODO: take the year into account, as well
                     .slice(0, 3).map((weekData, index) => {
                         const date = utils.getDateFromWeekNumber(weekData.year, weekData.week)
                         const weekStudyTimeTarget = weekData.target

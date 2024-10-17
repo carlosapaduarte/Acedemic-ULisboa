@@ -202,6 +202,8 @@ function TimerAndAssociatedTasksView({ associatedTasks }: { associatedTasks: Tas
     }
 }
 
+// TODO: check if pause is pressed for a long time, and, if yes, act like the user stopped a study session (update study time average).
+
 function StudyPage() {
     // In short, this component begins by asking the user to select a set of tasks to associate to the study time
     // If there is a study block now, it starts the timer to the end of the study block.
