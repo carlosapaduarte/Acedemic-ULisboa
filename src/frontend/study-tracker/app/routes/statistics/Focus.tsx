@@ -74,18 +74,48 @@ function useFocusStats() {
 export function FocusStats() {
     const {studyTimeByWeek, getCurrentWeekStudyTime} = useFocusStats()
 
-    const curWeekStats = getCurrentWeekStudyTime()
+    const maxHours = 200;
+
+    const barData = [
+        {
+            "name": "week1",
+            "hours": 120
+        },
+        {
+            "name": "week2",
+            "hours": 70
+        },
+        {
+            "name": "week3",
+            "hours": 160
+        }
+    ];
 
     return (
         <div className={styles.statsContainer}>
             <div className={styles.statsContainerTitle}>
                 (O) Focus
             </div>
-            {curWeekStats ?
+            <div className={styles.focusWeeksContainer}>
+                {
+                    barData.map(weekData =>
+                        <div className={styles.focusWeekContainer}>
+                            <div className={styles.focusWeekLabel}>
+                                {weekData.name}
+                            </div>
+                            <div className={styles.focusWeekProgressBarContainer}>
+                                <div className={styles.focusWeekProgressBar}
+                                     style={{ "--bar-width": `${weekData.hours / maxHours * 100}%` } as React.CSSProperties}>
+                                </div>
+                            </div>
+                        </div>)
+                }
+            </div>
+            {/*{curWeekStats ?
                 <ThisWeekFocusStats weekStats={curWeekStats} />
                 :
                 <></>
-            }
+            }*/}
         </div>
-    )
+    );
 }
