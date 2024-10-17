@@ -630,6 +630,7 @@ export type WeekTimeStudy = {
     week: number,
     total: number, // in minutes
     averageBySession: number // in minutes
+    target: number // in minutes
 }
 
 async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {

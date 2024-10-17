@@ -152,6 +152,7 @@ class WeekTimeStudyOutputDto(BaseModel):
     week: int
     total: int
     averageBySession: float
+    target: float | None
     
     @staticmethod
     def from_domain(domain: list[WeekTimeStudy]) -> list["WeekTimeStudyOutputDto"]:
@@ -162,7 +163,8 @@ class WeekTimeStudyOutputDto(BaseModel):
                     year=record.week_and_year.year,
                     week=record.week_and_year.week,    
                     total=record.total,
-                    averageBySession=record.average_by_session
+                    averageBySession=record.average_by_session,
+                    target=record.target
                 )
             )
         return dtos

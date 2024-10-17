@@ -1,3 +1,14 @@
+.pageTitleDiv {
+    display: flex;
+    margin-bottom: 1em;
+    margin-left: 1.5em;
+}
+
+.pageTitle {
+    font-size: x-large;
+    font-weight: bolder;
+}
+
 .statsContainer {
     margin: 0 1rem;
     @media (min-width: 600px) {

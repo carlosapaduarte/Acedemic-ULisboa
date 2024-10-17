@@ -3,6 +3,7 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import { EnergyStats } from "./Energy";
 import { FocusStats } from "./Focus";
+import styles from "./statistics.module.css";
 
 function WeekStats({ week, stats }: { week: string, stats: any }) {
     return (
@@ -65,7 +66,11 @@ function TaskDistribution() {
 export default function Statistics() {
     return (
         <>
-            <h1>Statistics</h1>
+            <div className={styles.pageTitleDiv}>
+                <span className={styles.pageTitle}>
+                    Statistics
+                </span>
+            </div>
             <EnergyStats />
             <br /><br />
             <FocusStats />

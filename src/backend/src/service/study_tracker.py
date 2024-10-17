@@ -1,6 +1,8 @@
+from datetime import datetime
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 from exception import AlreadyExistsException, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
+from utils import get_datetime_utc
 
 
 study_tracker_repo = StudyTrackerSqlRepo()
@@ -35,8 +37,8 @@ def delete_event(user_id: int, event_id: int):
 def update_receive_notifications_pref(user_id: int, receive: bool):
     study_tracker_repo.update_receive_notifications_pref(user_id, receive)
 
-def get_events(user_id: int, today: bool, recurrentEvents: bool) -> list[Event]:
-    return study_tracker_repo.get_events(user_id, today, recurrentEvents)
+def get_events(user_id: int, today: bool, recurrentEvents: bool, study_events: bool, week_number: int | None) -> list[Event]:
+    return study_tracker_repo.get_events(user_id, today, recurrentEvents, study_events, week_number)
 
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
@@ -106,7 +108,7 @@ def get_archives(user_id: int) -> list[Archive]:
 
 def create_file(user_id: int, archive_name: str, name: str):
     study_tracker_repo.create_file(user_id, archive_name, name)
-    
+
 def update_file_content(user_id: int, archive_name: str, filename: str, new_content: str):
     study_tracker_repo.update_file_content(user_id, archive_name, filename, new_content)
     
@@ -132,7 +134,26 @@ def get_task_time_distribution(user_id: int) -> dict[int, dict[int, dict[str, in
     return study_tracker_repo.get_time_spent_by_tag(user_id)
 
 def get_total_time_study_per_week(user_id: int) -> list[WeekTimeStudy]:
-    return study_tracker_repo.get_total_time_study_per_week(user_id)
+    stats_by_week = study_tracker_repo.get_total_time_study_per_week(user_id)
+    for week in stats_by_week:
+        week_study_time_target = get_week_study_time_target(user_id, week.week_and_year.week)
+        week.target = week_study_time_target
+    return stats_by_week
+
+"""
+    dat_1 < dat_2.
+"""
+def elapsed_minutes(dat_1: datetime, dat_2: datetime) -> int:
+    minutes_1 = get_datetime_utc(dat_1) / 60
+    minutes_2 = get_datetime_utc(dat_2) / 60
+    return (int) (minutes_2 - minutes_1)
+
+def get_week_study_time_target(user_id: int, week_number: int) -> int:
+    events = get_events(user_id, False, False, True, week_number)
+    total: int = 0
+    for event in events:
+        total += elapsed_minutes(event.date.start_date, event.date.end_date)
+    return total
 
 def increment_week_study_time(user_id: int, week_and_year: WeekAndYear, minutes: int):
     study_tracker_repo.increment_week_study_time(user_id, week_and_year, minutes)

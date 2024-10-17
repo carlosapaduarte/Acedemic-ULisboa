@@ -58,10 +58,10 @@ def update_task_status(
 def get_events(
     user_id: Annotated[int, Depends(get_current_user_id)],
     today: bool,
-    recurrentEvents: bool
+    recurrentEvents: bool,
 ) -> list[EventOutputDto]:
     #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
-    events = study_tracker_service.get_events(user_id, today, recurrentEvents)
+    events = study_tracker_service.get_events(user_id, today, recurrentEvents, False)
     return EventOutputDto.from_events(events)
 
 @router.post("/users/me/events")
@@ -243,8 +243,8 @@ def get_task_time_distribution(
 def get_study_time_by_week(
     user_id: Annotated[int, Depends(get_current_user_id)]
 ) ->  list[WeekTimeStudyOutputDto]:
-    domain = study_tracker_service.get_total_time_study_per_week(user_id)
-    return WeekTimeStudyOutputDto.from_domain(domain)
+    stats_by_week = study_tracker_service.get_total_time_study_per_week(user_id)
+    return WeekTimeStudyOutputDto.from_domain(stats_by_week)
 
 @router.put("/users/me/statistics/week-study-time/total")
 def increment_week_study_time(

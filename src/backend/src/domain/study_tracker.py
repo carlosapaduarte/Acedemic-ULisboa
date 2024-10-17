@@ -275,12 +275,20 @@ class WeekTimeStudy():
     week_and_year: WeekAndYear
     total: int
     average_by_session: float
+    target: int | None
     
-    def __init__(self, week_and_year: WeekAndYear, total: int, average_by_session: float) -> None:
+    def __init__(
+        self, 
+        week_and_year: WeekAndYear, 
+        total: int, 
+        average_by_session: float,
+        target: int | None
+    ) -> None:
         self.week_and_year=week_and_year
         self.total=total
         self.average_by_session=average_by_session
-        
+        self.target=target
+
     @staticmethod
     def from_STCurricularUnitModel(models: list[WeekStudyTimeModel]) -> list['WeekTimeStudy']:
         curricular_units: list[WeekTimeStudy] = []
@@ -291,7 +299,8 @@ class WeekTimeStudy():
                     week=model.week
                 ),
                 total=model.total,
-                average_by_session=model.average_by_session
+                average_by_session=model.average_by_session,
+                target=None
             ))
             
         return curricular_units

@@ -3,7 +3,6 @@ import styles from "./statistics.module.css";
 import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
-import classNames from "classnames";
 
 function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
     const maxHours = 200;

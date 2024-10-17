@@ -148,25 +148,49 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def is_today(date_1: datetime) -> bool:
         today = datetime.today()
         return date_1.year == today.year and date_1.month == today.month and date_1.day == today.day
-
-    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool) -> list[Event]:
+    
+    @staticmethod
+    def is_study_event(event: STEventModel) -> bool:
+        for tag in event.tags:
+            if tag.tag == "study" or tag.tag == "Study":
+                #print(tag)
+                return True
+        return False
+    
+    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool, study_events: bool, week_number: int | None) -> list[Event]:
         with Session(engine) as session:
             statement = select(STEventModel)\
                 .where(STEventModel.user_id == user_id)\
                     
             if recurrentEvents:
                 statement = statement.where(STEventModel.every_week == True)
-            
+                
             results = session.exec(statement)
             
             # Ideally, we would use another where statement. Yet, this was not working for me...
-            today_events: list[STEventModel] = []
+            events: list[STEventModel] = []
             for event in results:
                 if (not filter_today or StudyTrackerSqlRepo.is_today(event.start_date)):
                     #print('From DB: ', event.start_date.timestamp())
-                    today_events.append(event)
+                    events.append(event)
+                                
+
+            # Filter events that has tag "study"
+            if study_events:    
+                events_filtered: list[STEventModel] = []
+                for event in events:
+                    if StudyTrackerSqlRepo.is_study_event(event):
+                        events_filtered.append(event)                
+                events = events_filtered
+                
+            if week_number is not None:
+                events_filtered: list[STEventModel] = []
+                for event in events:
+                    if event.start_date.isocalendar().week is week_number:
+                        events_filtered.append(event)                
+                events = events_filtered
             
-            return Event.from_STEventModel(today_events)
+            return Event.from_STEventModel(events)
         
     def update_receive_notifications_pref(self, user_id: int, receive: bool):
         with Session(engine) as session:

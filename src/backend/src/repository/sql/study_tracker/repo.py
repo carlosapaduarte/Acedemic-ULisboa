@@ -21,7 +21,14 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool) -> list[Event]:
+    def get_events(
+        self, 
+        user_id: int, 
+        filter_today: bool, 
+        recurrentEvents: bool, 
+        study_events: bool, 
+        week_number: int | None
+    ) -> list[Event]:
         pass
 
     @abstractmethod
