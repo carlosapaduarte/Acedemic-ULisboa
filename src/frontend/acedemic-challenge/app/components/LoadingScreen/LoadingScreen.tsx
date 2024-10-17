@@ -40,8 +40,6 @@ function LoadingScreen() {
                 </div>
                 <div className={styles.challengeAndCheckboxContainer}>
                     <h1 className={styles.challengeText}>CHALLENGE</h1>
-                    <div className={styles.checkBox} style={{marginLeft: "0.5rem"}}>
-                    </div>
                 </div>
             </div>
         </div>

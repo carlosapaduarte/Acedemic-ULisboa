@@ -61,17 +61,17 @@
 
 .demicText {
     font-size: 3rem;
-    color: var(--primary-text-color);
+    color: var(--secondary-text-color);
 }
 
 .challengeAndCheckboxContainer {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: center;
 }
 
 .challengeText {
     font-size: 2rem;
-    color: var(--primary-text-color);
+    color: var(--secondary-text-color);
 }

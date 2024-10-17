@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { service, UserInfo } from "~/service/service";
 import { utils } from "~/utils";
 import styles from "./challengesPage.module.css";
-import { CutButton } from "~/components/Button/Button";
 import { Level1 } from "~/challenges/level_1";
 import classNames from "classnames";
 
@@ -27,44 +26,49 @@ function ChallengeBox(
         <div className={
             classNames(
                 styles.challengeBoxContainer,
+                reached ? "" : styles.locked,
                 lastExpanded && reached ? styles.lastExpanded : "",
                 expanded && reached ? styles.expanded : ""
             )}>
-            <CutButton
-                className={classNames(
-                    styles.challengeBox,
-                    reached ? "" : styles.locked,
-                    expanded && reached ? styles.expanded : ""
-                )}
-                aria-expanded={reached ? (expanded) : undefined}
-                aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
-                onClick={() => onChallengeClick(challengeIndex)}>
-                {
-                    reached ?
-                        <div className={`${styles.challengeContainer}`}>
-                            <p className={`${styles.challengeTitle}`}>
-                                <span className="visually-hidden">Challenge </span>
-                                {challengeIndex + 1} - {challengeTitle}
-                            </p>
-                            <div
-                                className={`${styles.challengeExpandableContainer}`}
-                                id={`challengeDescription-${challengeIndex}`}
-                                aria-hidden={!expanded}
+            <div className={classNames(
+                styles.challengeBox,
+                reached ? "" : styles.locked,
+                expanded && reached ? styles.expanded : ""
+            )}>
+                <button
+                    className={classNames(styles.challengeBoxButton)}
+                    aria-expanded={reached ? (expanded) : undefined}
+                    aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
+                    onClick={() => onChallengeClick(challengeIndex)}>
+                    {
+                        reached ?
+                            <div className={`${styles.challengeContainer}`}
+                                 aria-label={`Challenge ${challengeIndex + 1} - ${challengeTitle}`}
                             >
-                                <div className={`${styles.challengeDescription}`}>
-                                    {challengeDescription}
-                                </div>
+                                <p className={`${styles.challengeTitle}`}>
+                                    {challengeIndex + 1} - {challengeTitle}
+                                </p>
                             </div>
-                        </div>
-                        :
-                        <div className={`${styles.challengeContainer}`}>
-                            <p className={`${styles.challengeTitle}`}>
-                                <span className="visually-hidden">Locked challenge</span>
-                                ?
-                            </p>
-                        </div>
-                }
-            </CutButton>
+                            :
+                            <div className={`${styles.challengeContainer}`}
+                                 aria-label={"Locked challenge"}
+                            >
+                                <p className={`${styles.challengeTitle}`}>
+                                    ?
+                                </p>
+                            </div>
+                    }
+                </button>
+                <div
+                    className={`${styles.challengeExpandableContainer}`}
+                    id={`challengeDescription-${challengeIndex}`}
+                    aria-hidden={!expanded}
+                >
+                    <div className={`${styles.challengeDescription}`}>
+                        {challengeDescription}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
@@ -129,7 +133,7 @@ function useChallenges() {
                 const level = batchToDisplay.level;
                 const startDate = new Date(batchToDisplay.startDate * 1000);
 
-                startDate.setDate(startDate.getDate() - 2);
+                startDate.setDate(startDate.getDate() - 6);
 
                 const challenges = utils.getChallengesPerDayByStartDate(level, startDate);
                 setChallenges(challenges);

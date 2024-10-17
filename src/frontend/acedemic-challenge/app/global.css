@@ -57,6 +57,7 @@ button {
     border-width: 0;
 }
 
+/* TODO currently pretty bugged when used in items that are in a list and are present in the overflow*/
 .visually-hidden {
     position: absolute;
     width: 1px;
