@@ -100,8 +100,8 @@ export function FocusStats() {
             </div>
             <div className={styles.focusWeeksContainer}>
                 {
-                    barData.map(weekData =>
-                        <div className={styles.focusWeekContainer}>
+                    barData.map((weekData, index) =>
+                        <div key={index} className={styles.focusWeekContainer}>
                             <div className={styles.focusWeekLabel}>
                                 {weekData.name}
                             </div>
