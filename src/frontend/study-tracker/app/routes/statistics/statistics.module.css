@@ -14,9 +14,15 @@
     border-radius: 10px;
 }
 
+.historyTitleAndSeeMore {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8em;
+}
+
 .statsContainerTitle {
     display: inline-block;
-    padding: 0.5rem 2rem;
+    padding: 0.4rem 1rem;
 
     position: relative;
     top: -25px;
@@ -26,7 +32,7 @@
 
     font-weight: bolder;
     color: white;
-    font-size: large;
+    
 
     --edge-size: .5rem;
     clip-path: polygon(
@@ -49,7 +55,7 @@
     font-weight: bolder;
 }
 
-.verWellColor {
+.veryWellColor {
     color: green;
 }
 
@@ -65,13 +71,10 @@
     color: red;
 }
 
-.todayDate {
+.containerHeaderDate {
     text-align: end;
-    margin-right: 2%;
     color: var(--secondary-color);
-    position: relative;
-    top: -10px;
-    left: -3px;
+    font-size: 0.7em;
 }
 
 .historyFirstContainer {
@@ -81,13 +84,14 @@
 }
 
 .historyTitle {
-    font-size: x-large;
+    font-size: larger;
     font-weight: bolder;
 }
 
 .seeFullHistoryText {
     color: var(--secondary-color);
     background-color: transparent;
+    font-size: smaller;
 }
 
 .historyStatusAndDate {
@@ -96,13 +100,13 @@
 }
 
 .focusContainerCurWeekStatisticTitle {
-    color: var(--secondary-color);
+    font-size: large;
     font-weight: bolder;
-    font-size: x-large;
+    color: var(--secondary-color);
 }
 
 .focusContainerCurWeekStatisticValue {
-    font-size: larger;
+    
 }
 
 .focusWeeksContainer {
@@ -133,4 +137,8 @@
     background-color: var(--fourth-color);
     width: var(--bar-width);
     border-radius: 1rem;
+}
+
+.spacer {
+    height: 0.7em;
 }

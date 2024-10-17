@@ -47,6 +47,26 @@ function getWeekNumber(date: Date): number {
     return 1 + Math.ceil((firstThursday - tempDate.valueOf()) / 604800000); // 604800000 = number of milliseconds in a week
 }
 
+function getDateFromWeekNumber(year: number, weekNumber: number): Date {
+    // Create a date object set to January 1st of the given year
+    const firstDayOfYear = new Date(year, 0, 1);
+
+    // Find the nearest Thursday to January 1st to align with the ISO week numbering system
+    const dayOfWeek = (firstDayOfYear.getDay() + 6) % 7; // Adjust so Monday is 0, Sunday is 6
+    const firstThursday = new Date(firstDayOfYear);
+    firstThursday.setDate(firstDayOfYear.getDate() - dayOfWeek + 3); // Get to the first Thursday
+
+    // Calculate the milliseconds from the first Thursday to the desired week
+    const targetDate = new Date(firstThursday);
+    targetDate.setDate(firstThursday.getDate() + (weekNumber - 1) * 7); // Move to the target week
+
+    // Set the target date to the Monday of the target week
+    const mondayOfTargetWeek = new Date(targetDate);
+    mondayOfTargetWeek.setDate(targetDate.getDate() - (targetDate.getDay() + 6) % 7);
+
+    return mondayOfTargetWeek;
+}
+
 // d1 should be greater than d2
 function elapsedMinutes(d1: Date, d2: Date): number {
     const diff = d1.getTime() - d2.getTime();
@@ -57,5 +77,6 @@ export const utils = {
     sameDay,
     toInputDateValueStr,
     getWeekNumber,
-    elapsedMinutes
+    elapsedMinutes,
+    getDateFromWeekNumber
 };
