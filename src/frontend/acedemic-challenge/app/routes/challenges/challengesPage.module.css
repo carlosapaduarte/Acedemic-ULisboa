@@ -88,6 +88,25 @@ Doesn't work, use SCSS
     flex-direction: column;
 }
 
+@keyframes loadingAnimation {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+.challengeBox.loading {
+    background: linear-gradient(90deg,
+    var(--third-color) 25%,
+    #f0f0f0 50%,
+    var(--third-color) 75%);
+    background-size: 400px 100%;
+    animation: loadingAnimation 1s infinite linear ;
+    color: white;
+}
+
 .challengeBox.expanded {
     background-color: var(--fourth-color);
 }

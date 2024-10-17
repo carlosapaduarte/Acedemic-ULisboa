@@ -12,8 +12,18 @@ import classNames from "classnames";
 *  https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
 * */
 function ChallengeBox(
-    { challengeIndex, challengeTitle, challengeDescription, lastExpanded, expanded, reached, onChallengeClick }: {
+    {
+        challengeIndex,
+        loading,
+        challengeTitle,
+        challengeDescription,
+        lastExpanded,
+        expanded,
+        reached,
+        onChallengeClick
+    }: {
         challengeIndex: number,
+        loading: boolean,
         challengeTitle: string,
         challengeDescription: string,
         lastExpanded: boolean,
@@ -26,64 +36,77 @@ function ChallengeBox(
         <div className={
             classNames(
                 styles.challengeBoxContainer,
-                reached ? "" : styles.locked,
                 lastExpanded && reached ? styles.lastExpanded : "",
                 expanded && reached ? styles.expanded : ""
             )}>
-            <div className={classNames(
-                styles.challengeBox,
-                reached ? "" : styles.locked,
-                expanded && reached ? styles.expanded : ""
-            )}>
-                <button
-                    className={classNames(styles.challengeBoxButton)}
-                    aria-expanded={reached ? (expanded) : undefined}
-                    aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
-                    onClick={() => onChallengeClick(challengeIndex)}>
-                    {
-                        reached ?
-                            <div className={`${styles.challengeContainer}`}
-                                 aria-label={`Challenge ${challengeIndex + 1} - ${challengeTitle}`}
-                            >
-                                <p className={`${styles.challengeTitle}`}>
-                                    {challengeIndex + 1} - {challengeTitle}
-                                </p>
-                            </div>
-                            :
-                            <div className={`${styles.challengeContainer}`}
-                                 aria-label={"Locked challenge"}
-                            >
-                                <p className={`${styles.challengeTitle}`}>
-                                    ?
-                                </p>
-                            </div>
-                    }
-                </button>
-                <div
-                    className={`${styles.challengeExpandableContainer}`}
-                    id={`challengeDescription-${challengeIndex}`}
-                    aria-hidden={!expanded}
-                >
-                    <div className={`${styles.challengeDescription}`}>
-                        {challengeDescription}
+            {loading
+                ?
+                <div className={classNames(
+                    styles.challengeBox,
+                    styles.loading
+                )}>
+                    <div className={styles.challengeBoxButton}>
+                        <p className={styles.challengeTitle}>
+                            Loading...
+                        </p>
                     </div>
                 </div>
-            </div>
+                :
+                <div className={classNames(
+                    styles.challengeBox,
+                    reached ? "" : styles.locked,
+                    expanded && reached ? styles.expanded : ""
+                )}>
+                    <button
+                        className={classNames(styles.challengeBoxButton)}
+                        aria-expanded={reached ? (expanded) : undefined}
+                        aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
+                        onClick={() => onChallengeClick(challengeIndex)}>
+                        {
+                            reached ?
+                                <div className={`${styles.challengeContainer}`}
+                                     aria-label={`Challenge ${challengeIndex + 1} - ${challengeTitle}`}
+                                >
+                                    <p className={`${styles.challengeTitle}`}>
+                                        {challengeIndex + 1} - {challengeTitle}
+                                    </p>
+                                </div>
+                                :
+                                <div className={`${styles.challengeContainer}`}
+                                     aria-label={"Locked challenge"}
+                                >
+                                    <p className={`${styles.challengeTitle}`}>
+                                        ?
+                                    </p>
+                                </div>
+                        }
+                    </button>
+                    <div
+                        className={`${styles.challengeExpandableContainer}`}
+                        id={`challengeDescription-${challengeIndex}`}
+                        aria-hidden={!expanded}
+                    >
+                        <div className={`${styles.challengeDescription}`}>
+                            {challengeDescription}
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     );
 }
 
 function ChallengesList({ challenges, onChallengeClickHandler }: {
-    challenges: Goal[][],
+    challenges: Goal[][] | undefined,
     onChallengeClickHandler: (challengeIndex: number) => void
 }) {
     const [selectedItem, setSelectedItem] = useState<number>(-1);
     const [lastSelectedItem, setLastSelectedItem] = useState<number>(-1);
 
-    const currentChallenge = challenges.length;
+    const currentChallenge = challenges?.length;
 
     function onItemClickHandler(index: number) {
-        const reached = index <= currentChallenge - 1;
+        const reached = currentChallenge ? index <= currentChallenge - 1 : false;
 
         if (!reached) {
             return;
@@ -104,10 +127,11 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
         <div className={`${styles.challengesList}`}>
             {
                 Array.from({ length: 21 }).map((_, index) => {
-                        const reached = index <= currentChallenge - 1;
+                        const reached = currentChallenge ? index <= currentChallenge - 1 : false;
 
                         return <ChallengeBox key={index}
                                              challengeIndex={index}
+                                             loading={challenges == undefined}
                                              challengeTitle={Level1.getLevel1GoalList()[index].title}
                                              challengeDescription={Level1.getLevel1GoalList()[index].description}
                                              lastExpanded={lastSelectedItem == index}
@@ -159,9 +183,7 @@ function MainContent() {
     return (
         <div className={`${styles.mainContent}`}>
             <div className={`${styles.challengesListContainer}`}>
-                {
-                    goals ? <ChallengesList challenges={goals} onChallengeClickHandler={onGoalClickHandler} /> : <></>
-                }
+                <ChallengesList challenges={goals} onChallengeClickHandler={onGoalClickHandler} />
             </div>
         </div>
     );
