@@ -9,5 +9,5 @@ class AcademicChallengeMemRepo(AcademicChallengeRepo):
     def create_new_user_note(self, user_id: int, note: str, date: datetime):
         pass
 
-    def create_completed_goal(self, user_id: int, batch_id: int, goal_id: int, goal_day: int, conclusion_date: datetime):
+    def create_completed_challenge(self, user_id: int, batch_id: int, challenge_id: int, challenge_day: int, conclusion_date: datetime):
         pass

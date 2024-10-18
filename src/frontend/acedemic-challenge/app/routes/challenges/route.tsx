@@ -1,4 +1,4 @@
-import { Goal } from "~/challenges/types";
+import { Challenge } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 import { service, UserInfo } from "~/service/service";
@@ -97,7 +97,7 @@ function ChallengeBox(
 }
 
 function ChallengesList({ challenges, onChallengeClickHandler }: {
-    challenges: Goal[][] | undefined,
+    challenges: Challenge[][] | undefined,
     onChallengeClickHandler: (challengeIndex: number) => void
 }) {
     const [selectedItem, setSelectedItem] = useState<number>(-1);
@@ -132,8 +132,8 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
                         return <ChallengeBox key={index}
                                              challengeIndex={index}
                                              loading={challenges == undefined}
-                                             challengeTitle={Level1.getLevel1GoalList()[index].title}
-                                             challengeDescription={Level1.getLevel1GoalList()[index].description}
+                                             challengeTitle={Level1.getLevel1ChallengeList()[index].title}
+                                             challengeDescription={Level1.getLevel1ChallengeList()[index].description}
                                              lastExpanded={lastSelectedItem == index}
                                              expanded={selectedItem == index}
                                              reached={reached}
@@ -165,25 +165,25 @@ function useChallenges() {
     }, []);
 
     const [selectedChallenge, setSelectedChallenge] = useState<number | undefined>(undefined);
-    const [goals, setChallenges] = useState<Goal[][] | undefined>(undefined);
+    const [challenges, setChallenges] = useState<Challenge[][] | undefined>(undefined);
 
-    function onGoalClickHandler(goalIndex: number) {
-        setSelectedChallenge(goalIndex);
+    function onChallengeClickHandler(challengeIndex: number) {
+        setSelectedChallenge(challengeIndex);
     }
 
-    let challengesInfoToDisplay: Goal[] | undefined = (selectedChallenge != undefined && goals) ? goals[selectedChallenge] : undefined;
+    let challengesInfoToDisplay: Challenge[] | undefined = (selectedChallenge != undefined && challenges) ? challenges[selectedChallenge] : undefined;
 
-    return { challengesInfoToDisplay, onGoalClickHandler, goals };
+    return { challengesInfoToDisplay, onChallengeClickHandler, challenges };
 }
 
 function MainContent() {
-    const { t } = useTranslation(["goal_overview"]);
-    const { challengesInfoToDisplay, onGoalClickHandler, goals } = useChallenges();
+    const { t } = useTranslation(["challenge_overview"]);
+    const { challengesInfoToDisplay, onChallengeClickHandler, challenges } = useChallenges();
 
     return (
         <div className={`${styles.mainContent}`}>
             <div className={`${styles.challengesListContainer}`}>
-                <ChallengesList challenges={goals} onChallengeClickHandler={onGoalClickHandler} />
+                <ChallengesList challenges={challenges} onChallengeClickHandler={onChallengeClickHandler} />
             </div>
         </div>
     );

@@ -5,14 +5,14 @@ class UserNote:
         self.name = name
         self.created = created
 
-class CompletedGoal:
-    def __init__(self, goal_day: int, id: int, conclusion_date: datetime) -> None:
-        self.goal_day = goal_day
+class CompletedChallenge:
+    def __init__(self, challenge_day: int, id: int, conclusion_date: datetime) -> None:
+        self.challenge_day = challenge_day
         self.id = id
         self.conclusion_date = conclusion_date
 
 class Batch:
-    def __init__(self, id: int, start_date: datetime, level: int, completed: list[CompletedGoal]) -> None:
+    def __init__(self, id: int, start_date: datetime, level: int, completed: list[CompletedChallenge]) -> None:
         self.id = id
         self.start_date = start_date
         self.level = level

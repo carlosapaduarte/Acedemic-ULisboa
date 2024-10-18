@@ -12,19 +12,17 @@ class CommonsMemRepo(CommonsRepo):
         self.users = dict()
         super().__init__()
 
-    users: dict[int, User] = dict()
+    users: dict[str, User] = dict()
 
-    def create_user(self, id: int, username: str, password: str):
-        "Creates a user without avatar, notes and goals, in level 1, and share_progress set to false"
-        self.users[id] = User(
-            id,
-            username,
-            level=1,
+    def create_user(self, username: str, hashed_password: str):
+        "Creates a user without avatar, notes and challenges, in level 1, and share_progress set to false"
+        self.users[username] = User(
+            id=id,
+            username=username,
             avatar_filename=None,
-            start_date=datetime.now(),
             share_progress=False,
             user_notes=[],
-            completed_goals=[]
+            batches=[]
         )
 
     def exists_user_by_id(self, id: int) -> bool:

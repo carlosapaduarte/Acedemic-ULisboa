@@ -26,43 +26,43 @@ async function login(username: string, password: string) {
     formData.append("password", password);
 
     const request = {
-        path: 'commons/token',
-        method: 'POST',
-        body: formData,
-    }
+        path: "commons/token",
+        method: "POST",
+        body: formData
+    };
 
-    const response: Response = await doFetch(request)
+    const response: Response = await doFetch(request);
     //console.log('Is logged in: ', response)
 
     if (response.ok) {
-        const responseObject: LoginResult = await response.json() // TODO: how 
-        localStorage["jwt"] = responseObject.access_token
+        const responseObject: LoginResult = await response.json(); // TODO: how
+        localStorage["jwt"] = responseObject.access_token;
     } else
-        return Promise.reject(new Error('Login failed!'))
+        return Promise.reject(new Error("Login failed!"));
 }
 
 async function testTokenValidity() {
     const request = {
-        path: 'commons/test-token',
-        method: 'GET',
-    }
-    const response: Response = await doFetch(request)
+        path: "commons/test-token",
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
     if (!response.ok) {
-        return Promise.reject(new Error('Login failed!'))
+        return Promise.reject(new Error("Login failed!"));
     }
 }
 
 async function createUser(username: string, password: string) {
     const request = {
-        path: 'commons/create-user',
-        method: 'POST',
-        body: toJsonBody({username, password}),
-    }
-    const response: Response = await doFetch(request)
+        path: "commons/create-user",
+        method: "POST",
+        body: toJsonBody({ username, password })
+    };
+    const response: Response = await doFetch(request);
     //console.log('Is logged in: ', response)
 
     if (!response.ok)
-        return Promise.reject(new Error('User creation was not possible!'))
+        return Promise.reject(new Error("User creation was not possible!"));
 }
 
 async function createBatch(level: LevelType) {
@@ -105,14 +105,14 @@ export type UserNote = {
     date: number
 }
 
-// Almost like DayAndGoal but without goal description
-export type GoalAndDate = {
+// Almost like DayAndChallenge but without challenge description
+export type ChallengeAndDate = {
     name: string;
     date: number
 }
 
-export type CompletedGoal = {
-    goalDay: number
+export type CompletedChallenge = {
+    challengeDay: number
     id: number
     conclusionDate: number
 }
@@ -121,7 +121,7 @@ export type Batch = {
     id: number,
     startDate: number,
     level: number,
-    completedGoals: CompletedGoal[]
+    completedChallenges: CompletedChallenge[]
 }
 
 // User info
@@ -148,11 +148,11 @@ async function fetchUserInfoFromApi(): Promise<UserInfo> {
         return Promise.reject(new Error("User info could not be obtained!"));
 }
 
-async function createNewUserNote(text: string, userGoalDate: Date) {
+async function createNewUserNote(text: string, userChallengeDate: Date) {
     const request = {
         path: `academic-challenge/users/me/notes`,
         method: "POST",
-        body: toJsonBody({ text, date: Math.trunc(userGoalDate.getTime() / 1000) }) // Send seconds from 1970
+        body: toJsonBody({ text, date: Math.trunc(userChallengeDate.getTime() / 1000) }) // Send seconds from 1970
     };
 
     //console.log(request)
@@ -161,15 +161,15 @@ async function createNewUserNote(text: string, userGoalDate: Date) {
         return Promise.reject(new Error("Note creation failed!"));
 }
 
-async function markGoalAsCompleted(batchId: number, goalId: number, goalDay: number) {
+async function markChallengeAsCompleted(batchId: number, challengeId: number, challengeDay: number) {
     const request = {
-        path: `academic-challenge/users/me/batches/${batchId}/completed-goals`,
+        path: `academic-challenge/users/me/batches/${batchId}/completed-challenges`,
         method: "POST",
-        body: toJsonBody({ goalId, goalDay })
+        body: toJsonBody({ challengeId, challengeDay })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
-        return Promise.reject(new Error("Goal finalized selection failed!"));
+        return Promise.reject(new Error("Challenge finalized selection failed!"));
 }
 
 export const service = {
@@ -181,5 +181,5 @@ export const service = {
     selectAvatar,
     fetchUserInfoFromApi,
     createNewUserNote,
-    markGoalAsCompleted
+    markChallengeAsCompleted: markChallengeAsCompleted
 };

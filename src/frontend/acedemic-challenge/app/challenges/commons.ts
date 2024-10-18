@@ -1,55 +1,51 @@
-import { DayGoals, Goal } from "./types";
+import { Challenge, DayChallenges } from "./types";
 
-function getDayGoals(goals: Goal[], startDate: Date, level: number): DayGoals[] {
-    // Returns DayGoals[], accounting for the start day
-
+function getDayChallenges(challenges: Challenge[], startDate: Date, level: number): DayChallenges[] {
     const today = new Date();
-    //console.log(today)
-    //console.log(startDate)
-    const elapsedDays = Math.round((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24)); // corresponds to [level1Aux] goal index
+
+    const elapsedDays = Math.round((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24)); // corresponds to [level1Aux] challenge index
 
     if (level == 1 || level == 2) {
-        const goalsShortened: Goal[] = goals.slice(0, elapsedDays + 1);
-        //console.log('Goals shortened: ', goalsShortened)
+        const challengesShortened: Challenge[] = challenges.slice(0, elapsedDays + 1);
+        //console.log('Challenges shortened: ', challengesShortened)
 
-        const goalsToReturn = goalsShortened.map((goal, index) => {
-            const goalDate = new Date();
-            goalDate.setDate(today.getDate() - (elapsedDays - index));
+        const challengesToReturn = challengesShortened.map((challenge, index) => {
+            const challengeDate = new Date();
+            challengeDate.setDate(today.getDate() - (elapsedDays - index));
             return {
-                goals: [{ id: goal.id, title: goal.title, description: goal.description }],
-                date: goalDate
+                challenges: [{ id: challenge.id, title: challenge.title, description: challenge.description }],
+                date: challengeDate
             };
         });
 
-        //console.log('Goals to return: ', goalsToReturn)
-        return goalsToReturn;
+        return challengesToReturn;
     } else {
-        const goalsToReturn: DayGoals[] = [];
+        const challengesToReturn: DayChallenges[] = [];
 
         for (let u = 0; u < 21; u++) {
             const curDate: Date = new Date(); // Starts on the first day (batch was created)
             curDate.setDate(startDate.getDate() + u);
 
-            const goalsForTheDay: Goal[] = [];
+            const challengesForTheDay: Challenge[] = [];
             if (u < 5) {
                 for (let i = u; i >= 0; i--) {
-                    goalsForTheDay.push(goals[i]);
+                    challengesForTheDay.push(challenges[i]);
                 }
             } else {
                 for (let i = 0; i < 5; i++) {
-                    goalsForTheDay.push(goals[i]);
+                    challengesForTheDay.push(challenges[i]);
                 }
             }
-            goalsToReturn.push({
-                goals: goalsForTheDay,
+            challengesToReturn.push({
+                challenges: challengesForTheDay,
                 date: curDate
             });
         }
-        console.log(goalsToReturn);
-        return goalsToReturn;
+        console.log(challengesToReturn);
+        return challengesToReturn;
     }
 }
 
 export const commons = {
-    getDayGoals
+    getDayChallenges
 };

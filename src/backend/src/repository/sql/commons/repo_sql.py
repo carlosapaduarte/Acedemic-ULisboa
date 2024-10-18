@@ -6,7 +6,7 @@ from exception import NotFoundException
 from repository.sql.commons.repo import CommonsRepo
 from repository.sql.models import database
 from repository.sql.models.models import BatchModel, UserModel
-from domain.commons.user import Batch, CompletedGoal, User, UserNote
+from domain.commons.user import Batch, CompletedChallenge, User, UserNote
 
 engine = database.get_engine()
 
@@ -41,10 +41,10 @@ class CommonsSqlRepo(CommonsRepo):
         batches_model: list[BatchModel] = user_model.user_batches
         
         # map() in Python is lazy, not eager!
-        # Therefore, this forces the session to retrieve all completed_goals, for each batch
+        # Therefore, this forces the session to retrieve all completed_challenges, for each batch
         # Better solutions are appreciated!
         for batch in batches_model:
-            batch.completed_goals
+            batch.completed_challenges
             
         # Build User Notes
         user_notes: list[UserNote] = []
@@ -55,12 +55,12 @@ class CommonsSqlRepo(CommonsRepo):
         batches: list[Batch] = []
         for batch in user_model.user_batches:
             
-            # Build Batch Completed Goals
-            completed_goals: list[CompletedGoal] = []
-            for goal in batch.completed_goals:
-                completed_goals.append(CompletedGoal(goal.goal_day, goal.id, goal.conclusion_date))
+            # Build Batch Completed Challenges
+            completed_challenges: list[CompletedChallenge] = []
+            for challenge in batch.completed_challenges:
+                completed_challenges.append(CompletedChallenge(challenge.challenge_day, challenge.id, challenge.conclusion_date))
             
-            batches.append(Batch(batch.id, batch.start_date, batch.level, completed_goals))
+            batches.append(Batch(batch.id, batch.start_date, batch.level, completed_challenges))
 
         return User(
             user_model.id,
@@ -82,7 +82,7 @@ class CommonsSqlRepo(CommonsRepo):
         return CommonsSqlRepo.from_user_model(user_model)
         
     def create_user(self, username: str, hashed_password: str) -> User:
-        "Creates a user without avatar, notes and goals, in level 1, and share_progress set to false"
+        "Creates a user without avatar, notes and challenges, in level 1, and share_progress set to false"
 
         with Session(engine) as session:
             db_user = UserModel(

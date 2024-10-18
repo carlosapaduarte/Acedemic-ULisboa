@@ -16,7 +16,7 @@
     overflow: auto;
 }
 
-.goalsContainerWrapper {
+.challengesContainerWrapper {
     --edge-size: 1.5em;
 
     width: 100%;
@@ -40,7 +40,7 @@
     );
 }
 
-.goalsContainer {
+.challengesContainer {
     width: 100%;
     height: 100%;
 
@@ -52,7 +52,7 @@
     overflow: auto;
 }
 
-.goalTextContainer {
+.challengeTextContainer {
     width: 100%;
     height: 100%;
 
@@ -62,7 +62,7 @@
     overflow: auto;
 }
 
-.goalTitle {
+.challengeTitle {
     margin-bottom: 0.25em;
 
     font-size: 1.5em;
@@ -73,7 +73,7 @@
     text-transform: uppercase;
 }
 
-.goalDescription {
+.challengeDescription {
     width: 100%;
     height: 100%;
 
@@ -84,7 +84,7 @@
 }
 
 /*Should have enough compatibility with every recent browser*/
-/*.goalDescription {
+/*.challengeDescription {
     height: auto;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -103,7 +103,7 @@
     color: white;
 }
 
-.noGoalsTextContainer {
+.noChallengesTextContainer {
     width: 100%;
     height: 100%;
 
@@ -112,7 +112,7 @@
     justify-content: center;
 }
 
-.noGoalsText {
+.noChallengesText {
     font-size: 1em;
     font-weight: bold;
 
