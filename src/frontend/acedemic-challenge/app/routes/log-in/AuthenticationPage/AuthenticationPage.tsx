@@ -127,26 +127,13 @@ export default function AuthenticationPage(
     }: {
         onAuthDone: (action: AuthAction) => void;
     }) {
-    const { t } = useTranslation(["login"]);
-
     const isLoggedIn = useIsLoggedIn();
-
-    const [actionPerformed, setActionPerformed] = useState<AuthAction | undefined>(undefined);
 
     return (
         <div className={styles.pageContainer}>
             <div className={styles.pageInnerContainer}>
-                {isLoggedIn ? (
-                    <>
-                        <h1 className={styles.titleText}>
-                            {t("login:authenticated_message")}
-                        </h1>
-                        <button className={styles.roundButton} onClick={() => onAuthDone(actionPerformed!)}>
-                            {t("login:authenticated_message")}
-                        </button>
-                    </>
-                ) : (
-                    <Authenticate onActionClicked={setActionPerformed} />
+                {isLoggedIn ? null : (
+                    <Authenticate onActionClicked={(action) => onAuthDone(action)} />
                 )}
             </div>
         </div>

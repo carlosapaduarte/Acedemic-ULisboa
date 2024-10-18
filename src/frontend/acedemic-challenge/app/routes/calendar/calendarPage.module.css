@@ -63,9 +63,9 @@
 }
 
 .challengeTitle {
-    margin-bottom: 0.25em;
+    margin-bottom: 0.25rem;
 
-    font-size: 1.5em;
+    font-size: 1.25rem;
     font-weight: bold;
 
     color: black;
@@ -77,10 +77,16 @@
     width: 100%;
     height: 100%;
 
+    font-size: 1rem;
+    color: black;
+
     overflow: auto;
 
-    font-size: 1em;
-    color: black;
+    /*display: -webkit-box; !* Required for multiline ellipsis *!
+    -webkit-line-clamp: 3; !* Number of lines to show before truncating *!
+    -webkit-box-orient: vertical; !* Required for multiline ellipsis *!
+    overflow: hidden; !* Hides overflow content *!
+    text-overflow: ellipsis; !* Adds ellipsis *!*/
 }
 
 /*Should have enough compatibility with every recent browser*/
