@@ -8,7 +8,7 @@ import classNames from "classnames";
 function createAvatars(): string[] {
     const avatars: string[] = [];
     for (let u = 0; u < 30; u++) {
-        avatars.push(`./avatars/avatar${u % 8}.png`); // filename
+        avatars.push(`./avatars/avatar${u % 12}.png`); // filename
     }
     return avatars;
 }

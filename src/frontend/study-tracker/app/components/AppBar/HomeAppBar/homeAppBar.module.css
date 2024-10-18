@@ -39,7 +39,7 @@
 
     animation: fade 500ms;
 
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 @keyframes fade {
@@ -66,10 +66,19 @@
 
 .avatarAndDropdownContainer {
     flex-shrink: 0;
+
+    height: 100%;
 }
 
 .avatarContainer {
-    background-color: transparent;
+    background-color: var(--primary-color);
+    height: 100%;
+
+    img {
+        height: 100%;
+    }
+
+    overflow: hidden;
 }
 
 .navBar {

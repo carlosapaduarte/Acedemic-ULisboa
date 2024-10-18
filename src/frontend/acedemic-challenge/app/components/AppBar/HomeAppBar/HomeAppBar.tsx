@@ -100,7 +100,6 @@ export function GreetingsContainer() {
                     <button className={`${styles.avatarContainer}`}>
                         <img
                             src={`${avatarFilename}`}
-                            height="100px"
                             alt={`User's Avatar`}
                         />
                     </button>
