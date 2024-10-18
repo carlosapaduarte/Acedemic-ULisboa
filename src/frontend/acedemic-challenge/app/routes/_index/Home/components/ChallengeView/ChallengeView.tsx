@@ -186,7 +186,7 @@ function MainContent() {
     /*console.log(userInfo?.avatarFilename);*/
     if (userInfo && daysSinceStart && todayChallenges && todayCompletedChallenges && todayNotes && batchToDisplay) {
         return (
-            <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>
+            <div className={styles.challengesContainerWrapper}>
                 <Challenges
                     currentDayNumber={daysSinceStart}
                     challenges={todayChallenges.challenges}
@@ -230,17 +230,5 @@ function MainContent() {
 }
 
 export function ChallengeView() {
-
-    return (
-        <div className={styles.challengeViewContainer}>
-            <MainContent />
-            {/*<Button variant={"round"}
-                        className={styles.logoutButton}
-                        onClick={() => {
-                            logOut();
-                            navigate("/");
-                        }}
-                >Log out</Button>*/}
-        </div>
-    );
+    return (<MainContent />);
 }
