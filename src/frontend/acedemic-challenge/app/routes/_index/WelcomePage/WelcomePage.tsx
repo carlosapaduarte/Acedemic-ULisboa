@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import styles from "~/routes/_index/WelcomePage/welcomePage.module.css";
 import { CutButton } from "~/components/Button/Button";
 import classNames from "classnames";
-import { useAppBar } from "~/components/AppBar/AppBar";
+import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useState } from "react";
 
 function useWelcomePage() {

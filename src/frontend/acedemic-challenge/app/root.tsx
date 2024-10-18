@@ -17,7 +17,7 @@ import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 import "./global.css";
 import "./themes.css";
-import { AppBar, AppBarProvider } from "./components/AppBar/AppBar";
+import { AppBar } from "./components/AppBar/AppBar";
 import React, { useEffect, useState } from "react";
 import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
 import i18next from "~/i18next.server";
@@ -26,6 +26,7 @@ import { useTranslation } from "react-i18next";
 import { GlobalErrorContainer } from "~/components/error/GlobalErrorContainer";
 import { GlobalErrorController } from "~/components/error/GlobalErrorController";
 import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
+import { AppBarProvider } from "~/components/AppBar/AppBarProvider";
 
 export const meta: MetaFunction = () => {
     return [
