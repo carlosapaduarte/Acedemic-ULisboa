@@ -3,6 +3,7 @@
     padding: 1rem;
 
     width: 100%;
+    overflow: auto;
 
     color: white;
 }
