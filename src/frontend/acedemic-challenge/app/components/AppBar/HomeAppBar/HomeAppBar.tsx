@@ -30,7 +30,9 @@ function getHelloQuote(): string {
     }
 }
 
-function NavBarButton({ text, url }: { text: string, url: string }) {
+function NavBarButton({ text, url, iconSrc, iconAlt }: {
+    text: string, url: string, iconSrc?: string, iconAlt?: string
+}) {
     const navigate = useNavigate();
 
     return (
@@ -39,7 +41,7 @@ function NavBarButton({ text, url }: { text: string, url: string }) {
                 onClick={() => navigate(url)}
                 className={`${styles.navBarButton}`}
             >
-                Icon
+                {iconSrc ? <img src={iconSrc} alt={iconAlt} /> : "Icon"}
             </CutButton>
             <div className={`${styles.navBarButtonText}`}>
                 {text}
@@ -111,9 +113,9 @@ export function GreetingsContainer() {
 export function NavBar() {
     return (
         <div className={`${styles.navBar}`}>
-            <NavBarButton text="Challenges" url={"/challenges"} />
-            <NavBarButton text="Calendar" url={"/calendar"} />
-            <NavBarButton text="Badges" url={"/badges"} />
+            <NavBarButton text="Challenges" url={"/challenges"} iconSrc={"/icons/challenges_icon.svg"} iconAlt={"Challenges Icon"}/>
+            <NavBarButton text="Calendar" url={"/calendar"} iconSrc={"/icons/calendar_icon.svg"} iconAlt={"Calendar Icon"}/>
+            <NavBarButton text="Badges" url={"/badges"} iconSrc={"/icons/badges_icon.svg"} iconAlt={"Badges Icon"}/>
         </div>
     );
 }
