@@ -4,16 +4,54 @@ import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
 
+function getWeekIntervalStr(date: Date): string {
+    const weekDay = date.getDay();
+    const todayDate = date.getDate();
+
+    const firstDayOfWeek = new Date(date);
+
+    // Offsets date to first day of week
+    firstDayOfWeek.setDate(todayDate - weekDay + 1); // Monday is 1
+    const firstDayOfWeekDate = date.getDate();
+
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+
+    // Offsets date to last day of week
+    lastDayOfWeek.setDate(firstDayOfWeekDate + 6);
+
+    return `${firstDayOfWeek.getDate()} ${firstDayOfWeek.toLocaleString('default', { month: 'long' }).substring(0, 3).toUpperCase()}-${lastDayOfWeek.getDate()} ${lastDayOfWeek.toLocaleString('default', { month: 'long' }).substring(0, 3).toUpperCase()}`
+}
+
 function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
-    const maxHours = 200;
     return (
         <div className={styles.focusWeeksContainer}>
             {
                 weekStudyTimeHistory
-                    .sort((week1: WeekTimeStudy, week2: WeekTimeStudy) => week1.week - week2.week) // latest weeks first. TODO: take the year into account, as well
-                    .slice(0, 3).map((weekData, index) => {
+                .sort((week1: WeekTimeStudy, week2: WeekTimeStudy) => { // sorts by increasing year and week
+                    const year1 = week1.week
+                    const year2 = week2.week
+
+                    if (year1 < year2)
+                        return -1
+
+                    if (year1 > year2)
+                        return 1
+
+                    return week1.week - week2.week
+
+                })
+                    .reverse() // higher weeks first
+                    .slice(0, 3) // Selects the three first weeks
+                    .reverse() // lower weeks first
+                    .map((weekData, index) => {
                         const date = utils.getDateFromWeekNumber(weekData.year, weekData.week)
                         const weekStudyTimeTarget = weekData.target
+                        let percentageFocusDone = weekData.total / weekStudyTimeTarget * 100
+                        
+                        // To avoid bar overflow
+                        if (percentageFocusDone > 100)
+                            percentageFocusDone = 100
+                        
                         return (
                             <div key={index} className={styles.focusWeekContainer}>
                                 <div className={styles.focusWeekLabel}>
@@ -23,7 +61,7 @@ function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[
                                 </div>
                                 <div className={styles.focusWeekProgressBarContainer}>
                                     <div className={styles.focusWeekProgressBar}
-                                        style={{ "--bar-width": `${weekData.total / weekStudyTimeTarget * 100}%` } as React.CSSProperties}>
+                                        style={{ "--bar-width": `${percentageFocusDone}%` } as React.CSSProperties}>
                                     </div>
                                 </div>
                             </div>
@@ -34,23 +72,6 @@ function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[
     )
 }
 
-function getWeekIntervalStr(date: Date): string {
-    const weekDay = date.getDay();
-    const todayDate = date.getDate();
-
-    const firstDayOfWeek = new Date(date);
-
-    // Offsets date to first day of week
-    firstDayOfWeek.setDate(todayDate - weekDay);
-    const firstDayOfWeekDate = date.getDate();
-
-    const lastDayOfWeek = new Date(firstDayOfWeek);
-
-    // Offsets date to last day of week
-    lastDayOfWeek.setDate(firstDayOfWeekDate + 6);
-
-    return `${firstDayOfWeek.getDate()} ${firstDayOfWeek.toLocaleString('default', { month: 'long' }).substring(0, 3).toUpperCase()}-${lastDayOfWeek.getDate()} ${lastDayOfWeek.toLocaleString('default', { month: 'long' }).substring(0, 3).toUpperCase()}`
-}
 
 function HistoryStats({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
     return (
