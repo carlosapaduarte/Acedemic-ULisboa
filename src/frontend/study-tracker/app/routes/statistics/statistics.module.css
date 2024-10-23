@@ -38,8 +38,8 @@
 }
 
 .statsContainerTitle {
-    display: inline-block;
-    padding: 0.4rem 1rem;
+    display: flex;
+    padding: 0.35rem 0.8rem;
 
     position: relative;
     top: -25px;
@@ -65,11 +65,24 @@
 
     text-transform: uppercase;
     font-family: 'Chakra Petch', sans-serif;
+
+    .titleImg {
+        margin-right: 0.3em;
+        height: 1.25em;
+        width: 1.25em;
+    }
 }
 
 .todayEnergyStatusTitle {
-    margin-left: 1%;
+    display: flex;
     font-weight: bolder;
+    align-items: center;
+
+    .icon {
+        height: 2.5em;
+        width: 2.5em;
+        margin-right: 0.3em;
+    }
 }
 
 .veryWellColor {

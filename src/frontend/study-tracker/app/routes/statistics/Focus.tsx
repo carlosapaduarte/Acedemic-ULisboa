@@ -3,6 +3,7 @@ import styles from "./statistics.module.css";
 import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
+import { Spacer } from "./Commons";
 
 function getWeekIntervalStr(date: Date): string {
     const weekDay = date.getDay();
@@ -98,14 +99,6 @@ function CurWeekDate() {
             WEEK {getWeekIntervalStr(new Date())}
         </span>
     );
-}
-
-function Spacer() {
-    return (
-        <div className={styles.spacer}>
-
-        </div>
-    )
 }
 
 function CurWeekFocusStats({weekStats} : {weekStats: WeekTimeStudy}) {

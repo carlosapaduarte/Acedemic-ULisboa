@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { DailyEnergyStatus, service } from "~/service/service";
 import { utils } from "~/utils";
+import { Spacer } from "./Commons";
 
 function EnergyStatus({ status }: { status: DailyEnergyStatus }) {
     return (
@@ -29,8 +30,8 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
             </div>
 
             <div className={styles.historyStatusAndDate}>
-                {energyHistory.map((value: DailyEnergyStatus) =>
-                    <EnergyStatus status={value} />
+                {energyHistory.map((value: DailyEnergyStatus, index: number) =>
+                    <EnergyStatus status={value} key={index} />
                 )}
             </div>
         </>
@@ -40,8 +41,8 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
 function levelToStr(level: number): string {
     if (level >= 9) return "Very Well";
     if (level >= 7) return "Well";
-    if (level >= 5) return "Good";
-    return "Alive";
+    if (level >= 5) return "bad";
+    return "Very Bad";
 }
 
 function levelToColor(level: number): string {
@@ -60,18 +61,30 @@ function TodayDate() {
     );
 }
 
+function getEnergyIconByEnergyLevel(energyLevel: number): string {
+    const prefix = "/icons/"
+    let filename = ""
+    if (energyLevel >= 9) filename = "energy_very_good_icon.png";
+    if (energyLevel >= 7) filename = "energy_good_icon.png";
+    if (energyLevel >= 5) filename = "energy_bad_icon.png";
+    filename = "energy_very_bad_icon.png";
+    
+    return prefix + filename
+}
+
 function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }) {
     return (
         <>
             {status ?
-                <span className={classNames(levelToColor(status.level), styles.todayEnergyStatusTitle)}>
-                    (SYMBOL) I feel {levelToStr(status.level)}
-                </span>
+                <div className={classNames(levelToColor(status.level), styles.todayEnergyStatusTitle)}>
+                    <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon" className={styles.icon}/>
+                    I feel {levelToStr(status.level)}
+                </div>
                 :
                 <p>Nothing</p>
             }
 
-            <br /><br />
+            <Spacer />
 
             <span>
                 TAGS
@@ -91,6 +104,7 @@ function useEnergyStats() {
     }, []);
 
     function getTodayEnergyStatus(): DailyEnergyStatus | undefined {
+        //console.log(energyHistory)
         return energyHistory?.find((value) => utils.sameDay(value.date, new Date()));
     }
 
@@ -115,7 +129,8 @@ export function EnergyStats() {
             <div className={styles.statsContainer}>
                 <div className={styles.statsContainerTitleAndDateDiv}>
                     <div className={styles.statsContainerTitle}>
-                        (O) Energy
+                        <img src="/icons/energy_container_title_icon.png" alt="Energy Title Icon" className={styles.titleImg}/>
+                        Energy
                     </div>
                     <TodayDate />
                 </div>
