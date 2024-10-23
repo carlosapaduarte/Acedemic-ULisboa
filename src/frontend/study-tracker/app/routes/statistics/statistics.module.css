@@ -23,6 +23,25 @@
     border-color: var(--secondary-color);
 
     border-radius: 10px;
+
+    .tagsContainer {
+        display: inline-block;
+        line-height: 1.5em;
+    }
+
+    .energyTag {
+        text-transform: uppercase;
+
+        color: white;
+        font-weight: bold;
+        background-color: green;
+        border-radius: 1em;
+        font-size: 0.7em;
+        
+        padding: 0.4em;
+        margin-right: 0.5em;
+        margin-bottom: 1em;
+    }
 }
 
 .statsContainerTitleAndDateDiv {
@@ -127,7 +146,23 @@
 
 .historyStatusAndDate {
     display: flex;
-    justify-content: space-evenly;
+    
+    text-align: center;
+    color: var(--secondary-color);
+    font-size: 0.7em;
+
+    .textAndIconContainer {
+        display: flex;
+        flex-direction: column;
+
+        margin-right: 1em;
+        align-items: center;
+    }
+
+    .energyHistoryStatusIcon {
+        height: 2.6em;
+        width: 2.6em;
+    }
 }
 
 .focusContainerCurWeekStatisticTitle {

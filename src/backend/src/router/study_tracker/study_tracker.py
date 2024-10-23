@@ -217,13 +217,7 @@ def create_daily_energy_stat(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateDailyEnergyStatus
 ):
-    study_tracker_service.create_daily_energy_status(
-        user_id, 
-        DailyEnergyStatus(
-            datetime.fromtimestamp(dto.date), 
-            dto.level
-        )
-    )
+    study_tracker_service.create_daily_energy_status(user_id, dto.level)
     
 @router.get("/users/me/statistics/daily-energy-status")
 def get_daily_energy_history(

@@ -6,11 +6,22 @@ import { DailyEnergyStatus, service } from "~/service/service";
 import { utils } from "~/utils";
 import { Spacer } from "./Commons";
 
+function getEnergyIconByEnergyLevel(energyLevel: number): string {
+    const prefix = "/icons/"
+    let filename = ""
+    if (energyLevel >= 9) filename = "energy_very_good_icon.png";
+    else if (energyLevel >= 7) filename = "energy_good_icon.png";
+    else if (energyLevel >= 5) filename = "energy_bad_icon.png";
+    else filename = "energy_very_bad_icon.png";
+    
+    return prefix + filename
+}
+
 function EnergyStatus({ status }: { status: DailyEnergyStatus }) {
     return (
-        <div>
-            <p>(O)</p>
-            <span>{status.date.getDate()} {status.date.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}</span>
+        <div className={styles.textAndIconContainer}>
+            <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon" className={styles.energyHistoryStatusIcon}/>
+            {status.date.getDate()} {status.date.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}
         </div>
     );
 }
@@ -30,9 +41,25 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
             </div>
 
             <div className={styles.historyStatusAndDate}>
-                {energyHistory.map((value: DailyEnergyStatus, index: number) =>
-                    <EnergyStatus status={value} key={index} />
-                )}
+                {energyHistory
+                    .sort((status1: DailyEnergyStatus, status2: DailyEnergyStatus) => { // sorts by increasing year and week
+                        const lower = status1.date < status2.date
+                        if (lower)
+                            return -1
+                        else {
+                            if (status1.date > status2.date)
+                                return 1
+
+                            return 0
+                        }
+                    })
+                    .reverse()
+                    .slice(0, 6)
+                    .reverse()
+                    .map((value: DailyEnergyStatus, index: number) =>
+                        <EnergyStatus status={value} key={index} />
+                    )
+                }
             </div>
         </>
     );
@@ -61,15 +88,18 @@ function TodayDate() {
     );
 }
 
-function getEnergyIconByEnergyLevel(energyLevel: number): string {
-    const prefix = "/icons/"
-    let filename = ""
-    if (energyLevel >= 9) filename = "energy_very_good_icon.png";
-    if (energyLevel >= 7) filename = "energy_good_icon.png";
-    if (energyLevel >= 5) filename = "energy_bad_icon.png";
-    filename = "energy_very_bad_icon.png";
-    
-    return prefix + filename
+const tags = ["sleep weel", "sports", "healthy food", "sun", "friends"]
+
+function Tags() {
+    return (
+        <div className={styles.tagsContainer}>
+            {
+                tags.map((tag: string) => 
+                    <span className={styles.energyTag}>{tag} </span>
+                )
+            }
+        </div>
+    )
 }
 
 function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }) {
@@ -86,9 +116,7 @@ function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }
 
             <Spacer />
 
-            <span>
-                TAGS
-            </span>
+            <Tags/>
         </>
     );
 }
@@ -139,7 +167,7 @@ export function EnergyStats() {
 
                 <br /><br />
 
-                <EnergyStatusHistory energyHistory={energyHistory ? energyHistory.slice(0, 6) : []}
+                <EnergyStatusHistory energyHistory={energyHistory ? energyHistory : []}
                                      onSeeFullHistoryClick={onSeeFullHistoryClickHandler} />
             </div>
         </>

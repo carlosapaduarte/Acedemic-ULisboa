@@ -495,6 +495,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             result = session.exec(statement)
             model: DailyEnergyStatusModel | None = result.first()
+            print(model)
             return model is not None
             
     def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:

@@ -3,6 +3,7 @@ from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Dat
 from exception import AlreadyExistsException, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
+from datetime import date
 
 
 study_tracker_repo = StudyTrackerSqlRepo()
@@ -121,8 +122,13 @@ def create_curricular_unit(user_id: int, name: str):
 def create_grade(user_id: int, curricular_unit: str, grade: Grade):
     return study_tracker_repo.create_grade(user_id, curricular_unit, grade)
 
-def create_daily_energy_status(user_id: int, status: DailyEnergyStatus):
+def create_daily_energy_status(user_id: int, level: int):
     if not study_tracker_repo.is_today_energy_status_created(user_id):
+        today = date.today()
+        status = DailyEnergyStatus(
+            today,
+            level
+        )
         study_tracker_repo.create_daily_energy_status(user_id, status)
     else:
         raise AlreadyExistsException()

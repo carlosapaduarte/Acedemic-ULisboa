@@ -64,7 +64,6 @@ class CreateGradeInputDto(BaseModel):
     weight: float
     
 class CreateDailyEnergyStatus(BaseModel):
-    date: float
     level: int
     
 class UpdateWeekStudyTime(BaseModel):
