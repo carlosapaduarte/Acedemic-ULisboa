@@ -6,7 +6,7 @@ import { DailyEnergyStatus, service } from "~/service/service";
 import { utils } from "~/utils";
 import { Spacer } from "./Commons";
 
-function getEnergyIconByEnergyLevel(energyLevel: number): string {
+export function getEnergyIconByEnergyLevel(energyLevel: number): string {
     const prefix = "/icons/"
     let filename = ""
     if (energyLevel >= 9) filename = "energy_very_good_icon.png";
@@ -65,7 +65,7 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
     );
 }
 
-function levelToStr(level: number): string {
+export function levelToStr(level: number): string {
     if (level >= 9) return "Very Well";
     if (level >= 7) return "Well";
     if (level >= 5) return "bad";

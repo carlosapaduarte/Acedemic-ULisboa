@@ -1,0 +1,56 @@
+@import "../../components/Button/button.module.css";
+
+.titleContainer {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: x-large;
+    margin-bottom: 0.6em;
+}
+
+.secondaryMessage {
+    text-align: center;
+    font-size: 0.65em;
+}
+
+.selectedEnergyLevelIconContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.selectedEnergyLevelIcon {
+    height: 8em;
+    width: 8em;
+}
+
+.energyLevelSelectedText {
+    display: flex;
+    font-weight: bold;
+    justify-content: center;
+    text-align: center;
+    color: var(--secondary-color);
+}
+
+.buttonsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.saveButton {
+    composes: roundButton;    
+    margin-bottom: 1em;
+    width: 12rem;
+    height: 2rem;
+}
+
+.skipButton {
+    composes: roundButton;    
+
+    width: 12rem;
+    height: 2rem;
+
+    background-color: rgba(188, 153, 107, 0.323);
+
+    color: var(--secondary-color);
+}

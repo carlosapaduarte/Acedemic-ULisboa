@@ -1,5 +1,6 @@
 {
     "energy_question": "How much energy do you have today?",
+    "secondary_message": "Your study plan will adapt to it",
     "save": "Save",
     "skip": "Skip",
     "energy_level": "Energy level:"

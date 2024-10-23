@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
-import { HowMuchEnergyQuestionPage } from "./EnergyQuestion";
+import HowMuchEnergyQuestionPage from "~/routes/energy-question/route";
 
 export default function HomePage() {
     const { t } = useTranslation(["home"]);
