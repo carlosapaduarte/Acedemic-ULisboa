@@ -131,6 +131,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+
 }
 
 .historyTitle {
@@ -138,10 +140,19 @@
     font-weight: bolder;
 }
 
-.seeFullHistoryText {
+.seeFullHistoryButton {
     color: var(--secondary-color);
     background-color: transparent;
     font-size: smaller;
+
+    display: flex;
+    align-items: center;
+
+    .historyIcon {
+        height: 1em;
+        width: 1em;
+        margin-right: 0.4em;
+    }
 }
 
 .historyStatusAndDate {

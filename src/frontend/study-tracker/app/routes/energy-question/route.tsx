@@ -12,8 +12,6 @@ function useHowMuchEnergyQuestionPage(onQuestionSubmitted: () => void) {
 
     function onConfirmPressHandler() {
         service.createDailyEnergyStat(level)
-            .then(() => {
-            })
             .catch((error) => setError(error));
 
         onQuestionSubmitted();
@@ -36,6 +34,8 @@ export default function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: 
                 {t("statistics:secondary_message")}
             </div>
 
+            <br/>
+
             <div className={styles.selectedEnergyLevelIconContainer}>
                 <img src={getEnergyIconByEnergyLevel(energyLevel)} alt="Energy Status Icon" className={styles.selectedEnergyLevelIcon}/>
             </div>
@@ -44,20 +44,20 @@ export default function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: 
                 {levelToStr(energyLevel)}
             </div>
 
-            <TextField autoFocus>
-                <Label>
-                    {t("statistics:energy_level")}
-                </Label>
-                <Input
-                    value={energyLevel}
-                    required type="number"
-                    min={1}
-                    max={10}
-                    onChange={(e) => setLevel(Number(e.target.value))}
+            <div className={styles.slideContainer}>
+                <input 
+                    type="range" 
+                    min="1" 
+                    max="10" 
+                    value={energyLevel} 
+                    className={styles.slider} onChange={(e) => setLevel(Number(e.target.value))} 
                 />
-            </TextField>
+            </div>
 
-            <br />
+            <div className={styles.sliderLegend}>
+                <span>Tired</span>
+                <span>Energetic</span>
+            </div>
 
             <div className={styles.buttonsContainer}>
                 <Button

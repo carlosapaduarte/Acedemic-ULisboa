@@ -3,7 +3,7 @@ import styles from "./statistics.module.css";
 import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
-import { Spacer } from "./Commons";
+import { SeeFullHistory, Spacer } from "./Commons";
 
 function getWeekIntervalStr(date: Date): string {
     const weekDay = date.getDay();
@@ -81,9 +81,7 @@ function HistoryStats({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeSt
                 <span className={styles.historyTitle}>
                     History
                 </span>
-                <button className={styles.seeFullHistoryText}>
-                    (O) See full history
-                </button>
+                <SeeFullHistory />
             </div>
 
             <div>

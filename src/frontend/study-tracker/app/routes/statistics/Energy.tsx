@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { DailyEnergyStatus, service } from "~/service/service";
 import { utils } from "~/utils";
-import { Spacer } from "./Commons";
+import { SeeFullHistory, Spacer } from "./Commons";
 
 export function getEnergyIconByEnergyLevel(energyLevel: number): string {
     const prefix = "/icons/"
@@ -35,9 +35,7 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
         <>
             <div className={styles.historyFirstContainer}>
                 <span className={styles.historyTitle}>History</span>
-                <button className={styles.seeFullHistoryText}>
-                    (O) See full history
-                </button>
+                <SeeFullHistory />
             </div>
 
             <div className={styles.historyStatusAndDate}>
@@ -94,8 +92,8 @@ function Tags() {
     return (
         <div className={styles.tagsContainer}>
             {
-                tags.map((tag: string) => 
-                    <span className={styles.energyTag}>{tag} </span>
+                tags.map((tag: string, index: number) => 
+                    <span key={index} className={styles.energyTag}>{tag} </span>
                 )
             }
         </div>

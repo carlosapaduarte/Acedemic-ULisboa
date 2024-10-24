@@ -4,6 +4,7 @@ import { service } from "~/service/service";
 import { EnergyStats } from "./Energy";
 import { FocusStats } from "./Focus";
 import styles from "./statistics.module.css";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 function WeekStats({ week, stats }: { week: string, stats: any }) {
     return (
@@ -65,7 +66,7 @@ function TaskDistribution() {
 
 export default function Statistics() {
     return (
-        <>
+        <RequireAuthn>
             <div className={styles.pageTitleDiv}>
                 <span className={styles.pageTitle}>
                     Statistics
@@ -74,6 +75,6 @@ export default function Statistics() {
             <EnergyStats />
             <br /><br />
             <FocusStats />
-        </>
+        </RequireAuthn>
     );
 }

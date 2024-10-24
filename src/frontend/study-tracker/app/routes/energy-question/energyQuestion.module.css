@@ -16,11 +16,16 @@
 .selectedEnergyLevelIconContainer {
     display: flex;
     justify-content: center;
+    margin-bottom: 1em;
 }
 
 .selectedEnergyLevelIcon {
     height: 8em;
     width: 8em;
+
+    border-radius: 50%; 
+    background: var(--primary-color);
+    border: 1px solid black;
 }
 
 .energyLevelSelectedText {
@@ -53,4 +58,53 @@
     background-color: rgba(188, 153, 107, 0.323);
 
     color: var(--secondary-color);
+}
+
+.slideContainer {
+    margin-top: 2em;
+    display: flex;
+    justify-content: center;
+}
+  
+.slider {
+    -webkit-appearance: none;
+    width: 80%;
+    height: 15px;
+    border-radius: 5px;  
+    background: linear-gradient(to right, rgba(228, 0, 91, 0.921), green);
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+  
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    
+    border-radius: 50%; 
+    background: var(--primary-color);
+    border:2px solid black;
+
+    cursor: pointer;
+}
+  
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #04AA6D;
+    cursor: pointer;
+}
+
+.sliderLegend {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+    margin-bottom: 3em;
+    margin-left: 30px;
+    margin-right: 30px;
+    font-weight: bold;
 }

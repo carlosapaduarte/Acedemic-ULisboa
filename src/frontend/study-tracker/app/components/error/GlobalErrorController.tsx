@@ -13,8 +13,9 @@ export function GlobalErrorController({ children }: { children: React.ReactNode 
 
     const logout = useLogOut();
 
-    // If the error is because of authentication issues, delete local authentication information.
     // NotAuthorizedError is an error that is thrown by the fetch function, when token is invalid.
+    // In this case, delete local authentication information.
+    // Then, clear error flag, and display children. If children has <RequireAuth>, user is redirected to login.
     if (globalError instanceof NotAuthorizedError) {
         logout();
         setGlobalError(undefined);
