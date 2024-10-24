@@ -161,8 +161,34 @@ def get_week_study_time_target(user_id: int, week_number: int) -> int:
         total += elapsed_minutes(event.date.start_date, event.date.end_date)
     return total
 
+"""
 def increment_week_study_time(user_id: int, week_and_year: WeekAndYear, minutes: int):
     study_tracker_repo.increment_week_study_time(user_id, week_and_year, minutes)
+"""
+def start_new_study_session(user_id: int):
+    study_tracker_repo.override_study_session_start_date(user_id)
     
+"""
+    Should be called after start_new_study_session();
+    Fetches last stored study session start date, and computes minutes elapsed until now.
+    Then, uses that information to update the current week time average study time, and the total week study time.
+"""
+def finish_study_session(user_id: int):
+    start_time = study_tracker_repo.get_study_session_start_date(user_id)
+    now = datetime.now()
+    
+    study_session_duration_min = elapsed_minutes(start_time, now)
+    
+    cur_week_number = now.isocalendar()[1]
+    week_and_year = WeekAndYear(
+        year=now.year,
+        week=cur_week_number
+    )
+    
+    study_tracker_repo.increment_week_study_time(user_id, week_and_year, study_session_duration_min)
+    study_tracker_repo.update_week_time_average_study_time(user_id, week_and_year, study_session_duration_min)
+    
+"""
 def update_week_time_average_study_time(user_id: int, week_and_year: WeekAndYear, study_session_time: int):
     study_tracker_repo.update_week_time_average_study_time(user_id, week_and_year, study_session_time)
+"""

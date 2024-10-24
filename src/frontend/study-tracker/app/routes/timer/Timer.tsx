@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import useTimer from "react-timer-hook";
 import { utils } from "~/utils";
 
-export function Timer({ title, onMinuteElapsed, stopDate, onStopClick, onFinish }: {
+export function Timer({ title, stopDate, onStart, onStopClick, onFinish }: {
     title: string,
-    onMinuteElapsed: () => void
     stopDate: Date,
+    onStart: () => void,
     onStopClick: (minutesElapsed: number) => void,
     onFinish: () => void
 }) {
@@ -28,21 +28,14 @@ export function Timer({ title, onMinuteElapsed, stopDate, onStopClick, onFinish 
     } = // @ts-ignore
         useTimer({ expiryTimestamp: stopDate, onExpire: onFinish });
 
-    // Just a simple variable to help to figure when to call onMinuteElapsed()
-    const [count, setCount] = useState(0);
+    useEffect(() => {
+        onStart()
+    }, [])
 
     // This should not be necessary, but, whenever argument [stopDate] changes, the counter doesn't restart, despite the change in [stopDate]
     useEffect(() => {
         restart(stopDate);
     }, [stopDate]);
-
-    // Each minutes it passes, calls onMinuteElapsed()
-    useEffect(() => {
-        if (count >= 2)
-            onMinuteElapsed();
-        else
-            setCount(count + 1);
-    }, [minutes]);
 
     function onStopClickHandler() {
         const now = new Date();

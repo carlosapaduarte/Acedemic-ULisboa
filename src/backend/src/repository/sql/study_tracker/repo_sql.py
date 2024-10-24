@@ -595,6 +595,38 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 session.add(week_study_time_model)
                 session.commit()
                 
+    def override_study_session_start_date(self, user_id: int):
+        with Session(engine) as session:
+            statement = select(UserModel)\
+                .where(UserModel.id == user_id)
+                    
+            result = session.exec(statement)
+            user_model: UserModel | None = result.first()            
+            
+            if user_model is None:
+                raise NotFoundException(user_id)
+            
+            user_model.study_session_time = datetime.now()
+            
+            session.add(user_model)
+            session.commit()
+            
+    def get_study_session_start_date(self, user_id: int) -> datetime:
+        with Session(engine) as session:
+            statement = select(UserModel)\
+                .where(UserModel.id == user_id)
+                    
+            result = session.exec(statement)
+            user_model: UserModel | None = result.first()            
+            
+            if user_model is None:
+                raise NotFoundException(user_id)
+            
+            start = user_model.study_session_time
+            if start is None:
+                raise NotFoundException(user_id)
+            return start
+            
     def update_week_time_average_study_time(self, user_id: int, week_and_year: WeekAndYear, study_session_time: int):
         with Session(engine) as session:
             statement = select(WeekStudyTimeModel)\

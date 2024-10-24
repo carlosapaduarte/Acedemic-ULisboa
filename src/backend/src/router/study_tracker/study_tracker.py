@@ -240,6 +240,7 @@ def get_study_time_by_week(
     stats_by_week = study_tracker_service.get_total_time_study_per_week(user_id)
     return WeekTimeStudyOutputDto.from_domain(stats_by_week)
 
+"""
 @router.put("/users/me/statistics/week-study-time/total")
 def increment_week_study_time(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -253,7 +254,21 @@ def increment_week_study_time(
         ),
         dto.time
     )
+"""
+    
+@router.put("/users/me/week-study-time-session")
+def start_new_study_session(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+):
+    study_tracker_service.start_new_study_session(user_id)
+    
+@router.delete("/users/me/week-study-time-session")
+def finish_study_session(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+):
+    study_tracker_service.finish_study_session(user_id)
 
+"""
 @router.put("/users/me/statistics/week-study-time/average-per-session")
 def update_week_time_average_study_time(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -267,3 +282,4 @@ def update_week_time_average_study_time(
         ),
         dto.time
     )
+"""

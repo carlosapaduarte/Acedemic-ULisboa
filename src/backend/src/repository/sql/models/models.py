@@ -14,6 +14,8 @@ class UserModel(SQLModel, table=True):
     share_progress: bool | None
     receive_st_app_notifications: bool | None
     
+    study_session_time: datetime | None
+    
     user_notes: list["NoteModel"] = Relationship(back_populates="user")
     user_batches: list["BatchModel"] = Relationship(back_populates="user")
     user_st_app_uses: list["STAppUseModel"] = Relationship(back_populates="user")

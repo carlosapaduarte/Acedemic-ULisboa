@@ -571,7 +571,7 @@ async function createGrade(curricularUnit: string, value: number, weight: number
 async function createDailyEnergyStat(energyLevel: number) {
     const today = new Date();
     const request = {
-        path: `study-tracker/users/me/statistics/daily-energy`,
+        path: `study-tracker/users/me/statistics/daily-energy-status`,
         method: "POST",
         body: toJsonBody({
             date: today.getTime() / 1000,
@@ -646,6 +646,7 @@ async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
         return Promise.reject(new Error("Could not obtain total time study this week!"));
 }
 
+/*
 async function incrementWeekStudyTime(year: number, week: number, time: number) {
     const request = {
         path: `study-tracker/users/me/statistics/week-study-time/total`,
@@ -656,7 +657,9 @@ async function incrementWeekStudyTime(year: number, week: number, time: number) 
     if (!response.ok)
         return Promise.reject(new Error("Could not update study time!"));
 }
+*/
 
+/*
 async function updateWeekAverageAttentionSpan(year: number, week: number, time: number) {
     const request = {
         path: `study-tracker/users/me/statistics/week-study-time/average-per-session`,
@@ -666,6 +669,27 @@ async function updateWeekAverageAttentionSpan(year: number, week: number, time: 
     const response: Response = await doFetch(request);
     if (!response.ok)
         return Promise.reject(new Error("Could not update week average study attention span!"));
+}
+*/
+
+async function startStudySession() {
+    const request = {
+        path: `study-tracker/users/me/week-study-time-session`,
+        method: "PUT"
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not start study session!"));
+}
+
+async function finishStudySession() {
+    const request = {
+        path: `study-tracker/users/me/week-study-time-session`,
+        method: "DELETE"
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not finish study session!"));
 }
 
 export const service = {
@@ -702,6 +726,8 @@ export const service = {
     getDailyTasksProgress,
     fetchEnergyHistory,
     getStudyTimeByWeek,
-    incrementWeekStudyTime,
-    updateWeekAverageAttentionSpan
+    //incrementWeekStudyTime,
+    //updateWeekAverageAttentionSpan
+    startStudySession,
+    finishStudySession
 };
