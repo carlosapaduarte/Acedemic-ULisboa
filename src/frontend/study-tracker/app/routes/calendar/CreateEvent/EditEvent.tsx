@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { service } from "~/service/service";
 import { Button, Dialog, Input, Label, Modal, TextField } from "react-aria-components";
 import styles from "~/routes/calendar/CreateEvent/createEvent.module.css";
 import classNames from "classnames";
@@ -45,11 +44,11 @@ const DateSection = React.memo(function DeadlineSection(
     const [endTime, setEndTime] = useState(newEventEndDate.toTimeString().slice(0, 5));
 
     useEffect(() => {
-        const [startDateYear, startDateMonth, startDateDay] = startDate.split('-');
-        const [endDateYear, endDateMonth, endDateDay] = endDate.split('-');
+        const [startDateYear, startDateMonth, startDateDay] = startDate.split("-");
+        const [endDateYear, endDateMonth, endDateDay] = endDate.split("-");
 
-        const [startHours, startMinutes] = startTime.split(':');
-        const [endHours, endMinutes] = endTime.split(':');
+        const [startHours, startMinutes] = startTime.split(":");
+        const [endHours, endMinutes] = endTime.split(":");
 
         const newStartDate = new Date(
             parseInt(startDateYear),
@@ -87,7 +86,10 @@ const DateSection = React.memo(function DeadlineSection(
                     <Input type={"time"}
                            aria-label={"Start time"}
                            value={startTime}
-                           onChange={(e) => setStartTime(e.target.value)}
+                           onChange={(e) => {
+                               const timeValue = e.target.value.length !== 0 ? e.target.value : "12:00";
+                               setStartTime(timeValue);
+                           }}
                            className={classNames(styles.timeInput)} />
                 </TextField>
                 <TextField>
@@ -103,7 +105,10 @@ const DateSection = React.memo(function DeadlineSection(
                     <Input type={"time"}
                            aria-label={"End time"}
                            value={endTime}
-                           onChange={(e) => setEndTime(e.target.value)}
+                           onChange={(e) => {
+                               const timeValue = e.target.value.length !== 0 ? e.target.value : "12:00";
+                               setEndTime(timeValue);
+                           }}
                            className={classNames(styles.timeInput)} />
                 </TextField>
             </div>
@@ -244,15 +249,15 @@ export function EditEventModal(
                         <h1 className={styles.newEventTitleText}>Edit Event</h1>
                         <div className={styles.newEventFormContainer}>
                             <EditEventForm eventTitle={eventTitle}
-                                             setEventTitle={setEventTitle}
-                                             eventStartDate={eventStartDate}
-                                             setEventStartDate={setEventStartDate}
-                                             eventEndDate={eventEndDate}
-                                             setEventEndDate={setEventEndDate}
-                                             selectedTags={selectedTags}
-                                             setSelectedTags={setSelectedTags}
-                                             isNewEventRecurrent={isNewEventRecurrent}
-                                             setIsNewEventRecurrent={setIsNewEventRecurrent}
+                                           setEventTitle={setEventTitle}
+                                           eventStartDate={eventStartDate}
+                                           setEventStartDate={setEventStartDate}
+                                           eventEndDate={eventEndDate}
+                                           setEventEndDate={setEventEndDate}
+                                           selectedTags={selectedTags}
+                                           setSelectedTags={setSelectedTags}
+                                           isNewEventRecurrent={isNewEventRecurrent}
+                                           setIsNewEventRecurrent={setIsNewEventRecurrent}
                             />
                         </div>
                         <div className={styles.finishCreatingEventButtonContainer}>

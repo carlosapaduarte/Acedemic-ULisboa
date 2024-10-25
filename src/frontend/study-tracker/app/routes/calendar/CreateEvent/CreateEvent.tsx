@@ -46,11 +46,11 @@ const DateSection = React.memo(function DeadlineSection(
     const [endTime, setEndTime] = useState(newEventEndDate.toTimeString().slice(0, 5));
 
     useEffect(() => {
-        const [startDateYear, startDateMonth, startDateDay] = startDate.split('-');
-        const [endDateYear, endDateMonth, endDateDay] = endDate.split('-');
+        const [startDateYear, startDateMonth, startDateDay] = startDate.split("-");
+        const [endDateYear, endDateMonth, endDateDay] = endDate.split("-");
 
-        const [startHours, startMinutes] = startTime.split(':');
-        const [endHours, endMinutes] = endTime.split(':');
+        const [startHours, startMinutes] = startTime.split(":");
+        const [endHours, endMinutes] = endTime.split(":");
 
         const newStartDate = new Date(
             parseInt(startDateYear),
@@ -78,17 +78,20 @@ const DateSection = React.memo(function DeadlineSection(
                 <TextField>
                     <Label className={styles.formSectionTitle}>Start Date</Label>
                     <Input type={"date"}
-                            aria-label={"Start date"}
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className={classNames(styles.dateInput)} />
+                           aria-label={"Start date"}
+                           value={startDate}
+                           onChange={(e) => setStartDate(e.target.value)}
+                           className={classNames(styles.dateInput)} />
                 </TextField>
                 <TextField>
                     <Label className={styles.formSectionTitle}>Start Time</Label>
                     <Input type={"time"}
                            aria-label={"Start time"}
                            value={startTime}
-                           onChange={(e) => setStartTime(e.target.value)}
+                           onChange={(e) => {
+                               const timeValue = e.target.value.length !== 0 ? e.target.value : "12:00";
+                               setStartTime(timeValue);
+                           }}
                            className={classNames(styles.timeInput)} />
                 </TextField>
                 <TextField>
@@ -104,7 +107,10 @@ const DateSection = React.memo(function DeadlineSection(
                     <Input type={"time"}
                            aria-label={"End time"}
                            value={endTime}
-                           onChange={(e) => setEndTime(e.target.value)}
+                           onChange={(e) => {
+                               const timeValue = e.target.value.length !== 0 ? e.target.value : "12:00";
+                               setEndTime(timeValue);
+                           }}
                            className={classNames(styles.timeInput)} />
                 </TextField>
             </div>
