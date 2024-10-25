@@ -20,7 +20,7 @@ app.include_router(academic_challenge.router)
 app.include_router(study_tracker.router)
 
 origins = [
-    "*" # This is just for now, we need to change this to the actual frontend URL
+    "*" # TODO This is just for now, we need to change this to the actual frontend URL
     #"http://localhost:3000",
     #"http://localhost:5173",
 ]
