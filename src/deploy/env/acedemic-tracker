@@ -1,2 +1,1 @@
-PORT=3000
-API_URL=http://localhost:80/
+PORT=3002

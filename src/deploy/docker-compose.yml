@@ -3,7 +3,7 @@ services:
     build:
       context: ../backend
     ports:
-      - "80:80"
+      - "8000:80"
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -17,7 +17,7 @@ services:
     image: postgres:14.1-alpine
     restart: always
     ports:
-      - ":5432"
+      - "5432:5432"
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
       interval: 10s
@@ -32,7 +32,7 @@ services:
     build:
       context: ../frontend/study-tracker
     ports:
-      - "3000:3000"
+      - "3000:3002"
     env_file:
       - env/acedemic-tracker
 
