@@ -162,7 +162,7 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
                                         taskData: {
                                             title,
                                             description: description ?? "",
-                                            deadline: deadline,
+                                            deadline: deadline ?? new Date(),
                                             priority: "importante", // TODO: change in backend to have "low", "medium", and "high" priorities
                                             tags,
                                             status: status ?? "unfinished"
