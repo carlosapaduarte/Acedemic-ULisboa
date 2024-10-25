@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from router.study_tracker import study_tracker
 
 
-# Check this for erro handling: https://fastapi.tiangolo.com/tutorial/handling-errors/?h=error#import-httpexception
+# Check this for error handling: https://fastapi.tiangolo.com/tutorial/handling-errors/?h=error#import-httpexception
 
 app = FastAPI()
 
@@ -20,9 +20,13 @@ app.include_router(academic_challenge.router)
 app.include_router(study_tracker.router)
 
 origins = [
-    "*" # TODO This is just for now, we need to change this to the actual frontend URL
-    #"http://localhost:3000",
-    #"http://localhost:5173",
+    "*" # [DEVELOPMENT ONLY]
+    "https://acedemic.studentlife.ulisboa.pt",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:5173",
+    "http://localhost:5273",
 ]
 
 app.add_middleware(

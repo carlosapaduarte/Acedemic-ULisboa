@@ -1,8 +1,12 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import * as path from "node:path";
 
 export default defineConfig({
+    server: {
+        port: 5173
+    },
     plugins: [
         remix({
             future: {
@@ -12,5 +16,17 @@ export default defineConfig({
             }
         }),
         tsconfigPaths()
-    ]
+    ],
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: "modern-compiler" // or "modern"
+            }
+        }
+    },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './app')
+        }
+    }
 });
