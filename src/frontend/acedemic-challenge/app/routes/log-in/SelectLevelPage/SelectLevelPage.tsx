@@ -52,13 +52,13 @@ function useSelectLevelPage(
         null
     );
 
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     async function onConfirmClickHandler(level: LevelType) {
         await service
             .createBatch(level) // returns if was successful or not
             .then(() => onLevelSelected())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     // TODO Quiz Button

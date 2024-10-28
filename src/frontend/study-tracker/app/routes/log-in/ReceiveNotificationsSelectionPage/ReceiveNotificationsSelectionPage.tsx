@@ -8,12 +8,12 @@ import { useTranslation } from "react-i18next";
 export function ReceiveNotificationsSelectionPage({ onProceed }: { onProceed: () => void }) {
     const { t } = useTranslation(["login"]);
 
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     function submitReceiveNotPref(answer: BinaryAnswer) {
         service.updateReceiveNotificationsPreference(answer)
             .then(() => onProceed())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return (

@@ -9,7 +9,7 @@ export function GlobalErrorController({ children }: { children: React.ReactNode 
     const { t } = useTranslation(["error"]);
 
     const globalError = useGlobalError();
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     const logout = useLogOut();
 
@@ -17,7 +17,7 @@ export function GlobalErrorController({ children }: { children: React.ReactNode 
     // NotAuthorizedError is an error that is thrown by the fetch function, when token is invalid.
     if (globalError instanceof NotAuthorizedError) {
         logout();
-        setError(undefined);
+        setGlobalError(undefined);
     }
 
     if (globalError === undefined) {

@@ -41,13 +41,13 @@ export default function ShareProgressPage(
 }
 
 function useShareProgressPage({ onShareSelected }: { onShareSelected: () => void }) {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     async function selectShareProgressState(shareProgress: boolean) {
         await service
             .selectShareProgressState(shareProgress)
             .then(() => onShareSelected())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { selectShareProgressState };

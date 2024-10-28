@@ -119,7 +119,7 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
         service.createNewTask(newTaskInfo)
             .then((task: Task) => onDone(task))
             .catch((error) => {
-            }/*setError(error)*/);
+            }/*setGlobalError(error)*/);
     }
 
     function onConfirmClick(newTaskInfo: CreateTask) {

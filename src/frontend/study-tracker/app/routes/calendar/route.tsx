@@ -21,7 +21,7 @@ type EventsView =
     | "recurringEvents"
 
 function useMyCalendar() {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     const [events, setEvents] = useState<CalendarEvent[]>([]);
 
@@ -103,7 +103,7 @@ function useMyCalendar() {
     function createNewEvent(event: NewEventInfo, onDone: () => void) {
         service.createNewEvent(event)
             .then(onDone)
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return {

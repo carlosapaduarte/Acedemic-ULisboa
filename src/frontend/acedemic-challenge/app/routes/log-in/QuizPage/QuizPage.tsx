@@ -70,7 +70,7 @@ function useQuizPage(
     const [answers, setAnswers] = useState<boolean[]>(
         new Array(10).fill(undefined)
     );
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     function onAnswerClick(questionNumber: number, answer: boolean) {
         const newAnswers: boolean[] = answers.slice();
@@ -86,7 +86,7 @@ function useQuizPage(
         await service
             .createBatch(computedLevel) // returns if was successful or not
             .then(() => onLevelSelected())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { onAnswerClick, computeLevel };

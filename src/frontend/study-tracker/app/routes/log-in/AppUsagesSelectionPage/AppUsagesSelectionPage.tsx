@@ -21,7 +21,7 @@ function useAppUsagesSelection(
         onComplete: () => void;
     }) {
     const [selectedOptions, setSelectedOptions] = useState<Set<number>>(new Set([]));
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     function onInputValueChange(index: number) {
         const cur: Set<number> = new Set([...selectedOptions]);
@@ -35,7 +35,7 @@ function useAppUsagesSelection(
     function submitAppUseGoals() {
         service.updateAppUseGoals(selectedOptions)
             .then(() => onComplete())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return {

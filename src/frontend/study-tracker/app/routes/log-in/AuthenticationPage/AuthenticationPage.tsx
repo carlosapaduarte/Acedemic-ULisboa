@@ -9,7 +9,7 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 function useUserInfoPage() {
     const logIn = useLogIn();
 
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
@@ -19,7 +19,7 @@ function useUserInfoPage() {
             .then(() => {
                 login(username, password);
             })
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     async function login(username: string, password: string) {
@@ -27,7 +27,7 @@ function useUserInfoPage() {
             .then(() => {
                 logIn();
             })
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { createUser, login };
@@ -41,8 +41,7 @@ export enum AuthAction {
 function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthAction) => void }) {
     const { t } = useTranslation(["login"]);
 
-    const { createUser } = useUserInfoPage();
-    const { login } = useUserInfoPage();
+    const { createUser, login } = useUserInfoPage();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");

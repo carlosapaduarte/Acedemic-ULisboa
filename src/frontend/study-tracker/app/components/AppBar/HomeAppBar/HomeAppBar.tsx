@@ -72,7 +72,7 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
 }
 
 export function GreetingsContainer() {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     const [username, setUsername] = React.useState<string | undefined>(undefined);
     const [avatarFilename, setAvatarFilename] = React.useState<string | undefined>(undefined);
@@ -83,7 +83,7 @@ export function GreetingsContainer() {
                 setAvatarFilename(userInfo.avatarFilename);
                 setUsername(userInfo.username);
             })
-            .catch((e: Error) => setError(e));
+            .catch((e: Error) => setGlobalError(e));
     }, []);
 
 

@@ -6,12 +6,12 @@ import { useTranslation } from "react-i18next";
 import { useWeekDayHourPicker, weekDays } from "~/hooks/useWeekDayHourPicker/useWeekDayHourPicker";
 
 function usePlanDaySelection(onProceed: () => void) {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     function submitPlanDaySelection(weekDay: number, hour: number) {
         service.updateWeekPlanningDay(weekDay, hour)
             .then(() => onProceed())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { submitPlanDaySelection };

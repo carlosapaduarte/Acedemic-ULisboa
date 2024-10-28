@@ -6,7 +6,7 @@ import { CreateGrade } from "./CreateGrade";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 function useCurricularUnitView(initialCurricularUnit: CurricularUnit) {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
     const [curricularUnit, setCurricularUnit] = useState<CurricularUnit>(initialCurricularUnit);
     const [finalGrade, setFinalGrade] = useState<number | undefined>(undefined);
 
@@ -23,7 +23,7 @@ function useCurricularUnitView(initialCurricularUnit: CurricularUnit) {
     function refreshCurricularUnit() {
         service.getCurricularUnit(initialCurricularUnit.name)
             .then((cu: CurricularUnit) => setCurricularUnit(cu))
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { curricularUnit, finalGrade, refreshCurricularUnit };
@@ -48,13 +48,13 @@ function CurricularUnitView({ initialCurricularUnit }: { initialCurricularUnit: 
 }
 
 function useCurricularUnitListView() {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
     const [cuList, setCuList] = useState<CurricularUnit[]>([]);
 
     function refreshCurricularUnits() {
         service.getCurricularUnits()
             .then((cus: CurricularUnit[]) => setCuList(cus))
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     useEffect(() => {

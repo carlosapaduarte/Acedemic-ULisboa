@@ -5,7 +5,7 @@ type ContextType = {
     globalError: Error | undefined
     setGlobalError: (error: Error | undefined) => void
 }
-const LoggedInContext = createContext<ContextType>({
+const GlobalErrorContext = createContext<ContextType>({
     globalError: undefined,
     setGlobalError: (error: Error | undefined) => {
     }
@@ -15,16 +15,16 @@ export function GlobalErrorContainer({ children }: { children: React.ReactNode }
     const [globalError, setGlobalError] = useState<Error | undefined>(undefined);
 
     return (
-        <LoggedInContext.Provider value={{ globalError: globalError, setGlobalError: setGlobalError }}>
+        <GlobalErrorContext.Provider value={{ globalError: globalError, setGlobalError: setGlobalError }}>
             {children}
-        </LoggedInContext.Provider>
+        </GlobalErrorContext.Provider>
     );
 }
 
 export function useGlobalError() {
-    return useContext(LoggedInContext).globalError;
+    return useContext(GlobalErrorContext).globalError;
 }
 
 export function useSetGlobalError() {
-    return useContext(LoggedInContext).setGlobalError;
+    return useContext(GlobalErrorContext).setGlobalError;
 }

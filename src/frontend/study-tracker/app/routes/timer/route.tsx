@@ -38,13 +38,13 @@ function useTimerSetup() {
 }
 
 function useStudyBlock() {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
     const [happeningStudyBlock, setHappeningStudyBlock] = useState<Event | undefined>();
 
     useEffect(() => {
         service.getStudyBlockHappeningNow()
             .then((event: Event | undefined) => setHappeningStudyBlock(event))
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }, []);
 
     return happeningStudyBlock;

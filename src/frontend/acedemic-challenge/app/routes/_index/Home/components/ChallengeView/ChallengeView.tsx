@@ -37,7 +37,7 @@ function getTodayCompletedChallenges(batch: Batch): number[] {
 }
 
 function useMainDashboardContent() {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
     const [newNoteText, setNewNoteText] = useState("");
 
     const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -109,7 +109,7 @@ function useMainDashboardContent() {
         setLoadingChallengesAndNotes(false);
 
         if (userInfo == undefined) {
-            setError(new Error("User information could not be obtained!"));
+            setGlobalError(new Error("User information could not be obtained!"));
             return;
         }
 
@@ -126,7 +126,7 @@ function useMainDashboardContent() {
                 fetchUserInfo(); // Updates state again
                 setView(View.Default);
             }) // this triggers a new refresh. TODO: improve later)
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }*/
 
     async function onMarkCompleteClickHandler(challenge: Challenge, batch: Batch) {
@@ -140,7 +140,7 @@ function useMainDashboardContent() {
             .then(() => {
                 fetchUserInfo(); // Updates state again
             }) // this triggers a new refresh. TODO: improve later
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     useEffect(() => {
@@ -158,7 +158,7 @@ function useMainDashboardContent() {
         todayNotes,
         newNoteText,
         batchToDisplay,
-        setError,
+        setGlobalError,
         setNewNoteText,
         /*
         onAddNewNoteClickHandler,
@@ -176,7 +176,7 @@ function MainContent() {
         todayNotes,
         newNoteText,
         batchToDisplay,
-        setError,
+        setGlobalError,
         setNewNoteText,
         /*
         onAddNewNoteClickHandler,
@@ -224,7 +224,7 @@ function MainContent() {
             </div>
         );
     else {
-        setError(new Error("Something went wrong..."));
+        setGlobalError(new Error("Something went wrong..."));
         return <></>;
     }*/
 }

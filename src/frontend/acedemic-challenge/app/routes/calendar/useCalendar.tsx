@@ -6,7 +6,7 @@ import { utils } from "~/utils";
 import { CalendarDay } from "~/routes/calendar/components/MyCalendar/MyCalendar";
 
 export function useCalendar() {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [challenges, setChallenges] = useState<DayChallenges[] | undefined>(undefined);
@@ -36,7 +36,7 @@ export function useCalendar() {
             setChallenges(userChallenges);
             setUserNotes(userInfo.userNotes);
         } catch (error: any) {
-            setError(error);
+            setGlobalError(error);
         }
     }
 
@@ -117,7 +117,7 @@ export function useCalendar() {
     const onConfirmNewNoteSubmitClickHandler = (noteText: string) => {
         service.createNewUserNote(noteText, selectedDate) // TODO: handle error later
             .then(() => fetchUserCurrentDayAndLoadChallenges()) // TODO: improve later
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     };
 
     return { challenges, userNotes, selectedDate, handleDateClick, onConfirmNewNoteSubmitClickHandler };
