@@ -56,7 +56,7 @@ function useMyCalendar() {
     }
 
     function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
-        service.getUserRecurrentEvents()
+        service.getUserEvents(false, true)
             .then((events: Event[]) => {
                 const calendarEvents: CalendarEvent[] = [];
                 calendarDisplayedDates.forEach((displayedDate: Date) => {
@@ -85,7 +85,7 @@ function useMyCalendar() {
     }
 
     function refreshUserEvents() {
-        service.getUserEvents(false)
+        service.getUserEvents(false, false)
             .then((events: Event[]) => {
                 //console.log(events)
                 const calendarEvents: CalendarEvent[] = events.map((event: Event) => {

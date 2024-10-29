@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
-from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -20,7 +21,14 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def get_events(self, user_id: int, filter_today: bool) -> list[Event]:
+    def get_events(
+        self, 
+        user_id: int, 
+        filter_today: bool, 
+        recurrentEvents: bool, 
+        study_events: bool, 
+        week_number: int | None
+    ) -> list[Event]:
         pass
 
     @abstractmethod
@@ -40,7 +48,7 @@ class StudyTrackerRepo(ABC):
         pass
     
     @abstractmethod
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
+    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool, filter_deadline_is_today: bool) -> list[Task]:
         pass
 
     @abstractmethod
@@ -73,4 +81,28 @@ class StudyTrackerRepo(ABC):
     
     @abstractmethod
     def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
+        pass
+    
+    @abstractmethod
+    def create_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
+        pass
+    
+    @abstractmethod
+    def is_today_energy_status_created(self, user_id: int) -> bool:
+        pass
+    
+    @abstractmethod
+    def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:
+        pass
+    
+    @abstractmethod
+    def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
+        pass
+    
+    @abstractmethod
+    def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:
+        pass
+    
+    @abstractmethod
+    def increment_week_study_time(self, user_id: int, week_and_year: WeekAndYear, minutes: int):
         pass

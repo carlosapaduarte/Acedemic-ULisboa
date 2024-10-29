@@ -6,8 +6,11 @@ import { SelectAssociatedTasks } from "./SelectAssociatedTasks";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { TaskList } from "~/routes/tasks/TaskList";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
+import { utils } from "~/utils";
 
 function useTimerSetup() {
+    const setError = useSetGlobalError();
+
     const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(undefined);
     const [pauseStopDate, setPauseStopDate] = useState<Date | undefined>(undefined);
 
@@ -21,6 +24,15 @@ function useTimerSetup() {
         setTimerStopDate(studyStopDate);
     }
 
+    function onStopClick() {
+        service.finishStudySession()
+            .catch((error) => setError(error));
+
+        setStudyStopDate(undefined);
+        setPauseStopDate(undefined);
+        setTimerStopDate(undefined);
+    }
+
     function onTimerFinish() {
         if (timerStopDate == studyStopDate)
             setTimerStopDate(pauseStopDate);
@@ -28,12 +40,18 @@ function useTimerSetup() {
             setTimerStopDate(undefined);
     }
 
+    function markTimerStart() {
+        service.startStudySession()
+            .catch((error) => setError(error));
+    }
+
     return {
         timerStopDate,
         onTimeSelected,
         studyStopDate,
-        setStudyStopDate,
-        onTimerFinish
+        onStopClick,
+        onTimerFinish,
+        markTimerStart
     };
 }
 
@@ -103,8 +121,9 @@ function SetupAndStartTimer({ associatedTasks }: { associatedTasks: Task[] }) {
         timerStopDate,
         onTimeSelected,
         studyStopDate,
-        setStudyStopDate,
-        onTimerFinish
+        onStopClick,
+        onTimerFinish,
+        markTimerStart
     } = useTimerSetup();
 
     if (timerStopDate == undefined)
@@ -115,8 +134,13 @@ function SetupAndStartTimer({ associatedTasks }: { associatedTasks: Task[] }) {
         const title = studyStopDate ? "(Study Time)" : "(Pause Time)";
         return (
             <div>
-                <Timer title={title} stopDate={timerStopDate} onStopClick={() => setStudyStopDate(undefined)}
-                       onFinish={onTimerFinish} />
+                <Timer
+                    title={title}
+                    stopDate={timerStopDate}
+                    onStart={markTimerStart}
+                    onStopClick={onStopClick}
+                    onFinish={onTimerFinish}
+                />
                 <AssociatedTaskListView associatedTasks={associatedTasks} />
             </div>
         );
@@ -132,9 +156,12 @@ function StartTimerByStudyBlock({ associatedTasks, happeningStudyBlock }:
                                         happeningStudyBlock: Event
                                     }) {
     const {
+        timerStopDate,
+        onTimeSelected,
         studyStopDate,
-        setStudyStopDate,
-        onTimerFinish
+        onStopClick,
+        onTimerFinish,
+        markTimerStart
     } = useTimerSetup();
 
     // Title is the name of the current study block event, and if it's in study or pause time
@@ -142,8 +169,13 @@ function StartTimerByStudyBlock({ associatedTasks, happeningStudyBlock }:
 
     return (
         <div>
-            <Timer title={timerTitleMsg} stopDate={happeningStudyBlock.endDate}
-                   onStopClick={() => setStudyStopDate(undefined)} onFinish={onTimerFinish} />
+            <Timer
+                title={timerTitleMsg}
+                stopDate={happeningStudyBlock.endDate}
+                onStart={markTimerStart}
+                onStopClick={onStopClick}
+                onFinish={onTimerFinish}
+            />
             <AssociatedTaskListView associatedTasks={associatedTasks} />
         </div>
     );
@@ -166,6 +198,8 @@ function TimerAndAssociatedTasksView({ associatedTasks }: { associatedTasks: Tas
         return (<StartTimerByStudyBlock associatedTasks={associatedTasks} happeningStudyBlock={happeningStudyBlock} />);
     }
 }
+
+// TODO: check if pause is pressed for a long time, and, if yes, act like the user stopped a study session (update study time average).
 
 function StudyPage() {
     // In short, this component begins by asking the user to select a set of tasks to associate to the study time

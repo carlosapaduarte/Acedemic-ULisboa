@@ -9,4 +9,8 @@ class UsernameAlreadyExistsException(Exception):
 
 class NotAvailableScheduleBlockCollision(Exception):
     def __init__(self):
-        super().__init__()    
+        super().__init__()
+        
+class AlreadyExistsException(Exception):
+    def __init__(self):
+        super().__init__()

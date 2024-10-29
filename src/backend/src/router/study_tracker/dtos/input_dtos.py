@@ -62,3 +62,11 @@ class CreateCurricularUnitInputDto(BaseModel):
 class CreateGradeInputDto(BaseModel):
     value: float
     weight: float
+    
+class CreateDailyEnergyStatus(BaseModel):
+    level: int
+    
+class UpdateWeekStudyTime(BaseModel):
+    year: int
+    week: int
+    time: int # in minutes

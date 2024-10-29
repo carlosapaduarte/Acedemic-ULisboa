@@ -2,6 +2,7 @@ from typing import Optional
 from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, Relationship, SQLModel
 from datetime import datetime
+from datetime import date
 
 class UserModel(SQLModel, table=True):
     __tablename__ = "user"
@@ -13,6 +14,8 @@ class UserModel(SQLModel, table=True):
     share_progress: bool | None
     receive_st_app_notifications: bool | None
     
+    study_session_time: datetime | None
+    
     user_notes: list["NoteModel"] = Relationship(back_populates="user")
     user_batches: list["BatchModel"] = Relationship(back_populates="user")
     user_st_app_uses: list["STAppUseModel"] = Relationship(back_populates="user")
@@ -22,6 +25,8 @@ class UserModel(SQLModel, table=True):
     st_tasks: list["STTaskModel"] = Relationship(back_populates="user")    
     st_archives: list["STArchiveModel"] = Relationship(back_populates="user")
     st_curricular_units: list["STCurricularUnitModel"] = Relationship(back_populates="user")
+    daily_energy_status: list["DailyEnergyStatusModel"] = Relationship(back_populates="user")
+    week_study_time: list["WeekStudyTimeModel"] = Relationship(back_populates="user")
 
 class NoteModel(SQLModel, table=True):
     __tablename__ = "note"
@@ -272,3 +277,24 @@ class STGradeModel(SQLModel, table=True):
     
     # Relationship with STTaskModel
     curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")
+    
+class DailyEnergyStatusModel(SQLModel, table=True):
+    __tablename__ = "daily_energy_status"
+
+    date_: date = Field(primary_key=True, default=None)
+    level: int
+
+    user_id: int = Field(foreign_key="user.id")    
+    user: UserModel = Relationship(back_populates="daily_energy_status")
+    
+class WeekStudyTimeModel(SQLModel, table=True):
+    __tablename__ = "week_study_time"
+
+    year: int = Field(primary_key=True, default=None)
+    week: int = Field(primary_key=True, default=None)
+    total: int
+    average_by_session: float
+    n_of_sessions: int
+
+    user_id: int = Field(foreign_key="user.id")    
+    user: UserModel = Relationship(back_populates="week_study_time")

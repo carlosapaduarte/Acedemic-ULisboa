@@ -1,0 +1,221 @@
+.pageTitleDiv {
+    display: flex;
+    margin-bottom: 1em;
+    margin-left: 1.5em;
+}
+
+.pageTitle {
+    font-size: x-large;
+    font-weight: bolder;
+}
+
+.statsContainer {
+    margin: 0 1rem;
+    @media (min-width: 600px) {
+        margin: 0 5rem;
+    }
+
+    padding: 1rem;
+
+    box-sizing: border-box;
+    border: 3px solid;
+
+    border-color: var(--secondary-color);
+
+    border-radius: 10px;
+
+    .tagsContainer {
+        display: inline-block;
+        line-height: 1.5em;
+    }
+
+    .energyTag {
+        text-transform: uppercase;
+
+        color: white;
+        font-weight: bold;
+        background-color: green;
+        border-radius: 1em;
+        font-size: 0.7em;
+        
+        padding: 0.4em;
+        margin-right: 0.5em;
+        margin-bottom: 1em;
+    }
+}
+
+.statsContainerTitleAndDateDiv {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8em;
+}
+
+.historyTitleAndSeeMore {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8em;
+}
+
+.statsContainerTitle {
+    display: flex;
+    padding: 0.35rem 0.8rem;
+
+    position: relative;
+    top: -25px;
+    left: -17px;
+    background-color: var(--secondary-color);
+    text-align: center;
+
+    font-weight: bolder;
+    color: white;
+    
+
+    --edge-size: .5rem;
+    clip-path: polygon(
+            var(--edge-size) 0,
+            calc(100% - var(--edge-size)) 0,
+            100% var(--edge-size),
+            100% calc(100% - var(--edge-size)),
+            calc(100% - var(--edge-size)) 100%,
+            var(--edge-size) 100%,
+            0 calc(100% - var(--edge-size)),
+            0 var(--edge-size)
+    );
+
+    text-transform: uppercase;
+    font-family: 'Chakra Petch', sans-serif;
+
+    .titleImg {
+        margin-right: 0.3em;
+        height: 1.25em;
+        width: 1.25em;
+    }
+}
+
+.todayEnergyStatusTitle {
+    display: flex;
+    font-weight: bolder;
+    align-items: center;
+
+    .icon {
+        height: 2.5em;
+        width: 2.5em;
+        margin-right: 0.3em;
+    }
+}
+
+.veryWellColor {
+    color: green;
+}
+
+.wellColor {
+    color: yellowgreen;
+}
+
+.goodColor {
+    color: yellow;
+}
+
+.badColor {
+    color: red;
+}
+
+.containerHeaderDate {
+    text-align: end;
+    color: var(--secondary-color);
+    font-size: 0.7em;
+    flex: 0 0 50%;
+}
+
+.historyFirstContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+
+}
+
+.historyTitle {
+    font-size: larger;
+    font-weight: bolder;
+}
+
+.seeFullHistoryButton {
+    color: var(--secondary-color);
+    background-color: transparent;
+    font-size: smaller;
+
+    display: flex;
+    align-items: center;
+
+    .historyIcon {
+        height: 1em;
+        width: 1em;
+        margin-right: 0.4em;
+    }
+}
+
+.historyStatusAndDate {
+    display: flex;
+    
+    text-align: center;
+    color: var(--secondary-color);
+    font-size: 0.7em;
+
+    .textAndIconContainer {
+        display: flex;
+        flex-direction: column;
+
+        margin-right: 1em;
+        align-items: center;
+    }
+
+    .energyHistoryStatusIcon {
+        height: 2.6em;
+        width: 2.6em;
+    }
+}
+
+.focusContainerCurWeekStatisticTitle {
+    font-size: large;
+    font-weight: bolder;
+    color: var(--secondary-color);
+}
+
+.focusContainerCurWeekStatisticValue {
+    
+}
+
+.focusWeeksContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.focusWeekContainer {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.focusWeekLabel {
+    flex: 0 0 35%;
+}
+
+.focusWeekProgressBarContainer {
+    flex: 1;
+}
+
+.focusWeekProgressBar {
+    --bar-width: 50%;
+
+    height: 100%;
+
+    background-color: var(--fourth-color);
+    width: var(--bar-width);
+    border-radius: 1rem;
+}
+
+.spacer {
+    height: 0.7em;
+}

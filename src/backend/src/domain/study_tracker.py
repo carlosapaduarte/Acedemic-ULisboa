@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
-from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel
+from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel, WeekStudyTimeModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, SlotToWorkInputDto
 
 class Priority(Enum):
@@ -215,4 +215,92 @@ class CurricularUnit():
                 grades=Grade.from_STGradeModel(cu_model.grades)
             ))
 
+        return curricular_units
+
+class DailyEnergyStatus():
+    date_: date
+    level: int
+
+    def __init__(self, date: date, level: int) -> None:
+        self.date_=date
+        self.level=level
+
+class WeekAndYear():
+    year: int
+    week: int
+    
+    def __init__(self, year: int, week: int) -> None:
+        self.year=year
+        self.week=week
+        
+class WeekTimeStudy():
+    week_and_year: WeekAndYear
+    minutes: int
+    
+    def __init__(self, week_and_year: WeekAndYear, minutes: int) -> None:
+        self.week_and_year=week_and_year
+        self.minutes=minutes
+        
+    @staticmethod
+    def from_STCurricularUnitModel(models: list[WeekStudyTimeModel]) -> list['WeekTimeStudy']:
+        curricular_units: list[WeekTimeStudy] = []
+        for model in models:
+            curricular_units.append(WeekTimeStudy(
+                week_and_year=WeekAndYear(
+                    year=model.year,
+                    week=model.week
+                ),
+                minutes=model.total
+            ))
+            
+        return curricular_units
+    
+class DailyEnergyStatus():
+    date_: date
+    level: int
+    
+    def __init__(self, date: date, level: int) -> None:
+        self.date_=date
+        self.level=level
+
+class WeekAndYear():
+    year: int
+    week: int
+    
+    def __init__(self, year: int, week: int) -> None:
+        self.year=year
+        self.week=week
+        
+class WeekTimeStudy():
+    week_and_year: WeekAndYear
+    total: int
+    average_by_session: float
+    target: int | None
+    
+    def __init__(
+        self, 
+        week_and_year: WeekAndYear, 
+        total: int, 
+        average_by_session: float,
+        target: int | None
+    ) -> None:
+        self.week_and_year=week_and_year
+        self.total=total
+        self.average_by_session=average_by_session
+        self.target=target
+
+    @staticmethod
+    def from_STCurricularUnitModel(models: list[WeekStudyTimeModel]) -> list['WeekTimeStudy']:
+        curricular_units: list[WeekTimeStudy] = []
+        for model in models:
+            curricular_units.append(WeekTimeStudy(
+                week_and_year=WeekAndYear(
+                    year=model.year,
+                    week=model.week
+                ),
+                total=model.total,
+                average_by_session=model.average_by_session,
+                target=None
+            ))
+            
         return curricular_units

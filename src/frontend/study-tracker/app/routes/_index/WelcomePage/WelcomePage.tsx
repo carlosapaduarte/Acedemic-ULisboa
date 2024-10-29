@@ -30,10 +30,14 @@ export default function WelcomePage() {
 
     return (
         <div className={classNames(styles.welcomePage)}>
-            <h1>Welcome! <br /> Log in to continue</h1>
+            <h1>
+                {t("welcome_page:hello_message")}
+                <br />
+                {t("welcome_page:login_to_continue")}
+            </h1>
             <br />
             <button className={styles.roundButton} onClick={handleOnProceedClick}>
-                Go to Login
+                {t("welcome_page:login")}
             </button>
         </div>
     );

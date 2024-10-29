@@ -151,7 +151,7 @@ async function fetchUserInfo(): Promise<UserInfo> {
     const response: Response = await doFetch(request);
 
     if (response.ok) {
-        const responseObject: UserInfo = await response.json(); // TODO: how
+        const responseObject: UserInfo = await response.json();
         return responseObject;
     } else
         return Promise.reject(new Error("User info could not be obtained!"));
@@ -242,15 +242,15 @@ export type Event = {
     everyWeek: boolean
 }
 
-async function getUserEvents(filterTodayEvents: boolean): Promise<Event[]> {
+async function getUserEvents(filterTodayEvents: boolean, filterRecurrentEvents: boolean): Promise<Event[]> {
     const request = {
-        path: `study-tracker/users/me/events?today=${filterTodayEvents}`,
+        path: `study-tracker/users/me/events?today=${filterTodayEvents}&recurrentEvents=${filterRecurrentEvents}`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
 
     if (response.ok) {
-        const responseObject: EventDto[] = await response.json(); // TODO: how
+        const responseObject: EventDto[] = await response.json();
         return responseObject.map((eventDto: EventDto) => {
             return {
                 startDate: new Date(eventDto.startDate * 1000),
@@ -268,19 +268,13 @@ async function getUserEvents(filterTodayEvents: boolean): Promise<Event[]> {
     }
 }
 
-async function getUserRecurrentEvents(): Promise<Event[]> {
-    // For simplicity, let's just get all events and filter here instead of in the backend
-    const allEvents = await getUserEvents(false);
-    return allEvents.filter((event: Event) => event.everyWeek);
-}
-
 async function getStudyBlockHappeningNow(): Promise<Event | undefined> {
 
     function containsStudyTag(tags: string[]): boolean {
         return tags.includes("Revisão") || tags.includes("Leitura") || tags.includes("Exercícios / Prática") || tags.includes("Preparação de provas");
     }
 
-    const recurrentEvents = await getUserRecurrentEvents();
+    const recurrentEvents = await getUserEvents(false, true);
 
     // Study blocks happening now!
     const now = new Date();
@@ -290,7 +284,7 @@ async function getStudyBlockHappeningNow(): Promise<Event | undefined> {
 }
 
 async function getUserTodayEvents(): Promise<Event[]> {
-    return getUserEvents(true);
+    return getUserEvents(true, false);
 }
 
 export type CreateScheduleNotAvailableBlock = {
@@ -348,7 +342,7 @@ async function createNewTask(newTaskInfo: CreateTask): Promise<Task> {
     // Backend returns the newly created Task!
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: TaskDto = await response.json(); // TODO: how
+        const responseObject: TaskDto = await response.json();
         return fromTaskDtoToTask(responseObject);
     } else
         return Promise.reject(new Error("Task could not be created!"));
@@ -389,19 +383,31 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
 
 async function getTasks(filterUncompletedTasks: boolean): Promise<Task[]> {
     const request = {
-        path: `study-tracker/users/me/tasks?order_by_deadline_and_priority=true`,
+        path: `study-tracker/users/me/tasks?orderByDeadlineAndPriority=true&filterUncompletedTasks=${filterUncompletedTasks}`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: TaskDto[] = await response.json(); // TODO: how
+        const responseObject: TaskDto[] = await response.json();
         const tasks = responseObject.map((taskDto: TaskDto) => fromTaskDtoToTask(taskDto));
+        return tasks;
+    } else
+        return Promise.reject(new Error("User tasks could not be obtained!"));
+}
 
-        // TODO: do filter on backend!
-        if (filterUncompletedTasks)
-            return tasks.filter((task: Task) => task.data.status != "Tarefa Completa");
-        else
-            return tasks;
+type DailyTasksProgress = {
+    progress: number
+}
+
+async function getDailyTasksProgress(): Promise<number> {
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-tasks-progress`,
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject = await response.json();
+        return responseObject.progress;
     } else
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
@@ -455,7 +461,7 @@ async function getArchives(): Promise<Archive[]> {
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: Archive[] = await response.json(); // TODO: how
+        const responseObject: Archive[] = await response.json();
         return responseObject;
     } else
         return Promise.reject(new Error("Archives could not be obtained!"));
@@ -522,7 +528,7 @@ async function getCurricularUnits(): Promise<CurricularUnit[]> {
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: CurricularUnit[] = await response.json(); // TODO: how
+        const responseObject: CurricularUnit[] = await response.json();
         return responseObject;
     } else
         return Promise.reject(new Error("Curricular Units could not be obtained!"));
@@ -562,6 +568,130 @@ async function createGrade(curricularUnit: string, value: number, weight: number
         return Promise.reject(new Error("New Curricular Unit could not be created!"));
 }
 
+async function createDailyEnergyStat(energyLevel: number) {
+    const today = new Date();
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-energy-status`,
+        method: "POST",
+        body: toJsonBody({
+            date: today.getTime() / 1000,
+            energyLevel
+        })
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Energy level daily statistic could not be submitted!"));
+}
+
+async function getTaskDistributionStats(): Promise<any> {
+    const request = {
+        path: `study-tracker/users/me/statistics/time-by-event-tag`,
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: CurricularUnit[] = await response.json();
+        return responseObject;
+    } else
+        return Promise.reject(new Error("Could not obtain task distribution statistics!"));
+}
+
+export type DailyEnergyStatus = {
+    date: Date,
+    level: number
+}
+type DailyEnergyStatusDto = {
+    date: number,
+    level: number
+}
+
+async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
+    function toDomain(value: DailyEnergyStatusDto): DailyEnergyStatus {
+        return {
+            date: new Date(value.date * 1000),
+            level: value.level
+        };
+    }
+
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-energy-status`,
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: DailyEnergyStatusDto[] = await response.json();
+        return responseObject.map((value) => toDomain(value));
+    } else
+        return Promise.reject(new Error("Could not obtain user energy history!"));
+}
+
+export type WeekTimeStudy = {
+    year: number,
+    week: number,
+    total: number, // in minutes
+    averageBySession: number // in minutes
+    target: number // in minutes
+}
+
+async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
+    const request = {
+        path: `study-tracker/users/me/statistics/week-study-time`,
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: WeekTimeStudy[] = await response.json();
+        return responseObject;
+    } else
+        return Promise.reject(new Error("Could not obtain total time study this week!"));
+}
+
+/*
+async function incrementWeekStudyTime(year: number, week: number, time: number) {
+    const request = {
+        path: `study-tracker/users/me/statistics/week-study-time/total`,
+        method: "PUT",
+        body: toJsonBody({ year, week, time })
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not update study time!"));
+}
+*/
+
+/*
+async function updateWeekAverageAttentionSpan(year: number, week: number, time: number) {
+    const request = {
+        path: `study-tracker/users/me/statistics/week-study-time/average-per-session`,
+        method: "PUT",
+        body: toJsonBody({ year, week, time })
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not update week average study attention span!"));
+}
+*/
+
+async function startStudySession() {
+    const request = {
+        path: `study-tracker/users/me/week-study-time-session`,
+        method: "PUT"
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not start study session!"));
+}
+
+async function finishStudySession() {
+    const request = {
+        path: `study-tracker/users/me/week-study-time-session`,
+        method: "DELETE"
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Could not finish study session!"));
+}
+
 export const service = {
     login,
     testTokenValidity,
@@ -574,7 +704,6 @@ export const service = {
     updateWeekPlanningDay,
     createNewEvent,
     getUserEvents,
-    getUserRecurrentEvents,
     getStudyBlockHappeningNow,
     getUserTodayEvents,
     createScheduleNotAvailableBlock,
@@ -591,5 +720,14 @@ export const service = {
     getCurricularUnits,
     getCurricularUnit,
     createCurricularUnit,
-    createGrade
+    createGrade,
+    createDailyEnergyStat,
+    getTaskDistributionStats,
+    getDailyTasksProgress,
+    fetchEnergyHistory,
+    getStudyTimeByWeek,
+    //incrementWeekStudyTime,
+    //updateWeekAverageAttentionSpan
+    startStudySession,
+    finishStudySession
 };

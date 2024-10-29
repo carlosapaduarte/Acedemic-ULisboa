@@ -40,7 +40,7 @@ function LoadingScreen() {
                 </div>
                 <div className={styles.trackerAndCheckboxContainer}>
                     <h1 className={styles.trackerText}>TRACKER</h1>
-                    <div className={styles.checkBox} style={{marginLeft: "0.5rem"}}>
+                    <div className={styles.checkBox} style={{ marginLeft: "0.5rem" }}>
                     </div>
                 </div>
             </div>

@@ -85,7 +85,7 @@ const TitleAndCheckboxSection = memo(function TitleAndCheckboxSection(
 const DescriptionSection = memo(function DescriptionSection({ description }: { description: string | undefined }) {
     return (
         <div>
-        {
+            {
                 description == undefined || description == ""
                     ? <p className={styles.noDescription}>No description...</p>
                     : <p className={styles.description}>{description}</p>

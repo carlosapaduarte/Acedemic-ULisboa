@@ -1,13 +1,15 @@
 import random
 from sqlmodel import Session, select
 
-from domain.study_tracker import Archive, CurricularUnit, Event, Grade, Priority, Task, UnavailableScheduleBlock
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel
+from repository.sql.models.models import DailyEnergyStatusModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel, WeekStudyTimeModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
+from utils import get_datetime_utc
+from datetime import date
 
 engine = database.get_engine()
 
@@ -146,20 +148,49 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def is_today(date_1: datetime) -> bool:
         today = datetime.today()
         return date_1.year == today.year and date_1.month == today.month and date_1.day == today.day
-
-    def get_events(self, user_id: int, filter_today: bool) -> list[Event]:
+    
+    @staticmethod
+    def is_study_event(event: STEventModel) -> bool:
+        for tag in event.tags:
+            if tag.tag == "study" or tag.tag == "Study":
+                #print(tag)
+                return True
+        return False
+    
+    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool, study_events: bool, week_number: int | None) -> list[Event]:
         with Session(engine) as session:
-            statement = select(STEventModel).where(STEventModel.user_id == user_id)
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)\
+                    
+            if recurrentEvents:
+                statement = statement.where(STEventModel.every_week == True)
+                
             results = session.exec(statement)
             
             # Ideally, we would use another where statement. Yet, this was not working for me...
-            today_events: list[STEventModel] = []
+            events: list[STEventModel] = []
             for event in results:
                 if (not filter_today or StudyTrackerSqlRepo.is_today(event.start_date)):
                     #print('From DB: ', event.start_date.timestamp())
-                    today_events.append(event)
+                    events.append(event)
+                                
+
+            # Filter events that has tag "study"
+            if study_events:    
+                events_filtered: list[STEventModel] = []
+                for event in events:
+                    if StudyTrackerSqlRepo.is_study_event(event):
+                        events_filtered.append(event)                
+                events = events_filtered
+                
+            if week_number is not None:
+                events_filtered: list[STEventModel] = []
+                for event in events:
+                    if event.start_date.isocalendar().week is week_number:
+                        events_filtered.append(event)                
+                events = events_filtered
             
-            return Event.from_STEventModel(today_events)
+            return Event.from_STEventModel(events)
         
     def update_receive_notifications_pref(self, user_id: int, receive: bool):
         with Session(engine) as session:
@@ -219,15 +250,43 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             status=task_model.status,
             sub_tasks=subtasks
         )
+    
+    """
+    @staticmethod
+    def is_task_or_son_completed(task: STTaskModel):
+        # Returns True if task is completed or one of it's sons is completed
+        
+        if (task.status == "Tarefa Completa"):
+            return True
+        
+        for task in task.subtasks:
+            if StudyTrackerSqlRepo.is_task_or_son_completed(task):
+                return True
+
+        return False
+        """
+        
             
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool) -> list[Task]:
+    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool, filter_deadline_is_today: bool) -> list[Task]:
         with Session(engine) as session:
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
-                .where(STTaskModel.parent_task_id == None) # This is important to not mess parent with child tasks. Remember that each task will also grab it's child tasks (subtasks)
+                .where(STTaskModel.parent_task_id == None)\
+                
+            if filter_uncompleted_tasks:
+                statement = statement\
+                    .where(STTaskModel.status == "Tarefa Completa")
+
             result = session.exec(statement)
             
             task_models: list[STTaskModel] = result.all()
+            
+            """
+            if filter_uncompleted_tasks:
+                for task_model in task_models:
+                    if not StudyTrackerSqlRepo.is_task_or_son_completed(task_model):
+                        task_models.remove(task_model)
+            """
             
             # Retrieve Tasks
             tasks: list[Task] = []
@@ -239,6 +298,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             if order_by_deadline_and_priority:
                 tasks.sort(key=lambda task: task.deadline)
                 tasks.sort(key=lambda task: Priority.from_str(task.priority).value)
+                
+            # Ideally, we would use another where statement. Yet, this was not working for me...
+            if filter_deadline_is_today:
+                for task in tasks:
+                    if (not StudyTrackerSqlRepo.is_today(task.deadline)):
+                        tasks.remove(task)
                 
             return tasks
         
@@ -409,3 +474,179 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             session.add(curricular_unit_model)
             session.commit()
+            
+    def create_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
+        with Session(engine) as session:
+            daily_energy_stat = DailyEnergyStatusModel(
+                date_=status.date_,
+                level=status.level,
+                user_id=user_id
+            )
+            
+            session.add(daily_energy_stat)
+            session.commit()
+            
+    def is_today_energy_status_created(self, user_id: int) -> bool:
+        today = date.today()
+        with Session(engine) as session:
+            statement = select(DailyEnergyStatusModel)\
+                .where(DailyEnergyStatusModel.user_id == user_id)\
+                .where(DailyEnergyStatusModel.date_ == today) # Not working!
+                
+            result = session.exec(statement)
+            model: DailyEnergyStatusModel | None = result.first()
+            print(model)
+            return model is not None
+            
+    def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:
+        with Session(engine) as session:
+            statement = select(DailyEnergyStatusModel)\
+                .where(DailyEnergyStatusModel.user_id == user_id)
+                
+            result = session.exec(statement)
+            daily_energy_history_models: list[DailyEnergyStatusModel] = result.all()
+            
+            daily_energy_history: list[DailyEnergyStatus] = []
+            for stat_model in daily_energy_history_models:
+                daily_energy_history.append(
+                    DailyEnergyStatus(
+                        date=stat_model.date_,
+                        level=stat_model.level
+                    )
+                )
+                
+            return daily_energy_history
+            
+            
+    @staticmethod
+    def compute_elapsed_minutes(date1: datetime, date2: datetime) -> int:
+        return (int) ((get_datetime_utc(date1) - get_datetime_utc(date2)) / 60)
+            
+    def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
+        # TODO: events that repeat every week
+        
+        with Session(engine) as session:
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)
+            
+            result = session.exec(statement)
+            events: list[STEventModel] = result.all()
+            
+            stats: dict[int, dict[int, dict[str, int]]] = {}
+
+            for event in events:
+                start_date = event.start_date
+                elapsed_minutes = StudyTrackerSqlRepo.compute_elapsed_minutes(event.end_date, start_date)
+                
+                year = start_date.year
+                week = event.start_date.isocalendar().week
+                            
+                tags = event.tags
+                for tag in tags:
+                    tag_name = tag.tag
+                    
+                    if stats.get(year) is None:
+                        stats[year] = {}
+                        
+                    if stats[year].get(week) is None:
+                        stats[year][week] = {}
+                        
+                    if stats[year][week].get(tag_name) is None:
+                        stats[year][week][tag_name] = 0
+                        
+                    stats[year][week][tag_name] += elapsed_minutes
+
+            return stats
+        
+    def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:
+        with Session(engine) as session:
+            statement = select(WeekStudyTimeModel)\
+                .where(WeekStudyTimeModel.user_id == user_id)\
+                    
+            result = session.exec(statement)
+            week_study_time_history: list[WeekStudyTimeModel] = result.all()
+            return WeekTimeStudy.from_STCurricularUnitModel(week_study_time_history)
+            
+            
+    
+    def increment_week_study_time(self, user_id: int, week_and_year: WeekAndYear, minutes: int):
+        with Session(engine) as session:
+            statement = select(WeekStudyTimeModel)\
+                .where(WeekStudyTimeModel.user_id == user_id)\
+                .where(WeekStudyTimeModel.year == week_and_year.year)\
+                .where(WeekStudyTimeModel.week == week_and_year.week)
+                    
+            result = session.exec(statement)
+            week_study_time_model: WeekStudyTimeModel | None = result.first()
+            
+            if week_study_time_model is None:
+                new_model = WeekStudyTimeModel(
+                    year=week_and_year.year,
+                    week=week_and_year.week,
+                    total=minutes,
+                    average_by_session=0,
+                    n_of_sessions=0,
+                    user_id=user_id
+                )
+                session.add(new_model)
+                session.commit()
+            else:
+                week_study_time_model.total += minutes
+                session.add(week_study_time_model)
+                session.commit()
+                
+    def override_study_session_start_date(self, user_id: int):
+        with Session(engine) as session:
+            statement = select(UserModel)\
+                .where(UserModel.id == user_id)
+                    
+            result = session.exec(statement)
+            user_model: UserModel | None = result.first()            
+            
+            if user_model is None:
+                raise NotFoundException(user_id)
+            
+            user_model.study_session_time = datetime.now()
+            
+            session.add(user_model)
+            session.commit()
+            
+    def get_study_session_start_date(self, user_id: int) -> datetime:
+        with Session(engine) as session:
+            statement = select(UserModel)\
+                .where(UserModel.id == user_id)
+                    
+            result = session.exec(statement)
+            user_model: UserModel | None = result.first()            
+            
+            if user_model is None:
+                raise NotFoundException(user_id)
+            
+            start = user_model.study_session_time
+            if start is None:
+                raise NotFoundException(user_id)
+            return start
+            
+    def update_week_time_average_study_time(self, user_id: int, week_and_year: WeekAndYear, study_session_time: int):
+        with Session(engine) as session:
+            statement = select(WeekStudyTimeModel)\
+                .where(WeekStudyTimeModel.user_id == user_id)\
+                .where(WeekStudyTimeModel.year == week_and_year.year)\
+                .where(WeekStudyTimeModel.week == week_and_year.week)
+                    
+            result = session.exec(statement)
+            week_study_time_model: WeekStudyTimeModel | None = result.first()
+            
+            if week_study_time_model is None:
+                raise # TODO!
+            else:
+                if week_study_time_model.average_by_session is 0:
+                    new_average = study_session_time    
+                else:
+                    new_average = ((week_study_time_model.average_by_session * week_study_time_model.n_of_sessions) + study_session_time) / (week_study_time_model.n_of_sessions + 1)
+                    new_average = round(new_average, 1)
+                
+                week_study_time_model.average_by_session = new_average
+                week_study_time_model.n_of_sessions += 1
+                session.add(week_study_time_model)
+                session.commit()

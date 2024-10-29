@@ -1,7 +1,10 @@
 from pydantic import BaseModel
 
-from domain.study_tracker import Archive, CurricularUnit, Event, File, Grade, Task
-from utils import get_datetime_utc
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task, WeekTimeStudy
+from utils import get_datetime_utc, get_datetime_utc_from_date
+
+class DailyTasksProgress(BaseModel):
+    progress: float
 
 class UserTaskOutputDto(BaseModel):
     id: int
@@ -127,3 +130,41 @@ class CurricularUnitOutputDto(BaseModel):
             ))
             
         return cu_output_dtos
+    
+class DailyEnergyStatusOutputDto(BaseModel):
+    date: float
+    level: int
+    
+    @staticmethod
+    def from_domain(daily_energy_status_history: list[DailyEnergyStatus]) -> list["DailyEnergyStatusOutputDto"]:
+        dtos: list[DailyEnergyStatusOutputDto] = []
+        for status in daily_energy_status_history:
+            dtos.append(
+                DailyEnergyStatusOutputDto(
+                    date=get_datetime_utc_from_date(status.date_),
+                    level=status.level
+                )
+            )
+        return dtos
+    
+class WeekTimeStudyOutputDto(BaseModel):
+    year: int
+    week: int
+    total: int
+    averageBySession: float
+    target: float | None
+    
+    @staticmethod
+    def from_domain(domain: list[WeekTimeStudy]) -> list["WeekTimeStudyOutputDto"]:
+        dtos: list[WeekTimeStudyOutputDto] = []
+        for record in domain:
+            dtos.append(
+                WeekTimeStudyOutputDto(
+                    year=record.week_and_year.year,
+                    week=record.week_and_year.week,    
+                    total=record.total,
+                    averageBySession=record.average_by_session,
+                    target=record.target
+                )
+            )
+        return dtos
