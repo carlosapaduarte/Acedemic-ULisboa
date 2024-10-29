@@ -1,15 +1,15 @@
 import { useIsLoggedIn, useLogIn } from "~/components/auth/Authn";
 import { useState } from "react";
-import { service } from "~/service/service";
+import { AuthError, service } from "~/service/service";
 import styles from "./authenticationPage.module.css";
 import { useTranslation } from "react-i18next";
-import { Button, Input, Label, TextField } from "react-aria-components";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { Button, FieldError, Form, Input, Label, TextField } from "react-aria-components";
+import classNames from "classnames";
 
-function useUserInfoPage() {
+function useAuthenticationPage() {
     const logIn = useLogIn();
 
-    const setGlobalError = useSetGlobalError();
+    const [authError, setAuthError] = useState<AuthError | null>(null);
 
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
@@ -19,7 +19,10 @@ function useUserInfoPage() {
             .then(() => {
                 login(username, password);
             })
-            .catch((error) => setGlobalError(error));
+            .catch((error: AuthError) => {
+                setAuthError(error);
+                return Promise.reject(error);
+            });
     }
 
     async function login(username: string, password: string) {
@@ -27,10 +30,13 @@ function useUserInfoPage() {
             .then(() => {
                 logIn();
             })
-            .catch((error) => setGlobalError(error));
+            .catch((error: AuthError) => {
+                setAuthError(error);
+                return Promise.reject(error);
+            });
     }
 
-    return { createUser, login };
+    return { createUser, login, authError, setAuthError };
 }
 
 export enum AuthAction {
@@ -38,16 +44,23 @@ export enum AuthAction {
     LOGIN
 }
 
+const MIN_PASSWORD_LENGTH = 6;
+const MIN_USERNAME_LENGTH = 4;
+const MAX_USERNAME_LENGTH = 20;
+
 function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthAction) => void }) {
     const { t } = useTranslation(["login"]);
 
-    const { createUser, login } = useUserInfoPage();
+    const { createUser, login, authError, setAuthError } = useAuthenticationPage();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loginLoading, setLoginLoading] = useState(false);
 
-    const authenticateButtonDisabled = username.length <= 0 || password.length <= 0 || loginLoading;
+    const authenticateButtonDisabled =
+        (username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH)
+        || password.length < MIN_PASSWORD_LENGTH
+        || loginLoading;
 
     function onCreateUserClick() {
         if (authenticateButtonDisabled) {
@@ -57,8 +70,8 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
         setLoginLoading(true);
         createUser(username, password).then(() => {
             onActionClicked(AuthAction.CREATE_USER);
-            setLoginLoading(false);
-        });
+        }).catch(() => {
+        }).finally(() => setLoginLoading(false));
     }
 
     function onLoginCreate() {
@@ -70,53 +83,88 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
         login(username, password).then(() => {
             onActionClicked(AuthAction.LOGIN);
             setLoginLoading(false);
-        });
+        }).catch(() => {
+        }).finally(() => setLoginLoading(false));
+    }
+
+    function renderUsernameErrorMessage() {
+        if (authError?.type == "USERNAME_ALREADY_EXISTS") {
+            return "Username already exists";
+        }
+    }
+
+    function renderPasswordErrorMessage() {
+        if (authError?.type == "INVALID_USERNAME_OR_PASSWORD") {
+            return "Invalid username or password";
+        }
     }
 
     return (
-        <>
+        <div className={styles.authenticationContainer}>
             <h1 className={styles.titleText}>
                 {t("login:authenticate_title")}
             </h1>
 
-            <TextField autoFocus>
-                <Label className={styles.usernameLabel}>
-                    {t("login:username_field_name")}
-                </Label>
-                <Input className={styles.username} value={username} required
-                       onChange={(e) => setUsername(e.target.value)} />
-            </TextField>
+            <Form className={styles.authenticationForm}>
+                <div className={styles.authenticationTextFields}>
+                    <TextField className={styles.formTextField}
+                               autoFocus isRequired
+                               minLength={MIN_USERNAME_LENGTH}
+                               maxLength={MAX_USERNAME_LENGTH}
+                               isInvalid={renderUsernameErrorMessage() != undefined ? true : undefined}
+                    >
+                        <Label className={styles.formSectionTitle}>
+                            {t("login:username_field_name")}
+                        </Label>
+                        <Input className={styles.formInput} value={username}
+                               onChange={(e) => {
+                                   setUsername(e.target.value);
+                                   setAuthError(null);
+                               }} />
+                        <FieldError className={styles.textFieldError}>
+                            {renderUsernameErrorMessage()}
+                        </FieldError>
+                    </TextField>
 
-            <br /><br />
+                    <TextField className={styles.formTextField}
+                               type={"password"} isRequired
+                               minLength={MIN_PASSWORD_LENGTH}
+                               isInvalid={renderPasswordErrorMessage() != undefined ? true : undefined}
+                    >
+                        <Label className={styles.formSectionTitle}>
+                            {t("login:password_field_name")}
+                        </Label>
+                        <Input className={styles.formInput} value={password} required
+                               onChange={(e) => {
+                                   setPassword(e.target.value);
+                                   setAuthError(null);
+                               }} />
+                        <FieldError className={styles.textFieldError}>
+                            {renderPasswordErrorMessage()}
+                        </FieldError>
+                    </TextField>
+                </div>
+                <div className={styles.authenticationButtons}>
+                    <Button className={classNames(styles.roundButton, styles.authenticationButton)}
+                            isDisabled={authenticateButtonDisabled}
+                            onPress={onCreateUserClick}>
+                        {t("login:register_button_title")}
+                    </Button>
 
-            <TextField autoFocus>
-                <Label className={styles.passwordLabel}>
-                    {t("login:password_field_name")}
-                </Label>
-                <Input type={"password"} className={styles.password} value={password} required
-                       onChange={(e) => setPassword(e.target.value)} />
-            </TextField>
+                    <Button className={classNames(styles.roundButton, styles.authenticationButton)}
+                            isDisabled={authenticateButtonDisabled}
+                            onPress={onLoginCreate}>
+                        {t("login:login_button_title")}
+                    </Button>
 
-            <br /><br />
-
-            <Button className={styles.roundButton}
-                    isDisabled={authenticateButtonDisabled}
-                    onPress={onCreateUserClick}>
-                {t("login:register_button_title")}
-            </Button>
-
-            <br />
-
-            <Button className={styles.roundButton}
-                    isDisabled={authenticateButtonDisabled}
-                    onPress={onLoginCreate}>
-                {t("login:login_button_title")}
-            </Button>
-
-            <h2>
-                {loginLoading ? "Logging in..." : ""}
-            </h2>
-        </>
+                    <h2> {loginLoading ?
+                        <span className={styles.loginLoadingText}>Logging in...</span>
+                        : <span><br/></span>
+                    }
+                    </h2>
+                </div>
+            </Form>
+        </div>
     );
 }
 

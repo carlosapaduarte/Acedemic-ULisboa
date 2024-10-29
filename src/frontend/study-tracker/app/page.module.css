@@ -10,7 +10,7 @@
 }
 
 .pageInnerContainer {
-    padding: 2rem;
+    padding: 1rem;
 
     height: 100%;
     width: 100%;
@@ -22,11 +22,8 @@
 }
 
 @media (min-width: 768px) {
-    .pageContainer {
-        height: 50%;
-    }
-
     .pageInnerContainer {
+        padding: 2rem;
         width: 75%;
     }
 }

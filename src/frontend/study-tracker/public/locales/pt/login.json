@@ -1,11 +1,11 @@
 {
     "advance_message": "Clica aqui para continuar...",
-    "authenticate_title": "Criar nova conta ou fazer Login",
+    "authenticate_title": "Registar ou fazer Login",
     "authenticated_message": "Autenticado",
     "confirm": "Confirmar",
     "login_button_title": "Entrar",
     "no_answer_option": "Não",
-    "password_field_name": "Senha",
+    "password_field_name": "Palavra-passe",
     "receive_notification_title": "Receber notificações",
     "register_button_title": "Registar",
     "select_avatar_initial_question": "Seleciona o teu avatar",
