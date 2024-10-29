@@ -282,6 +282,7 @@ class DailyEnergyStatusModel(SQLModel, table=True):
     __tablename__ = "daily_energy_status"
 
     date_: date = Field(primary_key=True, default=None)
+    time_of_day: str
     level: int
 
     user_id: int = Field(foreign_key="user.id")    

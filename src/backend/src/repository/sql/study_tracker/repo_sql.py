@@ -485,15 +485,30 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(curricular_unit_model)
             session.commit()
             
-    def create_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
+    def create_or_override_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
         with Session(engine) as session:
-            daily_energy_stat = DailyEnergyStatusModel(
-                date_=status.date_,
-                level=status.level,
-                user_id=user_id
-            )
             
-            session.add(daily_energy_stat)
+            statement = select(DailyEnergyStatusModel)\
+                .where(DailyEnergyStatusModel.user_id == user_id)\
+                .where(DailyEnergyStatusModel.date_ == status.date_) # Not working!
+                
+            result = session.exec(statement)
+            model: DailyEnergyStatusModel | None = result.first()
+            
+            if model is None:            
+                daily_energy_stat = DailyEnergyStatusModel(
+                    date_=status.date_,
+                    time_of_day=status.time_of_day,
+                    level=status.level,
+                    user_id=user_id
+                )
+                
+                session.add(daily_energy_stat)
+            else:
+                model.level = status.level
+                model.time_of_day = status.time_of_day
+                session.add(model)
+            
             session.commit()
             
     def is_today_energy_status_created(self, user_id: int) -> bool:
@@ -505,7 +520,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             result = session.exec(statement)
             model: DailyEnergyStatusModel | None = result.first()
-            print(model)
             return model is not None
             
     def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:
@@ -521,6 +535,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 daily_energy_history.append(
                     DailyEnergyStatus(
                         date=stat_model.date_,
+                        time_of_day=stat_model.time_of_day,
                         level=stat_model.level
                     )
                 )

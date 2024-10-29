@@ -4,14 +4,12 @@ import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
 import HowMuchEnergyQuestionPage from "~/routes/energy-question/route";
 
-export default function HomePage() {
-    const { t } = useTranslation(["home"]);
-    const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(undefined);
-
-    useAppBar("home");
+function useHomePage() {
+    const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(false);
 
     useEffect(() => {
-        const prompted: Date = new Date(localStorage["lastEnergyQuestionPromptedDate"]);
+        const promptedState = localStorage["lastEnergyQuestionPromptedDate"]
+        const prompted: Date | undefined = promptedState ? new Date(promptedState) : undefined;
         const today = new Date();
         if (
             prompted == undefined ||
@@ -20,16 +18,34 @@ export default function HomePage() {
             today.getDay() > prompted.getDay()
         ) {
             setDisplayDailyEnergyQuestion(true);
-            localStorage["lastEnergyQuestionPromptedDate"] = today;
-        } else
-            setDisplayDailyEnergyQuestion(false);
+        }
     }, []);
 
+    function onQuestionAnswered() {
+        const today = new Date();
+        localStorage["lastEnergyQuestionPromptedDate"] = today;
+        setDisplayDailyEnergyQuestion(false)
+    }
+
+    return {
+        displayDailyEnergyQuestion,
+        onQuestionAnswered
+    }
+}
+
+export default function HomePage() {
+    const { t } = useTranslation(["home"]);
+    const {
+        displayDailyEnergyQuestion,
+        onQuestionAnswered
+    } = useHomePage()
+
+    useAppBar("home");    
 
     return (
         <div className={styles.homePage}>
             {displayDailyEnergyQuestion ?
-                <HowMuchEnergyQuestionPage onComplete={() => setDisplayDailyEnergyQuestion(false)} />
+                <HowMuchEnergyQuestionPage onComplete={onQuestionAnswered} />
                 :
                 <div>
                     {t("home:main_question")}

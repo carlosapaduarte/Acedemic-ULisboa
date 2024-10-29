@@ -1,5 +1,5 @@
 from datetime import datetime
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
 from exception import AlreadyExistsException, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
@@ -123,16 +123,17 @@ def create_curricular_unit(user_id: int, name: str):
 def create_grade(user_id: int, curricular_unit: str, grade: Grade):
     return study_tracker_repo.create_grade(user_id, curricular_unit, grade)
 
-def create_daily_energy_status(user_id: int, level: int):
-    if not study_tracker_repo.is_today_energy_status_created(user_id):
-        today = date.today()
-        status = DailyEnergyStatus(
-            today,
-            level
-        )
-        study_tracker_repo.create_daily_energy_status(user_id, status)
-    else:
-        raise AlreadyExistsException()
+def create_daily_energy_status(user_id: int, level: int, time_of_day: str):
+    if not verify_time_of_day(time_of_day):
+        raise # TODO
+        
+    today = date.today()
+    status = DailyEnergyStatus(
+        today,
+        time_of_day,
+        level
+    )
+    study_tracker_repo.create_or_override_daily_energy_status(user_id, status)
 
 def get_daily_energy_history(user_id: int) -> list[DailyEnergyStatus]:
     return study_tracker_repo.get_daily_energy_history(user_id)

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Input, Label, TextField } from "react-aria-components";
 import { useTranslation } from "react-i18next";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { service } from "~/service/service";
+import { service, TimeOfDay } from "~/service/service";
 import { getEnergyIconByEnergyLevel, levelToStr } from "../statistics/Energy";
 import styles from "./energyQuestion.module.css";
 
@@ -11,7 +11,19 @@ function useHowMuchEnergyQuestionPage(onQuestionSubmitted: () => void) {
     const [level, setLevel] = useState(1);
 
     function onConfirmPressHandler() {
-        service.createDailyEnergyStat(level)
+        function getCurTimeOfDay(): TimeOfDay {
+            const now = new Date()
+            const hour = now.getHours()
+            if (hour < 12)
+                return TimeOfDay.MORNING
+            if (hour < 19)
+                return TimeOfDay.AFTERNOON
+            return TimeOfDay.NIGHT
+        }
+
+        const timeOfDay = getCurTimeOfDay()
+
+        service.createDailyEnergyStat(level, timeOfDay)
             .catch((error) => setError(error));
 
         onQuestionSubmitted();

@@ -139,6 +139,7 @@ class CurricularUnitOutputDto(BaseModel):
     
 class DailyEnergyStatusOutputDto(BaseModel):
     date: float
+    timeOfDay: str
     level: int
     
     @staticmethod
@@ -148,6 +149,7 @@ class DailyEnergyStatusOutputDto(BaseModel):
             dtos.append(
                 DailyEnergyStatusOutputDto(
                     date=get_datetime_utc_from_date(status.date_),
+                    timeOfDay=status.time_of_day,
                     level=status.level
                 )
             )

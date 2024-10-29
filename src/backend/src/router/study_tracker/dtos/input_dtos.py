@@ -72,6 +72,7 @@ class CreateGradeInputDto(BaseModel):
     
 class CreateDailyEnergyStatus(BaseModel):
     level: int
+    timeOfDay: str
     
 class UpdateWeekStudyTime(BaseModel):
     year: int

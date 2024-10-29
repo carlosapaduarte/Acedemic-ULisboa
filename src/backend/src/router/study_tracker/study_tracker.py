@@ -219,7 +219,7 @@ def create_daily_energy_stat(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateDailyEnergyStatus
 ):
-    study_tracker_service.create_daily_energy_status(user_id, dto.level)
+    study_tracker_service.create_daily_energy_status(user_id, dto.level, dto.timeOfDay)
     
 @router.get("/users/me/statistics/daily-energy-status")
 def get_daily_energy_history(
@@ -241,22 +241,6 @@ def get_study_time_by_week(
 ) ->  list[WeekTimeStudyOutputDto]:
     stats_by_week = study_tracker_service.get_total_time_study_per_week(user_id)
     return WeekTimeStudyOutputDto.from_domain(stats_by_week)
-
-"""
-@router.put("/users/me/statistics/week-study-time/total")
-def increment_week_study_time(
-    user_id: Annotated[int, Depends(get_current_user_id)],
-    dto: UpdateWeekStudyTime
-):
-    study_tracker_service.increment_week_study_time(
-        user_id, 
-        WeekAndYear(
-            year=dto.year,
-            week=dto.week
-        ),
-        dto.time
-    )
-"""
     
 @router.put("/users/me/week-study-time-session")
 def start_new_study_session(
@@ -269,19 +253,3 @@ def finish_study_session(
     user_id: Annotated[int, Depends(get_current_user_id)],
 ):
     study_tracker_service.finish_study_session(user_id)
-
-"""
-@router.put("/users/me/statistics/week-study-time/average-per-session")
-def update_week_time_average_study_time(
-    user_id: Annotated[int, Depends(get_current_user_id)],
-    dto: UpdateWeekStudyTime
-):
-    study_tracker_service.update_week_time_average_study_time(
-        user_id, 
-        WeekAndYear(
-            year=dto.year,
-            week=dto.week
-        ),
-        dto.time
-    )
-"""

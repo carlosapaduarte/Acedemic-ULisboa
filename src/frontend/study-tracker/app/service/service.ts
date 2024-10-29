@@ -600,14 +600,29 @@ async function createGrade(curricularUnit: string, value: number, weight: number
         return Promise.reject(new Error("New Curricular Unit could not be created!"));
 }
 
-async function createDailyEnergyStat(energyLevel: number) {
+export enum TimeOfDay {
+    MORNING,
+    AFTERNOON,
+    NIGHT
+}
+
+async function createDailyEnergyStat(energyLevel: number, timeOfDay: TimeOfDay) {
+    function toStr(timeOfDay: TimeOfDay): string {
+        if (timeOfDay == TimeOfDay.MORNING)
+            return "morning"
+        if (timeOfDay == TimeOfDay.AFTERNOON)
+            return "afternoon"
+        return "night"
+    }
+
     const today = new Date();
     const request = {
         path: `study-tracker/users/me/statistics/daily-energy-status`,
         method: "POST",
         body: toJsonBody({
             date: today.getTime() / 1000,
-            energyLevel
+            timeOfDay: toStr(timeOfDay),
+            level: energyLevel
         })
     };
     const response: Response = await doFetch(request);

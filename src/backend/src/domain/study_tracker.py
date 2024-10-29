@@ -221,13 +221,15 @@ class CurricularUnit():
             ))
 
         return curricular_units
-    
+
 class DailyEnergyStatus():
     date_: date
+    time_of_day: str
     level: int
-
-    def __init__(self, date: date, level: int) -> None:
+    
+    def __init__(self, date: date, time_of_day: str, level: int) -> None:
         self.date_=date
+        self.time_of_day=time_of_day
         self.level=level
 
 class WeekAndYear():
@@ -271,3 +273,7 @@ class WeekTimeStudy():
             ))
 
         return curricular_units
+
+def verify_time_of_day(time_of_day: str) -> bool:
+    print(time_of_day)
+    return time_of_day.lower() == "morning" or time_of_day.lower() == "afternoon" or time_of_day.lower() == "night"
