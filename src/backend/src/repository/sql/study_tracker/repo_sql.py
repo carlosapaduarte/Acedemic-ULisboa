@@ -158,7 +158,14 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 return True
         return False
     
-    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool, study_events: bool, week_number: int | None) -> list[Event]:
+    def get_events(
+        self, 
+        user_id: int, 
+        filter_today: bool, 
+        recurrentEvents: bool, 
+        study_events: bool, 
+        week_number: int | None
+    ) -> list[Event]:
         with Session(engine) as session:
             statement = select(STEventModel)\
                 .where(STEventModel.user_id == user_id)\

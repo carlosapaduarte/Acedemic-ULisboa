@@ -13,6 +13,7 @@ import { CreateEventModal } from "./CreateEvent/CreateEvent";
 import { useTranslation } from "react-i18next";
 import { EditEventModal } from "./CreateEvent/EditEvent";
 import { useTags } from "~/hooks/useTags";
+import { utils } from "~/utils";
 
 const localizer = momentLocalizer(moment);
 
@@ -36,6 +37,9 @@ function useMyCalendar() {
 
     const [displayedDates, setDisplayedDates] = useState<Date[]>([]);
 
+    //console.log(events)
+    //console.log(calendarView)
+
     useEffect(() => {
         if (eventsView == "allEvents")
             refreshUserEvents();
@@ -48,6 +52,12 @@ function useMyCalendar() {
             refreshUserRecurrentEvents(displayedDates);
     }, [displayedDates]);
 
+    // If user selects Month view, change to "allEvents" automatically
+    useEffect(() => {
+        if (calendarView == Views.MONTH)
+            setEventsView("allEvents")
+    }, [calendarView]);
+
     function toggleEventsView() {
         if (eventsView == "allEvents")
             setEventsView("recurringEvents");
@@ -58,6 +68,8 @@ function useMyCalendar() {
     function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
         service.getUserEvents(false, true)
             .then((events: Event[]) => {
+                //console.log(calendarDisplayedDates)
+                //console.log(events)
                 const calendarEvents: CalendarEvent[] = [];
                 calendarDisplayedDates.forEach((displayedDate: Date) => {
                     events
@@ -68,16 +80,19 @@ function useMyCalendar() {
                             const start = new Date(displayedDate);
                             start.setHours(event.startDate.getHours());
                             start.setMinutes(event.startDate.getMinutes());
+                            
                             const end = new Date(displayedDate);
                             end.setHours(event.endDate.getHours());
                             end.setMinutes(event.endDate.getMinutes());
 
-                            calendarEvents.push({
+                            const calendarEvent = {
                                 title: event.title,
                                 start: start,
                                 end: end,
                                 resource: { id: event.id, tags: event.tags, everyWeek: event.everyWeek }
-                            });
+                            }
+
+                            calendarEvents.push(calendarEvent);
                         });
                 });
                 setEvents(calendarEvents);
@@ -207,11 +222,23 @@ function MyCalendar() {
 
     // This is invoked when the user navigates across months/weeks/days with React-Big-Calendar button
     const onRangeChange = useCallback((range: Date[] | { start: Date; end: Date; }) => {
-        if (!(range instanceof Array)) {
-            setDisplayedDates([range.start, range.end]);
-        }
 
-        setDisplayedDates(range as Date[]);
+        // When "agenda" view type is selected
+        if (!(range instanceof Array)) {
+            const dates: Date[] = []
+            let curDate = new Date(range.start)
+            while (true) {
+                if (utils.sameDay(curDate, range.end))
+                    break
+
+                dates.push(curDate)
+
+                curDate = new Date(curDate)
+                curDate.setDate(curDate.getDate() + 1)
+            }
+            setDisplayedDates(dates);
+        } else
+            setDisplayedDates(range as Date[]);
     }, [eventsView, calendarView]);
 
     const onView = useCallback((newView: any) => {
@@ -250,17 +277,22 @@ function MyCalendar() {
                     refreshUserEvents={refreshUserEvents}
                 />
             }
-            <button onClick={toggleEventsView}>
-                {eventsView == "allEvents" ?
-                    (<span>
-                        {t("calendar:display_only_recurring_events_button")}
-                    </span>)
+            {
+                calendarView != Views.MONTH ?
+                    <button onClick={toggleEventsView}>
+                        {eventsView == "allEvents" ?
+                            (<span>
+                                {t("calendar:display_only_recurring_events_button")}
+                            </span>)
+                            :
+                            (<span>
+                                {t("calendar:display_all_events_button")}
+                            </span>)
+                        }
+                    </button>
                     :
-                    (<span>
-                        {t("calendar:display_all_events_button")}
-                    </span>)
-                }
-            </button>
+                    <></>
+            }
             <div className={styles.calendarContainer}>
                 <Calendar
                     components={

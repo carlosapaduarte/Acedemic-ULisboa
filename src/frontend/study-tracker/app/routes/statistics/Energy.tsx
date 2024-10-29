@@ -72,8 +72,8 @@ export function levelToStr(level: number): string {
 
 function levelToColor(level: number): string {
     if (level >= 9) return styles.veryWellColor;
-    if (level >= 7) return styles.wellColor;
-    if (level >= 5) return styles.goodColor;
+    if (level >= 7) return styles.goodColor;
+    if (level >= 5) return styles.mediumColor;
     return styles.badColor;
 }
 

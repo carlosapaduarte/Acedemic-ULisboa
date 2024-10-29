@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response
-from domain.study_tracker import DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear
+from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, UpdateWeekStudyTime
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgress, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 

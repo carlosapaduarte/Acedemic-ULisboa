@@ -2,6 +2,10 @@ function sameDay(date1: Date, date2: Date): boolean {
     return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate();
 }
 
+function sameTime(date1: Date, date2: Date): boolean {
+    return date1.getHours() == date2.getHours() && date1.getMinutes() == date2.getMinutes() && date1.getSeconds() == date2.getSeconds();
+}
+
 // This function converts a Date type into a string that is recognizable by <input type="datetime-local" ../> component
 export function toInputDateValueStr(date: Date) {
 
@@ -75,6 +79,7 @@ function elapsedMinutes(d1: Date, d2: Date): number {
 
 export const utils = {
     sameDay,
+    sameTime,
     toInputDateValueStr,
     getWeekNumber,
     elapsedMinutes,

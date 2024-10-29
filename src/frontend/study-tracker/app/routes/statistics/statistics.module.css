@@ -108,12 +108,12 @@
     color: green;
 }
 
-.wellColor {
+.goodColor {
     color: yellowgreen;
 }
 
-.goodColor {
-    color: yellow;
+.mediumColor {
+    color: #7d065d;
 }
 
 .badColor {
