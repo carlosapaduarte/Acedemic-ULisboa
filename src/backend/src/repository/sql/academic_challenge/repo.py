@@ -11,5 +11,5 @@ class AcademicChallengeRepo(ABC):
         pass
 
     @abstractmethod
-    def create_completed_goal(self, user_id: int, batch_id: int, goal_id: int, goal_day: int, conclusion_date: datetime):
+    def create_completed_challenge(self, user_id: int, batch_id: int, challenge_id: int, challenge_day: int, conclusion_date: datetime):
         pass

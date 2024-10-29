@@ -8,7 +8,7 @@ import classNames from "classnames";
 function createAvatars(): string[] {
     const avatars: string[] = [];
     for (let u = 0; u < 30; u++) {
-        avatars.push(`./avatars/avatar${u % 8}.png`); // filename
+        avatars.push(`./avatars/avatar${u % 12}.png`); // filename
     }
     return avatars;
 }
@@ -19,7 +19,7 @@ function useAvatarSelection(
     }: {
         onComplete: () => void;
     }) {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
     const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
     const [avatars, setAvatars] = React.useState<string[]>([]);
 
@@ -27,7 +27,7 @@ function useAvatarSelection(
         await service
             .selectAvatar(avatarFilename)
             .then(() => onComplete())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     useEffect(() => {

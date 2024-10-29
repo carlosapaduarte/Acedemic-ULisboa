@@ -30,7 +30,7 @@ export function LoadingOverlay({ loading }: { loading: boolean }) {
     );
 }
 
-export function LoadingScreen() {
+function LoadingScreen() {
     return (
         <div className={styles.loadingScreen}>
             <div className={styles.contentContainer}>

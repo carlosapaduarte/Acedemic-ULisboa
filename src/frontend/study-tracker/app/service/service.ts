@@ -1,6 +1,7 @@
 // This component could be used to define functions that interact with the Backend
 
 import { doFetch, toJsonBody } from "./fetch";
+import { NotAuthorizedError } from "~/service/error";
 
 
 // For now, all of these functions will return the expected response.
@@ -11,6 +12,35 @@ export type LoginResult = {
     access_token: string,
     token_type: string
 };
+
+export type AuthErrorType =
+    | "USERNAME_ALREADY_EXISTS"
+    | "INVALID_USERNAME_OR_PASSWORD"
+    | "INVALID_FORMAT"
+    | "USER_CREATION_FAILED"
+    | "LOGIN_FAILED";
+
+type AuthErrorField = "username" | "password";
+
+const AUTH_ERROR_MESSAGES: Record<AuthErrorType, string> = {
+    USERNAME_ALREADY_EXISTS: "Username already exists!",
+    INVALID_USERNAME_OR_PASSWORD: "Invalid username or password!",
+    INVALID_FORMAT: "Invalid format of username or password!",
+    USER_CREATION_FAILED: "User creation was not possible!",
+    LOGIN_FAILED: "Login failed!"
+};
+
+export class AuthError extends Error {
+    type: AuthErrorType;
+    field: AuthErrorField;
+
+    constructor(type: AuthErrorType, field: AuthErrorField) {
+        super(AUTH_ERROR_MESSAGES[type]);
+        this.name = "AuthError";
+        this.type = type;
+        this.field = field;
+    }
+}
 
 /**
  * Makes an API request, using credentials, to create a JWT token, which
@@ -30,14 +60,24 @@ async function login(username: string, password: string) {
         body: formData
     };
 
-    const response: Response = await doFetch(request);
-    //console.log('Is logged in: ', response)
+    const response: Response = await doFetch(request)
+        .catch((error) => {
+            if (error instanceof NotAuthorizedError) {
+                return Promise.reject(new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"));
+            }
+            return Promise.reject(new AuthError("LOGIN_FAILED", "password"));
+        });
 
     if (response.ok) {
-        const responseObject: LoginResult = await response.json(); // TODO: how
+        const responseObject: LoginResult = await response.json();
         localStorage["jwt"] = responseObject.access_token;
-    } else
-        return Promise.reject(new Error("Login failed!"));
+    } else {
+        if (response.status == 400)
+            return Promise.reject(new AuthError("INVALID_FORMAT", "password"));
+        else if (response.status == 401)
+            return Promise.reject(new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"));
+        return Promise.reject(new AuthError("LOGIN_FAILED", "password"));
+    }
 }
 
 async function testTokenValidity() {
@@ -58,10 +98,15 @@ async function createUser(username: string, password: string) {
         body: toJsonBody({ username, password })
     };
     const response: Response = await doFetch(request);
-    //console.log('Is logged in: ', response)
 
-    if (!response.ok)
-        return Promise.reject(new Error("User creation was not possible!"));
+    if (!response.ok) {
+        if (response.status == 409)
+            return Promise.reject(new AuthError("USERNAME_ALREADY_EXISTS", "username"));
+        else if (response.status == 400)
+            return Promise.reject(new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"));
+
+        return Promise.reject(new AuthError("USER_CREATION_FAILED", "password"));
+    }
 }
 
 async function selectShareProgressState(shareProgress: boolean) {

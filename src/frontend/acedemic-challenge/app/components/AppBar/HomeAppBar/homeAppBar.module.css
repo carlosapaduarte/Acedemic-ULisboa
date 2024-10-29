@@ -30,7 +30,7 @@
 
     animation: fade 500ms;
 
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 @keyframes fade {
@@ -57,10 +57,19 @@
 
 .avatarAndDropdownContainer {
     flex-shrink: 0;
+
+    height: 100%;
 }
 
 .avatarContainer {
-    background-color: transparent;
+    background-color: var(--primary-color);
+    height: 100%;
+
+    img {
+        height: 100%;
+    }
+
+    overflow: hidden;
 }
 
 .navBar {
@@ -86,6 +95,15 @@
     color: white;
     width: 5rem;
     height: 4rem;
+
+    padding: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+        height: 100%;
+    }
 }
 
 .navBarButtonText {

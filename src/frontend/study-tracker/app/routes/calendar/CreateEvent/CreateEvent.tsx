@@ -250,7 +250,7 @@ export function CreateEventModal(
                 clearFields();
                 refreshUserEvents();
             })
-        /*.catch((error) => setError(error))*/;
+        /*.catch((error) => setGlobalError(error))*/;
     }
 
     return (

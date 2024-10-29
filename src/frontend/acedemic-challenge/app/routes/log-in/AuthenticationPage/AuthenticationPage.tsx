@@ -2,14 +2,14 @@ import { useIsLoggedIn, useLogIn } from "~/components/auth/Authn";
 import { useState } from "react";
 import { service } from "~/service/service";
 import styles from "./authenticationPage.module.css";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Label, TextField } from "react-aria-components";
 
 function useUserInfoPage() {
     const logIn = useLogIn();
 
-    const setError = useSetError();
+    const setGlobalError = useSetGlobalError();
 
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
@@ -19,7 +19,7 @@ function useUserInfoPage() {
             .then(() => {
                 login(username, password);
             })
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     async function login(username: string, password: string) {
@@ -27,7 +27,7 @@ function useUserInfoPage() {
             .then(() => {
                 logIn();
             })
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { createUser, login };
@@ -127,26 +127,13 @@ export default function AuthenticationPage(
     }: {
         onAuthDone: (action: AuthAction) => void;
     }) {
-    const { t } = useTranslation(["login"]);
-
     const isLoggedIn = useIsLoggedIn();
-
-    const [actionPerformed, setActionPerformed] = useState<AuthAction | undefined>(undefined);
 
     return (
         <div className={styles.pageContainer}>
             <div className={styles.pageInnerContainer}>
-                {isLoggedIn ? (
-                    <>
-                        <h1 className={styles.titleText}>
-                            {t("login:authenticated_message")}
-                        </h1>
-                        <button className={styles.roundButton} onClick={() => onAuthDone(actionPerformed!)}>
-                            {t("login:authenticated_message")}
-                        </button>
-                    </>
-                ) : (
-                    <Authenticate onActionClicked={setActionPerformed} />
+                {isLoggedIn ? null : (
+                    <Authenticate onActionClicked={(action) => onAuthDone(action)} />
                 )}
             </div>
         </div>

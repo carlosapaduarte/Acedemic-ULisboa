@@ -9,13 +9,12 @@
     font-size: 1.25rem;
     font-weight: 600;
     text-transform: uppercase;
-    color: white;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
 }
 
-.goalDescription {
-    font-size: 0.75rem;
+.challengeDescription {
+    font-size: 1rem;
     font-weight: 400;
     text-align: left;
     width: 100%;
@@ -38,10 +37,13 @@
     flex-basis: 40%;
 }
 
-.completeGoalButton {
-    background-color: var(--fourth-color);
-    font-weight: bold;
-    font-size: 1rem;
+.completeChallengeButton {
     height: auto;
     flex-basis: 60%;
+
+    background-color: black;
+    color: white;
+
+    font-weight: bold;
+    font-size: 1rem;
 }

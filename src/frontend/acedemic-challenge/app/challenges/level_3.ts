@@ -1,12 +1,7 @@
-// This object represents the challenges of level 3.
-// Each index represents a different challenge.
-// From day 1 to day 5, the assigned challenges are every challenge from day 1 to the correspondent day. 
-// From day 5 and over, all challenges are assigned for the day.
+import { commons } from "./commons";
+import { Challenge, DayChallenges } from "./types";
 
-import {commons} from "./commons"
-import {DayGoals, Goal} from "./types"
-
-const level3StaticGoal: Goal[] = [
+const level3StaticChallenge: Challenge[] = [
     {
         id: 42,
         title: "Lista de Tarefas",
@@ -32,17 +27,17 @@ const level3StaticGoal: Goal[] = [
         title: "Descansar",
         description: "Dormir o número de horas recomendadas para mim."
     }
-]
+];
 
-function level3Goals(startDate: Date): DayGoals[] {
-    return commons.getDayGoals(level3StaticGoal, startDate, 3)
+function level3Challenges(startDate: Date): DayChallenges[] {
+    return commons.getDayChallenges(level3StaticChallenge, startDate, 3);
 }
 
-function getLevel3GoalList(): Goal[] {
-    return level3StaticGoal
+function getLevel3ChallengeList(): Challenge[] {
+    return level3StaticChallenge;
 }
 
 export const Level3 = {
-    level3Goals,
-    getLevel3GoalList
-}
+    level3Challenges,
+    getLevel3ChallengeList
+};

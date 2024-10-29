@@ -22,10 +22,6 @@
 }
 
 @media (min-width: 768px) {
-    .pageContainer {
-        height: 50%;
-    }
-
     .pageInnerContainer {
         width: 75%;
     }

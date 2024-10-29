@@ -1,10 +1,9 @@
-import { Goal } from "~/challenges/types";
+import { Challenge } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { service, UserInfo } from "~/service/service";
 import { utils } from "~/utils";
 import styles from "./challengesPage.module.css";
-import { CutButton } from "~/components/Button/Button";
 import { Level1 } from "~/challenges/level_1";
 import classNames from "classnames";
 
@@ -13,8 +12,18 @@ import classNames from "classnames";
 *  https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
 * */
 function ChallengeBox(
-    { challengeIndex, challengeTitle, challengeDescription, lastExpanded, expanded, reached, onChallengeClick }: {
+    {
+        challengeIndex,
+        loading,
+        challengeTitle,
+        challengeDescription,
+        lastExpanded,
+        expanded,
+        reached,
+        onChallengeClick
+    }: {
         challengeIndex: number,
+        loading: boolean,
         challengeTitle: string,
         challengeDescription: string,
         lastExpanded: boolean,
@@ -30,56 +39,74 @@ function ChallengeBox(
                 lastExpanded && reached ? styles.lastExpanded : "",
                 expanded && reached ? styles.expanded : ""
             )}>
-            <CutButton
-                className={classNames(
+            {loading
+                ?
+                <div className={classNames(
+                    styles.challengeBox,
+                    styles.loading
+                )}>
+                    <div className={styles.challengeBoxButton}>
+                        <p className={styles.challengeTitle}>
+                            Loading...
+                        </p>
+                    </div>
+                </div>
+                :
+                <div className={classNames(
                     styles.challengeBox,
                     reached ? "" : styles.locked,
                     expanded && reached ? styles.expanded : ""
-                )}
-                aria-expanded={reached ? (expanded) : undefined}
-                aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
-                onClick={() => onChallengeClick(challengeIndex)}>
-                {
-                    reached ?
-                        <div className={`${styles.challengeContainer}`}>
-                            <p className={`${styles.challengeTitle}`}>
-                                <span className="visually-hidden">Challenge </span>
-                                {challengeIndex + 1} - {challengeTitle}
-                            </p>
-                            <div
-                                className={`${styles.challengeExpandableContainer}`}
-                                id={`challengeDescription-${challengeIndex}`}
-                                aria-hidden={!expanded}
-                            >
-                                <div className={`${styles.challengeDescription}`}>
-                                    {challengeDescription}
+                )}>
+                    <button
+                        className={classNames(styles.challengeBoxButton)}
+                        aria-expanded={reached ? (expanded) : undefined}
+                        aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
+                        onClick={() => onChallengeClick(challengeIndex)}>
+                        {
+                            reached ?
+                                <div className={`${styles.challengeContainer}`}
+                                     aria-label={`Challenge ${challengeIndex + 1} - ${challengeTitle}`}
+                                >
+                                    <p className={`${styles.challengeTitle}`}>
+                                        {challengeIndex + 1} - {challengeTitle}
+                                    </p>
                                 </div>
-                            </div>
+                                :
+                                <div className={`${styles.challengeContainer}`}
+                                     aria-label={"Locked challenge"}
+                                >
+                                    <p className={`${styles.challengeTitle}`}>
+                                        ?
+                                    </p>
+                                </div>
+                        }
+                    </button>
+                    <div
+                        className={`${styles.challengeExpandableContainer}`}
+                        id={`challengeDescription-${challengeIndex}`}
+                        aria-hidden={!expanded}
+                    >
+                        <div className={`${styles.challengeDescription}`}>
+                            {challengeDescription}
                         </div>
-                        :
-                        <div className={`${styles.challengeContainer}`}>
-                            <p className={`${styles.challengeTitle}`}>
-                                <span className="visually-hidden">Locked challenge</span>
-                                ?
-                            </p>
-                        </div>
-                }
-            </CutButton>
+                    </div>
+                </div>
+            }
         </div>
     );
 }
 
 function ChallengesList({ challenges, onChallengeClickHandler }: {
-    challenges: Goal[][],
+    challenges: Challenge[][] | undefined,
     onChallengeClickHandler: (challengeIndex: number) => void
 }) {
     const [selectedItem, setSelectedItem] = useState<number>(-1);
     const [lastSelectedItem, setLastSelectedItem] = useState<number>(-1);
 
-    const currentChallenge = challenges.length;
+    const currentChallenge = challenges?.length;
 
     function onItemClickHandler(index: number) {
-        const reached = index <= currentChallenge - 1;
+        const reached = currentChallenge ? index <= currentChallenge - 1 : false;
 
         if (!reached) {
             return;
@@ -100,12 +127,13 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
         <div className={`${styles.challengesList}`}>
             {
                 Array.from({ length: 21 }).map((_, index) => {
-                        const reached = index <= currentChallenge - 1;
+                        const reached = currentChallenge ? index <= currentChallenge - 1 : false;
 
                         return <ChallengeBox key={index}
                                              challengeIndex={index}
-                                             challengeTitle={Level1.getLevel1GoalList()[index].title}
-                                             challengeDescription={Level1.getLevel1GoalList()[index].description}
+                                             loading={challenges == undefined}
+                                             challengeTitle={Level1.getLevel1ChallengeList()[index].title}
+                                             challengeDescription={Level1.getLevel1ChallengeList()[index].description}
                                              lastExpanded={lastSelectedItem == index}
                                              expanded={selectedItem == index}
                                              reached={reached}
@@ -120,42 +148,42 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
 function useChallenges() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
 
-    service.fetchUserInfoFromApi()
-        .then((userInfo: UserInfo) => {
-            console.log("User info: ", userInfo);
+    useEffect(() => {
+        service.fetchUserInfoFromApi()
+            .then((userInfo: UserInfo) => {
+                console.log("User info: ", userInfo);
 
-            const batchToDisplay = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
-            const level = batchToDisplay.level;
-            const startDate = new Date(batchToDisplay.startDate * 1000);
+                const batchToDisplay = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
+                const level = batchToDisplay.level;
+                const startDate = new Date(batchToDisplay.startDate * 1000);
 
-            startDate.setDate(startDate.getDate() - 2);
+                startDate.setDate(startDate.getDate() - 6);
 
-            const challenges = utils.getChallengesPerDayByStartDate(level, startDate);
-            setChallenges(challenges);
-        });
+                const challenges = utils.getChallengesPerDayByStartDate(level, startDate);
+                setChallenges(challenges);
+            });
+    }, []);
 
     const [selectedChallenge, setSelectedChallenge] = useState<number | undefined>(undefined);
-    const [goals, setChallenges] = useState<Goal[][] | undefined>(undefined);
+    const [challenges, setChallenges] = useState<Challenge[][] | undefined>(undefined);
 
-    function onGoalClickHandler(goalIndex: number) {
-        setSelectedChallenge(goalIndex);
+    function onChallengeClickHandler(challengeIndex: number) {
+        setSelectedChallenge(challengeIndex);
     }
 
-    let challengesInfoToDisplay: Goal[] | undefined = (selectedChallenge != undefined && goals) ? goals[selectedChallenge] : undefined;
+    let challengesInfoToDisplay: Challenge[] | undefined = (selectedChallenge != undefined && challenges) ? challenges[selectedChallenge] : undefined;
 
-    return { challengesInfoToDisplay, onGoalClickHandler, goals };
+    return { challengesInfoToDisplay, onChallengeClickHandler, challenges };
 }
 
 function MainContent() {
-    const { t } = useTranslation(["goal_overview"]);
-    const { challengesInfoToDisplay, onGoalClickHandler, goals } = useChallenges();
+    const { t } = useTranslation(["challenge_overview"]);
+    const { challengesInfoToDisplay, onChallengeClickHandler, challenges } = useChallenges();
 
     return (
         <div className={`${styles.mainContent}`}>
             <div className={`${styles.challengesListContainer}`}>
-                {
-                    goals ? <ChallengesList challenges={goals} onChallengeClickHandler={onGoalClickHandler} /> : <></>
-                }
+                <ChallengesList challenges={challenges} onChallengeClickHandler={onChallengeClickHandler} />
             </div>
         </div>
     );

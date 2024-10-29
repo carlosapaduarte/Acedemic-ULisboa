@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import styles from "~/routes/_index/WelcomePage/welcomePage.module.css";
 import { CutButton } from "~/components/Button/Button";
 import classNames from "classnames";
-import { useAppBar } from "~/components/AppBar/AppBar";
+import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useState } from "react";
 
 function useWelcomePage() {
@@ -24,7 +24,7 @@ function InfoPage1({ handleOnNextClick }: { handleOnNextClick: () => void }) {
     return (
         <>
             <div className={styles.studyImageContainer}>
-                <img src="public/study.png" alt="A girl using her tablet"
+                <img src="/study.png" alt="A girl using her tablet"
                      className={styles.studyImage} />
             </div>
             <h1 className={styles.titleHeading}>
@@ -59,7 +59,7 @@ function InfoPage2({ handleOnProceedClick }: { handleOnProceedClick: () => void 
                 nulla rhoncus.
             </p>
             <div className={styles.studyImageContainer}>
-                <img src="public/study2.png" alt="A boy writing in a paper"
+                <img src="/study2.png" alt="A boy writing in a paper"
                      className={styles.studyImage} />
             </div>
             <div className={classNames(styles.navigationContainer)}>

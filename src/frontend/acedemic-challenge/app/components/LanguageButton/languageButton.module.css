@@ -16,19 +16,7 @@
 
     position: relative;
     isolation: isolate;
-}
 
-.languageButton::after,
-.languageButton::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-
-    scale: 95%;
     --border-edge-size: calc(var(--edge-size));
     clip-path: polygon(
             var(--border-edge-size) 0,
@@ -39,6 +27,29 @@
             var(--border-edge-size) 100%,
             0 calc(100% - var(--border-edge-size)),
             0 var(--border-edge-size)
+    );
+}
+
+.languageButton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    --border-size: 1px;
+    --border-edge-size_after: calc(var(--edge-size) + var(--border-size) / 2);
+    clip-path: polygon(
+            var(--border-edge-size_after) var(--border-size),
+            calc(100% - var(--border-edge-size_after)) var(--border-size),
+            calc(100% - var(--border-size)) var(--border-edge-size_after),
+            calc(100% - var(--border-size)) calc(100% - var(--border-edge-size_after)),
+            calc(100% - var(--border-edge-size_after)) calc(100% - var(--border-size)),
+            var(--border-edge-size_after) calc(100% - var(--border-size)),
+            var(--border-size) calc(100% - var(--border-edge-size_after)),
+            var(--border-size) var(--border-edge-size_after)
     );
 }
 

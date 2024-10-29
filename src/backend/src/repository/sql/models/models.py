@@ -43,19 +43,19 @@ class BatchModel(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="user_batches")
 
-    completed_goals: list["CompletedGoalModel"] = Relationship(back_populates="batch")
+    completed_challenges: list["CompletedChallengeModel"] = Relationship(back_populates="batch")
 
-class CompletedGoalModel(SQLModel, table=True):
-    __tablename__ = "completed_goal"
+class CompletedChallengeModel(SQLModel, table=True):
+    __tablename__ = "completed_challenge"
 
     id: int = Field(primary_key=True)
-    goal_day: int = Field(primary_key=True)
+    challenge_day: int = Field(primary_key=True)
     conclusion_date: datetime
 
     user_id: int = Field(primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
     
     batch_id: int = Field(primary_key=True)
-    batch: BatchModel = Relationship(back_populates="completed_goals")
+    batch: BatchModel = Relationship(back_populates="completed_challenges")
     
     # Composite foreign key constraint
     __table_args__ = (

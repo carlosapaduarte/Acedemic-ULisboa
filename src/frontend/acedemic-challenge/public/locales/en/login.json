@@ -6,6 +6,20 @@
     "level_2_title": "Effective",
     "level_3_description": "I study consistently, focus easily, and achieve top grades",
     "level_3_title": "Highly Effective",
+    "advance_message": "Click here to advance...",
+    "authenticate_title": "Create New User or Login",
+    "authenticated_message": "Authenticated",
+    "confirm": "Confirm",
+    "login_button_title": "Login",
+    "no_answer_option": "No",
+    "password_field_name": "Password",
+    "receive_notification_title": "Receive notifications",
+    "register_button_title": "Register",
     "select_avatar_initial_question": "Select your avatar",
-    "select_level_initial_question": "How effective have been your study habits lately?"
+    "select_level_initial_question": "How effective have been your study habits lately?",
+    "share_progress_question": "Do you want to share your progress?",
+    "submit_selection_message": "Submit selection",
+    "usage_objectives_title": "Usage objectives",
+    "username_field_name": "Username",
+    "yes_answer_option": "Yes"
 }

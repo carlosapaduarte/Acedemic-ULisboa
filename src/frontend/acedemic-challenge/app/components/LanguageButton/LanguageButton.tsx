@@ -5,6 +5,6 @@ import { useTranslation } from "react-i18next";
 
 export function LanguageButton({ language }: { language: string }) {
     const { i18n } = useTranslation();
-    return <CutButton className={`${styles.languageButton} ${styles[language]}`}
+    return <button className={`${styles.languageButton} ${styles[language]}`}
                       onClick={() => i18n.changeLanguage(language)} />;
 }

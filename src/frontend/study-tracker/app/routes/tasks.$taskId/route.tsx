@@ -13,7 +13,7 @@ function useTask(
     refreshTasks: () => void,
     taskId: string | undefined
 ) {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
     const [task, setTask] = useState<Task | undefined>(undefined);
 
     useEffect(() => {
@@ -29,7 +29,7 @@ function useTask(
         }
         service.getTask(task.id)
             .then((updatedTask: Task) => setTask(updatedTask))
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     function updateTaskStatus(newStatus: string) {
@@ -41,7 +41,7 @@ function useTask(
                 refreshTask();
                 refreshTasks();
             })
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { task, refreshTask, updateTaskStatus };

@@ -17,6 +17,6 @@ class NewUserNoteDto(BaseModel):
     text: str
     date: float
 
-class GoalCompletedDto(BaseModel):
-    goalId: int
-    goalDay: int
+class ChallengeCompletedDto(BaseModel):
+    challengeId: int
+    challengeDay: int

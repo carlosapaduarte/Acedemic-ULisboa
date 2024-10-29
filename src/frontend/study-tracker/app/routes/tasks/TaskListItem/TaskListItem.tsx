@@ -7,19 +7,19 @@ import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
 
 
 function useTaskView(taskToCache: Task) {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
     const [task, setTask] = useState<Task>(taskToCache);
 
     function updateTask() {
         service.getTask(task.id)
             .then((updatedTask: Task) => setTask(updatedTask))
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     function updateTaskStatus(newStatus: string, onDone: () => void) {
         service.updateTaskStatus(task.id, newStatus)
             .then(() => onDone())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { task, updateTask, updateTaskStatus };

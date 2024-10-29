@@ -1,15 +1,32 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/node";
+import {
+    isRouteErrorResponse,
+    json,
+    Links,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    useLoaderData,
+    useRouteError
+} from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { AuthnContainer } from "~/components/auth/Authn";
 import { NotFoundPage } from "./Pages/NotFoundPage";
 import { Footer } from "~/components/Footer/Footer";
+import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 import "./global.css";
-import "./i18n";
 import "./themes.css";
-import { AppBar, AppBarProvider } from "./components/AppBar/AppBar";
-import { useEffect, useState } from "react";
+import { AppBar } from "./components/AppBar/AppBar";
+import React, { useEffect, useState } from "react";
 import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
+import i18next from "~/i18next.server";
+import { useChangeLanguage } from "remix-i18next/react";
+import { useTranslation } from "react-i18next";
+import { GlobalErrorContainer } from "~/components/error/GlobalErrorContainer";
+import { GlobalErrorController } from "~/components/error/GlobalErrorController";
+import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
+import { AppBarProvider } from "~/components/AppBar/AppBarProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -18,9 +35,29 @@ export const meta: MetaFunction = () => {
     ];
 };
 
+export async function loader({ request }: LoaderFunctionArgs) {
+    let locale = await i18next.getLocale(request);
+    return json({ locale });
+}
+
+export let handle = {
+    // In the handle export, we can add a i18n key with namespaces our route
+    // will need to load. This key can be a single string or an array of strings.
+    // TIP: In most cases, you should set this to your defaultNS from your i18n config
+    // or if you did not set one, set it to the i18next default namespace "translation"
+    i18n: ["common", "error"]
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
+    // Get the locale from the loader
+    let { locale } = useLoaderData<typeof loader>();
+
+    let { i18n } = useTranslation();
+
+    useChangeLanguage(locale);
+
     return (
-        <html lang="en">
+        <html lang={locale} dir={i18n.dir()}>
         <head>
             <meta charSet="utf-8" />
             <meta
@@ -41,42 +78,54 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function Root() {
-    const [isHydrated, setIsHydrated] = useState(false);
     const [theme, setTheme] = useState<AppTheme>(AppTheme.defaultTheme);
 
     useEffect(() => {
         const storedTheme = getLocalStorageTheme();
 
         setTheme(storedTheme);
-
-        setIsHydrated(true);
     }, []);
 
     useEffect(() => {
         document.body.className = getAppThemeClassNames(theme);
     }, [theme]);
 
-    if (!isHydrated) {
-        return null;
-    }
-
     return (
-        <AuthnContainer>
-            <ThemeProvider theme={theme} setTheme={setTheme}>
-                <App />
-            </ThemeProvider>
-        </AuthnContainer>
+        <GlobalErrorContainer>
+            <AuthnContainer>
+                <ThemeProvider theme={theme} setTheme={setTheme}>
+                    <App />
+                </ThemeProvider>
+            </AuthnContainer>
+        </GlobalErrorContainer>
     );
 }
 
 export function App() {
+    const { t } = useTranslation(["error"]);
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 1000));
+
+        Promise.all([minLoadingTime]).then(() => {
+            setLoading(false);
+        });
+    }, []);
+
     return (
         <AppBarProvider>
             <div className="app">
                 <AppBar />
                 <div className="mainContentContainer">
-                    <Outlet />
+                    <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
+                        <GlobalErrorController>
+                            <Outlet />
+                        </GlobalErrorController>
+                    </ReactErrorBoundary>
                 </div>
+                <LoadingOverlay loading={loading} />
                 <Footer />
             </div>
         </AppBarProvider>
@@ -85,6 +134,8 @@ export function App() {
 
 export function ErrorBoundary() {
     const error = useRouteError();
+
+    const { t } = useTranslation(["error"]);
 
     if (isRouteErrorResponse(error)) {
         if (error.status === 404) {
@@ -103,10 +154,7 @@ export function ErrorBoundary() {
     } else if (error instanceof Error) {
         return (
             <div>
-                <h1>Error</h1>
-                <p>{error.message}</p>
-                <p>The stack trace is:</p>
-                <pre>{error.stack}</pre>
+                <h1>{t("error:title")}</h1>
             </div>
         );
     } else {

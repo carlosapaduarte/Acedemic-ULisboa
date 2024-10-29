@@ -1,6 +1,6 @@
 import { CutButton } from "~/components/Button/Button";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
 import styles from "./appBar.module.css";
 import cleanAppBarStyles from "./cleanAppBar.module.css";
@@ -9,36 +9,7 @@ import { useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 import { GreetingsContainer, NavBar } from "./HomeAppBar/HomeAppBar";
 import classNames from "classnames";
-
-type AppBarVariant = "default" | "home" | "clean";
-
-type AppBarContextType = {
-    appBarVariant: AppBarVariant;
-    setAppBarVariant: (variant: AppBarVariant) => void;
-};
-
-export const AppBarContext = createContext<AppBarContextType>({
-    appBarVariant: "default",
-    setAppBarVariant: (variant: AppBarVariant) => {
-    }
-});
-
-export function AppBarProvider({ children }: { children: React.ReactNode }) {
-    const [appBarVariant, setAppBarVariant] = useState<AppBarVariant>("default");
-
-    return <AppBarContext.Provider value={{ appBarVariant, setAppBarVariant }}>
-        {children}
-    </AppBarContext.Provider>;
-}
-
-export function useAppBar(variant: AppBarVariant) {
-    const { setAppBarVariant } = useContext(AppBarContext);
-
-    useEffect(() => {
-        setAppBarVariant(variant);
-        return () => setAppBarVariant("default");
-    }, [setAppBarVariant]);
-}
+import { AppBarContext } from "~/components/AppBar/AppBarProvider";
 
 export function AppBar() {
     const { appBarVariant } = useContext(AppBarContext);
@@ -63,7 +34,7 @@ export function AppBar() {
             {appBarVariant === "default" && (
                 <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
                     <CutButton className={styles.homeButton}>
-                        Home
+                        <img src="/icons/home_icon.svg" alt="Home Icon" />
                     </CutButton>
                 </div>
             )}

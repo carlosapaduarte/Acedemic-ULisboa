@@ -1,30 +1,31 @@
-import { Goal } from "~/challenges/types";
+import { Challenge } from "~/challenges/types";
 import { CutButton } from "~/components/Button/Button";
 import React from "react";
 
-import styles from "./goals.module.css";
+import styles from "./challenges.module.css";
 import { useTranslation } from "react-i18next";
 
-export default function Goals({ currentDayNumber, goals, completedGoals, onMarkComplete }: {
+export default function Challenges({ currentDayNumber, challenges, completedChallenges, onMarkComplete }: {
     currentDayNumber: number,
-    goals: Goal[],
-    completedGoals: number[],
-    onMarkComplete: (goal: Goal) => void
+    challenges: Challenge[],
+    completedChallenges: number[],
+    onMarkComplete: (challenge: Challenge) => void
 }) {
     const { t } = useTranslation(["dashboard"]);
 
-    // Per goal, there is a "Mark Complete" button
+    // Per challenge, there is a "Mark Complete" button
     return (
         <div>
             <h1 className={styles.currentDayText}>
                 {t("dashboard:day")} {currentDayNumber}
             </h1>
-            {goals.map((goal: Goal) => {
-                const completed = completedGoals.find((completedGoalId) => goal.id == completedGoalId);
+            {challenges.map((challenge: Challenge) => {
+                const completed = completedChallenges.find((completedChallengeId) => challenge.id == completedChallengeId);
                 return (
-                    <div key={goal.id} style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
+                    <div key={challenge.id}
+                         style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
                         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                            <h2 className={styles.challengeTitle}>{goal.title}</h2>
+                            <h2 className={styles.challengeTitle}>{challenge.title}</h2>
                             {
                                 completed ?
                                     <p style={{
@@ -33,14 +34,14 @@ export default function Goals({ currentDayNumber, goals, completedGoals, onMarkC
                                         marginBottom: "1%",
                                         textDecoration: "underline"
                                     }}>
-                                        ({t("dashboard:goal_completed")})
+                                        ({t("dashboard:challenge_completed")})
                                     </p>
                                     :
                                     <></>
                             }
                         </div>
-                        <p className={styles.goalDescription}>
-                            {goal.description}
+                        <p className={styles.challengeDescription}>
+                            {challenge.description}
                         </p>
                         <div className={styles.buttonsContainer}>
                             <CutButton className={styles.addNoteButton}>
@@ -50,8 +51,8 @@ export default function Goals({ currentDayNumber, goals, completedGoals, onMarkC
                                 completed ?
                                     <></>
                                     :
-                                    <CutButton className={styles.completeGoalButton}
-                                               onClick={() => onMarkComplete(goal)}>
+                                    <CutButton className={styles.completeChallengeButton}
+                                               onClick={() => onMarkComplete(challenge)}>
                                         {t("dashboard:mark_complete")}
                                     </CutButton>
                             }

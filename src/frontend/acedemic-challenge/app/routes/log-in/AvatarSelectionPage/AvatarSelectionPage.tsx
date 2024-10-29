@@ -1,4 +1,4 @@
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import React, { useEffect } from "react";
 import styles from "./avatarSelectionPage.module.css";
@@ -8,7 +8,7 @@ import { CutButton } from "~/components/Button/Button";
 function createAvatars(): string[] {
     const avatars: string[] = [];
     for (let u = 0; u < 30; u++) {
-        avatars.push(`./avatars/avatar${u % 8}.png`); // filename
+        avatars.push(`./avatars/avatar${u % 12}.png`); // filename
     }
     return avatars;
 }
@@ -19,7 +19,7 @@ function useAvatarSelection(
     }: {
         onComplete: () => void;
     }) {
-    const setError = useSetError();
+    const setGlobalError = useSetGlobalError();
     const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
     const [avatars, setAvatars] = React.useState<string[]>([]);
 
@@ -27,7 +27,7 @@ function useAvatarSelection(
         await service
             .selectAvatar(avatarFilename)
             .then(() => onComplete())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     useEffect(() => {

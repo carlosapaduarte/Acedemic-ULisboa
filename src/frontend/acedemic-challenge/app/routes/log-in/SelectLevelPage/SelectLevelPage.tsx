@@ -1,4 +1,4 @@
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -52,13 +52,13 @@ function useSelectLevelPage(
         null
     );
 
-    const setError = useSetError();
+    const setGlobalError = useSetGlobalError();
 
     async function onConfirmClickHandler(level: LevelType) {
         await service
             .createBatch(level) // returns if was successful or not
             .then(() => onLevelSelected())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     // TODO Quiz Button

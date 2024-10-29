@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from domain.commons.user import Batch, CompletedGoal, UserNote
+from domain.commons.user import Batch, CompletedChallenge, UserNote
 from utils import get_datetime_utc
 
 
@@ -20,39 +20,39 @@ class UserNoteDto(BaseModel):
         return user_notes_dtos
         
     
-class CompletedGoalDto(BaseModel):
-    goalDay: int
+class CompletedChallengeDto(BaseModel):
+    challengeDay: int
     id: int
     conclusionDate: int
     
     @staticmethod
-    def fromCompletedGoals(completed_goals: list[CompletedGoal]) -> list['CompletedGoalDto']:
-        completed_goals_dtos: list[CompletedGoalDto] = []
-        for completed_goal in completed_goals:
-            completed_goals_dtos.append(CompletedGoalDto(
-                goalDay=completed_goal.goal_day,
-                    id=completed_goal.id,
-                    conclusionDate=get_datetime_utc(completed_goal.conclusion_date)
+    def fromCompletedChallenges(completed_challenges: list[CompletedChallenge]) -> list['CompletedChallengeDto']:
+        completed_challenges_dtos: list[CompletedChallengeDto] = []
+        for completed_challenge in completed_challenges:
+            completed_challenges_dtos.append(CompletedChallengeDto(
+                challengeDay=completed_challenge.challenge_day,
+                    id=completed_challenge.id,
+                    conclusionDate=get_datetime_utc(completed_challenge.conclusion_date)
             ))
             
-        return completed_goals_dtos
+        return completed_challenges_dtos
     
 class BatchDto(BaseModel):
     id: int
     startDate: int
     level: int
-    completedGoals: list[CompletedGoalDto]
+    completedChallenges: list[CompletedChallengeDto]
     
     @staticmethod
     def fromBatches(batches: list[Batch]) -> list['BatchDto']:
         batches_dtos: list[BatchDto] = []
         for batch in batches:
-            completed_goals_dtos = CompletedGoalDto.fromCompletedGoals(batch.completed)
+            completed_challenges_dtos = CompletedChallengeDto.fromCompletedChallenges(batch.completed)
             batches_dtos.append(BatchDto(
                 id=batch.id,
                 startDate=get_datetime_utc(batch.start_date),
                 level=batch.level,
-                completedGoals=completed_goals_dtos
+                completedChallenges=completed_challenges_dtos
             ))
             
         return batches_dtos

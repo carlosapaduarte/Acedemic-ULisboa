@@ -1,10 +1,10 @@
-export type Goal = {
+export type Challenge = {
     id: number,
     title: string,
     description: string
 }
 
-export type DayGoals = {
-    goals: Goal[],
+export type DayChallenges = {
+    challenges: Challenge[],
     date: Date
 }

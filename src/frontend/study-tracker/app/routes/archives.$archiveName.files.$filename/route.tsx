@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 function FileView() {
     const { t } = useTranslation(["notes"]);
 
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     const params = useParams();
     const archiveName = params.archiveName;
@@ -19,11 +19,11 @@ function FileView() {
 
     useEffect(() => {
         if (archiveName == undefined || filename == undefined)
-            setError(new Error("Archive name and filename should not be null!"));
+            setGlobalError(new Error("Archive name and filename should not be null!"));
         else {
             service.getFile(archiveName, filename)
                 .then((file: File) => setFile(file))
-                .catch((e: Error) => setError(e));
+                .catch((e: Error) => setGlobalError(e));
         }
     }, []);
 

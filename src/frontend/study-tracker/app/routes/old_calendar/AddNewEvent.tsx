@@ -37,7 +37,7 @@ export function AddEvent({ startDate, onNewEventCreated }: { startDate: Date, on
 }
 
 function useAddEvent(startDate: Date, onNewEventCreated: () => void) {
-    const setError = useSetGlobalError();
+    const setGlobalError = useSetGlobalError();
 
     const [title, setTitle] = useState<string>("");
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -52,7 +52,7 @@ function useAddEvent(startDate: Date, onNewEventCreated: () => void) {
             everyWeek: false
         })
             .then(() => onNewEventCreated())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { title, endDate, tags, setTitle, setEndDate, appendTag, removeTag, createNewEvent };

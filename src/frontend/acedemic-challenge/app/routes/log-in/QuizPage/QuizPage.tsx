@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSetError } from "~/components/error/ErrorContainer";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import { service } from "~/service/service";
 import { Button } from "~/components/Button/Button";
@@ -70,7 +70,7 @@ function useQuizPage(
     const [answers, setAnswers] = useState<boolean[]>(
         new Array(10).fill(undefined)
     );
-    const setError = useSetError();
+    const setGlobalError = useSetGlobalError();
 
     function onAnswerClick(questionNumber: number, answer: boolean) {
         const newAnswers: boolean[] = answers.slice();
@@ -86,7 +86,7 @@ function useQuizPage(
         await service
             .createBatch(computedLevel) // returns if was successful or not
             .then(() => onLevelSelected())
-            .catch((error) => setError(error));
+            .catch((error) => setGlobalError(error));
     }
 
     return { onAnswerClick, computeLevel };
