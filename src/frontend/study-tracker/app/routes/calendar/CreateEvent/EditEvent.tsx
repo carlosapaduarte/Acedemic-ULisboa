@@ -266,6 +266,18 @@ export function EditEventModal(
         /*.catch((error) => setGlobalError(error))*/;
     }
 
+    function deleteEventClickHandler() {
+        if (finishEditingEventButtonDisabled) {
+            return;
+        }
+        service.deleteEvent(eventId)
+            .then(() => {
+                clearFields();
+                refreshUserEvents();
+            })
+        /*.catch((error) => setGlobalError(error))*/;
+    }
+
     return (
         <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>
             <Dialog aria-label={"Edit Event"}>
@@ -289,6 +301,13 @@ export function EditEventModal(
                             />
                         </div>
                         <div className={styles.finishCreatingEventButtonContainer}>
+                            <Button className={classNames(styles.deleteEventButton)}
+                                    onPress={() => {
+                                        close();
+                                        deleteEventClickHandler();
+                                    }}>
+                                Delete
+                            </Button>
                             <Button className={classNames(styles.finishCreatingEventButton)}
                                     isDisabled={finishEditingEventButtonDisabled}
                                     onPress={() => {

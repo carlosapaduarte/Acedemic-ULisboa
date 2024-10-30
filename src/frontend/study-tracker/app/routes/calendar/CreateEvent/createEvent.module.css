@@ -28,15 +28,26 @@
 
 .finishCreatingEventButton {
     composes: roundButton;
-    flex-grow: 1;
-    flex-shrink: 0;
+    flex: 1 1 50%;
 
     height: 2rem;
-    width: 100%;
 
     margin-top: 0.5rem;
     font-size: 1rem;
     text-align: center;
+}
+
+.deleteEventButton {
+    composes: roundButton;
+    flex: 1 1 25%;
+
+    height: 2rem;
+
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    text-align: center;
+
+    background-color: #b10f0f;
 }
 
 .titleSectionContainer {
