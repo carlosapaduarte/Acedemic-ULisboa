@@ -99,6 +99,7 @@ export function GreetingsContainer() {
                 <Dropdown trigger={
                     <button className={`${styles.avatarContainer}`}>
                         <img
+                            width={92} height={92}
                             src={`${avatarFilename}`}
                             alt={`User's Avatar`}
                         />
