@@ -127,6 +127,8 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
                     </h1>
                     <div className={styles.newTaskFormContainer}>
                         <CreateTaskForm
+                            description={description}
+                            setDescription={setDescription}
                             slotsToWork={slotsToWork}
                             setSlotsToWork={setSlotsToWork}
                             deadline={deadline}
@@ -152,7 +154,7 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
                                         description,
                                         deadline,
                                         priority,
-                                        tags,
+                                        tags: selectedTags,
                                         status: status ?? "not_completed",
                                         subTasks
                                     });

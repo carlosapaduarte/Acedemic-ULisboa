@@ -40,6 +40,28 @@ const TitleSection = React.memo(function TitleSection({ title, setTitle }: {
     );
 });
 
+const DescriptionSection = React.memo(function DescriptionSection({ description, setDescription }: {
+    description: string | undefined,
+    setDescription: (description: string) => void
+}) {
+    const { t } = useTranslation(["task"]);
+    return (
+        <div className={styles.titleSectionContainer}>
+            <TextField autoFocus>
+                <Label className={styles.formSectionTitle}>
+                    {t("task:description_label")}
+                </Label>
+                <Input className={styles.formInput}
+                       required
+                       value={description}
+                       onChange={
+                           (e) => setDescription(e.target.value)
+                       } />
+            </TextField>
+        </div>
+    );
+});
+
 const SlotsToWorkSection = React.memo(function SlotsToWorkSection({ slotsToWork, setSlotsToWork }: {
     slotsToWork: number,
     setSlotsToWork: (slotsToWork: number) => void
@@ -196,6 +218,8 @@ const TagSection = React.memo(function TagSection({ selectedTags, setSelectedTag
 
 export function CreateTaskForm(
     {
+        description,
+        setDescription,
         slotsToWork,
         setSlotsToWork,
         deadline,
@@ -207,6 +231,8 @@ export function CreateTaskForm(
         priority,
         setPriority
     }: {
+        description: string | undefined,
+        setDescription: (description: string) => void,
         slotsToWork: number,
         setSlotsToWork: (slotsToWork: number) => void,
         deadline: Date | undefined,
@@ -220,6 +246,7 @@ export function CreateTaskForm(
     }) {
     return (<form className={styles.newTaskForm}>
         <TitleSection title={title} setTitle={setTitle} />
+        <DescriptionSection description={description} setDescription={setDescription} />
         <SlotsToWorkSection slotsToWork={slotsToWork} setSlotsToWork={setSlotsToWork} />
         <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
         <PrioritySection priority={priority} setPriority={setPriority} />
