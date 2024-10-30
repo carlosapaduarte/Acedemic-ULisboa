@@ -69,7 +69,7 @@ function useStudyBlock() {
 }
 
 function useAssociatedTasks() {
-    const [associatedTasks, setAssociatedTasks] = useState<Task[] | undefined>(undefined);
+    const [associatedTasks, setAssociatedTasks] = useState<Task[] | undefined>([]); // TODO: set this to undefined. For the beta, no tasks are associated to the study time
 
     function onTasksSelected(tasks: Task[]) {
         setAssociatedTasks(tasks);
@@ -101,13 +101,10 @@ function AssociatedTaskListView({ associatedTasks }: { associatedTasks: Task[] }
                       onTaskStatusUpdated={() => {
                       }}
             />
-            <button onClick={() => setShowCreateTask(!showCreateTask)}>{newTaskButtonMsg}</button>
+            {/*<button onClick={() => setShowCreateTask(!showCreateTask)}>{newTaskButtonMsg}</button>*/}
             {/*{showCreateTask ?
                 <CreateTaskView onTaskCreated={onTaskCreated} />
                 :*/}
-            <></>
-            {/*
-            }*/}
         </div>
     );
 }

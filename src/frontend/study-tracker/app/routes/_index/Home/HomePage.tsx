@@ -19,12 +19,13 @@ function useHomePage() {
         ) {
             setDisplayDailyEnergyQuestion(true);
         }
+        setDisplayDailyEnergyQuestion(true); // TODO: remove this line. For the beta, show always to fill the home page
     }, []);
 
     function onQuestionAnswered() {
         const today = new Date();
         localStorage["lastEnergyQuestionPromptedDate"] = today;
-        setDisplayDailyEnergyQuestion(false)
+        // setDisplayDailyEnergyQuestion(false) // TODO: uncomment this line. For the beta, show always to fill the home page
     }
 
     return {
