@@ -630,7 +630,32 @@ async function createDailyEnergyStat(energyLevel: number, timeOfDay: TimeOfDay) 
         return Promise.reject(new Error("Energy level daily statistic could not be submitted!"));
 }
 
-async function getTaskDistributionStats(): Promise<any> {
+export type TaskDistributionPerWeek = {
+    year: number,
+    week: number,
+    tag: string,
+    time: number
+}
+
+async function getTaskDistributionStats(): Promise<TaskDistributionPerWeek[]> {
+    function toDomain(obj: any): TaskDistributionPerWeek[] {
+        const stats: TaskDistributionPerWeek[] = []
+        
+        for (const [year, weeksObj] of Object.entries<any>(obj)) {
+            for (const [week, tagsObj] of Object.entries<any>(weeksObj)) {
+                for (const [tag, time] of Object.entries(tagsObj)) {
+                    stats.push({
+                        year: Number(year), 
+                        week: Number(week), 
+                        tag, 
+                        time: Number(time)
+                    })
+                }
+            }
+        }
+        return stats
+    }
+
     const request = {
         path: `study-tracker/users/me/statistics/time-by-event-tag`,
         method: "GET"
@@ -638,7 +663,7 @@ async function getTaskDistributionStats(): Promise<any> {
     const response: Response = await doFetch(request);
     if (response.ok) {
         const responseObject: CurricularUnit[] = await response.json();
-        return responseObject;
+        return toDomain(responseObject);
     } else
         return Promise.reject(new Error("Could not obtain task distribution statistics!"));
 }

@@ -64,10 +64,13 @@
     top: -25px;
     left: -17px;
     background-color: var(--secondary-color);
-    text-align: center;
 
     font-weight: bolder;
     color: white;
+
+    .fix {
+        font-size: smaller;
+    }
     
 
     --edge-size: .5rem;
@@ -118,6 +121,11 @@
 
 .badColor {
     color: red;
+}
+
+.containerAlignRight {
+    display: flex;
+    justify-content: right;
 }
 
 .containerHeaderDate {
@@ -218,4 +226,25 @@
 
 .spacer {
     height: 0.7em;
+}
+
+.chartGroup {
+    display: flex;
+    justify-content: space-between;
+}
+
+.legendGroupContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.legendItemContainer {
+    margin-bottom: 0.5em;
+    
+    font-weight: bolder;
+    color: white;
+    
+    background-color: aqua;
+    border-radius: 10px;
+    padding: 0.3em;
 }

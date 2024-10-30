@@ -40,33 +40,6 @@ function YearStats({ year, stats }: { year: string, stats: any }) {
     );
 }
 
-/*
-function TaskDistribution() {
-    const setError = useSetGlobalError();
-    const [stats, setStats] = useState<any | undefined>(undefined);
-
-    console.log(stats);
-
-    useEffect(() => {
-        service.getTaskDistributionStats()
-            .then((stats: any) => setStats(stats))
-            .catch((error) => setError(error));
-    }, []);
-
-    return (
-        <>
-            {stats ?
-                Object.keys(stats).map(key =>
-                    <YearStats year={key} stats={stats[key]} />
-                )
-                :
-                <></>
-            }
-        </>
-    );
-}
-*/
-
 export default function Statistics() {
     return (
         <RequireAuthn>

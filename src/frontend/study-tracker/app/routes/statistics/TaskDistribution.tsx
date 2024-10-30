@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CurWeekDate } from "./Commons";
 import styles from "./statistics.module.css";
 
@@ -7,6 +7,33 @@ import { Pie } from "@visx/shape";
 import { Group } from "@visx/group";
 import { scaleOrdinal } from "@visx/scale";
 import { letterFrequency } from "@visx/mock-data";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { service, TaskDistributionPerWeek } from "~/service/service";
+
+const tags = [
+    "Study",
+    "Homework",
+    "Classes",
+    "Meditation",
+]
+
+function LegendItem({tag} : {tag: string}) {
+    return (
+        <div className={styles.legendItemContainer}>
+            {tag}
+        </div>
+    )
+}
+
+function Legend() {
+    return (
+        <div className={styles.legendGroupContainer}>
+            {tags.map((tag: string, index: number) => 
+                <LegendItem tag={tag} key={index}/>
+            )}
+        </div>
+    )
+}
 
 const letters = letterFrequency.slice(0, 4);
 const frequency = (d) => d.frequency;
@@ -14,14 +41,14 @@ const frequency = (d) => d.frequency;
 const getLetterFrequencyColor = scaleOrdinal({
   domain: letters.map((l) => l.letter),
   range: [
-    "rgba(93,30,91,1)",
-    "rgba(93,30,91,0.8)",
-    "rgba(93,30,91,0.6)",
-    "rgba(93,30,91,0.4)"
+    "rgba(3, 186, 252, 1)", // blue
+    "rgba(14, 194, 119, 0.8)", // green
+    "rgba(14, 194, 119, 0.6)", // yellow
+    "rgba(194, 14, 185, 0.4)" // pink
   ]
 });
 
-const defaultMargin = { top: 20, right: 20, bottom: 20, left: 20 };
+const defaultMargin = { top: 0, right: 0, bottom: 0, left: 0 };
 
 export type PieProps = {
   width: number;
@@ -29,11 +56,14 @@ export type PieProps = {
   margin?: typeof defaultMargin;
 };
 
+// Source: https://codesandbox.io/p/sandbox/visx-simple-pie-chart-tf4ed
 function Chart({
-  width,
-  height,
   margin = defaultMargin
 }: PieProps) {
+
+  const height = 150
+  const width = 150
+
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
   const radius = Math.min(innerWidth, innerHeight) / 2;
@@ -87,20 +117,40 @@ function Chart({
   );
 }
 
+function useTaskDistribution() {
+    const setError = useSetGlobalError();
+    const [stats, setStats] = useState<TaskDistributionPerWeek[] | undefined>(undefined);
 
-export default function TaskDistribution() {
+    useEffect(() => {
+        service.getTaskDistributionStats()
+            .then((stats: any) => setStats(stats))
+            .catch((error) => setError(error));
+    }, []);
+
+    return {stats}
+}
+
+export function TaskDistribution() {
+    const {stats} = useTaskDistribution()
+
+    // TODO: continue by using stats to populate the plot
+
+    console.log(stats)
+    
     return (
         <>
             <div className={styles.statsContainer}>
-                <div className={styles.statsContainerTitleAndDateDiv}>
-                    <div className={styles.statsContainerTitle}>
-                        <img src="/icons/energy_container_title_icon.png" alt="Energy Title Icon" className={styles.titleImg}/>
-                        Workload distribution
-                    </div>
+                <div className={styles.statsContainerTitle}>
+                    (O) Workload distribution
+                </div>
+                <div className={styles.containerAlignRight}>
                     <CurWeekDate />
                 </div>
 
-                <Chart width={300} height={300}/>
+                <div className={styles.chartGroup}>
+                    <Chart width={200} height={200}/>
+                    <Legend />    
+                </div>
 
             </div>
         </>

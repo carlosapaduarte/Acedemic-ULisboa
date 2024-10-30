@@ -228,11 +228,10 @@ def get_daily_energy_history(
     history = study_tracker_service.get_daily_energy_history(user_id)
     return DailyEnergyStatusOutputDto.from_domain(history)
 
-
 @router.get("/users/me/statistics/time-by-event-tag")
 def get_task_time_distribution(
     user_id: Annotated[int, Depends(get_current_user_id)]
-) ->  dict[int, dict[int, dict[str, int]]]:
+) -> dict[int, dict[int, dict[str, int]]]:
     return study_tracker_service.get_task_time_distribution(user_id)
 
 @router.get("/users/me/statistics/week-study-time")
