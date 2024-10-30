@@ -118,16 +118,16 @@ export function App() {
     return (
         <AppBarProvider>
             <div className="app">
-                <AppBar />
-                <div className="mainContentContainer">
+                <AppBar aria-hidden={loading ? true : undefined} />
+                <main className="mainContentContainer" aria-hidden={loading}>
                     <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
                         <GlobalErrorController>
                             <Outlet />
                         </GlobalErrorController>
                     </ReactErrorBoundary>
-                </div>
+                </main>
+                <Footer aria-hidden={loading ? true : undefined} />
                 <LoadingOverlay loading={loading} />
-                <Footer />
             </div>
         </AppBarProvider>
     );

@@ -101,17 +101,19 @@ function SideBar() {
     );
 }
 
-export function AppBar() {
+export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean }) {
     const { appBarVariant } = useContext(AppBarContext);
 
     const navigate = useNavigate();
 
     return (
-        <div className={classNames(
+        <header role="banner" className={classNames(
             appBarVariant === "default" && styles.appBarContainer,
             appBarVariant === "home" && homeAppBarStyles.appBarContainer,
             appBarVariant === "clean" && cleanAppBarStyles.appBarContainer
-        )}>
+        )}
+                aria-hidden={ariaHidden}
+        >
             <div className={
                 classNames(
                     appBarVariant === "default" && styles.appBar,
@@ -149,6 +151,6 @@ export function AppBar() {
             {appBarVariant !== "clean" &&
                 <SideBar />
             }
-        </div>
+        </header>
     );
 }
