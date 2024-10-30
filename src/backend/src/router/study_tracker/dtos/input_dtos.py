@@ -18,6 +18,13 @@ class CreateEventInputDto(BaseModel):
     tags: list[str]
     everyWeek: bool
 
+class UpdateEventInputDto(BaseModel):
+    startDate: float
+    endDate: float
+    title: str
+    tags: list[str]
+    everyWeek: bool
+
 class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int
     startHour: int

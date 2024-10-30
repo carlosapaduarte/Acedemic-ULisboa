@@ -76,7 +76,7 @@ function useMyCalendar() {
                                 title: event.title,
                                 start: start,
                                 end: end,
-                                resource: { tags: event.tags }
+                                resource: { id: event.id, tags: event.tags, everyWeek: event.everyWeek }
                             });
                         });
                 });
@@ -87,13 +87,12 @@ function useMyCalendar() {
     function refreshUserEvents() {
         service.getUserEvents(false, false)
             .then((events: Event[]) => {
-                //console.log(events)
                 const calendarEvents: CalendarEvent[] = events.map((event: Event) => {
                     return {
                         title: event.title,
                         start: event.startDate,
                         end: event.endDate,
-                        resource: { tags: event.tags }
+                        resource: { id: event.id, tags: event.tags, everyWeek: event.everyWeek }
                     };
                 });
                 setEvents(calendarEvents);
@@ -145,11 +144,12 @@ function MyCalendar() {
         createNewEvent,
         toggleEventsView
     } = useMyCalendar();
-    const [edittedEventStartDate, setEdittedEventStartDate] = useState<Date>(new Date());
-    const [edittedEventEndDate, setEdittedEventEndDate] = useState<Date>(new Date());
-    const [edittedEventTitle, setEdittedEventTitle] = useState<string | undefined>(undefined);
-
-    const [isEdittedEventRecurrent, setIsEdittedEventRecurrent] = useState<boolean>(false);
+    const [editedEventId, setEditedEventId] = useState<number | undefined>(undefined);
+    const [editedEventStartDate, setEditedEventStartDate] = useState<Date>(new Date());
+    const [editedEventEndDate, setEditedEventEndDate] = useState<Date>(new Date());
+    const [editedEventTitle, setEditedEventTitle] = useState<string | undefined>(undefined);
+    const [editedEventTags, setEditedEventTags] = useState<string[]>([]);
+    const [editedEventRecurrent, setEditedEventRecurrent] = useState<boolean>(false);
 
     const { t } = useTranslation(["calendar"]);
 
@@ -169,19 +169,28 @@ function MyCalendar() {
     // This is invoked when the user clicks on an event
     const handleSelectEvent = useCallback(
         (event: CalendarEvent) => {
+            if (event.resource.id != undefined) {
+                setEditedEventId(event.resource.id as number);
+            }
             if (event.title != undefined) {
-                setEdittedEventTitle(event.title as string);
+                setEditedEventTitle(event.title as string);
             }
             if (event.start != undefined) {
-                setEdittedEventStartDate(event.start);
+                setEditedEventStartDate(event.start);
             }
             if (event.end != undefined) {
-                setEdittedEventEndDate(event.end);
+                setEditedEventEndDate(event.end);
+            }
+            if (event.resource.tags != undefined) {
+                setEditedEventTags(event.resource.tags as string[]);
+            }
+            if (event.resource.everyWeek != undefined) {
+                setEditedEventRecurrent(event.resource.everyWeek as boolean);
             }
 
             setIsEditEventModalOpen(true);
 
-            console.log("My event: ", event);
+            // console.log("My event: ", event);
         }, []);
 
     // This is invoked when the user navigates across months/weeks/days with React-Big-Calendar button
@@ -211,17 +220,24 @@ function MyCalendar() {
                 setNewEventEndDate={setNewEventEndDate}
                 refreshUserEvents={refreshUserEvents}
             />
-            <EditEventModal
-                isModalOpen={isEditEventModalOpen}
-                setIsModalOpen={setIsEditEventModalOpen}
-                eventTitle={edittedEventTitle}
-                setEventTitle={setEdittedEventTitle}
-                eventStartDate={edittedEventStartDate}
-                setEventStartDate={setEdittedEventStartDate}
-                eventEndDate={edittedEventEndDate}
-                setEventEndDate={setEdittedEventEndDate}
-                refreshUserEvents={refreshUserEvents}
-            />
+            {editedEventId &&
+                <EditEventModal
+                    isModalOpen={isEditEventModalOpen}
+                    setIsModalOpen={setIsEditEventModalOpen}
+                    eventId={editedEventId}
+                    eventTitle={editedEventTitle}
+                    setEventTitle={setEditedEventTitle}
+                    eventStartDate={editedEventStartDate}
+                    setEventStartDate={setEditedEventStartDate}
+                    eventEndDate={editedEventEndDate}
+                    setEventEndDate={setEditedEventEndDate}
+                    eventTags={editedEventTags}
+                    setEventTags={setEditedEventTags}
+                    eventRecurrent={editedEventRecurrent}
+                    setEventRecurrent={setEditedEventRecurrent}
+                    refreshUserEvents={refreshUserEvents}
+                />
+            }
             <button onClick={toggleEventsView}>
                 {eventsView == "allEvents" ?
                     (<span>

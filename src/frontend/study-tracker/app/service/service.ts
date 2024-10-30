@@ -228,6 +228,7 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
 }
 
 type EventDto = {
+    id: number,
     startDate: number,
     endDate: number,
     title: string,
@@ -236,11 +237,47 @@ type EventDto = {
 }
 
 export type Event = {
+    id: number,
     startDate: Date,
     endDate: Date,
     title: string,
     tags: string[],
     everyWeek: boolean
+}
+
+export type UpdateEventInputDto = {
+    title: string,
+    startDate: Date,
+    endDate: Date,
+    tags: string[]
+    everyWeek: boolean
+}
+
+async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
+    const request = {
+        path: `study-tracker/users/me/events/${eventId}`,
+        method: "PUT",
+        body: toJsonBody({
+            title: inputDto.title,
+            startDate: inputDto.startDate.getTime() / 1000,
+            endDate: inputDto.endDate.getTime() / 1000,
+            tags: inputDto.tags,
+            everyWeek: inputDto.everyWeek
+        })
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Event could not be updated!"));
+}
+
+async function deleteEvent(eventId: number) {
+    const request = {
+        path: `study-tracker/users/me/events/${eventId}`,
+        method: "DELETE"
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Event could not be deleted!"));
 }
 
 async function getUserEvents(filterTodayEvents: boolean, filterRecurrentEvents: boolean): Promise<Event[]> {
@@ -254,6 +291,7 @@ async function getUserEvents(filterTodayEvents: boolean, filterRecurrentEvents: 
         const responseObject: EventDto[] = await response.json();
         return responseObject.map((eventDto: EventDto) => {
             return {
+                id: eventDto.id,
                 startDate: new Date(eventDto.startDate * 1000),
                 endDate: new Date(eventDto.endDate * 1000),
                 title: eventDto.title,
@@ -697,6 +735,8 @@ export const service = {
     updateReceiveNotificationsPreference,
     updateWeekPlanningDay,
     createNewEvent,
+    updateEvent,
+    deleteEvent,
     getUserEvents,
     getStudyBlockHappeningNow,
     getUserTodayEvents,

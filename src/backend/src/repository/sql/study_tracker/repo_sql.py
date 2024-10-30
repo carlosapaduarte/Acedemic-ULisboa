@@ -99,6 +99,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             event_model.title = event.title
             event_model.start_date = event.date.start_date
             event_model.end_date = event.date.end_date
+            event_model.every_week = event.every_week
         
             session.add(event_model)
             session.commit()

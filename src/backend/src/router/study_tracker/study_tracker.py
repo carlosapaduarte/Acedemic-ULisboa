@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from domain.study_tracker import DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, UpdateWeekStudyTime
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, UpdateWeekStudyTime
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgress, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -72,6 +72,7 @@ def create_event(
     study_tracker_service.create_event(
         user_id, 
         Event(
+            id=None,
             title=dto.title,
             date=DateInterval(
                     start_date=datetime.fromtimestamp(dto.startDate),
@@ -87,12 +88,13 @@ def create_event(
 def update_event(
     user_id: Annotated[int, Depends(get_current_user_id)],
     event_id: int,
-    dto: CreateEventInputDto
+    dto: UpdateEventInputDto
 ) -> Response:
     study_tracker_service.update_event(
         user_id,
         event_id,
         Event(
+            id=event_id,
             title=dto.title,
             date=DateInterval(
                     start_date=datetime.fromtimestamp(dto.startDate),

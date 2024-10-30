@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Dialog, Input, Label, Modal, TextField } from "react-aria-components";
 import styles from "~/routes/calendar/CreateEvent/createEvent.module.css";
 import classNames from "classnames";
+import { service } from "~/service/service";
 
 const possibleTags = [
     "study",
@@ -127,8 +128,9 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection(
         <TextField className={styles.recurrentEventSectionCheckboxField}>
             <Input className={styles.checkboxInput}
                    type="checkbox"
-                   value={isNewEventRecurrent.toString()}
-                   onChange={(e) => setIsNewEventRecurrent((Boolean)(e.target.value))} />
+                   checked={isNewEventRecurrent}
+                   onChange={(e) => setIsNewEventRecurrent(e.target.checked)}
+            />
             <Label className={styles.formSectionTitle}>Every Week</Label>
         </TextField>
     </div>;
@@ -172,7 +174,7 @@ function EditEventForm(
         setEventStartDate,
         eventEndDate,
         setEventEndDate,
-        selectedTags, setSelectedTags, isNewEventRecurrent, setIsNewEventRecurrent
+        selectedTags, setSelectedTags, eventRecurrent, setEventRecurrent
     }:
         {
             eventTitle: string | undefined,
@@ -183,8 +185,8 @@ function EditEventForm(
             setEventEndDate: (endDate: Date) => void,
             selectedTags: string[],
             setSelectedTags: (selectedTags: string[]) => void,
-            isNewEventRecurrent: boolean,
-            setIsNewEventRecurrent: (value: (((prevState: boolean) => boolean) | boolean)) => void
+            eventRecurrent: boolean,
+            setEventRecurrent: (value: (((prevState: boolean) => boolean) | boolean)) => void
         }
 ) {
     return (
@@ -195,8 +197,8 @@ function EditEventForm(
                          newEventEndDate={eventEndDate}
                          setNewEventEndDate={setEventEndDate}
             />
-            <IsRecurrentSection isNewEventRecurrent={isNewEventRecurrent}
-                                setIsNewEventRecurrent={setIsNewEventRecurrent} />
+            <IsRecurrentSection isNewEventRecurrent={eventRecurrent}
+                                setIsNewEventRecurrent={setEventRecurrent} />
             <TagSection selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
         </div>
     );
@@ -206,37 +208,63 @@ export function EditEventModal(
     {
         isModalOpen,
         setIsModalOpen,
+        eventId,
         eventTitle,
         setEventTitle,
         eventStartDate,
         setEventStartDate,
         eventEndDate,
         setEventEndDate,
+        eventTags,
+        setEventTags,
+        eventRecurrent,
+        setEventRecurrent,
         refreshUserEvents
     }: {
         isModalOpen: boolean,
         setIsModalOpen: (isOpen: boolean) => void,
+        eventId: number,
         eventTitle: string | undefined,
         setEventTitle: (title: string) => void,
         eventStartDate: Date,
         setEventStartDate: (startDate: Date) => void,
         eventEndDate: Date,
         setEventEndDate: (endDate: Date) => void,
+        eventTags: string[],
+        setEventTags: (tags: string[] | ((prevTags: string[]) => string[])) => void,
+        eventRecurrent: boolean,
+        setEventRecurrent: (value: (((prevState: boolean) => boolean) | boolean)) => void,
         refreshUserEvents: () => void
     }
 ) {
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [isNewEventRecurrent, setIsNewEventRecurrent] = useState<boolean>(false);
-
     function clearFields() {
         setEventTitle("");
         setEventStartDate(new Date());
         setEventEndDate(new Date());
-        setSelectedTags([]);
-        setIsNewEventRecurrent(false);
+        setEventTags([]);
+        setEventRecurrent(false);
     }
 
-    const finishCreatingEventButtonDisabled = !eventTitle;
+    const finishEditingEventButtonDisabled = !eventTitle;
+
+    function editEventClickHandler() {
+        if (finishEditingEventButtonDisabled) {
+            return;
+        }
+        service.updateEvent(eventId,
+            {
+                title: eventTitle,
+                startDate: eventStartDate,
+                endDate: eventEndDate,
+                tags: eventTags,
+                everyWeek: eventRecurrent
+            })
+            .then(() => {
+                clearFields();
+                refreshUserEvents();
+            })
+        /*.catch((error) => setGlobalError(error))*/;
+    }
 
     return (
         <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -254,17 +282,18 @@ export function EditEventModal(
                                            setEventStartDate={setEventStartDate}
                                            eventEndDate={eventEndDate}
                                            setEventEndDate={setEventEndDate}
-                                           selectedTags={selectedTags}
-                                           setSelectedTags={setSelectedTags}
-                                           isNewEventRecurrent={isNewEventRecurrent}
-                                           setIsNewEventRecurrent={setIsNewEventRecurrent}
+                                           selectedTags={eventTags}
+                                           setSelectedTags={setEventTags}
+                                           eventRecurrent={eventRecurrent}
+                                           setEventRecurrent={setEventRecurrent}
                             />
                         </div>
                         <div className={styles.finishCreatingEventButtonContainer}>
                             <Button className={classNames(styles.finishCreatingEventButton)}
-                                    isDisabled={finishCreatingEventButtonDisabled}
+                                    isDisabled={finishEditingEventButtonDisabled}
                                     onPress={() => {
                                         close();
+                                        editEventClickHandler();
                                     }}>
                                 Save
                             </Button>

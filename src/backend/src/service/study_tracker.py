@@ -46,6 +46,7 @@ def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleB
 
 def create_event_from_task(user_id: int, task: Task, slot: SlotToWork):
     associatedEvent = Event(
+        id=None,
         title=task.title,
         date=DateInterval(
             start_date=slot.start_time,

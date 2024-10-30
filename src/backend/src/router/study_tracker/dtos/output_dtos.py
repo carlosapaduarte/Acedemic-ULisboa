@@ -45,6 +45,7 @@ class UserTaskOutputDto(BaseModel):
         )
 
 class EventOutputDto(BaseModel):
+    id: int
     startDate: int
     endDate: int
     title: str
@@ -55,8 +56,13 @@ class EventOutputDto(BaseModel):
     def from_events(events: list[Event]) -> list['EventOutputDto']:
         output_dtos_events: list[EventOutputDto] = []
         for event in events:
+            event_id = event.id
+            if event_id is None:
+                raise
+        
             output_dtos_events.append(
                 EventOutputDto(
+                    id=event_id,
                     startDate=get_datetime_utc(event.date.start_date),
                     endDate=get_datetime_utc(event.date.end_date),
                     title=event.title,

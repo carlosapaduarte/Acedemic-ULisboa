@@ -121,7 +121,8 @@ class ScheduleBlock():
 """
 
 class Event():
-    def __init__(self, title: str, date: DateInterval, tags: list[str], every_week: bool):
+    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool):
+        self.id=id
         self.title=title
         self.date=date
         self.tags=tags
@@ -139,6 +140,7 @@ class Event():
 
             today_events.append(
                 Event(
+                    id=event_result.id,
                     title=event_result.title,
                     date=DateInterval(
                         start_date=event_result.start_date,
