@@ -285,7 +285,7 @@ class DailyEnergyStatusModel(SQLModel, table=True):
     time_of_day: str
     level: int
 
-    user_id: int = Field(foreign_key="user.id")    
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="daily_energy_status")
     
 class WeekStudyTimeModel(SQLModel, table=True):
@@ -297,5 +297,5 @@ class WeekStudyTimeModel(SQLModel, table=True):
     average_by_session: float
     n_of_sessions: int
 
-    user_id: int = Field(foreign_key="user.id")    
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="week_study_time")
