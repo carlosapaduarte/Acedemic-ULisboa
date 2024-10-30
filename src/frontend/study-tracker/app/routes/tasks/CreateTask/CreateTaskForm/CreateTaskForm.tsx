@@ -247,7 +247,7 @@ export function CreateTaskForm(
     return (<form className={styles.newTaskForm}>
         <TitleSection title={title} setTitle={setTitle} />
         <DescriptionSection description={description} setDescription={setDescription} />
-        <SlotsToWorkSection slotsToWork={slotsToWork} setSlotsToWork={setSlotsToWork} />
+        {/*<SlotsToWorkSection slotsToWork={slotsToWork} setSlotsToWork={setSlotsToWork} />*/}
         <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
         <PrioritySection priority={priority} setPriority={setPriority} />
         <TagSection selectedTags={selectedTags} setSelectedTags={setSelectedTags} />

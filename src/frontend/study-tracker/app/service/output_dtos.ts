@@ -1,4 +1,9 @@
 
+export type SlotToWorkDto = {
+    start: Date
+    end: Date
+}
+
 export type CreateTaskInputDto = {
     title: string
     description: string | undefined
@@ -6,5 +11,6 @@ export type CreateTaskInputDto = {
     priority: string
     tags: string[]
     status: string,
-    subTasks: CreateTaskInputDto[]
+    subTasks: CreateTaskInputDto[],
+    slotsToWork: SlotToWorkDto[]
 }
