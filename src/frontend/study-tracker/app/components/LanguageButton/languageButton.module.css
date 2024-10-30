@@ -31,3 +31,11 @@
 .languageButton.en-GB {
     background-image: url('../minimalist-enGB.png');
 }
+
+.languageButton.selected {
+    outline-color: var(--primary-text-color);
+
+    &.clean {
+        outline-color: var(--secondary-text-color);
+    }
+}
