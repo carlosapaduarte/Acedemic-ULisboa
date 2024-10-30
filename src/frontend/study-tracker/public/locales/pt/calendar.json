@@ -24,12 +24,33 @@
     "today": "Hoje",
     "very_week_label": "Todas as semanas",
     "weekdays": {
-        "friday": "Sex",
-        "monday": "Seg",
-        "saturday": "Sáb",
-        "sunday": "Dom",
-        "thursday": "Qui",
-        "tuesday": "Ter",
-        "wednesday": "Qua"
+        "friday": {
+            "medium": "Sex",
+            "short": "S"
+        },
+        "monday": {
+            "medium": "Seg",
+            "short": "S"
+        },
+        "saturday": {
+            "medium": "Sáb",
+            "short": "S"
+        },
+        "sunday": {
+            "medium": "Dom",
+            "short": "D"
+        },
+        "thursday": {
+            "medium": "Qui",
+            "short": "Q"
+        },
+        "tuesday": {
+            "medium": "Ter",
+            "short": "T"
+        },
+        "wednesday": {
+            "medium": "Qua",
+            "short": "Q"
+        }
     }
 }

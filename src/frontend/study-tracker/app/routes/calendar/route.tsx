@@ -268,9 +268,8 @@ function MyCalendar() {
                             week: {
                                 header: (props: any) => {
                                     /*console.log("Props: ", props);*/
-                                    const days = isWideScreen ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-                                        : ["S", "M", "T", "W", "T", "F", "S"];
-                                    const dayOfWeekName = days[props.date.getDay()];
+                                    const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+                                    const dayOfWeekName = t(`calendar:weekdays.${days[props.date.getDay()]}.${isWideScreen ? "medium" : "short"}`);
 
                                     return (
                                         <div style={{

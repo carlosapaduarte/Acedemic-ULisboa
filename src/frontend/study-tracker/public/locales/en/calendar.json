@@ -24,12 +24,33 @@
     "today": "Today",
     "very_week_label": "Every Week",
     "weekdays": {
-        "friday": "Fri",
-        "monday": "Mon",
-        "saturday": "Sat",
-        "sunday": "Sun",
-        "thursday": "Thu",
-        "tuesday": "Tue",
-        "wednesday": "Wed"
+        "friday": {
+            "medium": "Fri",
+            "short": "F"
+        },
+        "monday": {
+            "medium": "Mon",
+            "short": "M"
+        },
+        "saturday": {
+            "medium": "Sat",
+            "short": "S"
+        },
+        "sunday": {
+            "medium": "Sun",
+            "short": "S"
+        },
+        "thursday": {
+            "medium": "Thu",
+            "short": "T"
+        },
+        "tuesday": {
+            "medium": "Tue",
+            "short": "T"
+        },
+        "wednesday": {
+            "medium": "Wed",
+            "short": "W"
+        }
     }
 }
