@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../createTask.module.css";
 import { Button, Input, Label, TextField } from "react-aria-components";
 import { SlotToWork } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
@@ -76,24 +76,53 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({ slotsToWork,
     );
 });
 
-const DeadlineSection = React.memo(function DeadlineSection() {
+const DeadlineSection = React.memo(function DeadlineSection({ deadline, setDeadline }: {
+    deadline: Date | undefined,
+    setDeadline: (deadline: Date | undefined) => void
+}) {
     const { t } = useTranslation(["task"]);
+
+    const [date, setDate] = useState<string>("");
+    const [time, setTime] = useState<string>("");
+
+    useEffect(() => {
+        if (date) {
+            const combinedDateTime = new Date(date);
+            if (time) {
+                const [hours, minutes] = time.split(":").map(Number);
+                combinedDateTime.setHours(hours, minutes);
+            }
+            setDeadline(combinedDateTime);
+        } else {
+            setDeadline(undefined);
+        }
+    }, [date, time, setDeadline]);
+
     return (
         <div className={styles.deadlineSectionContainer}>
             <h2 className={styles.formSectionTitle}>
                 {t("task:deadline_label")}
             </h2>
-            <div aria-label={`Deadline`} className={styles.deadlineInputsContainer}>
-                <Input type={"date"}
-                       aria-label={"Date for deadline"}
-                       className={classNames(styles.dateInput)} />
-                <Input type={"time"}
-                       aria-label={"Time for deadline"}
-                       className={classNames(styles.timeInput)} />
+            <div aria-label="Deadline" className={styles.deadlineInputsContainer}>
+                <Input
+                    type="date"
+                    aria-label="Date for deadline"
+                    className={classNames(styles.dateInput)}
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                />
+                <Input
+                    type="time"
+                    aria-label="Time for deadline"
+                    className={classNames(styles.timeInput)}
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                />
             </div>
         </div>
     );
 });
+
 
 const PrioritySection = React.memo(function PrioritySection({ priority, setPriority }: {
     priority: string | undefined,
@@ -169,6 +198,8 @@ export function CreateTaskForm(
     {
         slotsToWork,
         setSlotsToWork,
+        deadline,
+        setDeadline,
         selectedTags,
         setSelectedTags,
         title,
@@ -178,6 +209,8 @@ export function CreateTaskForm(
     }: {
         slotsToWork: number,
         setSlotsToWork: (slotsToWork: number) => void,
+        deadline: Date | undefined,
+        setDeadline: (deadline: Date | undefined) => void,
         selectedTags: string[],
         setSelectedTags: (selectedTags: string[]) => void,
         title: string | undefined,
@@ -188,7 +221,7 @@ export function CreateTaskForm(
     return (<form className={styles.newTaskForm}>
         <TitleSection title={title} setTitle={setTitle} />
         <SlotsToWorkSection slotsToWork={slotsToWork} setSlotsToWork={setSlotsToWork} />
-        <DeadlineSection />
+        <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
         <PrioritySection priority={priority} setPriority={setPriority} />
         <TagSection selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
     </form>);

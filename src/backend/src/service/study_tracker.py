@@ -71,7 +71,7 @@ def get_user_daily_tasks_progress(user_id: int) -> float:
     
     completed = 0    
     for task in daily_tasks:
-        if task.status == "Tarefa Completa":
+        if task.status == "completed":
             completed += 1
             
     return completed / number_of_daily_tasks

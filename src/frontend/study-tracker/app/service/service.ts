@@ -2,6 +2,7 @@
 
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
+import { CreateTaskInputDto } from "~/service/output_dtos";
 
 
 // For now, all of these functions will return the expected response.
@@ -313,30 +314,23 @@ export type TaskData = {
     status: string,
 }
 
-export type CreateTask = {
-    taskData: TaskData
-    subTasks: CreateTask[],
-    createEvent: boolean
-}
-
-async function createNewTask(newTaskInfo: CreateTask): Promise<Task> {
-    function toNewTaskBodyBody(newTaskInfo: CreateTask): any {
+async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
+    function requestBody(newTaskInfo: CreateTaskInputDto): any {
         return {
-            title: newTaskInfo.taskData.title,
-            description: newTaskInfo.taskData.description,
-            deadline: newTaskInfo.taskData.deadline ? newTaskInfo.taskData.deadline.getTime() / 1000 : undefined,
-            priority: newTaskInfo.taskData.priority,
-            tags: newTaskInfo.taskData.tags,
-            status: newTaskInfo.taskData.status,
-            subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTask) => toNewTaskBodyBody(subTaskInfo)),
-            createEvent: newTaskInfo.createEvent
+            title: newTaskInfo.title,
+            description: newTaskInfo.description,
+            deadline: newTaskInfo.deadline ? newTaskInfo.deadline.getTime() / 1000 : undefined,
+            priority: newTaskInfo.priority,
+            tags: newTaskInfo.tags,
+            status: newTaskInfo.status,
+            subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) => requestBody(subTaskInfo)),
         };
     }
 
     const request = {
         path: `study-tracker/users/me/tasks`,
         method: "POST",
-        body: toJsonBody(toNewTaskBodyBody(newTaskInfo))
+        body: toJsonBody(requestBody(newTaskInfo))
     };
 
     // Backend returns the newly created Task!
@@ -358,7 +352,7 @@ export type TaskDto = {
     id: number,
     title: string
     description: string
-    deadline: number
+    deadline: number | undefined
     priority: string
     tags: string[]
     status: string,
@@ -372,7 +366,7 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
         data: {
             title: dto.title,
             description: dto.description,
-            deadline: new Date(dto.deadline * 1000),
+            deadline: dto.deadline ? new Date(dto.deadline * 1000) : undefined,
             priority: dto.priority,
             tags: dto.tags,
             status: dto.status

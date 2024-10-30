@@ -152,7 +152,7 @@ class STTaskModel(SQLModel, table=True):
     # Task details
     title: str
     description: str
-    deadline: datetime
+    deadline: datetime | None
     priority: str
     status: str
 

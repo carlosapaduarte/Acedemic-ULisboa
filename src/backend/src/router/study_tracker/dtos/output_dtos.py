@@ -10,7 +10,7 @@ class UserTaskOutputDto(BaseModel):
     id: int
     title: str
     description: str
-    deadline: int
+    deadline: float | None
     priority: str
     tags: list[str]
     status: str
@@ -37,7 +37,7 @@ class UserTaskOutputDto(BaseModel):
             id=task_id,
             title=task.title,
             description=task.description,
-            deadline=get_datetime_utc(task.deadline),
+            deadline=get_datetime_utc(task.deadline) if task.deadline is not None else None,
             priority=task.priority,
             tags=task.tags,
             status=task.status,

@@ -4,12 +4,12 @@ import { Outlet } from "@remix-run/react";
 import { useTaskList } from "~/routes/tasks/useTaskList";
 
 export default function TasksPage() {
-    const { tasks, refreshTasks } = useTaskList(false);
+    const { tasks, setTasks, refreshTasks } = useTaskList(false);
 
     return (
         <RequireAuthn>
             <div className={styles.tasksPage}>
-                <Outlet context={{ tasks, refreshTasks }} />
+                <Outlet context={{ tasks, setTasks, refreshTasks }} />
             </div>
         </RequireAuthn>
     );

@@ -36,8 +36,8 @@ class SlotToWorkInputDto(BaseModel):
 
 class CreateTaskInputDto(BaseModel):
     title: str
-    description: str
-    deadline: float
+    description: str | None = None
+    deadline: float | None = None
     priority: str
     tags: list[str]
     status: str

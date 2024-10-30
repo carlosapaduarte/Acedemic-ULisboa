@@ -10,7 +10,11 @@ export default function TasksPage() {
     const { t } = useTranslation(["task"]);
     const navigate = useNavigate();
 
-    const { tasks, refreshTasks } = useOutletContext<{ tasks: Task[], refreshTasks: () => void }>();
+    const { tasks, setTasks, refreshTasks } = useOutletContext<{
+        tasks: Task[],
+        setTasks: (tasks: Task[] | ((prevTasks: Task[]) => Task[])) => void,
+        refreshTasks: () => void
+    }>();
 
     function onTaskCreated() {
         refreshTasks();
@@ -23,13 +27,19 @@ export default function TasksPage() {
         <div className={styles.taskListPage}>
             <h1 className={styles.tasksListTitle}>{t("task:my_tasks_list_title")}</h1>
             <CreateTaskButton onTaskCreated={onTaskCreated} />
-            <TaskList tasks={tasks}
-                      onTaskClick={(task: Task) => {
-                          navigate(`/tasks/${task.id}`);
-                      }}
-                      onTaskStatusUpdated={() => {
-                          refreshTasks();
-                      }} />
+            <div className={styles.taskListContainer}>
+                <TaskList tasks={tasks}
+                          onTaskClick={(task: Task) => {
+                              navigate(`/tasks/${task.id}`);
+                          }}
+                          onTaskStatusUpdated={(updatedTask) => {
+                              setTasks(prevTasks => {
+                                  return prevTasks.map(task =>
+                                      task.id === updatedTask.id ? updatedTask : task
+                                  );
+                              });
+                          }} />
+            </div>
         </div>
     );
 }

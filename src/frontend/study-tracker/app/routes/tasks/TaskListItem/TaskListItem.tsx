@@ -1,69 +1,61 @@
 import React, { useState } from "react";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service, Task } from "~/service/service";
 import styles from "./taskListItem.module.css";
 import classNames from "classnames";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
 
 
-function useTaskView(taskToCache: Task) {
-    const setGlobalError = useSetGlobalError();
-    const [task, setTask] = useState<Task>(taskToCache);
+function useTaskView(task: Task, onTaskStatusUpdated: (task: Task) => void) {
+    const [internalTask, setInternalTask] = useState<Task>(task);
 
     function updateTask() {
         service.getTask(task.id)
-            .then((updatedTask: Task) => setTask(updatedTask))
-            .catch((error) => setGlobalError(error));
+            .then((updatedTask: Task) => {
+                setInternalTask(updatedTask);
+                onTaskStatusUpdated(updatedTask);
+            })
+            .catch((error) => {
+            });
     }
 
-    function updateTaskStatus(newStatus: string, onDone: () => void) {
+    function updateTaskStatus(newStatus: string) {
         service.updateTaskStatus(task.id, newStatus)
-            .then(() => onDone())
-            .catch((error) => setGlobalError(error));
+            .then(() => {
+                updateTask();
+            })
+            .catch((error) => {
+            });
     }
 
-    return { task, updateTask, updateTaskStatus };
+    function passedDeadline(): boolean {
+        if (internalTask.data.deadline == undefined)
+            return false;
+
+        return internalTask.data.deadline < new Date();
+    }
+
+    return { internalTask, updateTaskStatus };
 }
 
 export function TaskListItem({ taskToDisplay, onTaskClick, onTaskStatusUpdated }: {
     taskToDisplay: Task,
     onTaskClick: (task: Task) => void,
-    onTaskStatusUpdated: () => void
+    onTaskStatusUpdated: (task: Task) => void
 }) {
-    // This function received a "onTaskStatusUpdated()" handler because, sometimes, it's handy for the caller to know that one of the tasks was updated!
-
     const {
-        task,
-        updateTask,
+        internalTask,
         updateTaskStatus
-    } = useTaskView(taskToDisplay);
-
-    const [checked, setChecked] = useState(false);
-
-    function passedDeadline(): boolean {
-        if (task.data.deadline == undefined)
-            return false;
-
-        return task.data.deadline < new Date();
-    }
-
-    function onNewStatusUpdateSelect(newStatus: string) {
-        updateTaskStatus(newStatus, () => {
-            updateTask();
-            onTaskStatusUpdated();
-        });
-    }
-
+    } = useTaskView(taskToDisplay, onTaskStatusUpdated);
 
     return (
-        <div aria-checked={task.data.status == "finished"} className={styles.checkboxAndTitleContainer}>
+        <div aria-checked={internalTask.data.status == "completed"} className={styles.checkboxAndTitleContainer}>
             <div className={styles.checkboxContainer}>
-                <TaskCheckbox checked={task.data.status == "finished"}
+                <TaskCheckbox checked={internalTask.data.status == "completed"}
                               onClick={() => {
-                                  if (task.data.status == "finished") {
-                                      onNewStatusUpdateSelect("not_finished");
+                                  if (internalTask.data.status == "completed") {
+                                      updateTaskStatus("not_completed");
                                   } else {
-                                      onNewStatusUpdateSelect("finished");
+                                      updateTaskStatus("completed");
                                   }
                               }}
                               className={styles.listCheckbox}
@@ -71,14 +63,14 @@ export function TaskListItem({ taskToDisplay, onTaskClick, onTaskStatusUpdated }
             </div>
             <button className={classNames(
                 styles.taskTitleContainer,
-                task.data.status == "finished" && styles.strikeThrough
+                internalTask.data.status == "completed" && styles.strikeThrough
             )}
-                    onClick={() => onTaskClick(task)}>
+                    onClick={() => onTaskClick(internalTask)}>
                 <p className={classNames(
                     styles.taskTitle,
-                    task.data.status == "finished" && styles.strikeThrough
+                    internalTask.data.status == "completed" && styles.strikeThrough
                 )}>
-                    {task.data.title}
+                    {internalTask.data.title}
                 </p>
             </button>
         </div>

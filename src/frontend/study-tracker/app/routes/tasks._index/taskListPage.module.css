@@ -1,5 +1,12 @@
 
 .taskListPage {
+    height: 100%;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+
     animation: fade 300ms ease;
 }
 
@@ -14,4 +21,10 @@
 
 .tasksListTitle {
     font-size: 1.5rem;
+}
+
+.taskListContainer {
+    width: 100%;
+
+    overflow: auto;
 }

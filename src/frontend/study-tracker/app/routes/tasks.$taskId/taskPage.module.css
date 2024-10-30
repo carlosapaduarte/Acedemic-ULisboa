@@ -31,7 +31,7 @@
     font-size: 1.5rem;
     font-weight: 900;
 
-    &.finished {
+    &.completed {
         /*text-decoration: line-through;*/
     }
 }
