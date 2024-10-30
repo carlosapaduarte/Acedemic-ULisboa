@@ -7,3 +7,11 @@
 
 .rbc-toolbar button {
 }
+
+.rbc-time-view .rbc-row {
+    min-height: unset;
+}
+
+.rbc-allday-cell .rbc-row-content {
+    padding-bottom: 20px;
+}

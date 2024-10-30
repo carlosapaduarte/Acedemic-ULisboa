@@ -153,6 +153,18 @@ function MyCalendar() {
 
     const { t } = useTranslation(["calendar"]);
 
+    const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 400);
+
+    useEffect(() => {
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 400) {
+                setIsWideScreen(true);
+            } else {
+                setIsWideScreen(false);
+            }
+        });
+    }, []);
+
     const { tags, appendTag, removeTag } = useTags();
 
     const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
@@ -251,6 +263,32 @@ function MyCalendar() {
             </button>
             <div className={styles.calendarContainer}>
                 <Calendar
+                    components={
+                        {
+                            week: {
+                                header: (props: any) => {
+                                    /*console.log("Props: ", props);*/
+                                    const days = isWideScreen ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+                                        : ["S", "M", "T", "W", "T", "F", "S"];
+                                    const dayOfWeekName = days[props.date.getDay()];
+
+                                    return (
+                                        <div style={{
+                                            display: "flex", flexDirection: "column",
+                                            alignItems: "center"
+                                        }}>
+                                            <div>
+                                                {dayOfWeekName}
+                                            </div>
+                                            <div>
+                                                {props.date.getDate()}
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            }
+                        }
+                    }
                     localizer={localizer}
                     events={events}
                     startAccessor="start"
