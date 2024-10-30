@@ -84,7 +84,7 @@ class StudyTrackerRepo(ABC):
         pass
     
     @abstractmethod
-    def create_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
+    def create_or_override_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
         pass
     
     @abstractmethod

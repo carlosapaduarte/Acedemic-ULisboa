@@ -99,6 +99,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             event_model.title = event.title
             event_model.start_date = event.date.start_date
             event_model.end_date = event.date.end_date
+            event_model.every_week = event.every_week
         
             session.add(event_model)
             session.commit()
@@ -157,7 +158,14 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 return True
         return False
     
-    def get_events(self, user_id: int, filter_today: bool, recurrentEvents: bool, study_events: bool, week_number: int | None) -> list[Event]:
+    def get_events(
+        self, 
+        user_id: int, 
+        filter_today: bool, 
+        recurrentEvents: bool, 
+        study_events: bool, 
+        week_number: int | None
+    ) -> list[Event]:
         with Session(engine) as session:
             statement = select(STEventModel)\
                 .where(STEventModel.user_id == user_id)\
@@ -256,7 +264,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def is_task_or_son_completed(task: STTaskModel):
         # Returns True if task is completed or one of it's sons is completed
         
-        if (task.status == "Tarefa Completa"):
+        if (task.status == "completed"):
             return True
         
         for task in task.subtasks:
@@ -275,11 +283,11 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             if filter_uncompleted_tasks:
                 statement = statement\
-                    .where(STTaskModel.status == "Tarefa Completa")
+                    .where(STTaskModel.status == "completed")
 
             result = session.exec(statement)
             
-            task_models: list[STTaskModel] = result.all()
+            task_models: list[STTaskModel] = list(result.all())
             
             """
             if filter_uncompleted_tasks:
@@ -292,17 +300,19 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             tasks: list[Task] = []
             for task_model in task_models:
                 tasks.append(StudyTrackerSqlRepo.build_task(task_model))
-                
+            
+            tasks.sort(key=lambda task: task.id if task.id is not None else 0)
+            
             # TODO: do this using SQL Model!
             # Right now, he is just sorting based on the task.deadline plus the priority string size
             if order_by_deadline_and_priority:
-                tasks.sort(key=lambda task: task.deadline)
-                tasks.sort(key=lambda task: Priority.from_str(task.priority).value)
+                tasks.sort(key=lambda task: task.deadline if task.deadline is not None else datetime.max)
+                tasks.sort(key=lambda task: Priority.from_str(task.priority).value, reverse=True)
                 
             # Ideally, we would use another where statement. Yet, this was not working for me...
             if filter_deadline_is_today:
                 for task in tasks:
-                    if (not StudyTrackerSqlRepo.is_today(task.deadline)):
+                    if task.deadline is not None and not StudyTrackerSqlRepo.is_today(task.deadline):
                         tasks.remove(task)
                 
             return tasks
@@ -397,7 +407,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 .where(STArchiveModel.user_id == user_id)
             result = session.exec(statement)
             
-            archive_models: list[STArchiveModel] = result.all()
+            archive_models: list[STArchiveModel] = list(result.all())
             
             return Archive.from_STArchiveModel(archive_models)
         
@@ -440,7 +450,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 .where(STCurricularUnitModel.user_id == user_id)
             result = session.exec(statement)
             
-            cu_models: list[STCurricularUnitModel] = result.all()
+            cu_models: list[STCurricularUnitModel] = list(result.all())
             
             return CurricularUnit.from_STCurricularUnitModel(cu_models)
         
@@ -475,15 +485,30 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(curricular_unit_model)
             session.commit()
             
-    def create_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
+    def create_or_override_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
         with Session(engine) as session:
-            daily_energy_stat = DailyEnergyStatusModel(
-                date_=status.date_,
-                level=status.level,
-                user_id=user_id
-            )
             
-            session.add(daily_energy_stat)
+            statement = select(DailyEnergyStatusModel)\
+                .where(DailyEnergyStatusModel.user_id == user_id)\
+                .where(DailyEnergyStatusModel.date_ == status.date_) # Not working!
+                
+            result = session.exec(statement)
+            model: DailyEnergyStatusModel | None = result.first()
+            
+            if model is None:            
+                daily_energy_stat = DailyEnergyStatusModel(
+                    date_=status.date_,
+                    time_of_day=status.time_of_day,
+                    level=status.level,
+                    user_id=user_id
+                )
+                
+                session.add(daily_energy_stat)
+            else:
+                model.level = status.level
+                model.time_of_day = status.time_of_day
+                session.add(model)
+            
             session.commit()
             
     def is_today_energy_status_created(self, user_id: int) -> bool:
@@ -495,7 +520,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             result = session.exec(statement)
             model: DailyEnergyStatusModel | None = result.first()
-            print(model)
             return model is not None
             
     def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:
@@ -504,13 +528,14 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 .where(DailyEnergyStatusModel.user_id == user_id)
                 
             result = session.exec(statement)
-            daily_energy_history_models: list[DailyEnergyStatusModel] = result.all()
+            daily_energy_history_models: list[DailyEnergyStatusModel] = list(result.all())
             
             daily_energy_history: list[DailyEnergyStatus] = []
             for stat_model in daily_energy_history_models:
                 daily_energy_history.append(
                     DailyEnergyStatus(
                         date=stat_model.date_,
+                        time_of_day=stat_model.time_of_day,
                         level=stat_model.level
                     )
                 )
@@ -530,7 +555,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 .where(STEventModel.user_id == user_id)
             
             result = session.exec(statement)
-            events: list[STEventModel] = result.all()
+            events: list[STEventModel] = list(result.all())
             
             stats: dict[int, dict[int, dict[str, int]]] = {}
 
@@ -564,7 +589,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 .where(WeekStudyTimeModel.user_id == user_id)\
                     
             result = session.exec(statement)
-            week_study_time_history: list[WeekStudyTimeModel] = result.all()
+            week_study_time_history: list[WeekStudyTimeModel] = list(result.all())
             return WeekTimeStudy.from_STCurricularUnitModel(week_study_time_history)
             
             

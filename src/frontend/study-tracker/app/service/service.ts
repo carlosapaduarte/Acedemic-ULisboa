@@ -2,6 +2,7 @@
 
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
+import { CreateTaskInputDto } from "~/service/output_dtos";
 
 
 // For now, all of these functions will return the expected response.
@@ -227,6 +228,7 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
 }
 
 type EventDto = {
+    id: number,
     startDate: number,
     endDate: number,
     title: string,
@@ -235,11 +237,47 @@ type EventDto = {
 }
 
 export type Event = {
+    id: number,
     startDate: Date,
     endDate: Date,
     title: string,
     tags: string[],
     everyWeek: boolean
+}
+
+export type UpdateEventInputDto = {
+    title: string,
+    startDate: Date,
+    endDate: Date,
+    tags: string[]
+    everyWeek: boolean
+}
+
+async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
+    const request = {
+        path: `study-tracker/users/me/events/${eventId}`,
+        method: "PUT",
+        body: toJsonBody({
+            title: inputDto.title,
+            startDate: inputDto.startDate.getTime() / 1000,
+            endDate: inputDto.endDate.getTime() / 1000,
+            tags: inputDto.tags,
+            everyWeek: inputDto.everyWeek
+        })
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Event could not be updated!"));
+}
+
+async function deleteEvent(eventId: number) {
+    const request = {
+        path: `study-tracker/users/me/events/${eventId}`,
+        method: "DELETE"
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Event could not be deleted!"));
 }
 
 async function getUserEvents(filterTodayEvents: boolean, filterRecurrentEvents: boolean): Promise<Event[]> {
@@ -253,6 +291,7 @@ async function getUserEvents(filterTodayEvents: boolean, filterRecurrentEvents: 
         const responseObject: EventDto[] = await response.json();
         return responseObject.map((eventDto: EventDto) => {
             return {
+                id: eventDto.id,
                 startDate: new Date(eventDto.startDate * 1000),
                 endDate: new Date(eventDto.endDate * 1000),
                 title: eventDto.title,
@@ -313,30 +352,23 @@ export type TaskData = {
     status: string,
 }
 
-export type CreateTask = {
-    taskData: TaskData
-    subTasks: CreateTask[],
-    createEvent: boolean
-}
-
-async function createNewTask(newTaskInfo: CreateTask): Promise<Task> {
-    function toNewTaskBodyBody(newTaskInfo: CreateTask): any {
+async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
+    function requestBody(newTaskInfo: CreateTaskInputDto): any {
         return {
-            title: newTaskInfo.taskData.title,
-            description: newTaskInfo.taskData.description,
-            deadline: newTaskInfo.taskData.deadline ? newTaskInfo.taskData.deadline.getTime() / 1000 : undefined,
-            priority: newTaskInfo.taskData.priority,
-            tags: newTaskInfo.taskData.tags,
-            status: newTaskInfo.taskData.status,
-            subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTask) => toNewTaskBodyBody(subTaskInfo)),
-            createEvent: newTaskInfo.createEvent
+            title: newTaskInfo.title,
+            description: newTaskInfo.description,
+            deadline: newTaskInfo.deadline ? newTaskInfo.deadline.getTime() / 1000 : undefined,
+            priority: newTaskInfo.priority,
+            tags: newTaskInfo.tags,
+            status: newTaskInfo.status,
+            subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) => requestBody(subTaskInfo)),
         };
     }
 
     const request = {
         path: `study-tracker/users/me/tasks`,
         method: "POST",
-        body: toJsonBody(toNewTaskBodyBody(newTaskInfo))
+        body: toJsonBody(requestBody(newTaskInfo))
     };
 
     // Backend returns the newly created Task!
@@ -358,7 +390,7 @@ export type TaskDto = {
     id: number,
     title: string
     description: string
-    deadline: number
+    deadline: number | undefined
     priority: string
     tags: string[]
     status: string,
@@ -372,7 +404,7 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
         data: {
             title: dto.title,
             description: dto.description,
-            deadline: new Date(dto.deadline * 1000),
+            deadline: dto.deadline ? new Date(dto.deadline * 1000) : undefined,
             priority: dto.priority,
             tags: dto.tags,
             status: dto.status
@@ -568,14 +600,29 @@ async function createGrade(curricularUnit: string, value: number, weight: number
         return Promise.reject(new Error("New Curricular Unit could not be created!"));
 }
 
-async function createDailyEnergyStat(energyLevel: number) {
+export enum TimeOfDay {
+    MORNING,
+    AFTERNOON,
+    NIGHT
+}
+
+async function createDailyEnergyStat(energyLevel: number, timeOfDay: TimeOfDay) {
+    function toStr(timeOfDay: TimeOfDay): string {
+        if (timeOfDay == TimeOfDay.MORNING)
+            return "morning"
+        if (timeOfDay == TimeOfDay.AFTERNOON)
+            return "afternoon"
+        return "night"
+    }
+
     const today = new Date();
     const request = {
         path: `study-tracker/users/me/statistics/daily-energy-status`,
         method: "POST",
         body: toJsonBody({
             date: today.getTime() / 1000,
-            energyLevel
+            timeOfDay: toStr(timeOfDay),
+            level: energyLevel
         })
     };
     const response: Response = await doFetch(request);
@@ -703,6 +750,8 @@ export const service = {
     updateReceiveNotificationsPreference,
     updateWeekPlanningDay,
     createNewEvent,
+    updateEvent,
+    deleteEvent,
     getUserEvents,
     getStudyBlockHappeningNow,
     getUserTodayEvents,

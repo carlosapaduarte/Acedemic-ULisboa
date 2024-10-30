@@ -13,6 +13,7 @@ import { CreateEventModal } from "./CreateEvent/CreateEvent";
 import { useTranslation } from "react-i18next";
 import { EditEventModal } from "./CreateEvent/EditEvent";
 import { useTags } from "~/hooks/useTags";
+import { utils } from "~/utils";
 
 const localizer = momentLocalizer(moment);
 
@@ -36,6 +37,9 @@ function useMyCalendar() {
 
     const [displayedDates, setDisplayedDates] = useState<Date[]>([]);
 
+    //console.log(events)
+    //console.log(calendarView)
+
     useEffect(() => {
         if (eventsView == "allEvents")
             refreshUserEvents();
@@ -48,6 +52,12 @@ function useMyCalendar() {
             refreshUserRecurrentEvents(displayedDates);
     }, [displayedDates]);
 
+    // If user selects Month view, change to "allEvents" automatically
+    useEffect(() => {
+        if (calendarView == Views.MONTH)
+            setEventsView("allEvents")
+    }, [calendarView]);
+
     function toggleEventsView() {
         if (eventsView == "allEvents")
             setEventsView("recurringEvents");
@@ -58,6 +68,8 @@ function useMyCalendar() {
     function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
         service.getUserEvents(false, true)
             .then((events: Event[]) => {
+                //console.log(calendarDisplayedDates)
+                //console.log(events)
                 const calendarEvents: CalendarEvent[] = [];
                 calendarDisplayedDates.forEach((displayedDate: Date) => {
                     events
@@ -68,16 +80,19 @@ function useMyCalendar() {
                             const start = new Date(displayedDate);
                             start.setHours(event.startDate.getHours());
                             start.setMinutes(event.startDate.getMinutes());
+                            
                             const end = new Date(displayedDate);
                             end.setHours(event.endDate.getHours());
                             end.setMinutes(event.endDate.getMinutes());
 
-                            calendarEvents.push({
+                            const calendarEvent = {
                                 title: event.title,
                                 start: start,
                                 end: end,
-                                resource: { tags: event.tags }
-                            });
+                                resource: { id: event.id, tags: event.tags, everyWeek: event.everyWeek }
+                            }
+
+                            calendarEvents.push(calendarEvent);
                         });
                 });
                 setEvents(calendarEvents);
@@ -87,13 +102,12 @@ function useMyCalendar() {
     function refreshUserEvents() {
         service.getUserEvents(false, false)
             .then((events: Event[]) => {
-                //console.log(events)
                 const calendarEvents: CalendarEvent[] = events.map((event: Event) => {
                     return {
                         title: event.title,
                         start: event.startDate,
                         end: event.endDate,
-                        resource: { tags: event.tags }
+                        resource: { id: event.id, tags: event.tags, everyWeek: event.everyWeek }
                     };
                 });
                 setEvents(calendarEvents);
@@ -145,13 +159,26 @@ function MyCalendar() {
         createNewEvent,
         toggleEventsView
     } = useMyCalendar();
-    const [edittedEventStartDate, setEdittedEventStartDate] = useState<Date>(new Date());
-    const [edittedEventEndDate, setEdittedEventEndDate] = useState<Date>(new Date());
-    const [edittedEventTitle, setEdittedEventTitle] = useState<string | undefined>(undefined);
-
-    const [isEdittedEventRecurrent, setIsEdittedEventRecurrent] = useState<boolean>(false);
+    const [editedEventId, setEditedEventId] = useState<number | undefined>(undefined);
+    const [editedEventStartDate, setEditedEventStartDate] = useState<Date>(new Date());
+    const [editedEventEndDate, setEditedEventEndDate] = useState<Date>(new Date());
+    const [editedEventTitle, setEditedEventTitle] = useState<string | undefined>(undefined);
+    const [editedEventTags, setEditedEventTags] = useState<string[]>([]);
+    const [editedEventRecurrent, setEditedEventRecurrent] = useState<boolean>(false);
 
     const { t } = useTranslation(["calendar"]);
+
+    const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 400);
+
+    useEffect(() => {
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 400) {
+                setIsWideScreen(true);
+            } else {
+                setIsWideScreen(false);
+            }
+        });
+    }, []);
 
     const { tags, appendTag, removeTag } = useTags();
 
@@ -169,28 +196,49 @@ function MyCalendar() {
     // This is invoked when the user clicks on an event
     const handleSelectEvent = useCallback(
         (event: CalendarEvent) => {
+            if (event.resource.id != undefined) {
+                setEditedEventId(event.resource.id as number);
+            }
             if (event.title != undefined) {
-                setEdittedEventTitle(event.title as string);
+                setEditedEventTitle(event.title as string);
             }
             if (event.start != undefined) {
-                setEdittedEventStartDate(event.start);
+                setEditedEventStartDate(event.start);
             }
             if (event.end != undefined) {
-                setEdittedEventEndDate(event.end);
+                setEditedEventEndDate(event.end);
+            }
+            if (event.resource.tags != undefined) {
+                setEditedEventTags(event.resource.tags as string[]);
+            }
+            if (event.resource.everyWeek != undefined) {
+                setEditedEventRecurrent(event.resource.everyWeek as boolean);
             }
 
             setIsEditEventModalOpen(true);
 
-            console.log("My event: ", event);
+            // console.log("My event: ", event);
         }, []);
 
     // This is invoked when the user navigates across months/weeks/days with React-Big-Calendar button
     const onRangeChange = useCallback((range: Date[] | { start: Date; end: Date; }) => {
-        if (!(range instanceof Array)) {
-            setDisplayedDates([range.start, range.end]);
-        }
 
-        setDisplayedDates(range as Date[]);
+        // When "agenda" view type is selected
+        if (!(range instanceof Array)) {
+            const dates: Date[] = []
+            let curDate = new Date(range.start)
+            while (true) {
+                if (utils.sameDay(curDate, range.end))
+                    break
+
+                dates.push(curDate)
+
+                curDate = new Date(curDate)
+                curDate.setDate(curDate.getDate() + 1)
+            }
+            setDisplayedDates(dates);
+        } else
+            setDisplayedDates(range as Date[]);
     }, [eventsView, calendarView]);
 
     const onView = useCallback((newView: any) => {
@@ -211,30 +259,67 @@ function MyCalendar() {
                 setNewEventEndDate={setNewEventEndDate}
                 refreshUserEvents={refreshUserEvents}
             />
-            <EditEventModal
-                isModalOpen={isEditEventModalOpen}
-                setIsModalOpen={setIsEditEventModalOpen}
-                eventTitle={edittedEventTitle}
-                setEventTitle={setEdittedEventTitle}
-                eventStartDate={edittedEventStartDate}
-                setEventStartDate={setEdittedEventStartDate}
-                eventEndDate={edittedEventEndDate}
-                setEventEndDate={setEdittedEventEndDate}
-                refreshUserEvents={refreshUserEvents}
-            />
-            <button onClick={toggleEventsView}>
-                {eventsView == "allEvents" ?
-                    (<span>
-                        {t("calendar:display_only_recurring_events_button")}
-                    </span>)
+            {editedEventId &&
+                <EditEventModal
+                    isModalOpen={isEditEventModalOpen}
+                    setIsModalOpen={setIsEditEventModalOpen}
+                    eventId={editedEventId}
+                    eventTitle={editedEventTitle}
+                    setEventTitle={setEditedEventTitle}
+                    eventStartDate={editedEventStartDate}
+                    setEventStartDate={setEditedEventStartDate}
+                    eventEndDate={editedEventEndDate}
+                    setEventEndDate={setEditedEventEndDate}
+                    eventTags={editedEventTags}
+                    setEventTags={setEditedEventTags}
+                    eventRecurrent={editedEventRecurrent}
+                    setEventRecurrent={setEditedEventRecurrent}
+                    refreshUserEvents={refreshUserEvents}
+                />
+            }
+            {
+                calendarView != Views.MONTH ?
+                    <button onClick={toggleEventsView}>
+                        {eventsView == "allEvents" ?
+                            (<span>
+                                {t("calendar:display_only_recurring_events_button")}
+                            </span>)
+                            :
+                            (<span>
+                                {t("calendar:display_all_events_button")}
+                            </span>)
+                        }
+                    </button>
                     :
-                    (<span>
-                        {t("calendar:display_all_events_button")}
-                    </span>)
-                }
-            </button>
+                    <></>
+            }
             <div className={styles.calendarContainer}>
                 <Calendar
+                    components={
+                        {
+                            week: {
+                                header: (props: any) => {
+                                    /*console.log("Props: ", props);*/
+                                    const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+                                    const dayOfWeekName = t(`calendar:weekdays.${days[props.date.getDay()]}.${isWideScreen ? "medium" : "short"}`);
+
+                                    return (
+                                        <div style={{
+                                            display: "flex", flexDirection: "column",
+                                            alignItems: "center"
+                                        }}>
+                                            <div>
+                                                {dayOfWeekName}
+                                            </div>
+                                            <div>
+                                                {props.date.getDate()}
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            }
+                        }
+                    }
                     localizer={localizer}
                     events={events}
                     startAccessor="start"

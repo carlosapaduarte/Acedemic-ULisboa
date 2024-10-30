@@ -18,6 +18,13 @@ class CreateEventInputDto(BaseModel):
     tags: list[str]
     everyWeek: bool
 
+class UpdateEventInputDto(BaseModel):
+    startDate: float
+    endDate: float
+    title: str
+    tags: list[str]
+    everyWeek: bool
+
 class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int
     startHour: int
@@ -36,8 +43,8 @@ class SlotToWorkInputDto(BaseModel):
 
 class CreateTaskInputDto(BaseModel):
     title: str
-    description: str
-    deadline: float
+    description: str | None = None
+    deadline: float | None = None
     priority: str
     tags: list[str]
     status: str
@@ -65,6 +72,7 @@ class CreateGradeInputDto(BaseModel):
     
 class CreateDailyEnergyStatus(BaseModel):
     level: int
+    timeOfDay: str
     
 class UpdateWeekStudyTime(BaseModel):
     year: int

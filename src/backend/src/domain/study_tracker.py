@@ -5,16 +5,19 @@ from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, 
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, SlotToWorkInputDto
 
 class Priority(Enum):
-    URGENTE = 1
-    IMPORTANTE = 2
+    LOW = 1
+    MEDIUM = 2
+    HIGH = 3
 
     @staticmethod
     def from_str(priority: str) -> 'Priority':
-        if priority == "importante":
-            return Priority.IMPORTANTE
-        if priority == "urgente":
-            return Priority.URGENTE
-        raise
+        if priority == "low":
+            return Priority.LOW
+        if priority == "medium":
+            return Priority.MEDIUM
+        if priority == "high":
+            return Priority.HIGH
+        return Priority.LOW
 
 class SlotToWork():
     def __init__(
@@ -41,11 +44,11 @@ class Task():
             id: int | None,
             title: str,
             description: str,
-            deadline: datetime,
+            deadline: datetime | None,
             priority: str,
             tags: list[str],
             sub_tasks: list['Task'],
-            status: str="Tarefa não iniciada", # Default value
+            status: str="not_completed",
     ) -> None:
         self.id=id
         self.title=title
@@ -64,8 +67,8 @@ class Task():
         return Task(
             id=None,
             title=task_dto.title,
-            description=task_dto.description,
-            deadline=datetime.fromtimestamp(task_dto.deadline),
+            description=task_dto.description if task_dto.description is not None else "",
+            deadline=datetime.fromtimestamp(task_dto.deadline) if task_dto.deadline is not None else None,
             priority=task_dto.priority,
             tags=task_dto.tags,
             status=task_dto.status,
@@ -118,7 +121,8 @@ class ScheduleBlock():
 """
 
 class Event():
-    def __init__(self, title: str, date: DateInterval, tags: list[str], every_week: bool):
+    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool):
+        self.id=id
         self.title=title
         self.date=date
         self.tags=tags
@@ -136,6 +140,7 @@ class Event():
 
             today_events.append(
                 Event(
+                    id=event_result.id,
                     title=event_result.title,
                     date=DateInterval(
                         start_date=event_result.start_date,
@@ -219,68 +224,32 @@ class CurricularUnit():
 
 class DailyEnergyStatus():
     date_: date
+    time_of_day: str
     level: int
-
-    def __init__(self, date: date, level: int) -> None:
+    
+    def __init__(self, date: date, time_of_day: str, level: int) -> None:
         self.date_=date
+        self.time_of_day=time_of_day
         self.level=level
 
 class WeekAndYear():
     year: int
     week: int
-    
-    def __init__(self, year: int, week: int) -> None:
-        self.year=year
-        self.week=week
-        
-class WeekTimeStudy():
-    week_and_year: WeekAndYear
-    minutes: int
-    
-    def __init__(self, week_and_year: WeekAndYear, minutes: int) -> None:
-        self.week_and_year=week_and_year
-        self.minutes=minutes
-        
-    @staticmethod
-    def from_STCurricularUnitModel(models: list[WeekStudyTimeModel]) -> list['WeekTimeStudy']:
-        curricular_units: list[WeekTimeStudy] = []
-        for model in models:
-            curricular_units.append(WeekTimeStudy(
-                week_and_year=WeekAndYear(
-                    year=model.year,
-                    week=model.week
-                ),
-                minutes=model.total
-            ))
-            
-        return curricular_units
-    
-class DailyEnergyStatus():
-    date_: date
-    level: int
-    
-    def __init__(self, date: date, level: int) -> None:
-        self.date_=date
-        self.level=level
 
-class WeekAndYear():
-    year: int
-    week: int
-    
     def __init__(self, year: int, week: int) -> None:
         self.year=year
         self.week=week
-        
+
 class WeekTimeStudy():
     week_and_year: WeekAndYear
     total: int
     average_by_session: float
     target: int | None
-    
+
     def __init__(
-        self, 
-        week_and_year: WeekAndYear, 
-        total: int, 
+        self,
+        week_and_year: WeekAndYear,
+        total: int,
         average_by_session: float,
         target: int | None
     ) -> None:
@@ -302,5 +271,9 @@ class WeekTimeStudy():
                 average_by_session=model.average_by_session,
                 target=None
             ))
-            
+
         return curricular_units
+
+def verify_time_of_day(time_of_day: str) -> bool:
+    print(time_of_day)
+    return time_of_day.lower() == "morning" or time_of_day.lower() == "afternoon" or time_of_day.lower() == "night"

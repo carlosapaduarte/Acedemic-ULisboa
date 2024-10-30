@@ -152,7 +152,7 @@ class STTaskModel(SQLModel, table=True):
     # Task details
     title: str
     description: str
-    deadline: datetime
+    deadline: datetime | None
     priority: str
     status: str
 
@@ -282,6 +282,7 @@ class DailyEnergyStatusModel(SQLModel, table=True):
     __tablename__ = "daily_energy_status"
 
     date_: date = Field(primary_key=True, default=None)
+    time_of_day: str
     level: int
 
     user_id: int = Field(foreign_key="user.id")    

@@ -60,34 +60,36 @@ const TitleAndCheckboxSection = memo(function TitleAndCheckboxSection(
     return (
         <div className={classNames(styles.checkboxAndTitleContainer)}>
             <div className={styles.mainTaskCheckbox}>
-                <TaskCheckbox checked={task.data.status == "finished"}
+                <TaskCheckbox checked={task.data.status == "completed"}
                               onClick={() => {
-                                  if (task.data.status == "finished") {
-                                      updateTaskStatus("not_finished");
+                                  if (task.data.status == "completed") {
+                                      updateTaskStatus("not_completed");
                                   } else {
-                                      updateTaskStatus("finished");
+                                      updateTaskStatus("completed");
                                   }
                               }} />
             </div>
             <h1 className={classNames(
                 styles.taskTitle,
-                task.data.status == "finished" && styles.finished
+                task.data.status == "completed" && styles.completed
             )}>
                 {task.data.title}
             </h1>
-            <button className={styles.editButton}>
+            {/*<button className={styles.editButton}>
                 <img src="/icons/edit_icon.svg" alt="Edit Icon" />
-            </button>
+            </button>*/}
         </div>
     );
 });
 
 const DescriptionSection = memo(function DescriptionSection({ description }: { description: string | undefined }) {
+    const { t } = useTranslation(["task"]);
+
     return (
         <div>
             {
                 description == undefined || description == ""
-                    ? <p className={styles.noDescription}>No description...</p>
+                    ? <p className={styles.noDescription}>{t("task:no_description")}</p>
                     : <p className={styles.description}>{description}</p>
             }
         </div>
@@ -95,19 +97,23 @@ const DescriptionSection = memo(function DescriptionSection({ description }: { d
 });
 
 const PrioritySection = memo(function PrioritySection({ priority }: { priority: string }) {
+    const { t } = useTranslation(["task"]);
+
     return (
-        <h3>Priority: {priority}</h3>
+        <h3>{t(`task:priority_label`)}: {t(`task:priority_option_${priority}`)}</h3>
     );
 });
 
 const DeadlineSection = memo(function DeadlineSection({ deadline }: { deadline: Date | undefined }) {
+    const { t } = useTranslation(["task"]);
+
     return (
         <div>
+            <h3>{t("task:deadline_label")}</h3>
             {
                 deadline == undefined
-                    ? <h3 className={styles.noDeadline}>No deadline...</h3>
+                    ? <h4 className={styles.noDeadline}>{t("task:no_deadline")}</h4>
                     : <div>
-                        <h3>Deadline</h3>
                         <h4>{deadline.toLocaleString()}</h4>
                     </div>
             }
@@ -116,12 +122,14 @@ const DeadlineSection = memo(function DeadlineSection({ deadline }: { deadline: 
 });
 
 const TagsSection = memo(function TagsSection({ tags }: { tags: string[] }) {
+    const { t } = useTranslation(["task"]);
+
     return (
         <div>
-            <h3>Tags</h3>
+            <h3>{t("task:tags_label")}</h3>
             {
                 tags.length == 0 ?
-                    <h4 className={styles.noTags}>No tags...</h4>
+                    <h4 className={styles.noTags}>{t("task:no_tags")}</h4>
                     :
                     tags.map((tag: string, index: number) =>
                         <p key={index} className={styles.tag}>{tag}</p>
@@ -132,12 +140,14 @@ const TagsSection = memo(function TagsSection({ tags }: { tags: string[] }) {
 });
 
 const SubTasksSection = memo(function SubTasksSection({ subTasks }: { subTasks: Task[] }) {
+    const { t } = useTranslation(["task"]);
+
     return (
         <div>
-            <h3>Subtasks</h3>
+            <h3>{t("task:subtasks_label")}</h3>
             {
                 subTasks.length == 0 ?
-                    <h4 className={styles.noSubtasks}>No subtasks...</h4>
+                    <h4 className={styles.noSubtasks}>{t("task:no_subtasks")}</h4>
                     :
                     <TaskList tasks={subTasks}
                               onTaskClick={() => {

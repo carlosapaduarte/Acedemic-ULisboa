@@ -1,7 +1,11 @@
 @import "../../components/Checkbox/checkbox.module.css";
 
 .tasksPage {
+    height: 100%;
+
     padding: 1rem clamp(1rem, 10vw - 1rem, 6rem);
+
+    overflow: hidden;
 }
 
 .createTaskTitle {

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { CreateTask, service, Task } from "~/service/service";
+import { service, Task } from "~/service/service";
 
 import { Button, Dialog, DialogTrigger, Modal } from "react-aria-components";
 
@@ -10,6 +10,7 @@ import { CreateTaskForm } from "~/routes/tasks/CreateTask/CreateTaskForm/CreateT
 import { SecondModalContext } from "./SecondModalContext";
 import { useTranslation } from "react-i18next";
 import { useTags } from "~/hooks/useTags";
+import { CreateTaskInputDto } from "~/service/output_dtos";
 
 
 function useCreateNewTask() {
@@ -19,8 +20,7 @@ function useCreateNewTask() {
     const [priority, setPriority] = useState<string | undefined>("low");
     const { tags, appendTag, removeTag } = useTags();
     const [status, setStatus] = useState<string | undefined>(undefined);
-    const [subTasks, setSubTasks] = useState<CreateTask[]>([]);
-    const [createEvent, setCreateEvent] = useState<boolean>(false);
+    const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
 
     const [slotsToWork, setSlotsToWork] = useState<number>(1);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -33,12 +33,11 @@ function useCreateNewTask() {
         tags.forEach((tag) => removeTag(tag));
         setStatus(undefined);
         setSubTasks([]);
-        setCreateEvent(false);
         setSlotsToWork(1);
         setSelectedTags([]);
     }
 
-    function appendSubSubTask(subTask: CreateTask) {
+    function appendSubSubTask(subTask: CreateTaskInputDto) {
         let newSubTasks;
         if (subTasks == undefined)
             newSubTasks = [subTask];
@@ -49,13 +48,6 @@ function useCreateNewTask() {
             newSubTasks.push(subTask);
         }
         setSubTasks(newSubTasks);
-    }
-
-    function toggleCreateEvent() {
-        if (createEvent)
-            setCreateEvent(false);
-        else
-            setCreateEvent(true);
     }
 
     return {
@@ -77,8 +69,6 @@ function useCreateNewTask() {
         selectedTags,
         setSelectedTags,
         subTasks,
-        createEvent,
-        toggleCreateEvent,
         appendSubSubTask,
         clearFields
     };
@@ -107,21 +97,19 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
         setSelectedTags,
         appendSubSubTask,
         subTasks,
-        createEvent,
-        toggleCreateEvent,
         clearFields
     } = useCreateNewTask();
 
     const { t } = useTranslation(["task"]);
 
-    function createTask(newTaskInfo: CreateTask, onDone: (task: Task) => void) {
+    function createTask(newTaskInfo: CreateTaskInputDto, onDone: (task: Task) => void) {
         service.createNewTask(newTaskInfo)
             .then((task: Task) => onDone(task))
             .catch((error) => {
             }/*setGlobalError(error)*/);
     }
 
-    function onConfirmClick(newTaskInfo: CreateTask) {
+    function onConfirmClick(newTaskInfo: CreateTaskInputDto) {
         createTask(newTaskInfo, onTaskCreated);
     }
 
@@ -139,8 +127,12 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
                     </h1>
                     <div className={styles.newTaskFormContainer}>
                         <CreateTaskForm
+                            description={description}
+                            setDescription={setDescription}
                             slotsToWork={slotsToWork}
                             setSlotsToWork={setSlotsToWork}
+                            deadline={deadline}
+                            setDeadline={setDeadline}
                             selectedTags={selectedTags}
                             setSelectedTags={setSelectedTags}
                             title={title}
@@ -158,16 +150,13 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
                                     }
                                     close();
                                     onConfirmClick({
-                                        taskData: {
-                                            title,
-                                            description: description ?? "",
-                                            deadline: deadline ?? new Date(),
-                                            priority: "importante", // TODO: change in backend to have "low", "medium", and "high" priorities
-                                            tags,
-                                            status: status ?? "unfinished"
-                                        },
-                                        subTasks,
-                                        createEvent
+                                        title,
+                                        description,
+                                        deadline,
+                                        priority,
+                                        tags: selectedTags,
+                                        status: status ?? "not_completed",
+                                        subTasks
                                     });
                                     clearFields();
                                 }}>

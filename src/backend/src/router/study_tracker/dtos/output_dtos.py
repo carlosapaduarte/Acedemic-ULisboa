@@ -10,7 +10,7 @@ class UserTaskOutputDto(BaseModel):
     id: int
     title: str
     description: str
-    deadline: int
+    deadline: float | None
     priority: str
     tags: list[str]
     status: str
@@ -37,7 +37,7 @@ class UserTaskOutputDto(BaseModel):
             id=task_id,
             title=task.title,
             description=task.description,
-            deadline=get_datetime_utc(task.deadline),
+            deadline=get_datetime_utc(task.deadline) if task.deadline is not None else None,
             priority=task.priority,
             tags=task.tags,
             status=task.status,
@@ -45,6 +45,7 @@ class UserTaskOutputDto(BaseModel):
         )
 
 class EventOutputDto(BaseModel):
+    id: int
     startDate: int
     endDate: int
     title: str
@@ -55,8 +56,13 @@ class EventOutputDto(BaseModel):
     def from_events(events: list[Event]) -> list['EventOutputDto']:
         output_dtos_events: list[EventOutputDto] = []
         for event in events:
+            event_id = event.id
+            if event_id is None:
+                raise
+        
             output_dtos_events.append(
                 EventOutputDto(
+                    id=event_id,
                     startDate=get_datetime_utc(event.date.start_date),
                     endDate=get_datetime_utc(event.date.end_date),
                     title=event.title,
@@ -133,6 +139,7 @@ class CurricularUnitOutputDto(BaseModel):
     
 class DailyEnergyStatusOutputDto(BaseModel):
     date: float
+    timeOfDay: str
     level: int
     
     @staticmethod
@@ -142,6 +149,7 @@ class DailyEnergyStatusOutputDto(BaseModel):
             dtos.append(
                 DailyEnergyStatusOutputDto(
                     date=get_datetime_utc_from_date(status.date_),
+                    timeOfDay=status.time_of_day,
                     level=status.level
                 )
             )
