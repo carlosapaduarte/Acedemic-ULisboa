@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
-import HowMuchEnergyQuestionPage from "~/routes/energy-question/route";
+import { HowMuchEnergyQuestionPage } from "./energy-question/energyQuestion";
 
 function useHomePage() {
     const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(false);
@@ -25,7 +25,7 @@ function useHomePage() {
     function onQuestionAnswered() {
         const today = new Date();
         localStorage["lastEnergyQuestionPromptedDate"] = today;
-        // setDisplayDailyEnergyQuestion(false) // TODO: uncomment this line. For the beta, show always to fill the home page
+        setDisplayDailyEnergyQuestion(false) // TODO: uncomment this line. For the beta, show always to fill the home page
     }
 
     return {

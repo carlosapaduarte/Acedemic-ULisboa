@@ -5,6 +5,7 @@ import { EnergyStats } from "./Energy";
 import { FocusStats } from "./Focus";
 import styles from "./statistics.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
+import { TaskDistribution } from "./TaskDistribution";
 
 function WeekStats({ week, stats }: { week: string, stats: any }) {
     return (
@@ -39,6 +40,7 @@ function YearStats({ year, stats }: { year: string, stats: any }) {
     );
 }
 
+/*
 function TaskDistribution() {
     const setError = useSetGlobalError();
     const [stats, setStats] = useState<any | undefined>(undefined);
@@ -63,6 +65,7 @@ function TaskDistribution() {
         </>
     );
 }
+*/
 
 export default function Statistics() {
     return (
@@ -73,8 +76,14 @@ export default function Statistics() {
                 </span>
             </div>
             <EnergyStats />
+            
             <br /><br />
+            
             <FocusStats />
+            
+            <br /><br />
+            
+            <TaskDistribution />
         </RequireAuthn>
     );
 }

@@ -42,7 +42,13 @@
         "react-timer-hook": "^3.0.7",
         "remix": "^2.12.1",
         "remix-i18next": "^6.4.1",
-        "tslog": "^4.9.3"
+        "tslog": "^4.9.3",
+
+        "@visx/group": "latest",
+        "@visx/mock-data": "latest",
+        "@visx/responsive": "latest",
+        "@visx/scale": "latest",
+        "@visx/shape": "latest"
     },
     "devDependencies": {
         "@remix-run/dev": "^2.11.2",
