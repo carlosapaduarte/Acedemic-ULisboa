@@ -47,7 +47,7 @@ const DescriptionSection = React.memo(function DescriptionSection({ description,
     const { t } = useTranslation(["task"]);
     return (
         <div className={styles.titleSectionContainer}>
-            <TextField autoFocus>
+            <TextField>
                 <Label className={styles.formSectionTitle}>
                     {t("task:description_label")}
                 </Label>

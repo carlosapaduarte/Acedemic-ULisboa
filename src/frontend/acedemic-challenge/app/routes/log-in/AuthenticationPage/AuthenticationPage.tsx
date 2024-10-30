@@ -90,7 +90,7 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
 
             <br /><br />
 
-            <TextField autoFocus>
+            <TextField>
                 <Label className={styles.passwordLabel}>
                     {t("login:password_field_name")}
                 </Label>
