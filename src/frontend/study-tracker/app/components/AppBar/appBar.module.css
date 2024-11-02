@@ -134,6 +134,8 @@
 
     padding: 0.5rem;
 
+    text-decoration: none;
+
     display: flex;
     flex-direction: row;
     gap: 0.5rem;

@@ -4,15 +4,20 @@ import { useTranslation } from "react-i18next";
 import { AppBarVariant } from "../AppBar/AppBarProvider";
 import classNames from "classnames";
 
-export function LanguageButton({ language, variant = "default" }: { language: string, variant?: AppBarVariant }) {
-    const { i18n } = useTranslation();
-    const selected = i18n.language.split("-")[0] === language.split("-")[0];
+export function LanguageButton({ language, languageCode, variant = "default" }: {
+    language: string,
+    languageCode: string,
+    variant?: AppBarVariant
+}) {
+    const { i18n, t } = useTranslation("appbar");
+    const selected = i18n.language.split("-")[0] === languageCode.split("-")[0];
     return <button
+        aria-label={t("appbar:language", { language })}
         className={classNames(
             styles.languageButton,
-            styles[language],
+            styles[languageCode],
             styles[variant],
             selected && styles.selected
         )}
-        onClick={() => i18n.changeLanguage(language)} />;
+        onClick={() => i18n.changeLanguage(languageCode)} />;
 }

@@ -11,6 +11,7 @@ import classNames from "classnames";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IconContext } from "react-icons";
 import { AppBarContext } from "./AppBarProvider";
+import { useTranslation } from "react-i18next";
 
 
 function SideBarNavButton({ text, url, iconUrl, setIsSideBarOpen }: {
@@ -23,13 +24,13 @@ function SideBarNavButton({ text, url, iconUrl, setIsSideBarOpen }: {
 
     return (
         <div className={`${styles.sideBarNavButtonContainer}`}>
-            <button
-                role="link"
-                onClick={() => {
-                    setIsSideBarOpen(false);
-                    navigate(url);
-                }}
-                className={`${styles.roundButton} ${styles.sideBarNavButton}`}
+            <a href={url}
+               onClick={(e) => {
+                   e.preventDefault();
+                   setIsSideBarOpen(false);
+                   navigate(url);
+               }}
+               className={`${styles.roundButton} ${styles.sideBarNavButton}`}
             >
                 <div className={styles.sideBarButtonIconContainer} aria-hidden={true}>
                     {iconUrl ?
@@ -37,33 +38,36 @@ function SideBarNavButton({ text, url, iconUrl, setIsSideBarOpen }: {
                              className={`${styles.sideBarNavButtonIcon}`}
                         />
                         :
-                        "ICON"
+                        <></>
                     }
                 </div>
                 <div className={`${styles.sideBarNavButtonText}`}>
                     {text}
                 </div>
-            </button>
+            </a>
         </div>
     );
 }
 
 function SideBarNavigationMenu({ setIsSideBarOpen }: { setIsSideBarOpen: (isOpen: boolean) => void }) {
+    const { t } = useTranslation("navigation");
+
     return (
         <>
-            <SideBarNavButton text="Calendar" url={"/calendar"} iconUrl={"icons/calendar_icon.png"}
+            <SideBarNavButton text={t("navigation:calendar")} url={"/calendar"} iconUrl={"icons/calendar_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Schedule" url={"/calendar"} iconUrl={"icons/schedule_icon.png"}
+            <SideBarNavButton text={t("navigation:schedule")} url={"/calendar"} iconUrl={"icons/schedule_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Tasks" url={"/tasks"} iconUrl={"icons/tasks_icon.png"}
+            <SideBarNavButton text={t("navigation:tasks")} url={"/tasks"} iconUrl={"icons/tasks_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Notes" url={"/archives"} iconUrl={"icons/notes_icon.png"}
+            <SideBarNavButton text={t("navigation:notes")} url={"/archives"} iconUrl={"icons/notes_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Study!" url={"/timer"} iconUrl={"icons/study_icon.png"}
+            <SideBarNavButton text={t("navigation:study")} url={"/timer"} iconUrl={"icons/study_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Statistics" url={"/statistics"} iconUrl={"icons/statistics_icon.png"}
+            <SideBarNavButton text={t("navigation:statistics")} url={"/statistics"}
+                              iconUrl={"icons/statistics_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text="Badges" url={"/badges"} iconUrl={"icons/badges_icon.png"}
+            <SideBarNavButton text={t("navigation:badges")} url={"/badges"} iconUrl={"icons/badges_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
         </>
     );
@@ -104,6 +108,8 @@ function SideBar() {
 export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean }) {
     const { appBarVariant } = useContext(AppBarContext);
 
+    const { t } = useTranslation("appbar");
+
     const navigate = useNavigate();
 
     return (
@@ -122,6 +128,7 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
                 )}>
                 {appBarVariant !== "clean" && (
                     <button
+                        aria-label={t("appbar:back")}
                         className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
                         onClick={() => navigate(-1)}
                     >
@@ -129,17 +136,23 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
                     </button>
                 )}
                 {appBarVariant === "default" && (
-                    <div className={styles.homeButtonContainer} onClick={() => navigate("/")}>
-                        <button className={styles.homeButton}>
+                    <div className={styles.homeButtonContainer}>
+                        <a href={"/"}
+                           aria-label={t("appbar:home")}
+                           className={styles.homeButton}
+                           onClick={(e) => {
+                               e.preventDefault();
+                               navigate("/");
+                           }}>
                             <img src="/icons/home_icon.svg" alt="Home Icon" />
-                        </button>
+                        </a>
                     </div>
                 )}
                 <div key="settingsButtons"
                      className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>
                     <SettingsButton variant={appBarVariant} />
-                    <LanguageButton language={"pt-PT"} variant={appBarVariant} />
-                    <LanguageButton language={"en-GB"} variant={appBarVariant} />
+                    <LanguageButton language={t("appbar:portugueseLanguage")} languageCode={"pt-PT"} variant={appBarVariant} />
+                    <LanguageButton language={t("appbar:englishLanguage")} languageCode={"en-GB"} variant={appBarVariant} />
                 </div>
                 {appBarVariant === "home" && (
                     <>
