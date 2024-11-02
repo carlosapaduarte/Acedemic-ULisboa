@@ -13,11 +13,11 @@
     background-color: white;
 
     border-radius: 5px;
-    outline: var(--secondary-text-color) solid 1px;
+    outline: var(--primary-text-color) solid 1px;
 }
 
 .languageButton.clean {
-    /*outline-color: var(--primary-text-color);*/
+    outline-color: var(--secondary-text-color);
 }
 
 .languageButton:focus-visible {
@@ -33,5 +33,9 @@
 }
 
 .languageButton.selected {
-    outline-color: var(--primary-text-color);
+    outline-color: var(--secondary-text-color);
+
+    &.clean {
+        outline-color: var(--primary-text-color);
+    }
 }
