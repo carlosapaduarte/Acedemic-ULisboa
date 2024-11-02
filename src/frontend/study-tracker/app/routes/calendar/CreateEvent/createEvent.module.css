@@ -50,13 +50,22 @@
     background-color: #b10f0f;
 }
 
+.formTextField {
+    display: flex;
+    flex-direction: column;
+}
+
 .titleSectionContainer {
 }
 
 .tagsSectionContainer {
+    display: flex;
+    flex-direction: column;
 }
 
 .recurrentEventSectionContainer {
+    display: flex;
+    flex-direction: column;
 }
 
 .recurrentEventSectionCheckboxField {

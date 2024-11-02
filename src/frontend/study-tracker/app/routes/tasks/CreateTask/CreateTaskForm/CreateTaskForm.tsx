@@ -25,7 +25,8 @@ const TitleSection = React.memo(function TitleSection({ title, setTitle }: {
     const { t } = useTranslation(["task"]);
     return (
         <div className={styles.titleSectionContainer}>
-            <TextField autoFocus>
+            <TextField className={styles.formTextField}
+                       autoFocus>
                 <Label className={styles.formSectionTitle}>
                     {t("task:title_label")}
                 </Label>
@@ -47,7 +48,7 @@ const DescriptionSection = React.memo(function DescriptionSection({ description,
     const { t } = useTranslation(["task"]);
     return (
         <div className={styles.titleSectionContainer}>
-            <TextField>
+            <TextField className={styles.formTextField}>
                 <Label className={styles.formSectionTitle}>
                     {t("task:description_label")}
                 </Label>

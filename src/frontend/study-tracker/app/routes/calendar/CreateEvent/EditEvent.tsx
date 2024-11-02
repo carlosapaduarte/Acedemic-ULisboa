@@ -17,7 +17,8 @@ const TitleSection = React.memo(function TitleSection({ title, setTitle }: {
 }) {
     return (
         <div className={styles.titleSectionContainer}>
-            <TextField autoFocus>
+            <TextField className={styles.formTextField}
+                       autoFocus>
                 <Label className={styles.formSectionTitle}>Title</Label>
                 <Input className={styles.formInput}
                        required
@@ -74,7 +75,7 @@ const DateSection = React.memo(function DeadlineSection(
     return (
         <div className={styles.dateSectionContainer}>
             <div aria-label={`Date`} className={styles.deadlineInputsContainer}>
-                <TextField>
+                <TextField className={styles.formTextField}>
                     <Label className={styles.formSectionTitle}>Start Date</Label>
                     <Input type={"date"}
                            aria-label={"Start date"}
@@ -82,7 +83,7 @@ const DateSection = React.memo(function DeadlineSection(
                            onChange={(e) => setStartDate(e.target.value)}
                            className={classNames(styles.dateInput)} />
                 </TextField>
-                <TextField>
+                <TextField className={styles.formTextField}>
                     <Label className={styles.formSectionTitle}>Start Time</Label>
                     <Input type={"time"}
                            aria-label={"Start time"}
@@ -93,7 +94,7 @@ const DateSection = React.memo(function DeadlineSection(
                            }}
                            className={classNames(styles.timeInput)} />
                 </TextField>
-                <TextField>
+                <TextField className={styles.formTextField}>
                     <Label className={styles.formSectionTitle}>End Date</Label>
                     <Input type={"date"}
                            aria-label={"End date"}
@@ -101,7 +102,7 @@ const DateSection = React.memo(function DeadlineSection(
                            onChange={(e) => setEndDate(e.target.value)}
                            className={classNames(styles.dateInput)} />
                 </TextField>
-                <TextField>
+                <TextField className={styles.formTextField}>
                     <Label className={styles.formSectionTitle}>End Time</Label>
                     <Input type={"time"}
                            aria-label={"End time"}

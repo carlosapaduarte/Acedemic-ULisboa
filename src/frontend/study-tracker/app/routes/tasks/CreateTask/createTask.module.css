@@ -70,12 +70,23 @@
 }
 
 .deadlineSectionContainer {
+    display: flex;
+    flex-direction: column;
 }
 
 .prioritySectionContainer {
+    display: flex;
+    flex-direction: column;
 }
 
 .tagsSectionContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.formTextField {
+    display: flex;
+    flex-direction: column;
 }
 
 .deadlineInputsContainer {
