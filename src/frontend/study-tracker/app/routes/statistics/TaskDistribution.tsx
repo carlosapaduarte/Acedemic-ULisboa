@@ -9,44 +9,39 @@ import { scaleOrdinal } from "@visx/scale";
 import { letterFrequency } from "@visx/mock-data";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service, TaskDistributionPerWeek } from "~/service/service";
+import { utils } from "~/utils";
+import { LetterFrequency } from "@visx/mock-data/lib/mocks/letterFrequency";
 
-const tags = [
-    "Study",
-    "Homework",
-    "Classes",
-    "Meditation",
-]
-
-function LegendItem({tag} : {tag: string}) {
+function LegendItem({tag, color} : {tag: string, color: string}) {
     return (
-        <div className={styles.legendItemContainer}>
+        <div className={styles.legendItemContainer} style={{ backgroundColor: color }}>
             {tag}
         </div>
     )
 }
 
-function Legend() {
+function getColors(): string[] {
+  return [
+    "rgba(60,148,168,255)", // blue
+    "rgba(94,124,86,255)", // green
+    "rgba(153,126,49,255)", // yellow
+    "rgba(186,93,123,255)", // pink
+    "rgba(103,103,103,255)" // grey
+  ]
+}
+
+function Legend({stats} : {stats: TaskDistributionPerWeek[]}) {
+  const legendColors = getColors()
     return (
         <div className={styles.legendGroupContainer}>
-            {tags.map((tag: string, index: number) => 
-                <LegendItem tag={tag} key={index}/>
+            {stats.map((stat: TaskDistributionPerWeek, index: number) => 
+                <LegendItem tag={stat.tag} key={index} color={legendColors[index]} />
             )}
         </div>
     )
 }
 
-const letters = letterFrequency.slice(0, 4);
 const frequency = (d) => d.frequency;
-
-const getLetterFrequencyColor = scaleOrdinal({
-  domain: letters.map((l) => l.letter),
-  range: [
-    "rgba(3, 186, 252, 1)", // blue
-    "rgba(14, 194, 119, 0.8)", // green
-    "rgba(14, 194, 119, 0.6)", // yellow
-    "rgba(194, 14, 185, 0.4)" // pink
-  ]
-});
 
 const defaultMargin = { top: 0, right: 0, bottom: 0, left: 0 };
 
@@ -57,73 +52,120 @@ export type PieProps = {
 };
 
 // Source: https://codesandbox.io/p/sandbox/visx-simple-pie-chart-tf4ed
-function Chart({
-  margin = defaultMargin
-}: PieProps) {
+function Chart({stats} : {stats: TaskDistributionPerWeek[]}) {
+    const margin = defaultMargin
+    const height = 130
+    const width = 130
 
-  const height = 150
-  const width = 150
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const radius = Math.min(innerWidth, innerHeight) / 2;
+    const centerY = innerHeight / 2;
+    const centerX = innerWidth / 2;
+    const top = centerY + margin.top;
+    const left = centerX + margin.left;
+    const pieSortValues = (a, b) => b - a;
 
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
-  const radius = Math.min(innerWidth, innerHeight) / 2;
-  const centerY = innerHeight / 2;
-  const centerX = innerWidth / 2;
-  const top = centerY + margin.top;
-  const left = centerX + margin.left;
-  const pieSortValues = (a, b) => b - a;
+    let total = 0
+    stats.forEach((stat: TaskDistributionPerWeek) => total += stat.time)
 
-  console.log(letters)
+    const data: LetterFrequency[] = stats.map((stat: TaskDistributionPerWeek) => {
+        return {
+            letter: stat.tag[0],
+            frequency: stat.time / total
+        }
+    })
 
-  return (
-    <svg width={width} height={height}>
-      <Group top={top} left={left}>
-        <Pie
-          data={letters}
-          pieValue={frequency}
-          pieSortValues={pieSortValues}
-          outerRadius={radius}
-        >
-          {(pie) => {
-            return pie.arcs.map((arc, index) => {
-              const { letter } = arc.data;
-              const [centroidX, centroidY] = pie.path.centroid(arc);
-              const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
-              const arcPath = pie.path(arc);
-              const arcFill = getLetterFrequencyColor(letter);
-              return (
-                <g key={`arc-${letter}-${index}`}>
-                  <path d={arcPath} fill={arcFill} />
-                  {hasSpaceForLabel && (
-                    <text
-                      x={centroidX}
-                      y={centroidY}
-                      dy=".33em"
-                      fill="#ffffff"
-                      fontSize={22}
-                      textAnchor="middle"
-                      pointerEvents="none"
-                    >
-                      {arc.data.letter}
-                    </text>
-                  )}
-                </g>
-              );
-            });
-          }}
-        </Pie>
-      </Group>
-    </svg>
-  );
+    const getLetterFrequencyColor = scaleOrdinal({
+        domain: data.map((l) => l.letter),
+        range: getColors()
+      });
+
+    return (
+        <svg width={width} height={height}>
+        <Group top={top} left={left}>
+            <Pie
+                data={data}
+                pieValue={frequency}
+                pieSortValues={pieSortValues}
+                outerRadius={radius}
+            >
+            {(pie) => {
+                return pie.arcs.map((arc, index) => {
+                const { letter } = arc.data;
+                const [centroidX, centroidY] = pie.path.centroid(arc);
+                const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
+                const arcPath = pie.path(arc);
+                const arcFill = getLetterFrequencyColor(letter);
+                return (
+                    <g key={`arc-${letter}-${index}`}>
+                    <path d={arcPath} fill={arcFill} />
+                    {hasSpaceForLabel && (
+                        <text
+                        x={centroidX}
+                        y={centroidY}
+                        dy=".33em"
+                        fill="#ffffff"
+                        fontSize={22}
+                        textAnchor="middle"
+                        pointerEvents="none"
+                        >
+                        {arc.data.letter}
+                        </text>
+                    )}
+                    </g>
+                );
+                });
+            }}
+            </Pie>
+        </Group>
+        </svg>
+    );
 }
 
 function useTaskDistribution() {
     const setError = useSetGlobalError();
-    const [stats, setStats] = useState<TaskDistributionPerWeek[] | undefined>(undefined);
+    const [stats, setStats] = useState<TaskDistributionPerWeek[]>([]);
+
+    function filterThisWeekTaskDistribution(stats: TaskDistributionPerWeek[]): TaskDistributionPerWeek[] {
+        const now = new Date()
+        const currentYear = now.getFullYear()
+        const currentYearWeekNumber = utils.getWeekNumber(now)
+        return stats.filter((stat: TaskDistributionPerWeek) => stat.year == currentYear && stat.week == currentYearWeekNumber)
+    }
+
+    function filterFirstFourTasks(stats: TaskDistributionPerWeek[]): TaskDistributionPerWeek[] {
+        // Sorts by task time, and selects the first four
+        const firstFour = stats.sort((t1, t2) => t1.time + t2.time).slice(0, 4)
+        
+        // The others not shown
+        const others = stats.filter((stat: TaskDistributionPerWeek) => 
+            firstFour.find((s: TaskDistributionPerWeek) => s == stat) == undefined
+        )
+
+        // Total time by others not shown
+        let total = 0
+        others.forEach((stat: TaskDistributionPerWeek) => total += stat.time)
+
+        // Assumes this function is called only for this week's stats
+        const now = new Date()
+        firstFour.push({
+            year: now.getFullYear(),
+            week: utils.getWeekNumber(now),
+            tag: "others",
+            time: total
+        })
+        
+        return firstFour
+    }
 
     useEffect(() => {
         service.getTaskDistributionStats()
-            .then((stats: any) => setStats(stats))
+            .then((stats: TaskDistributionPerWeek[]) => {
+                const currentWeekStats = filterThisWeekTaskDistribution(stats)
+                const trimmedWeekStats = filterFirstFourTasks(currentWeekStats)
+                setStats(trimmedWeekStats)
+            })
             .catch((error) => setError(error));
     }, []);
 
@@ -132,10 +174,7 @@ function useTaskDistribution() {
 
 export function TaskDistribution() {
     const {stats} = useTaskDistribution()
-
-    // TODO: continue by using stats to populate the plot
-
-    console.log(stats)
+    //console.log(stats)
     
     return (
         <>
@@ -148,8 +187,8 @@ export function TaskDistribution() {
                 </div>
 
                 <div className={styles.chartGroup}>
-                    <Chart width={200} height={200}/>
-                    <Legend />    
+                    <Chart stats={stats} />
+                    <Legend stats={stats} />
                 </div>
 
             </div>
