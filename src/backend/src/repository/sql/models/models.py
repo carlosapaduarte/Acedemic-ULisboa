@@ -100,7 +100,7 @@ class STWeekDayPlanningModel(SQLModel, table=True):
 class STEventModel(SQLModel, table=True):
     __tablename__ = "st_event"
 
-    id: int = Field(primary_key=True, default=None)
+    id: int = Field(default=None, primary_key=True)
     start_date: datetime
     end_date: datetime
     title: str

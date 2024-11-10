@@ -1,5 +1,5 @@
 import random
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from repository.sql.academic_challenge.repo import AcademicChallengeRepo
 from datetime import datetime
@@ -12,8 +12,18 @@ class AcademicChallengeSqlRepo(AcademicChallengeRepo):
     
     def create_new_batch(self, user_id: int, new_level: int) -> int:
         with Session(engine) as session:
+            
+            # Generates a random ID, that is not yet taken
+            random_generated_id: int = 0
+            while True:
+                random_generated_id: int = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+                statement = select(BatchModel).where(BatchModel.id == random_generated_id)
+                result = session.exec(statement)
+                if result.first() is None:
+                    break
+            
             new_batch = BatchModel(
-                id=random.randint(1, 999999999), # TODO For some reason, automatic ID is not working
+                id=random_generated_id,
                 start_date=datetime.now(),
                 level=new_level,
                 user_id=user_id

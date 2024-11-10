@@ -51,17 +51,26 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def create_event(self, user_id: int, event: Event):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
-        
+            
+            # Generates a random ID, that is not yet taken
+            random_generated_id: int = 0
+            while True:
+                random_generated_id: int = random.randint(1, POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+                statement = select(STEventModel).where(STEventModel.id == random_generated_id)
+                result = session.exec(statement)
+                if result.first() is None:
+                    break
+
             new_event_model = STEventModel(
-                    id=random.randint(1, 999999999), # For some reason, automatic ID is not working
-                    title=event.title,
-                    start_date=event.date.start_date,
-                    end_date=event.date.end_date,
-                    user_id=user_id,
-                    user=user_model,
-                    tags=[], # tags added next
-                    every_week=event.every_week
-                )
+                id=random_generated_id, # For some reason, automatic ID is not working
+                title=event.title,
+                start_date=event.date.start_date,
+                end_date=event.date.end_date,
+                user_id=user_id,
+                user=user_model,
+                tags=[], # tags added next
+                every_week=event.every_week
+            )
 
             user_model.st_events.append(
                 new_event_model
@@ -346,8 +355,17 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session: Session
     ) -> int:
         
+        # Generates a random ID, that is not yet taken
+        random_generated_id: int = 0
+        while True:
+            random_generated_id: int = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+            statement = select(STTaskModel).where(STTaskModel.id == random_generated_id)
+            result = session.exec(statement)
+            if result.first() is None:
+                break
+        
         new_task_model = STTaskModel(
-            id=random.randint(1, 999999999), # For some reason, automatic ID is not working
+            id=random_generated_id, # For some reason, automatic ID is not working
             title=task.title,
             description=task.description,
             deadline=task.deadline,

@@ -85,13 +85,24 @@ class CommonsSqlRepo(CommonsRepo):
         "Creates a user without avatar, notes and challenges, in level 1, and share_progress set to false"
 
         with Session(engine) as session:
+        
+            # Generates a random ID, that is not yet taken
+            random_generated_id: int = 0
+            while True:
+                random_generated_id: int = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+                statement = select(UserModel).where(UserModel.id == random_generated_id)
+                result = session.exec(statement)
+                if result.first() is None:
+                    break
+            
             db_user = UserModel(
-                id=random.randint(1, 999999999), # TODO: fix later
+                id=random_generated_id,
                 username=username,
                 hashed_password=hashed_password,
                 avatar_filename=None, 
                 share_progress=None,
-                receive_st_app_notifications=None
+                receive_st_app_notifications=None,
+                study_session_time=None
             )
             session.add(db_user)
             session.commit()
