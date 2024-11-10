@@ -1,6 +1,6 @@
 from datetime import datetime
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
-from exception import AlreadyExistsException, NotAvailableScheduleBlockCollision, NotFoundException
+from exception import NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
 from datetime import date
@@ -63,20 +63,36 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
         
     return study_tracker_repo.create_task(user_id, task)
 
-def get_user_daily_tasks_progress(user_id: int) -> float:
-    daily_tasks = study_tracker_repo.get_tasks(user_id, False, False, True)
-    number_of_daily_tasks = len(daily_tasks)
+def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tuple[int, float]]:
+    week_tasks = study_tracker_repo.get_tasks(user_id, False, False, False, year, week)
     
-    if number_of_daily_tasks is 0:
-        return 0
-    
-    completed = 0    
-    for task in daily_tasks:
-        if task.status == "completed":
-            completed += 1
+    tasks_by_day: dict[int, list[Task]] = {}
+    for task in week_tasks:
+        deadline = task.deadline
+        
+        # Should not happen because we asked for tasks with a specific year and week
+        if deadline is None:
+            raise
+        
+        day = deadline.day
+        if tasks_by_day.get(day) is None:
+            tasks_by_day[day] = [task]
+        else:
+            tasks_by_day[day].append(task)
             
-    return completed / number_of_daily_tasks
-    
+    progress_by_day: list[tuple[int, float]] = []
+    for day, tasks in tasks_by_day.items():
+        number_of_daily_tasks = len(tasks)
+        if number_of_daily_tasks is 0:
+            progress_by_day.append((day, 0))
+        else:
+            completed = 0    
+            for task in tasks:
+                if task.status == "completed":
+                    completed += 1
+            progress_by_day.append((day, completed / number_of_daily_tasks))
+            
+    return progress_by_day
 
 def get_user_tasks(
     user_id: int,
@@ -88,7 +104,9 @@ def get_user_tasks(
         user_id, 
         order_by_deadline_and_priority, 
         filter_uncompleted_tasks, 
-        filter_deadline_is_today
+        filter_deadline_is_today,
+        None,
+        None
     )
 
 def get_user_task(user_id: int, task_id: int) -> Task:

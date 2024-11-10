@@ -3,6 +3,7 @@
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 import { CreateTaskInputDto } from "~/service/output_dtos";
+import { utils } from "~/utils";
 
 
 // For now, all of these functions will return the expected response.
@@ -427,19 +428,21 @@ async function getTasks(filterUncompletedTasks: boolean): Promise<Task[]> {
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
 
-type DailyTasksProgress = {
+export type DailyTasksProgress = {
+    day: number,
     progress: number
 }
 
-async function getDailyTasksProgress(): Promise<number> {
+async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
+    const now = new Date()
     const request = {
-        path: `study-tracker/users/me/statistics/daily-tasks-progress`,
+        path: `study-tracker/users/me/statistics/daily-tasks-progress?year=${now.getFullYear()}&week=${utils.getWeekNumber(now)}`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject = await response.json();
-        return responseObject.progress;
+        const responseObject: DailyTasksProgress[] = await response.json();
+        return responseObject;
     } else
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
@@ -797,7 +800,7 @@ export const service = {
     createGrade,
     createDailyEnergyStat,
     getTaskDistributionStats,
-    getDailyTasksProgress,
+    getThisWeekDailyTasksProgress: getDailyTasksProgress,
     fetchEnergyHistory,
     getStudyTimeByWeek,
     //incrementWeekStudyTime,

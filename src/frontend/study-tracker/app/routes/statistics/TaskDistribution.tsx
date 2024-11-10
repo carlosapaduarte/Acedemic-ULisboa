@@ -54,8 +54,8 @@ export type PieProps = {
 // Source: https://codesandbox.io/p/sandbox/visx-simple-pie-chart-tf4ed
 function Chart({stats} : {stats: TaskDistributionPerWeek[]}) {
     const margin = defaultMargin
-    const height = 130
-    const width = 130
+    const height = 140
+    const width = 140
 
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -82,44 +82,46 @@ function Chart({stats} : {stats: TaskDistributionPerWeek[]}) {
       });
 
     return (
-        <svg width={width} height={height}>
-        <Group top={top} left={left}>
-            <Pie
-                data={data}
-                pieValue={frequency}
-                pieSortValues={pieSortValues}
-                outerRadius={radius}
-            >
-            {(pie) => {
-                return pie.arcs.map((arc, index) => {
-                const { letter } = arc.data;
-                const [centroidX, centroidY] = pie.path.centroid(arc);
-                const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
-                const arcPath = pie.path(arc);
-                const arcFill = getLetterFrequencyColor(letter);
-                return (
-                    <g key={`arc-${letter}-${index}`}>
-                    <path d={arcPath} fill={arcFill} />
-                    {hasSpaceForLabel && (
-                        <text
-                        x={centroidX}
-                        y={centroidY}
-                        dy=".33em"
-                        fill="#ffffff"
-                        fontSize={22}
-                        textAnchor="middle"
-                        pointerEvents="none"
-                        >
-                        {arc.data.letter}
-                        </text>
-                    )}
-                    </g>
-                );
-                });
-            }}
-            </Pie>
-        </Group>
-        </svg>
+        <div className={styles.chartContainer}>
+            <svg width={width} height={height}>
+            <Group top={top} left={left}>
+                <Pie
+                    data={data}
+                    pieValue={frequency}
+                    pieSortValues={pieSortValues}
+                    outerRadius={radius}
+                >
+                {(pie) => {
+                    return pie.arcs.map((arc, index) => {
+                    const { letter } = arc.data;
+                    const [centroidX, centroidY] = pie.path.centroid(arc);
+                    const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
+                    const arcPath = pie.path(arc);
+                    const arcFill = getLetterFrequencyColor(letter);
+                    return (
+                        <g key={`arc-${letter}-${index}`}>
+                        <path d={arcPath} fill={arcFill} />
+                        {hasSpaceForLabel && (
+                            <text
+                            x={centroidX}
+                            y={centroidY}
+                            dy=".33em"
+                            fill="#ffffff"
+                            fontSize={22}
+                            textAnchor="middle"
+                            pointerEvents="none"
+                            >
+                            {arc.data.letter}
+                            </text>
+                        )}
+                        </g>
+                    );
+                    });
+                }}
+                </Pie>
+            </Group>
+            </svg>
+        </div>
     );
 }
 
@@ -186,7 +188,7 @@ export function TaskDistribution() {
                     <CurWeekDate />
                 </div>
 
-                <div className={styles.chartGroup}>
+                <div className={styles.chartAndLegendContainer}>
                     <Chart stats={stats} />
                     <Legend stats={stats} />
                 </div>

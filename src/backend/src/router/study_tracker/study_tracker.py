@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Response
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
 from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
-from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgress, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -42,9 +42,11 @@ def get_tasks(
 @router.get("/users/me/statistics/daily-tasks-progress")
 def get_daily_tasks_progress(
     user_id: Annotated[int, Depends(get_current_user_id)],
-) -> DailyTasksProgress:
-    progress = study_tracker_service.get_user_daily_tasks_progress(user_id)
-    return DailyTasksProgress(progress=progress)
+    year: int,
+    week: int,
+) -> list[DailyTasksProgressOutputDto]:
+    res = study_tracker_service.get_user_daily_tasks_progress(user_id, year, week)
+    return DailyTasksProgressOutputDto.from_domain(res)
 
 @router.put("/users/me/tasks/{task_id}")
 def update_task_status(

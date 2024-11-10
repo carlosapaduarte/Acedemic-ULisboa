@@ -6,6 +6,7 @@ import { FocusStats } from "./Focus";
 import styles from "./statistics.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { TaskDistribution } from "./TaskDistribution";
+import { Progress } from "./Progress";
 
 function WeekStats({ week, stats }: { week: string, stats: any }) {
     return (
@@ -57,6 +58,10 @@ export default function Statistics() {
             <br /><br />
             
             <TaskDistribution />
+
+            <br /><br />
+            
+            <Progress />
         </RequireAuthn>
     );
 }

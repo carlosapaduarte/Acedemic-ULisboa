@@ -275,7 +275,16 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         """
         
             
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool, filter_deadline_is_today: bool) -> list[Task]:
+    def get_tasks(
+        self, 
+        user_id: int, 
+        order_by_deadline_and_priority: bool, 
+        filter_uncompleted_tasks: bool, 
+        filter_deadline_is_today: bool,
+        year: int | None,
+        week: int | None
+    ) -> list[Task]:
+        
         with Session(engine) as session:
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
@@ -314,7 +323,17 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 for task in tasks:
                     if task.deadline is not None and not StudyTrackerSqlRepo.is_today(task.deadline):
                         tasks.remove(task)
-                
+                        
+            if year:
+                for task in tasks:
+                    if task.deadline is not None and task.deadline.year != year:
+                        tasks.remove(task)
+                    
+            if week:
+                for task in tasks:
+                    if task.deadline is not None and task.deadline.isocalendar().week != week:
+                        tasks.remove(task)
+                        
             return tasks
         
     

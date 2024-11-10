@@ -48,7 +48,7 @@ class StudyTrackerRepo(ABC):
         pass
     
     @abstractmethod
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool, filter_deadline_is_today: bool) -> list[Task]:
+    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool, filter_deadline_is_today: bool, year: int, week: int) -> list[Task]:
         pass
 
     @abstractmethod
