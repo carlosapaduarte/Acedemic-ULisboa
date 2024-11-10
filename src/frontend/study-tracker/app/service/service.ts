@@ -429,11 +429,21 @@ async function getTasks(filterUncompletedTasks: boolean): Promise<Task[]> {
 }
 
 export type DailyTasksProgress = {
-    day: number,
+    date: Date,
     progress: number
 }
 
 async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
+    
+    function fromDtoToDomain(rsp: any[]): DailyTasksProgress[] {
+        return rsp.map((value: any) => {
+            return {
+                date: new Date(value.date_ * 1000),
+                progress: value.progress    
+            }
+        })
+    }
+
     const now = new Date()
     const request = {
         path: `study-tracker/users/me/statistics/daily-tasks-progress?year=${now.getFullYear()}&week=${utils.getWeekNumber(now)}`,
@@ -441,8 +451,8 @@ async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject: DailyTasksProgress[] = await response.json();
-        return responseObject;
+        const responseObject: any[] = await response.json();
+        return fromDtoToDomain(responseObject)
     } else
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }

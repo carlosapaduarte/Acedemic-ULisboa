@@ -47,6 +47,7 @@
 .statsContainerTitleAndDateDiv {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 0.8em;
 }
 
@@ -152,6 +153,7 @@
     color: var(--secondary-color);
     background-color: transparent;
     font-size: smaller;
+    font-weight: bold;
 
     display: flex;
     align-items: center;
@@ -231,15 +233,16 @@
 .chartAndLegendContainer {
     display: flex;
     justify-content: space-between;
+    margin-top: 0.5em;
 
     .chartContainer {
-        width: 56%;
+        width: 54%;
     }
 
     .legendGroupContainer {
         display: flex;
         flex-direction: column;
-        width: 43%;
+        width: 41%;
     
         .legendItemContainer {
             height: 1.75em;
@@ -264,6 +267,7 @@
 
     .weekDate {
         width: 50%;
+        font-size: medium;
     }
 
     .progressBarBase {

@@ -63,10 +63,10 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
         
     return study_tracker_repo.create_task(user_id, task)
 
-def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tuple[int, float]]:
+def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tuple[date, float]]:
     week_tasks = study_tracker_repo.get_tasks(user_id, False, False, False, year, week)
     
-    tasks_by_day: dict[int, list[Task]] = {}
+    tasks_by_day: dict[date, list[Task]] = {}
     for task in week_tasks:
         deadline = task.deadline
         
@@ -74,23 +74,24 @@ def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tu
         if deadline is None:
             raise
         
-        day = deadline.day
-        if tasks_by_day.get(day) is None:
-            tasks_by_day[day] = [task]
+        
+        task_date = deadline.date()
+        if tasks_by_day.get(task_date) is None:
+            tasks_by_day[task_date] = [task]
         else:
-            tasks_by_day[day].append(task)
+            tasks_by_day[task_date].append(task)
             
-    progress_by_day: list[tuple[int, float]] = []
-    for day, tasks in tasks_by_day.items():
+    progress_by_day: list[tuple[date, float]] = []
+    for task_date, tasks in tasks_by_day.items():
         number_of_daily_tasks = len(tasks)
         if number_of_daily_tasks is 0:
-            progress_by_day.append((day, 0))
+            progress_by_day.append((task_date, 0))
         else:
             completed = 0    
             for task in tasks:
                 if task.status == "completed":
                     completed += 1
-            progress_by_day.append((day, completed / number_of_daily_tasks))
+            progress_by_day.append((task_date, completed / number_of_daily_tasks))
             
     return progress_by_day
 

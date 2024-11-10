@@ -54,8 +54,8 @@ export type PieProps = {
 // Source: https://codesandbox.io/p/sandbox/visx-simple-pie-chart-tf4ed
 function Chart({stats} : {stats: TaskDistributionPerWeek[]}) {
     const margin = defaultMargin
-    const height = 140
-    const width = 140
+    const height = 135
+    const width = 135
 
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -182,7 +182,12 @@ export function TaskDistribution() {
         <>
             <div className={styles.statsContainer}>
                 <div className={styles.statsContainerTitle}>
-                    (O) Workload distribution
+                    <img 
+                        src="public/icons/workload_distribution_icon.svg" 
+                        alt="Workload distribution icon" 
+                        className={styles.titleImg} 
+                    />
+                    Workload distribution
                 </div>
                 <div className={styles.containerAlignRight}>
                     <CurWeekDate />
