@@ -3,7 +3,7 @@ import styles from "./statistics.module.css";
 import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
-import { CurWeekDate, getWeekIntervalStr, SeeFullHistory, Spacer } from "./Commons";
+import { CurWeekDate, getWeekIntervalStr, NoDataYetAvailableMessage, SeeFullHistory, Spacer } from "./Commons";
 
 function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
     return (
@@ -58,18 +58,21 @@ function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[
 
 function HistoryStats({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
     return (
-        <>
-            <div className={styles.historyTitleAndSeeMore}>
-                <span className={styles.historyTitle}>
-                    History
-                </span>
-                <SeeFullHistory />
-            </div>
+        weekStudyTimeHistory.length != 0 ?
+            <>
+                <div className={styles.historyTitleAndSeeMore}>
+                    <span className={styles.historyTitle}>
+                        History
+                    </span>
+                    <SeeFullHistory />
+                </div>
 
-            <div>
-                <BarChart weekStudyTimeHistory={weekStudyTimeHistory}/>
-            </div>
-        </>
+                <div>
+                    <BarChart weekStudyTimeHistory={weekStudyTimeHistory}/>
+                </div>
+            </>
+        :
+            <NoDataYetAvailableMessage />
     )
 }
 

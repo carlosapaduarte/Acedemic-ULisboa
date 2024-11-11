@@ -117,7 +117,7 @@ class STEventTagModel(SQLModel, table=True):
     # Primary key: Tag
     tag: str = Field(primary_key=True)
 
-    # Foreign key: Composite key referencing st_task
+    # Foreign key: Composite key referencing st_event
     event_id: int = Field(primary_key=True)
     user_id: int = Field(primary_key=True)
 

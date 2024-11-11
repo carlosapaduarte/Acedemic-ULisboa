@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CurWeekDate } from "./Commons";
+import { CurWeekDate, NoDataYetAvailableMessage } from "./Commons";
 import styles from "./statistics.module.css";
 
 import React from "react";
@@ -125,6 +125,18 @@ function Chart({stats} : {stats: TaskDistributionPerWeek[]}) {
     );
 }
 
+function ChartAndLegend({stats} : {stats: TaskDistributionPerWeek[]}) {
+    return (
+        stats.length != 0 ?
+            <div className={styles.chartAndLegendContainer}>
+                <Chart stats={stats} />
+                <Legend stats={stats} />
+            </div>
+        :
+            <NoDataYetAvailableMessage />
+    )
+}
+
 function useTaskDistribution() {
     const setError = useSetGlobalError();
     const [stats, setStats] = useState<TaskDistributionPerWeek[]>([]);
@@ -164,9 +176,12 @@ function useTaskDistribution() {
     useEffect(() => {
         service.getTaskDistributionStats()
             .then((stats: TaskDistributionPerWeek[]) => {
-                const currentWeekStats = filterThisWeekTaskDistribution(stats)
-                const trimmedWeekStats = filterFirstFourTasks(currentWeekStats)
-                setStats(trimmedWeekStats)
+                console.log(stats)
+                if (stats.length != 0) {
+                    const currentWeekStats = filterThisWeekTaskDistribution(stats)
+                    const trimmedWeekStats = filterFirstFourTasks(currentWeekStats)
+                    setStats(trimmedWeekStats)
+                }
             })
             .catch((error) => setError(error));
     }, []);
@@ -193,11 +208,7 @@ export function TaskDistribution() {
                     <CurWeekDate />
                 </div>
 
-                <div className={styles.chartAndLegendContainer}>
-                    <Chart stats={stats} />
-                    <Legend stats={stats} />
-                </div>
-
+                <ChartAndLegend stats={stats} />
             </div>
         </>
     );

@@ -29,7 +29,13 @@
         "@tiptap/react": "^2.6.6",
         "@tiptap/starter-kit": "^2.6.6",
         "@types/react-big-calendar": "^1.8.10",
+        "@visx/group": "latest",
+        "@visx/mock-data": "latest",
+        "@visx/responsive": "latest",
+        "@visx/scale": "latest",
+        "@visx/shape": "latest",
         "classnames": "^2.5.1",
+        "compass-mixins": "^0.12.12",
         "i18next-fs-backend": "^2.3.2",
         "i18next-http-backend": "^2.6.1",
         "isbot": "^4.1.0",
@@ -42,13 +48,7 @@
         "react-timer-hook": "^3.0.7",
         "remix": "^2.12.1",
         "remix-i18next": "^6.4.1",
-        "tslog": "^4.9.3",
-
-        "@visx/group": "latest",
-        "@visx/mock-data": "latest",
-        "@visx/responsive": "latest",
-        "@visx/scale": "latest",
-        "@visx/shape": "latest"
+        "tslog": "^4.9.3"
     },
     "devDependencies": {
         "@remix-run/dev": "^2.11.2",

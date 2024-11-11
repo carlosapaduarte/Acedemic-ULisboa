@@ -55,7 +55,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             # Generates a random ID, that is not yet taken
             random_generated_id: int = 0
             while True:
-                random_generated_id: int = random.randint(1, POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+                random_generated_id: int = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
                 statement = select(STEventModel).where(STEventModel.id == random_generated_id)
                 result = session.exec(statement)
                 if result.first() is None:
@@ -588,8 +588,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         # TODO: events that repeat every week
         
         with Session(engine) as session:
-            statement = select(STEventModel)\
-                .where(STEventModel.user_id == user_id)
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)
             
             result = session.exec(statement)
             events: list[STEventModel] = list(result.all())
@@ -617,7 +617,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                         stats[year][week][tag_name] = 0
                         
                     stats[year][week][tag_name] += elapsed_minutes
-
+                    
             return stats
         
     def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:

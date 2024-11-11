@@ -42,3 +42,11 @@ export function CurWeekDate() {
         </span>
     );
 }
+
+export function NoDataYetAvailableMessage() {
+    return (
+        <div className={styles.noDataAvailableMessage}>
+            No data available, yet...
+        </div>
+    )
+}

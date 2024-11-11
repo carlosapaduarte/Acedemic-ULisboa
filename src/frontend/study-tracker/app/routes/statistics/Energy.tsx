@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { DailyEnergyStatus, service } from "~/service/service";
 import { utils } from "~/utils";
-import { SeeFullHistory, Spacer } from "./Commons";
+import { NoDataYetAvailableMessage, SeeFullHistory, Spacer } from "./Commons";
 
 export function getEnergyIconByEnergyLevel(energyLevel: number): string {
     const prefix = "/icons/"
@@ -32,34 +32,37 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
                                      onSeeFullHistoryClick: () => void
                                  }) {
     return (
-        <>
-            <div className={styles.historyFirstContainer}>
-                <span className={styles.historyTitle}>History</span>
-                <SeeFullHistory />
-            </div>
+        energyHistory.length != 0 ?
+            <>
+                <div className={styles.historyFirstContainer}>
+                    <span className={styles.historyTitle}>History</span>
+                    <SeeFullHistory />
+                </div>
 
-            <div className={styles.historyStatusAndDate}>
-                {energyHistory
-                    .sort((status1: DailyEnergyStatus, status2: DailyEnergyStatus) => { // sorts by increasing year and week
-                        const lower = status1.date < status2.date
-                        if (lower)
-                            return -1
-                        else {
-                            if (status1.date > status2.date)
-                                return 1
+                <div className={styles.historyStatusAndDate}>
+                    {energyHistory
+                        .sort((status1: DailyEnergyStatus, status2: DailyEnergyStatus) => { // sorts by increasing year and week
+                            const lower = status1.date < status2.date
+                            if (lower)
+                                return -1
+                            else {
+                                if (status1.date > status2.date)
+                                    return 1
 
-                            return 0
-                        }
-                    })
-                    .reverse()
-                    .slice(0, 6)
-                    .reverse()
-                    .map((value: DailyEnergyStatus, index: number) =>
-                        <EnergyStatus status={value} key={index} />
-                    )
-                }
-            </div>
-        </>
+                                return 0
+                            }
+                        })
+                        .reverse()
+                        .slice(0, 6)
+                        .reverse()
+                        .map((value: DailyEnergyStatus, index: number) =>
+                            <EnergyStatus status={value} key={index} />
+                        )
+                    }
+                </div>
+            </>
+        :
+            <NoDataYetAvailableMessage />
     );
 }
 
@@ -109,11 +112,9 @@ function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }
                     I feel {levelToStr(status.level)}
                 </div>
                 :
-                <p>Nothing</p>
+                <NoDataYetAvailableMessage />
             }
-
             <Spacer />
-
             <Tags/>
         </>
     );

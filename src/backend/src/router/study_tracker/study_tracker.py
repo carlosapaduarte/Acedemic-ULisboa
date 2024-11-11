@@ -230,6 +230,7 @@ def get_daily_energy_history(
     history = study_tracker_service.get_daily_energy_history(user_id)
     return DailyEnergyStatusOutputDto.from_domain(history)
 
+# Important: this route is actually fetching data, not from tasks but from events! This is because tasks don't have time associated. They only have a deadline. Events have a time assigned, so it's more proper to use events to compute time waste on each event type (given by it's tag).
 @router.get("/users/me/statistics/time-by-event-tag")
 def get_task_time_distribution(
     user_id: Annotated[int, Depends(get_current_user_id)]
