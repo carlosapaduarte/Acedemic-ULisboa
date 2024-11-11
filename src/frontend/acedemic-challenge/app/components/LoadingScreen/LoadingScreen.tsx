@@ -21,7 +21,10 @@ export function LoadingOverlay({ loading }: { loading: boolean }) {
     }, [loading]);
 
     return (showOverlay &&
-        <div className={styles.loadingOverlay}>
+        <div className={styles.loadingOverlay}
+             aria-hidden={loading ? undefined : true}
+             aria-label="Loading Screen - Acedemic Challenge"
+        >
             <div className="app">
                 <LoadingScreen />
                 <Footer />
