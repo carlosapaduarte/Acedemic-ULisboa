@@ -7,7 +7,6 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import dropdownStyles from "./dropdown.module.css";
 import { service, UserInfo } from "~/service/service";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
@@ -72,8 +71,6 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
 }
 
 export function GreetingsContainer() {
-    const setGlobalError = useSetGlobalError();
-
     const [username, setUsername] = React.useState<string | undefined>(undefined);
     const [avatarFilename, setAvatarFilename] = React.useState<string | undefined>(undefined);
 
@@ -82,10 +79,8 @@ export function GreetingsContainer() {
             .then((userInfo: UserInfo) => {
                 setAvatarFilename(userInfo.avatarFilename);
                 setUsername(userInfo.username);
-            })
-            .catch((e: Error) => setGlobalError(e));
+            });
     }, []);
-
 
     let helloQuote = getHelloQuote();
 

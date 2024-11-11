@@ -92,6 +92,8 @@
 }
 
 .navBarButton {
+    composes: cutButton from "@/components/Button/button.module.css";
+
     background-color: var(--primary-color);
     color: white;
     width: 5rem;

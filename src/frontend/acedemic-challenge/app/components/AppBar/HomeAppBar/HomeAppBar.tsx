@@ -2,7 +2,6 @@ import styles from "./homeAppBar.module.css";
 import React, { useEffect, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import { useLogOut } from "~/components/auth/Authn";
-import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -37,12 +36,15 @@ function NavBarButton({ text, url, iconSrc, iconAlt }: {
 
     return (
         <div className={`${styles.navBarButtonContainer}`}>
-            <CutButton
-                onClick={() => navigate(url)}
-                className={`${styles.navBarButton}`}
+            <a href={url}
+               onClick={(e) => {
+                   e.preventDefault();
+                   navigate(url);
+               }}
+               className={`${styles.navBarButton}`}
             >
                 {iconSrc ? <img src={iconSrc} alt={iconAlt} /> : "Icon"}
-            </CutButton>
+            </a>
             <div className={`${styles.navBarButtonText}`}>
                 {text}
             </div>
@@ -113,9 +115,11 @@ export function GreetingsContainer() {
 export function NavBar() {
     return (
         <div className={`${styles.navBar}`}>
-            <NavBarButton text="Challenges" url={"/challenges"} iconSrc={"/icons/challenges_icon.svg"} iconAlt={"Challenges Icon"}/>
-            <NavBarButton text="Calendar" url={"/calendar"} iconSrc={"/icons/calendar_icon.svg"} iconAlt={"Calendar Icon"}/>
-            <NavBarButton text="Badges" url={"/badges"} iconSrc={"/icons/badges_icon.svg"} iconAlt={"Badges Icon"}/>
+            <NavBarButton text="Challenges" url={"/challenges"} iconSrc={"/icons/challenges_icon.svg"}
+                          iconAlt={"Challenges Icon"} />
+            <NavBarButton text="Calendar" url={"/calendar"} iconSrc={"/icons/calendar_icon.svg"}
+                          iconAlt={"Calendar Icon"} />
+            <NavBarButton text="Badges" url={"/badges"} iconSrc={"/icons/badges_icon.svg"} iconAlt={"Badges Icon"} />
         </div>
     );
 }
