@@ -16,7 +16,10 @@ export function SettingsButton({ variant = "default" }: { variant?: AppBarVarian
         <a href="/settings"
            aria-label={t("appbar:settings")}
            className={classNames(styles.settingsButton)}
-           onClick={() => navigate("/settings")}>
+           onClick={(e) => {
+               e.preventDefault();
+               navigate("/settings")
+           }}>
             <IconContext.Provider value={{
                 className: classNames(styles.settingsButtonIcon, styles[variant])
             }}>

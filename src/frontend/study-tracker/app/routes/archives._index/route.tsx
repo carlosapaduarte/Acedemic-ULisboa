@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Archive, File, service } from "~/service/service";
 import { useNavigate } from "@remix-run/react";
-import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { useTranslation } from "react-i18next";
-import { NotFoundPage } from "~/Pages/NotFoundPage";
+import { InConstructionPage } from "~/Pages/InConstruction";
 
 function useCreateArchiveView(onArchiveCreated: () => void) {
     const [name, setName] = useState("");
@@ -137,7 +136,7 @@ function ArchiveListView() {
 
 export default function ArchiveListViewAuthControlled() {
     return (
-        <NotFoundPage /> // TODO uncomment the following code. For the beta, we will show the NotFoundPage as this page has bugged styles.
+        <InConstructionPage /> // TODO uncomment the following code. For now, we will show the InConstructionPage as this page has bugged styles.
         /*<RequireAuthn>
             <ArchiveListView />
         </RequireAuthn>*/

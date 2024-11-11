@@ -98,12 +98,14 @@ Doesn't work, use SCSS
 }
 
 .challengeBox.loading {
+    --loadingColor: #1e001e;
+
     background: linear-gradient(90deg,
-    var(--third-color) 25%,
-    #f0f0f0 50%,
-    var(--third-color) 75%);
+    var(--loadingColor) 25%,
+    #471e47 50%,
+    var(--loadingColor) 75%);
     background-size: 400px 100%;
-    animation: loadingAnimation 1s infinite linear ;
+    animation: loadingAnimation 2s infinite linear;
     color: white;
 }
 

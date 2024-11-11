@@ -19,7 +19,7 @@
 
     overflow: auto;
 
-    background-color: var(--fourth-color);
+    color: var(--secondary-text-color);
 
     clip-path: polygon(
             100% 0%,
