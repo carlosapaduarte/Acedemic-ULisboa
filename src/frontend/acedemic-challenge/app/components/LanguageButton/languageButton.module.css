@@ -12,7 +12,7 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    background-color: white;
+    background-color: black;
 
     position: relative;
     isolation: isolate;
@@ -38,6 +38,7 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+    opacity: 0.65;
 
     --border-size: 1px;
     --border-edge-size_after: calc(var(--edge-size) + var(--border-size) / 2);
@@ -59,4 +60,12 @@
 
 .languageButton.en-GB::after {
     background-image: url('../minimalist-enGB.png');
+}
+
+.languageButton.selected {
+    background-color: white;
+
+    &::after {
+        opacity: 1;
+    }
 }

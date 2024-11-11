@@ -54,6 +54,7 @@
 }
 
 .homeButton {
+    composes: cutButton from '@/components/Button/button.module.css';
     width: 4rem;
     height: 3rem;
 

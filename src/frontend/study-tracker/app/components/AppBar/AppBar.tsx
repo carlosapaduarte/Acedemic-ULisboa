@@ -113,7 +113,7 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
     const navigate = useNavigate();
 
     return (
-        <header role="banner" className={classNames(
+        <header className={classNames(
             appBarVariant === "default" && styles.appBarContainer,
             appBarVariant === "home" && homeAppBarStyles.appBarContainer,
             appBarVariant === "clean" && cleanAppBarStyles.appBarContainer
@@ -151,8 +151,10 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
                 <div key="settingsButtons"
                      className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>
                     <SettingsButton variant={appBarVariant} />
-                    <LanguageButton language={t("appbar:portugueseLanguage")} languageCode={"pt-PT"} variant={appBarVariant} />
-                    <LanguageButton language={t("appbar:englishLanguage")} languageCode={"en-GB"} variant={appBarVariant} />
+                    <LanguageButton language={t("appbar:portugueseLanguage")} languageCode={"pt-PT"}
+                                    variant={appBarVariant} />
+                    <LanguageButton language={t("appbar:englishLanguage")} languageCode={"en-GB"}
+                                    variant={appBarVariant} />
                 </div>
                 {appBarVariant === "home" && (
                     <>

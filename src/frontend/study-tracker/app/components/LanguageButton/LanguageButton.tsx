@@ -11,13 +11,15 @@ export function LanguageButton({ language, languageCode, variant = "default" }: 
 }) {
     const { i18n, t } = useTranslation("appbar");
     const selected = i18n.language.split("-")[0] === languageCode.split("-")[0];
-    return <button
-        aria-label={t("appbar:language", { language })}
-        className={classNames(
-            styles.languageButton,
-            styles[languageCode],
-            styles[variant],
-            selected && styles.selected
-        )}
-        onClick={() => i18n.changeLanguage(languageCode)} />;
+    return <div className={styles.languageButtonBackdrop}>
+        <button
+            aria-label={t("appbar:language", { language })}
+            className={classNames(
+                styles.languageButton,
+                styles[languageCode],
+                styles[variant],
+                selected && styles.selected
+            )}
+            onClick={() => i18n.changeLanguage(languageCode)} />
+    </div>;
 }
