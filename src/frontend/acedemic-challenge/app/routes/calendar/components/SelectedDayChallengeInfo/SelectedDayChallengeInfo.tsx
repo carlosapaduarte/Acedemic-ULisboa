@@ -56,6 +56,10 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
         // Call the function initially and on window resize
         applyDynamicLineClamp();
         window.addEventListener("resize", applyDynamicLineClamp);
+
+        return () => {
+            window.removeEventListener("resize", applyDynamicLineClamp);
+        };
     }, [challengesToDisplay]);
 
     if (challengesToDisplay.length == 1) {
@@ -73,7 +77,7 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
                     </div>
                 </div>
                 <CutButton className={`${styles.seeMoreButton}`}>
-                {t("calendar:see_more_button_text")}
+                    {t("calendar:see_more_button_text")}
                 </CutButton>
             </>
         );
