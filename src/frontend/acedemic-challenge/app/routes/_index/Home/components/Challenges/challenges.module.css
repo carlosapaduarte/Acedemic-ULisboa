@@ -1,7 +1,35 @@
 
+.challengeWrapper {
+    height: 100%;
+    display: flex;
+}
+
+.challengeContentContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    overflow: hidden;
+}
+
+.challengeContentScrollWrapper {
+    flex-grow: 1;
+    width: 100%;
+    overflow: auto;
+    padding-right: 1rem;
+    color: white;
+
+}
+
 .currentDayText {
     font-family: 'Chakra Petch', sans-serif;
     text-transform: uppercase;
+}
+
+.challengeTitleContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
 }
 
 .challengeTitle {
@@ -22,12 +50,16 @@
 }
 
 .buttonsContainer {
+    padding-right: 1rem;
+    margin-top: 0.5rem;
+
+    min-height: 50px;
+    width: 100%;
+
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     gap: 0.5rem;
-    min-height: 50px;
-    width: 100%;
 }
 
 .addNoteButton {
@@ -46,4 +78,13 @@
 
     font-weight: bold;
     font-size: 1rem;
+}
+
+.challengeCompleteTag {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0.25rem;
+    text-transform: uppercase;
 }

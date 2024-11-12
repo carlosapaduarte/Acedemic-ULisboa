@@ -14,50 +14,55 @@ export default function Challenges({ currentDayNumber, challenges, onMarkComplet
 
     // Per challenge, there is a "Mark Complete" button
     return (
-        <div>
-            <h1 className={styles.currentDayText}>
-                {t("dashboard:day")} {currentDayNumber}
-            </h1>
-            {challenges.map((challenge: Challenge) => {
-                return (
-                    <div key={challenge.id}
-                         style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
-                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                            <h2 className={styles.challengeTitle}>{challenge.title}</h2>
-                            {
-                                challenge.completionDate != null ?
-                                    <p style={{
-                                        textAlign: "left",
-                                        width: "100%",
-                                        marginBottom: "1%",
-                                        textDecoration: "underline"
-                                    }}>
-                                        ({t("dashboard:challenge_completed")})
-                                    </p>
-                                    :
-                                    <></>
-                            }
+        <div className={styles.challengeWrapper}>
+            {
+                challenges.length == 1 ?
+                    <div key={challenges[0].id}
+                         className={styles.challengeContentContainer}>
+                        <div className={styles.challengeContentScrollWrapper}>
+                            <h1 className={styles.currentDayText}>
+                                {t("dashboard:day")} {currentDayNumber}
+                            </h1>
+                            <div className={styles.challengeTitleContainer}>
+                                <h2 className={styles.challengeTitle}>{challenges[0].title}</h2>
+                                {
+                                    challenges[0].completionDate != null ?
+                                        <div className={styles.challengeCompleteTag}>
+                                            {t("dashboard:challenge_completed")}
+                                        </div>
+                                        :
+                                        <></>
+                                }
+                            </div>
+                            <p className={styles.challengeDescription}>
+                                {challenges[0].description}
+                            </p>
                         </div>
-                        <p className={styles.challengeDescription}>
-                            {challenge.description}
-                        </p>
                         <div className={styles.buttonsContainer}>
                             <CutButton className={styles.addNoteButton}>
                                 {t("dashboard:add_note")}
                             </CutButton>
                             {
-                                challenge.completionDate != null ?
+                                challenges[0].completionDate != null ?
                                     <></>
                                     :
                                     <CutButton className={styles.completeChallengeButton}
-                                               onClick={() => onMarkComplete(challenge)}>
+                                               onClick={() => onMarkComplete(challenges[0])}>
                                         {t("dashboard:mark_complete")}
                                     </CutButton>
                             }
                         </div>
                     </div>
-                );
-            })}
+                    :
+                    <>
+                        {
+                            challenges.map((challenge: Challenge) => {
+                                return challenge.title;
+                            })
+                        }
+                    </>
+
+            }
         </div>
     );
 }
