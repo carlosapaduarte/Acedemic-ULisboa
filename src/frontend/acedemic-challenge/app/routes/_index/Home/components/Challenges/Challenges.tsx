@@ -56,9 +56,33 @@ export default function Challenges({ currentDayNumber, challenges, onMarkComplet
                     :
                     <>
                         {
-                            challenges.map((challenge: Challenge) => {
-                                return challenge.title;
-                            })
+                            <div style={{ display: "flex", flexDirection: "column", overflow: "auto" }}>
+                                <h1 className={styles.currentDayText}>
+                                    {t("dashboard:day")} {currentDayNumber}
+                                </h1>
+                                {challenges.map((challenge: Challenge) => {
+                                    return (
+                                        <div key={challenge.id}
+                                             className={styles.challengeContentContainer} style={{overflow: "visible"}}>
+                                            <div className={styles.challengeContentScrollWrapper}>
+                                                <div className={styles.challengeTitleContainer}>
+                                                    <h2 className={styles.challengeTitle}>{challenge.title}</h2>
+                                                    {
+                                                        challenge.completionDate != null ?
+                                                            <div className={styles.challengeCompleteTag}>
+                                                                {t("dashboard:challenge_completed")}
+                                                            </div>
+                                                            :
+                                                            <></>
+                                                    }
+                                                </div>
+                                                <p className={styles.challengeDescription}>
+                                                    {challenge.description}
+                                                </p>
+                                            </div>
+                                        </div>);
+                                })}
+                            </div>
                         }
                     </>
 
