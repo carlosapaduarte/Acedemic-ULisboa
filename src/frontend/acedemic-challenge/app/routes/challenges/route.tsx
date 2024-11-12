@@ -77,8 +77,10 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
 
                         const title = challenges && challenges.length > index ? challenges[index][0].title : undefined;
                         const description = challenges && challenges.length > index ? challenges[index][0].description : undefined;
+                        const completed = challenges && challenges.length > index ? challenges[index][0].completionDate != null : false;
 
                         return <ChallengeListItem key={index}
+                                                  completed={completed}
                                                   challengeIndex={index}
                                                   loading={challenges == undefined}
                                                   challengeTitle={title}

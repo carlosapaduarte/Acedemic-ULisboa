@@ -67,9 +67,19 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
         return (
             <>
                 <div className={`${styles.challengeTextContainer}`}>
-                    <h2 className={`${styles.challengeTitle}`}>
-                        {challenge.title}
-                    </h2>
+                    <div className={`${styles.challengeTitleContainer}`}>
+                        <h2 className={`${styles.challengeTitle}`}>
+                            {challenge.title}
+                        </h2>
+                        {
+                            challenge.completionDate != null ?
+                                <div className={styles.challengeCompleteTag}>
+                                    {t("dashboard:challenge_completed")}
+                                </div>
+                                :
+                                <></>
+                        }
+                    </div>
                     <div className={`${styles.challengeDescriptionContainer}`}>
                         <p className={`${styles.challengeDescription}`}>
                             {challenge.description}

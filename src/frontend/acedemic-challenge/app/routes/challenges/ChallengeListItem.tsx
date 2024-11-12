@@ -1,5 +1,7 @@
 import styles from "./challengesPage.module.css";
 import classNames from "classnames";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
 /*
 * TODO Make sure it adheres to the WAI-ARIA design pattern for the Accordion:
@@ -8,6 +10,7 @@ import classNames from "classnames";
 export function ChallengeListItem(
     {
         challengeIndex,
+        completed,
         loading,
         challengeTitle,
         challengeDescription,
@@ -17,6 +20,7 @@ export function ChallengeListItem(
         onChallengeClick
     }: {
         challengeIndex: number,
+        completed: boolean,
         loading: boolean,
         challengeTitle: string | undefined,
         challengeDescription: string | undefined,
@@ -26,6 +30,8 @@ export function ChallengeListItem(
         onChallengeClick: (challengeIndex: number) => void
     }
 ) {
+    const { t } = useTranslation("dashboard");
+
     return (
         <div className={
             classNames(
@@ -64,6 +70,14 @@ export function ChallengeListItem(
                                     <p className={`${styles.challengeTitle}`}>
                                         {challengeIndex + 1} - {challengeTitle}
                                     </p>
+                                    {
+                                        completed ?
+                                            <div className={styles.challengeCompleteTag}>
+                                                {t("dashboard:challenge_completed")}
+                                            </div>
+                                            :
+                                            <></>
+                                    }
                                 </div>
                                 :
                                 <div className={`${styles.challengeContainer}`}
