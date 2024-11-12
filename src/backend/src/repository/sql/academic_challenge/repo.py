@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
+
 class AcademicChallengeRepo(ABC):
     @abstractmethod
-    def create_new_batch(self, user_id: int, new_level: int) -> int:
+    def create_new_batch(self, user_id: int, new_level: int, challenge_ids: list[int] | list[list[int]]) -> int:
         pass
 
     @abstractmethod
@@ -11,5 +12,6 @@ class AcademicChallengeRepo(ABC):
         pass
 
     @abstractmethod
-    def create_completed_challenge(self, user_id: int, batch_id: int, challenge_id: int, challenge_day: int, conclusion_date: datetime):
+    def complete_challenge(self, user_id: int, batch_id: int, challenge_id: int, challenge_day: int,
+                           conclusion_date: datetime):
         pass

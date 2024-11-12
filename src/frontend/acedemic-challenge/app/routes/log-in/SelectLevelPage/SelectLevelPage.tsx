@@ -1,9 +1,9 @@
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./selectLevelPage.module.css";
 import { CutButton } from "~/components/Button/Button";
+import { getChallengeIdList } from "~/challenges/getLevels";
 
 export default function SelectLevelPage(
     {
@@ -15,8 +15,8 @@ export default function SelectLevelPage(
     }) {
     const { onConfirmClick, selectedLevel, setSelectedLevel } =
         useSelectLevelPage({
-            onLevelSelected: onLevelSelected,
-            onStartQuizClick: onStartQuizClick
+            onLevelSelected,
+            onStartQuizClick
         });
     const { t } = useTranslation(["login"]);
 
@@ -52,13 +52,10 @@ function useSelectLevelPage(
         null
     );
 
-    const setGlobalError = useSetGlobalError();
-
     async function onConfirmClickHandler(level: LevelType) {
         await service
-            .createBatch(level) // returns if was successful or not
-            .then(() => onLevelSelected())
-            .catch((error) => setGlobalError(error));
+            .createBatch(level, getChallengeIdList(level))
+            .then(() => onLevelSelected());
     }
 
     // TODO Quiz Button

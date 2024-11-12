@@ -1,11 +1,10 @@
 import { Challenge } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
-import { service, UserInfo } from "~/service/service";
-import { utils } from "~/utils";
+import { Batch, service, StoredChallenge, UserInfo } from "~/service/service";
 import styles from "./challengesPage.module.css";
-import { Level1 } from "~/challenges/level_1";
 import classNames from "classnames";
+import { getFullChallenge } from "~/challenges/getLevels";
 
 /*
 * TODO Make sure it adheres to the WAIA-ARIA design pattern for the Accordion:
@@ -24,8 +23,8 @@ function ChallengeBox(
     }: {
         challengeIndex: number,
         loading: boolean,
-        challengeTitle: string,
-        challengeDescription: string,
+        challengeTitle: string | undefined,
+        challengeDescription: string | undefined,
         lastExpanded: boolean,
         expanded: boolean,
         reached: boolean,
@@ -121,19 +120,20 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
         setSelectedItem(index);
     }
 
-    console.log("Challenges: ", challenges);
-
     return (
         <div className={`${styles.challengesList}`}>
             {
                 Array.from({ length: 21 }).map((_, index) => {
                         const reached = currentChallenge ? index <= currentChallenge - 1 : false;
 
+                        const title = challenges && challenges.length > index ? challenges[index][0].title : undefined;
+                        const description = challenges && challenges.length > index ? challenges[index][0].description : undefined;
+
                         return <ChallengeBox key={index}
                                              challengeIndex={index}
                                              loading={challenges == undefined}
-                                             challengeTitle={Level1.getLevel1ChallengeList()[index].title}
-                                             challengeDescription={Level1.getLevel1ChallengeList()[index].description}
+                                             challengeTitle={title}
+                                             challengeDescription={description}
                                              lastExpanded={lastSelectedItem == index}
                                              expanded={selectedItem == index}
                                              reached={reached}
@@ -148,23 +148,49 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
 function useChallenges() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
 
+    const { t } = useTranslation(["challenges"]);
+    const [currentBatch, setCurrentBatch] = useState<Batch | undefined>(undefined);
+    const [storedChallenges, setStoredChallenges] = useState<StoredChallenge[][]>();
+
     useEffect(() => {
         service.fetchUserInfoFromApi()
             .then((userInfo: UserInfo) => {
-                console.log("User info: ", userInfo);
+                const currentBatch: Batch = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
+                setCurrentBatch(currentBatch);
 
-                const batchToDisplay = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
-                const level = batchToDisplay.level;
-                const startDate = new Date(batchToDisplay.startDate * 1000);
+                const storedChallenges = userInfo.batches[userInfo.batches.length - 1].challenges;
+                setStoredChallenges(storedChallenges);
 
-                startDate.setDate(startDate.getDate() - 6);
+                setLevel(currentBatch.level);
 
-                const challenges = utils.getChallengesPerDayByStartDate(level, startDate);
-                setChallenges(challenges);
+                const currentDayIndex = Math.round((new Date().getTime() - currentBatch.startDate * 1000) / (1000 * 3600 * 24));
+                setChallenges(getFullTodayChallenges(currentBatch, storedChallenges, t, currentDayIndex));
             });
     }, []);
 
+    useEffect(() => {
+        if (!currentBatch || !storedChallenges)
+            return;
+
+        const currentDayIndex = Math.round((new Date().getTime() - currentBatch.startDate * 1000) / (1000 * 3600 * 24));
+
+        setChallenges(getFullTodayChallenges(currentBatch, storedChallenges, t, currentDayIndex));
+    }, [currentBatch, storedChallenges, t]);
+
+    function getFullTodayChallenges(currentBatch: Batch, storedChallenges: StoredChallenge[][], t: any, currentDayIndex: number) {
+        let todayChallenges: Challenge[][] = storedChallenges
+            .slice(0, currentDayIndex + 1)
+            .map((storedChallengeList) =>
+                storedChallengeList
+                    .map((storedChallenge) =>
+                        getFullChallenge(currentBatch.level, storedChallenge, t)
+                    )
+            );
+        return todayChallenges;
+    }
+
     const [selectedChallenge, setSelectedChallenge] = useState<number | undefined>(undefined);
+    const [level, setLevel] = useState<number | undefined>(undefined);
     const [challenges, setChallenges] = useState<Challenge[][] | undefined>(undefined);
 
     function onChallengeClickHandler(challengeIndex: number) {

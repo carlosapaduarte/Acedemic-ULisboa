@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Challenge, DayChallenges } from "~/challenges/types";
-import { Batch, CompletedChallenge, service, UserInfo, UserNote } from "~/service/service";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { Level1 } from "~/challenges/level_1";
-import { Level2 } from "~/challenges/level_2";
-import { Level3 } from "~/challenges/level_3";
+import { Challenge } from "~/challenges/types";
+import { Batch, service, StoredChallenge, UserInfo, UserNote } from "~/service/service";
+import { getFullChallenge } from "~/challenges/getLevels";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
+import { useTranslation } from "react-i18next";
 
 function sameDate(date1: Date, date2: Date): boolean {
     return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate();
-}
-
-function getTodayChallenges(allChallenges: DayChallenges[]): DayChallenges | undefined {
-    const today = new Date();
-    return allChallenges.find((challengesForTheDay: DayChallenges) => sameDate(challengesForTheDay.date, today));
 }
 
 function getTodayNotes(allNotes: UserNote[]): UserNote[] {
@@ -22,33 +15,20 @@ function getTodayNotes(allNotes: UserNote[]): UserNote[] {
     return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date * 1000), today));
 }
 
-function getTodayCompletedChallenges(batch: Batch): number[] {
-    const today = new Date();
-    const batchStartDate = new Date(batch.startDate * 1000);
-    //const batchStartDate = new Date(2024, 7, 21, 12) // For testing...
-    return batch.completedChallenges
-        .filter((completedChallenge: CompletedChallenge) => {
-            // To obtain the date of the challenge: batch-start-date + (challenge day index - 1)
-            const challengeDate = batchStartDate;
-            challengeDate.setDate(challengeDate.getDate() + (completedChallenge.challengeDay - 1));
-
-            return sameDate(new Date(challengeDate), today);
-        }).map((completedChallenge) => completedChallenge.id);
-}
-
 function useMainDashboardContent() {
-    const setGlobalError = useSetGlobalError();
+    const { t } = useTranslation(["challenges"]);
+
     const [newNoteText, setNewNoteText] = useState("");
 
     const [userInfo, setUserInfo] = useState<UserInfo>();
 
-    const [daysSinceStart, setDaysSinceStart] = useState<number>();
-    const [todayCompletedChallenges, setTodayCompletedChallenges] = useState<number[]>();
+    const [currentDayIndex, setCurrentDayIndex] = useState<number>();
     const [todayNotes, setTodayNotes] = useState<UserNote[]>();
-    const [todayChallenges, setTodayChallenges] = useState<DayChallenges>();
-    const [batchToDisplay, setBatchToDisplay] = useState<Batch | undefined>(undefined);
 
-    const [loadingChallengesAndNotes, setLoadingChallengesAndNotes] = useState(false);
+    const [currentBatch, setCurrentBatch] = useState<Batch | undefined>(undefined);
+    const [storedDayChallenges, setStoredDayChallenges] = useState<StoredChallenge[]>();
+    const [todayChallenges, setTodayChallenges] = useState<Challenge[]>();
+
 
     // Sparks a getUserInfo API call
     useEffect(() => {
@@ -61,36 +41,23 @@ function useMainDashboardContent() {
                 return;
             }
 
-            // For simplification, use the first one
-            const batchToDisplay = userInfo.batches[0];
-            setBatchToDisplay(batchToDisplay);
-            const batchStartDate = new Date(batchToDisplay.startDate * 1000); // Feel free to change for testing
-            //const batchStartDate = new Date(2024, 7, 21, 12) // For testing...
+            const currentBatch: Batch = userInfo.batches.sort((a, b) => b.startDate - a.startDate)[0];
+            setCurrentBatch(currentBatch);
 
-            const level = batchToDisplay.level;
-            let challenges: DayChallenges[];
-            switch (level) {
-                case 1:
-                    challenges = Level1.level1Challenges(batchStartDate);
-                    break;
-                case 2:
-                    challenges = Level2.level2Challenges(batchStartDate);
-                    break;
-                case 3:
-                    challenges = Level3.level3Challenges(batchStartDate);
-                    break;
-                default:
-                    return Promise.reject("TODO: error handling");
-            }
+            const currentDayIndex = Math.round((new Date().getTime() - currentBatch.startDate * 1000) / (1000 * 3600 * 24));
+            setCurrentDayIndex(currentDayIndex);
 
-            // Should never be undefined!
-            // TODO: handle error when undefined later
-            const todayChallengesAux: DayChallenges | undefined = getTodayChallenges(challenges);
+            const storedDayChallenges = userInfo.batches[userInfo.batches.length - 1].challenges[currentDayIndex];
+            setStoredDayChallenges(storedDayChallenges);
+
+            let todayChallenges: Challenge[] = storedDayChallenges
+                .map((storedChallenge) =>
+                    getFullChallenge(currentBatch.level, storedChallenge, t)
+                );
+
+            setTodayChallenges(todayChallenges);
+
             const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes);
-            const todaysCompletedChallenges: number[] = getTodayCompletedChallenges(batchToDisplay);
-
-            setTodayChallenges(todayChallengesAux);
-            setTodayCompletedChallenges(todaysCompletedChallenges);
             setTodayNotes(todaysNotes);
         }
 
@@ -99,70 +66,43 @@ function useMainDashboardContent() {
 
     }, [userInfo]);
 
+    useEffect(() => {
+        if (!currentBatch || !storedDayChallenges)
+            return;
+
+        let todayChallenges: Challenge[] = storedDayChallenges
+            .map((storedChallenge) =>
+                getFullChallenge(currentBatch.level, storedChallenge, t)
+            );
+
+        setTodayChallenges(todayChallenges);
+    }, [storedDayChallenges, t]);
+
     async function fetchUserInfo() {
-        setLoadingChallengesAndNotes(true);
-
-        // TODO: in future, request only today's challenges
-        const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi();
-        //console.log('User Info: ', userInfo)
-
-        setLoadingChallengesAndNotes(false);
+        const userInfo: UserInfo | undefined = await service.fetchUserInfoFromApi(); // TODO: in future, request only today's challenges
 
         if (userInfo == undefined) {
-            setGlobalError(new Error("User information could not be obtained!"));
             return;
         }
 
         setUserInfo(userInfo);
     }
 
-    /*function onAddNewNoteClickHandler() {
-        setView(View.CreateNewNote);
-    }
-
-    async function onConfirmNewNoteSubmitClickHandler() {
-        await service.createNewUserNote(userId, newNoteText, new Date())
-            .then(() => {
-                fetchUserInfo(); // Updates state again
-                setView(View.Default);
-            }) // this triggers a new refresh. TODO: improve later)
-            .catch((error) => setGlobalError(error));
-    }*/
-
     async function onMarkCompleteClickHandler(challenge: Challenge, batch: Batch) {
-        const today = new Date();
-        const startDate = new Date(batch.startDate * 1000);
-        //const startDate = new Date(2024, 7, 21, 12) // For testing...
-        const elapsedDays = Math.round((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-        const challengeIndex = elapsedDays + 1;
-
-        await service.markChallengeAsCompleted(batch.id, challenge.id, challengeIndex)
+        await service.markChallengeAsCompleted(batch.id, challenge.id, challenge.day)
             .then(() => {
-                fetchUserInfo(); // Updates state again
-            }) // this triggers a new refresh. TODO: improve later
-            .catch((error) => setGlobalError(error));
+                fetchUserInfo();
+            }); // this triggers a new refresh. TODO: improve later
     }
-
-    useEffect(() => {
-        if (!batchToDisplay)
-            return;
-
-        setDaysSinceStart(Math.round((new Date().getTime() - batchToDisplay.startDate * 1000) / (1000 * 3600 * 24)) + 1);
-    }, [batchToDisplay]);
 
     return {
         userInfo,
-        daysSinceStart,
+        currentDayIndex,
         todayChallenges,
-        todayCompletedChallenges,
         todayNotes,
         newNoteText,
-        batchToDisplay,
-        setGlobalError,
+        currentBatch,
         setNewNoteText,
-        /*
-        onAddNewNoteClickHandler,
-        onConfirmNewNoteSubmitClickHandler,*/
         onMarkCompleteClickHandler
     };
 }
@@ -170,63 +110,24 @@ function useMainDashboardContent() {
 function MainContent() {
     const {
         userInfo,
-        daysSinceStart,
+        currentDayIndex,
         todayChallenges,
-        todayCompletedChallenges,
         todayNotes,
-        newNoteText,
-        batchToDisplay,
-        setGlobalError,
-        setNewNoteText,
-        /*
-        onAddNewNoteClickHandler,
-        onConfirmNewNoteSubmitClickHandler,*/
+        currentBatch,
         onMarkCompleteClickHandler
     } = useMainDashboardContent();
-    /*console.log(userInfo?.avatarFilename);*/
-    if (userInfo && daysSinceStart && todayChallenges && todayCompletedChallenges && todayNotes && batchToDisplay) {
+
+    if (userInfo && currentDayIndex != undefined && todayChallenges && todayNotes && currentBatch) {
         return (
             <div className={styles.challengesContainerWrapper}>
                 <Challenges
-                    currentDayNumber={daysSinceStart}
-                    challenges={todayChallenges.challenges}
-                    completedChallenges={todayCompletedChallenges}
-                    onMarkComplete={(challenge: Challenge) => onMarkCompleteClickHandler(challenge, batchToDisplay)} />
-                {/*<div style={{ flexGrow: 1 }}>
-                    <DisplayUserNotes notes={todayNotes} alignTitleLeft={true} />
-                </div>
-                <div style={{ display: "flex", justifyContent: "right" }}>
-
-                    <Button variant="round" style={{ fontSize: "150%" }}
-                                onClick={onAddNewNoteClickHandler}>
-                            {t("dashboard:add_note")}
-                        </Button>
-                </div>*/}
+                    currentDayNumber={currentDayIndex + 1}
+                    challenges={todayChallenges}
+                    onMarkComplete={(challenge: Challenge) => onMarkCompleteClickHandler(challenge, currentBatch)} />
             </div>
         );
     } else
         return <></>;
-    /*} else if (view == View.CreateNewNote)
-        return (
-            <div style={{ display: "flex", flexDirection: "column" }}>
-                {/!*<TextField
-                    sx={{ marginBottom: "2%", width: "60%" }}
-                    id="outlined-controlled"
-                    label="Note Description"
-                    value={newNoteText}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNewNoteText(event.target.value);
-                    }}
-                />*!/}
-                <Button variant="round" style={{ width: "15%" }} onClick={onConfirmNewNoteSubmitClickHandler}>
-                    {t("dashboard:confirm_new_note")}
-                </Button>
-            </div>
-        );
-    else {
-        setGlobalError(new Error("Something went wrong..."));
-        return <></>;
-    }*/
 }
 
 export function ChallengeView() {

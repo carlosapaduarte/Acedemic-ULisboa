@@ -65,11 +65,11 @@ async function createUser(username: string, password: string) {
         return Promise.reject(new Error("User creation was not possible!"));
 }
 
-async function createBatch(level: LevelType) {
+async function createBatch(level: LevelType, challengeIds: number[] | number[][]) {
     const request = {
         path: `academic-challenge/users/me/batches`,
         method: "POST",
-        body: toJsonBody({ level: level })
+        body: toJsonBody({ level: level, challengeIds: challengeIds })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -105,23 +105,17 @@ export type UserNote = {
     date: number
 }
 
-// Almost like DayAndChallenge but without challenge description
-export type ChallengeAndDate = {
-    name: string;
-    date: number
-}
-
-export type CompletedChallenge = {
-    challengeDay: number
-    id: number
-    conclusionDate: number
+export type StoredChallenge = {
+    id: number,
+    challengeDay: number,
+    completionDate: number | null
 }
 
 export type Batch = {
     id: number,
     startDate: number,
     level: number,
-    completedChallenges: CompletedChallenge[]
+    challenges: StoredChallenge[][]
 }
 
 // User info
@@ -142,7 +136,7 @@ async function fetchUserInfoFromApi(): Promise<UserInfo> {
     const response: Response = await doFetch(request);
 
     if (response.ok) {
-        const responseObject: UserInfo = await response.json(); // TODO: how
+        const responseObject: UserInfo = await response.json();
         return responseObject;
     } else
         return Promise.reject(new Error("User info could not be obtained!"));

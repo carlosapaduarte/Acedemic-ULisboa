@@ -2,8 +2,7 @@ import React from "react";
 
 import styles from "./progressBar.module.css";
 
-export function ProgressBar() {
-    const progress = 30;
+export function ProgressBar({ progress }: { progress: number }) {
     return (
         <div className={styles.progressBarContainer}>
             <div className={styles.progressBar}>

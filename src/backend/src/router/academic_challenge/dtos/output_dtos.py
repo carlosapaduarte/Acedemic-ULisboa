@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
-from domain.commons.user import Batch, CompletedChallenge, UserNote
+from domain.commons.user import Batch, UserNote, Challenge
 from utils import get_datetime_utc
 
 
 class UserNoteDto(BaseModel):
     name: str
     date: int
-    
+
     @staticmethod
     def fromUserNotes(user_notes: list[UserNote]) -> list['UserNoteDto']:
         user_notes_dtos: list[UserNoteDto] = []
@@ -16,43 +16,45 @@ class UserNoteDto(BaseModel):
                 name=note.name,
                 date=get_datetime_utc(note.created)
             ))
-            
+
         return user_notes_dtos
-        
-    
-class CompletedChallengeDto(BaseModel):
-    challengeDay: int
+
+
+class ChallengeDto(BaseModel):
     id: int
-    conclusionDate: int
-    
+    challengeDay: int
+    completionDate: int | None
+
     @staticmethod
-    def fromCompletedChallenges(completed_challenges: list[CompletedChallenge]) -> list['CompletedChallengeDto']:
-        completed_challenges_dtos: list[CompletedChallengeDto] = []
-        for completed_challenge in completed_challenges:
-            completed_challenges_dtos.append(CompletedChallengeDto(
-                challengeDay=completed_challenge.challenge_day,
-                    id=completed_challenge.id,
-                    conclusionDate=get_datetime_utc(completed_challenge.conclusion_date)
+    def fromChallenges(challenges: list[Challenge]) -> list[list['ChallengeDto']]:
+        challenges_dtos: list[list['ChallengeDto']] = [[] for _ in range(21)]
+
+        for challenge in challenges:
+            index = challenge.challenge_day - 1
+            challenges_dtos[index].append(ChallengeDto(
+                id=challenge.id,
+                challengeDay=challenge.challenge_day,
+                completionDate=get_datetime_utc(challenge.completion_date) if challenge.completion_date else None
             ))
-            
-        return completed_challenges_dtos
-    
+
+        return challenges_dtos
+
+
 class BatchDto(BaseModel):
     id: int
     startDate: int
     level: int
-    completedChallenges: list[CompletedChallengeDto]
-    
+    challenges: list[list[ChallengeDto]]
+
     @staticmethod
     def fromBatches(batches: list[Batch]) -> list['BatchDto']:
         batches_dtos: list[BatchDto] = []
         for batch in batches:
-            completed_challenges_dtos = CompletedChallengeDto.fromCompletedChallenges(batch.completed)
             batches_dtos.append(BatchDto(
                 id=batch.id,
                 startDate=get_datetime_utc(batch.start_date),
                 level=batch.level,
-                completedChallenges=completed_challenges_dtos
+                challenges=ChallengeDto.fromChallenges(batch.challenges)
             ))
-            
+
         return batches_dtos

@@ -5,10 +5,9 @@ import React from "react";
 import styles from "./challenges.module.css";
 import { useTranslation } from "react-i18next";
 
-export default function Challenges({ currentDayNumber, challenges, completedChallenges, onMarkComplete }: {
+export default function Challenges({ currentDayNumber, challenges, onMarkComplete }: {
     currentDayNumber: number,
     challenges: Challenge[],
-    completedChallenges: number[],
     onMarkComplete: (challenge: Challenge) => void
 }) {
     const { t } = useTranslation(["dashboard"]);
@@ -20,14 +19,13 @@ export default function Challenges({ currentDayNumber, challenges, completedChal
                 {t("dashboard:day")} {currentDayNumber}
             </h1>
             {challenges.map((challenge: Challenge) => {
-                const completed = completedChallenges.find((completedChallengeId) => challenge.id == completedChallengeId);
                 return (
                     <div key={challenge.id}
                          style={{ display: "flex", flexDirection: "column", justifyContent: "start" }}>
                         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                             <h2 className={styles.challengeTitle}>{challenge.title}</h2>
                             {
-                                completed ?
+                                challenge.completionDate != null ?
                                     <p style={{
                                         textAlign: "left",
                                         width: "100%",
@@ -48,7 +46,7 @@ export default function Challenges({ currentDayNumber, challenges, completedChal
                                 {t("dashboard:add_note")}
                             </CutButton>
                             {
-                                completed ?
+                                challenge.completionDate != null ?
                                     <></>
                                     :
                                     <CutButton className={styles.completeChallengeButton}

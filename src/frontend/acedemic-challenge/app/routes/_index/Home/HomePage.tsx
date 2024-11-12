@@ -12,7 +12,7 @@ export default function HomePage() {
 
     return (
         <div className={styles.homePage}>
-            <ProgressBar />
+            <ProgressBar progress={40} />
             <ChallengeView />
         </div>
     );

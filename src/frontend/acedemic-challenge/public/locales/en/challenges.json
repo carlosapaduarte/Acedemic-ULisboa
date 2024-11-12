@@ -1,0 +1,196 @@
+{
+    "level1": {
+        "challenge0": {
+            "title": "Wake Up",
+            "description": "The first day is an invitation to start this challenge on the right foot. It is the first step to do things differently, to be more present, to dream and to believe in the realization of your goals. Choose a phrase or word that inspires you and repeat it throughout the day."
+        },
+        "challenge1": {
+            "title": "Conscious Walking",
+            "description": "The second day is an invitation to set goals: the art of knowing where you are going and with what purpose. Walking consciously presupposes knowing where you are now and where you want to go. Therefore, establish at least one specific academic goal that you have for this week. Write it down and place it in a visible place for you."
+        },
+        "challenge2": {
+            "title": "Plan",
+            "description": "Today's challenge is to plan your study schedule for this week. Think about the goals you set yesterday and include in your plan the tasks you should do daily."
+        },
+        "challenge3": {
+            "title": "Knowing How",
+            "description": "Do you know that moment during the exam season when you think 'I should have started studying earlier'? Today's challenge is an opportunity for that. Review the main concepts given in your classes today. Dedicate 25 minutes of your day to consolidate knowledge."
+        },
+        "challenge4": {
+            "title": "Silence",
+            "description": "The fifth day is an invitation to silence. Find a place for a study period without distractions and disconnect from everything. Choose to silence the world around you for 1 hour, putting your phone / tablet / computer in 'do not disturb' mode or choose to turn it off."
+        },
+        "challenge5": {
+            "title": "Daily Page",
+            "description": "Are you up to date with your reading? Choose an article, chapter or book related to your course and read at least three pages. Write down your main doubts and reflections."
+        },
+        "challenge6": {
+            "title": "Day of Compassion",
+            "description": "Today try to be your best friend. Imagine that a friend of yours is feeling demotivated with his academic life. What would be the best attitude you could have to help him? Apply that attitude to yourself."
+        },
+        "challenge7": {
+            "title": "Week's Compass",
+            "description": "Congratulations! You have reached the end of a week. Today is a day to reflect. Identify the most important tasks to be completed during the next week. Leave this list in an easily accessible place for you. Think about what may be more important and urgent to accomplish."
+        },
+        "challenge8": {
+            "title": "Question",
+            "description": "On the ninth day the invitation is to ask. Of what you studied and read so far, what raised the most doubts? Ask a teacher or colleague a question you have. Seek clarification and deepen your understanding."
+        },
+        "challenge9": {
+            "title": "Update",
+            "description": "Do you know or use any app that helps you manage your study? If your answer was yes, dedicate 20 minutes of today to understand what has worked well and what you can improve. But, if on the contrary, you have not yet joined anything of the kind, talk to a friend or colleague and find out what he uses. Venture out and get to know that whole world! Note: if the Logbook app has already been released, the challenge becomes to know it."
+        },
+        "challenge10": {
+            "title": "Organize",
+            "description": "The eleventh day is an invitation to organize. Organize your study materials and notes. Do not forget to also keep your study space tidy and functional."
+        },
+        "challenge11": {
+            "title": "Day of Being",
+            "description": "Today's challenge is an invitation to free yourself from the requirement. Take care of yourself and who you are, dedicating 2 hours of your day to leisure and rest. What do you feel like doing for yourself today that is consciously? Just standing still is not worth it..."
+        },
+        "challenge12": {
+            "title": "Help",
+            "description": "Are you particularly interested in a subject and/or feel that you master it? Offer help to a colleague. Share your knowledge and strengthen the collaboration and relationship between colleagues. You will see that this also helps you to structure the knowledge you have."
+        },
+        "challenge13": {
+            "title": "Knowing How to Stop",
+            "description": "When you study, do you usually take breaks? Today's challenge is precisely that. Whatever happens in your study moment, dedicate 10 minutes to self-care. Take a walk outdoors, meditate, a relaxing break... whatever makes you feel better."
+        },
+        "challenge14": {
+            "title": "Reflect",
+            "description": "On this fifteenth day the invitation is to reflect. Reflect on a recent academic mistake and how you can improve. Learn from your mistakes and adjust your strategies. If it is easier, list the mistakes you identify and propose at least one strategy for each error."
+        },
+        "challenge15": {
+            "title": "Group Study",
+            "description": "Today the focus is on collaboration. Combine and meet with some colleagues for a study session. Choose a topic that everyone needs to review and discuss. Take advantage of the diversity of knowledge and study strategies to enrich your learning."
+        },
+        "challenge16": {
+            "title": "Experiment",
+            "description": "The seventeenth day is an invitation to experiment. Choose a study technique that you have not yet used. Flashcards, mind maps, PLEMA method, Feynman... there is a whole world for you to explore. Venture out and discover what works best for you!"
+        },
+        "challenge17": {
+            "title": "Day of Recognition",
+            "description": "Today is a day to appreciate. Reflect on your academic journey so far. State a positive aspect of your academic life. Recognize your achievements and value your effort. What are you proud of in your journey?"
+        },
+        "challenge18": {
+            "title": "Knowing How to Do",
+            "description": "The challenge of the nineteenth day is to practice. If you have come this far, you have read a lot and studied during these days. Do a practical exercise or solve a problem related to one of your curricular units that you found very difficult. Show yourself that you can do it too!"
+        },
+        "challenge19": {
+            "title": "Overcoming Fear",
+            "description": "Great challenges bring us great learning and transformations. Therefore, on the twentieth day the invitation is to face an academic challenge that you have avoided. Face your fears and overcome your difficulties, dedicating 15 minutes to something you have avoided. Do not worry about perfection, what really matters is that you start. You can do it!"
+        },
+        "challenge20": {
+            "title": "Day of Victory",
+            "description": "You believed in these 21 days and made it happen. Now, it's time to reflect on this journey, celebrating the achievements and setting new goals. What do you take from this challenge? Write a word that defines this experience and choose three actions that you will implement from now on."
+        }
+    },
+    "level2": {
+        "challenge0": {
+            "title": "Horizon",
+            "description": "Welcome to the first challenge! Today is the day to set a specific academic goal for the week. What do you really want to achieve this week? Remember: it can be something symbolic, the important thing is that it is meaningful to you!"
+        },
+        "challenge1": {
+            "title": "Plan",
+            "description": "Today's challenge is to plan the week. Think about the goal you set yesterday and subdivide it into daily goals, so you know which tasks you should do daily. Only then will you be able to monitor your progress and readjust strategies. Every time you meet a goal you are one step closer to achieving what you aspire to!"
+        },
+        "challenge2": {
+            "title": "Prioritize",
+            "description": "We know that sometimes it can be tempting to perform several tasks at the same time. Therefore, on the third day the challenge is to prioritize. Focus on the most important task of the day and complete it before dedicating your time to other activities. Before making your choice, check if there is an important task that you are avoiding... Remember that by prioritizing you are ensuring that what is most important receives the attention it deserves."
+        },
+        "challenge3": {
+            "title": "Much More Than Review",
+            "description": "On the fourth day the challenge is an opportunity to have your study up to date. Review the concepts given in your classes today, dedicating 90 minutes of your day to consolidate knowledge. For each content and/or bibliography you study, prepare a study / summary sheet. After all, reviewing is the best way to ensure deep and lasting learning."
+        },
+        "challenge4": {
+            "title": "Silence",
+            "description": "The fifth day is an invitation to silence. Find a place for a study period without distractions and disconnect from everything. Define how long you will study and choose to silence the world around you in that period, putting your phone / tablet / computer in 'do not disturb' mode or choose to turn it off. Do not forget to incorporate study breaks!"
+        },
+        "challenge5": {
+            "title": "Critical Analysis",
+            "description": "Are you up to date with your reading? Choose an article or chapter related to your course and write a critical analysis of its content. Think about its strengths and weaknesses and your own interpretations of the material. This is an opportunity to exercise your critical thinking and deepen knowledge. Do not be afraid to express your interpretations!"
+        },
+        "challenge6": {
+            "title": "Diary",
+            "description": "Do you know the doubts that arose in the critical analysis of yesterday? The seventh day is an invitation to register. Reflecting and recording ideas is a very important step for your growth as a student. Try to write down your doubts and insights. A study diary is a valuable tool for organizing thought. And... do not worry if the answers do not come all at once, what matters is that you are looking to learn every day!"
+        },
+        "challenge7": {
+            "title": "Celebrate",
+            "description": "At the end of this first week of challenge, take a moment to recognize your effort. Reflect on how you have progressed in your goals for the week and reward yourself in a healthy way, even if you do not feel completely satisfied. Celebrating small steps helps maintain motivation and recognize your worth. As a reward you can think of something simple, like having leisure time, doing an activity you like or you can choose a gift for yourself! Keep up the good work!"
+        },
+        "challenge8": {
+            "title": "Right Foot",
+            "description": "Today is the day to start the week on the right foot, organizing the study / summary sheets of the contents given in the classes of the past week. Remember that having organized study brings a sense of control and confidence. You will see that it is not that difficult..."
+        },
+        "challenge9": {
+            "title": "Connection",
+            "description": "Today the challenge is to take care of yourself. Reserve at least 30 minutes for a walk outdoors, preferably in a green area. Allow yourself to disconnect from worries and responsibilities. Connect with nature, enjoying the view, sounds and smells. Enjoy every minute without weight on your conscience. Taking care of yourself is essential to maintain motivation and concentration."
+        },
+        "challenge10": {
+            "title": "Overcome",
+            "description": "Do you know that work / exercise that you have been avoiding for a long time? Today is the day to dedicate yourself to it. Face your fears and overcome your difficulties, dedicating at least 1 hour to something you have avoided. Do not worry about perfection, what matters is that you start."
+        },
+        "challenge11": {
+            "title": "Training",
+            "description": "On the twelfth day the challenge is to improve your communication skills. Do you have a presentation of a work soon? A seminar / congress? Dedicate time to train that presentation. You will see how much more confident you will feel facing the public!"
+        },
+        "challenge12": {
+            "title": "Mentoring",
+            "description": "Today the challenge is to let yourself be helped. If you feel you need guidance in your studies, look for a mentor. You can go to a teacher's office hours, a more experienced colleague or even someone outside the Faculty. If your Faculty has a mentoring program, you can also look for help there! If not, be creative in your search!"
+        },
+        "challenge13": {
+            "title": "Question of the Day",
+            "description": "The fourteenth day is an invitation to your curiosity. Formulate a relevant question about the contents you have studied during the week and dedicate time to know its answer. You can choose to research autonomously or ask a teacher or colleague."
+        },
+        "challenge14": {
+            "title": "Timed",
+            "description": "Do you know how long it takes you to read an article or solve an exercise? Today the challenge is to become more aware of how you use your time. Choose a task that you need to complete and turn on the stopwatch. During the task, monitor how much you are progressing during the timed time and, in the end, reflect on your performance. Ask yourself: “does this time make sense to me?”, “what did I manage to conclude?”, “can I do it in less time?”."
+        },
+        "challenge15": {
+            "title": "Future Map",
+            "description": "Today the challenge is to map knowledge. Choose an exam from a previous year or a list of exercises and dedicate time to analyze its content. Solve exercises that apply given matter without consulting notes and, in the end, record the questions you missed or found most challenging, to assess your mastery of the subject. If you come across matter you have not yet given, do not ignore it! Use these questions to get an idea of the topics you are still going to study and start getting familiar with their evaluation. You will see that this way you will deconstruct the “seven-headed beast” that evaluations seem to you."
+        },
+        "challenge16": {
+            "title": "Grow and Learn",
+            "description": "On the seventeenth day the challenge is to improve. Think of a skill / competence in which you are not so good or that you would like to improve. It can be something related to study (e.g., writing, research) or more personal (e.g., time management, communication). The important thing is to create a plan to develop it. Think about the resources you have at your disposal: a course, a book, a colleague's help... everything counts!"
+        },
+        "challenge17": {
+            "title": "Embrace Knowledge",
+            "description": "Today the challenge is to choose a workshop, lecture or webinar to attend on a topic that complements, but is not part of the main curriculum of your course. This will help you expand your knowledge and develop a broader perspective on your area. By investing in this type of initiative, you are not only enriching your skills, but also demonstrating initiative and differentiating your professional profile from others."
+        },
+        "challenge18": {
+            "title": "(Un)known",
+            "description": "On the nineteenth day the challenge is to simulate. Imagine that you are a teacher of one of your curricular units. Prepare an exam, based on your review of the contents. Prepare for the unknown, thinking about what is most likely to come out, type of question... this will help you identify areas that need more review and prepare real evaluations. Oh, do not forget to take a little time from your week to solve this exam!"
+        },
+        "challenge19": {
+            "title": "Ritual",
+            "description": "Today the challenge is to establish a routine before going to sleep. Avoid using technological devices at least one hour before your bedtime. Instead, create a ritual that includes light reading, meditation, hot bath, listening to music... You will see how the quality of your sleep will improve. Before you move away from your phone, do not forget to activate the 'do not disturb' mode."
+        },
+        "challenge20": {
+            "title": "The Letter",
+            "description": "You believed in these 21 days and made it happen. Now, it's time to reflect on this journey, celebrating the achievements and setting new goals. What do you take from this challenge? Write “a letter” to your future self and tell him how you would like to be as a student: what are your goals / ambitions and how do you plan to achieve them. Write your commitment to yourself. Write this letter in the easiest place for you. The notepad on your phone also counts!"
+        }
+    },
+    "level3": {
+        "challenge0": {
+            "title": "Task List",
+            "description": "Prepare / adjust my daily task list, taking into account: my daily goals, obligations and responsibilities, daily study reviews, assignments, etc."
+        },
+        "challenge1": {
+            "title": "Day Review",
+            "description": "Quickly review the concepts given in the classes, through notes, summaries, flashcards, videos, exercises, class slides, etc."
+        },
+        "challenge2": {
+            "title": "Maintain Focus",
+            "description": "Be able to study / prepare assignments without distractions for at least 1 hour."
+        },
+        "challenge3": {
+            "title": "Time for Me",
+            "description": "Reserve at least 30 minutes for an activity / task that you like to do (e.g., physical exercise, reading, listening to a podcast, running, meditating)."
+        },
+        "challenge4": {
+            "title": "Rest",
+            "description": "Sleep the recommended number of hours for me."
+        }
+    }
+}

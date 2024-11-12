@@ -2,14 +2,11 @@ import { useIsLoggedIn, useLogIn } from "~/components/auth/Authn";
 import { useState } from "react";
 import { service } from "~/service/service";
 import styles from "./authenticationPage.module.css";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Label, TextField } from "react-aria-components";
 
 function useUserInfoPage() {
     const logIn = useLogIn();
-
-    const setGlobalError = useSetGlobalError();
 
     // This function should redirect user to ULisboa authentication page,
     // so he can obtain an access token
@@ -18,16 +15,14 @@ function useUserInfoPage() {
         await service.createUser(username, password)
             .then(() => {
                 login(username, password);
-            })
-            .catch((error) => setGlobalError(error));
+            });
     }
 
     async function login(username: string, password: string) {
         await service.login(username, password)
             .then(() => {
                 logIn();
-            })
-            .catch((error) => setGlobalError(error));
+            });
     }
 
     return { createUser, login };

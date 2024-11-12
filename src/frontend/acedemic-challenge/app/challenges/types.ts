@@ -1,7 +1,9 @@
 export type Challenge = {
     id: number,
+    day: number,
     title: string,
-    description: string
+    description: string,
+    completionDate: Date | null
 }
 
 export type DayChallenges = {
