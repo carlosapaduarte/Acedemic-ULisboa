@@ -39,7 +39,7 @@ function MainContent() {
                     :
                     (
                         <>
-                            <MyCalendar onDayClickHandler={handleDateClick} />
+                            <MyCalendar challenges={challenges} onDayClickHandler={handleDateClick} />
                             <DayContent
                                 challenges={challenges}
                                 selectedDate={selectedDate}

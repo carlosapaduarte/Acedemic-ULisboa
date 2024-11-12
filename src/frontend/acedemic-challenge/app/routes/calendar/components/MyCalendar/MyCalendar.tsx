@@ -3,6 +3,8 @@ import { utils } from "~/utils";
 import { Button, CutButton } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
 import styles from "./myCalendar.module.css";
+import classNames from "classnames";
+import { DayChallenges } from "~/challenges/types";
 
 const weekdays = ["calendar:weekdays.sunday", "calendar:weekdays.monday", "calendar:weekdays.tuesday",
     "calendar:weekdays.wednesday", "calendar:weekdays.thursday", "calendar:weekdays.friday", "calendar:weekdays.saturday"];
@@ -124,32 +126,76 @@ function WeekHeader() {
     );
 }
 
-function Day({ day, onDayClick }: { day: CalendarDay, onDayClick: (day: CalendarDay) => void }) {
+function Day(
+    {
+        day, onDayClick, hasChallenge, selected
+    }: {
+        day: CalendarDay, onDayClick: (day: CalendarDay) => void,
+        selected: boolean,
+        hasChallenge: boolean
+    }
+) {
     const isCurrentMonth = day.currentMonth;
 
     const isToday = utils.sameDay(day.date, new Date());
 
     return (
-        <CutButton className={`${styles.calendarDayContainer}`} onClick={() => onDayClick(day)}>
-            <h1 className={
-                `${styles.calendarDayText}
-                ${isToday ? styles.today : ""}
-                ${isCurrentMonth ? "" : styles.notCurrentMonth}`}>
-                {day.number} {/*.toString().padStart(2, "0")*/}
+        <CutButton
+            className={classNames(
+                styles.calendarDayContainer,
+                { [styles.today]: isToday },
+                { [styles.notCurrentMonth]: !isCurrentMonth },
+                { [styles.hasChallenge]: hasChallenge },
+                { [styles.selected]: selected }
+            )}
+            onClick={() => onDayClick(day)}
+        >
+            <h1 className={classNames(
+                styles.calendarDayText,
+                { [styles.today]: isToday },
+                { [styles.notCurrentMonth]: !isCurrentMonth },
+                { [styles.hasChallenge]: hasChallenge },
+                { [styles.selected]: selected }
+            )}>
+                {day.number}
             </h1>
         </CutButton>
     );
 }
 
-function CalendarDays({ visibleMonth, onDayClick }: { visibleMonth: Date, onDayClick: (day: CalendarDay) => void }) {
+function CalendarDays(
+    {
+        challenges, visibleMonth, onDayClick
+    }: {
+        challenges: DayChallenges[], visibleMonth: Date, onDayClick: (day: CalendarDay) => void
+    }) {
     const { currentDays } = useCalendarDays(visibleMonth);
+    const [selectedDay, setSelectedDay] = useState<CalendarDay>({
+        currentMonth: true,
+        date: new Date(),
+        month: new Date().getMonth(),
+        number: new Date().getDate(),
+        selected: true,
+        year: new Date().getFullYear()
+    });
+
+    const daysWithChallenges = challenges.map((challenge) => {
+        return challenge.date.toDateString();
+    });
 
     return (
         <>
             {
                 currentDays.map((day: CalendarDay, index: number) => {
                     return (
-                        <Day key={index} day={day} onDayClick={onDayClick} />
+                        <Day key={index}
+                             day={day}
+                             hasChallenge={daysWithChallenges.includes(day.date.toDateString())}
+                             selected={selectedDay !== null && utils.sameDay(selectedDay.date, day.date)}
+                             onDayClick={(day) => {
+                                 setSelectedDay(day);
+                                 onDayClick(day);
+                             }} />
                     );
                 })
             }
@@ -157,22 +203,36 @@ function CalendarDays({ visibleMonth, onDayClick }: { visibleMonth: Date, onDayC
     );
 }
 
-function CalendarGrid({ visibleMonth, onDayClick }: { visibleMonth: Date, onDayClick: (day: CalendarDay) => void }) {
+function CalendarGrid(
+    {
+        challenges, visibleMonth, onDayClick
+    }: {
+        challenges: DayChallenges[],
+        visibleMonth: Date, onDayClick: (day: CalendarDay) => void
+    }
+) {
     return (
         <div className={`${styles.calendarGridContainer}`}> {/*${styles.switched}*/}
             <WeekHeader />
-            <CalendarDays visibleMonth={visibleMonth} onDayClick={onDayClick} />
+            <CalendarDays challenges={challenges} visibleMonth={visibleMonth} onDayClick={onDayClick} />
         </div>
     );
 }
 
-export function MyCalendar({ onDayClickHandler }: { onDayClickHandler: (day: CalendarDay) => void }) {
+export function MyCalendar(
+    {
+        challenges, onDayClickHandler
+    }: {
+        challenges: DayChallenges[],
+        onDayClickHandler: (day: CalendarDay) => void
+    }
+) {
     const { visibleMonth, monthChangeActionHandler } = useVisibleMonth();
 
     return (
         <div className={`${styles.myCalendar}`}>
             <ChangeViewButtons visibleMonth={visibleMonth} onButtonClick={monthChangeActionHandler} />
-            <CalendarGrid visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
+            <CalendarGrid challenges={challenges} visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
         </div>
     );
 }

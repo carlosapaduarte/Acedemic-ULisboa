@@ -74,14 +74,34 @@
     background-color: var(--third-color);
 }
 
+.calendarDayContainer.hasChallenge {
+    background-color: var(--secondary-color);
+}
+
+.calendarDayContainer.notCurrentMonth {
+    opacity: 0.75;
+}
+
+.calendarDayContainer.selected {
+    background-color: var(--fourth-color);
+}
+
 .calendarDayText {
     font-size: 150%;
     color: white;
     font-family: var(--font-family2), sans-serif;
 }
 
+.calendarDayText.hasChallenge {
+    color: black;
+}
+
+.calendarDayText.selected {
+    color: black;
+}
+
 .calendarDayText.today {
-    color: red;
+    color: #980000;
 }
 
 .calendarDayText.notCurrentMonth {
