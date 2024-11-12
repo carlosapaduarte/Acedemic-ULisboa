@@ -7,46 +7,16 @@ import styles from "./statistics.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { TaskDistribution } from "./TaskDistribution";
 import { Progress } from "./Progress";
-
-function WeekStats({ week, stats }: { week: string, stats: any }) {
-    return (
-        <div>
-            <h1>{week}</h1>
-            {stats ?
-                Object.keys(stats).map(key =>
-                    <div>
-                        <p>Tag: {key}</p>
-                        <p>Hours: {stats[key]}</p>
-                    </div>
-                )
-                :
-                <></>
-            }
-        </div>
-    );
-}
-
-function YearStats({ year, stats }: { year: string, stats: any }) {
-    return (
-        <>
-            <h1>{year}</h1>
-            {stats ?
-                Object.keys(stats).map(key =>
-                    <WeekStats week={key} stats={stats[key]} />
-                )
-                :
-                <></>
-            }
-        </>
-    );
-}
+import { useTranslation } from "react-i18next";
 
 export default function Statistics() {
+    const { t } = useTranslation(["statistics"]);
+    
     return (
         <RequireAuthn>
             <div className={styles.pageTitleDiv}>
                 <span className={styles.pageTitle}>
-                    Statistics
+                    {t("statistics:title")}
                 </span>
             </div>
             <EnergyStats />

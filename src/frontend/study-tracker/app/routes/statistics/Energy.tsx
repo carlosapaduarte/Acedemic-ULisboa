@@ -5,6 +5,7 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { DailyEnergyStatus, service } from "~/service/service";
 import { utils } from "~/utils";
 import { NoDataYetAvailableMessage, SeeFullHistory, Spacer } from "./Commons";
+import { useTranslation } from "react-i18next";
 
 export function getEnergyIconByEnergyLevel(energyLevel: number): string {
     const prefix = "/icons/"
@@ -81,10 +82,11 @@ function levelToColor(level: number): string {
 }
 
 function TodayDate() {
+    const { t } = useTranslation(["statistics"]);
     const today = new Date();
     return (
         <div className={styles.containerHeaderDate}>
-            TODAY, {today.getDate()} {today.toLocaleString("default", { month: "long" })}
+            {t("statistics:today")}, {today.getDate()} {today.toLocaleString("default", { month: "long" })}
         </div>
     );
 }
@@ -104,12 +106,13 @@ function Tags() {
 }
 
 function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }) {
+    const { t } = useTranslation(["statistics"]);
     return (
         <>
             {status ?
                 <div className={classNames(levelToColor(status.level), styles.todayEnergyStatusTitle)}>
                     <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon" className={styles.icon}/>
-                    I feel {levelToStr(status.level)}
+                    {t("statistics:i_feel")} {levelToStr(status.level)}
                 </div>
                 :
                 <NoDataYetAvailableMessage />
@@ -142,6 +145,7 @@ function useEnergyStats() {
 }
 
 export function EnergyStats() {
+    const { t } = useTranslation(["statistics"]);
     const {
         energyHistory,
         getTodayEnergyStatus
@@ -157,7 +161,7 @@ export function EnergyStats() {
                 <div className={styles.statsContainerTitleAndDateDiv}>
                     <div className={styles.statsContainerTitle}>
                         <img src="/icons/energy_container_title_icon.png" alt="Energy Title Icon" className={styles.titleImg}/>
-                        Energy
+                        {t("statistics:energy_container_title")}
                     </div>
                     <TodayDate />
                 </div>

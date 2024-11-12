@@ -1,18 +1,18 @@
+import { useTranslation } from "react-i18next";
 import styles from "./statistics.module.css";
 
 export function Spacer() {
     return (
-        <div className={styles.spacer}>
-
-        </div>
+        <div className={styles.spacer} />
     )
 }
 
 export function SeeFullHistory() {
+    const { t } = useTranslation(["statistics"]);
     return (
         <button className={styles.seeFullHistoryButton}>
             <img src="/icons/history_icon.svg" alt="History Icon" className={styles.historyIcon}/>
-            See full history
+            {t("statistics:see_full_history")}
         </button>
     )
 }
@@ -36,17 +36,19 @@ export function getWeekIntervalStr(date: Date): string {
 }
 
 export function CurWeekDate() {
+    const { t } = useTranslation(["statistics"]);
     return (
         <span className={styles.containerHeaderDate}>
-            WEEK {getWeekIntervalStr(new Date())}
+            {t("statistics:week")} {getWeekIntervalStr(new Date())}
         </span>
     );
 }
 
 export function NoDataYetAvailableMessage() {
+    const { t } = useTranslation(["statistics"]);
     return (
         <div className={styles.noDataAvailableMessage}>
-            No data available, yet...
+            {t("statistics:no_data_available_yet")}
         </div>
     )
 }

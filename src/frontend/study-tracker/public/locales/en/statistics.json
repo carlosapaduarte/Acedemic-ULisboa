@@ -1,7 +1,28 @@
 {
+    "title": "Statistics",
+    "energy_container_title": "ENERGY",
     "energy_level": "Energy level:",
     "energy_question": "How much energy do you have today?",
+    "i_feel": "I feel",
+
+    "focus_container_title": "FOCUS",
+    "total_time_study": "Total time study",
+    "average_attention_span": "Average attention span",
+    
+    "workload_distribution_container_title": "WORKLOAD DISTRIBUTION",
+
+    "progress_container_title": "PROGRESS",
+
     "save": "Save",
     "secondary_message": "Your study plan will adapt to it",
-    "skip": "Skip"
+    "skip": "Skip",
+
+    "no_data_available_yet": "No data available, yet...",
+    
+    "week": "WEEK",
+    "today": "TODAY",
+    "minutes": "minutes",
+
+    "see_full_history": "See full history",
+    "history": "History"
 }

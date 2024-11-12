@@ -4,6 +4,7 @@ import { DailyTasksProgress, service } from "~/service/service";
 import styles from "./statistics.module.css";
 import { CurWeekDate, NoDataYetAvailableMessage, SeeFullHistory } from "./Commons";
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 function ProgressIcon({progress} : {progress: number}) {
     function getRandomInt(max: number) {
@@ -140,6 +141,7 @@ function useProgress() {
 }
 
 export function Progress() {
+    const { t } = useTranslation(["statistics"]);
     const {progressByDay, weekProgress} = useProgress()
     
     return (
@@ -151,7 +153,7 @@ export function Progress() {
                         alt="Task progress icon" 
                         className={styles.titleImg} 
                     />
-                    Progress
+                    {t("statistics:progress_container_title")}
                 </div>
 
                 <div className={styles.WeekDateAndProgressBar}>

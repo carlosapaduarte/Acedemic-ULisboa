@@ -11,6 +11,7 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service, TaskDistributionPerWeek } from "~/service/service";
 import { utils } from "~/utils";
 import { LetterFrequency } from "@visx/mock-data/lib/mocks/letterFrequency";
+import { useTranslation } from "react-i18next";
 
 function LegendItem({tag, color} : {tag: string, color: string}) {
     return (
@@ -190,6 +191,7 @@ function useTaskDistribution() {
 }
 
 export function TaskDistribution() {
+    const { t } = useTranslation(["statistics"]);
     const {stats} = useTaskDistribution()
     //console.log(stats)
     
@@ -202,7 +204,7 @@ export function TaskDistribution() {
                         alt="Workload distribution icon" 
                         className={styles.titleImg} 
                     />
-                    Workload distribution
+                    {t("statistics:workload_distribution_container_title")}
                 </div>
                 <div className={styles.containerAlignRight}>
                     <CurWeekDate />

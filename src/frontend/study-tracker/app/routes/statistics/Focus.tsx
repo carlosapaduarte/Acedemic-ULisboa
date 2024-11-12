@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
 import { CurWeekDate, getWeekIntervalStr, NoDataYetAvailableMessage, SeeFullHistory, Spacer } from "./Commons";
+import { useTranslation } from "react-i18next";
 
 function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
     return (
@@ -57,12 +58,13 @@ function BarChart({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[
 
 
 function HistoryStats({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeStudy[]}) {
+    const { t } = useTranslation(["statistics"]);
     return (
         weekStudyTimeHistory.length != 0 ?
             <>
                 <div className={styles.historyTitleAndSeeMore}>
                     <span className={styles.historyTitle}>
-                        History
+                        {t("statistics:history")}
                     </span>
                     <SeeFullHistory />
                 </div>
@@ -77,6 +79,8 @@ function HistoryStats({weekStudyTimeHistory} : {weekStudyTimeHistory: WeekTimeSt
 }
 
 function CurWeekFocusStats({weekStats} : {weekStats: WeekTimeStudy}) {
+    const { t } = useTranslation(["statistics"]);
+
     function toHoursAndMinutesStr(totalMinutes: number): string {
         const hours = Math.trunc(totalMinutes / 60);
         const minutes = totalMinutes - hours * 60;
@@ -85,15 +89,21 @@ function CurWeekFocusStats({weekStats} : {weekStats: WeekTimeStudy}) {
 
     return (
         <>
-            <span className={styles.focusContainerCurWeekStatisticTitle}>Total time study</span>
+            <span className={styles.focusContainerCurWeekStatisticTitle}>
+                {t("statistics:total_time_study")}
+            </span>
             <br />
             <span className={styles.focusContainerCurWeekStatisticValue}>{toHoursAndMinutesStr(weekStats.total)}</span>
 
             <Spacer />
 
-            <span className={styles.focusContainerCurWeekStatisticTitle}>Average attention span</span>
+            <span className={styles.focusContainerCurWeekStatisticTitle}>
+                {t("statistics:average_attention_span")}
+            </span>
             <br />
-            <span className={styles.focusContainerCurWeekStatisticValue}>{weekStats.averageBySession} minutes</span>
+            <span className={styles.focusContainerCurWeekStatisticValue}>{weekStats.averageBySession}
+                {t("statistics:minutes")}
+            </span>
 
             <Spacer />
         </>
@@ -122,6 +132,7 @@ function useFocusStats() {
 }
 
 export function FocusStats() {
+    const { t } = useTranslation(["statistics"]);
     const { weekStudyTimeHistory, getCurrentWeekStudyTime } = useFocusStats();
     const curWeekStats = getCurrentWeekStudyTime();
 
@@ -129,7 +140,7 @@ export function FocusStats() {
         <div className={styles.statsContainer}>
             <div className={styles.statsContainerTitleAndDateDiv}>
                 <div className={styles.statsContainerTitle}>
-                    (O) Focus
+                    (O) {t("statistics:focus_container_title")}
                 </div>
                 <CurWeekDate />
             </div>
