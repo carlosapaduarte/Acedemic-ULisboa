@@ -1,6 +1,6 @@
 export type Challenge = {
     id: number,
-    day: number,
+    challengeDay: number,
     title: string,
     description: string,
     completionDate: Date | null

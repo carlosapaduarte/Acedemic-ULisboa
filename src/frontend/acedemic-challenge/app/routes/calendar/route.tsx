@@ -29,7 +29,6 @@ function DayContent({ challenges, selectedDate, userNotes, onConfirmNewNoteSubmi
 function MainContent() {
     const { challenges, userNotes, selectedDate, handleDateClick, onConfirmNewNoteSubmitClickHandler } = useCalendar();
 
-
     return (
         <div className={`${styles.mainContent}`}>
             {

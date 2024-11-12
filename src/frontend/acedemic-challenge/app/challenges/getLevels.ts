@@ -16,7 +16,7 @@ import { StoredChallenge } from "~/service/service";
 export function getFullChallenge(level: number, storedChallenge: StoredChallenge, t: (key: string) => string): Challenge {
     return {
         id: storedChallenge.id,
-        day: storedChallenge.challengeDay,
+        challengeDay: storedChallenge.challengeDay,
         title: t(`level${level}.challenge${storedChallenge.id}.title`),
         description: t(`level${level}.challenge${storedChallenge.id}.description`),
         completionDate: storedChallenge.completionDate ? new Date(storedChallenge.completionDate * 1000) : null
