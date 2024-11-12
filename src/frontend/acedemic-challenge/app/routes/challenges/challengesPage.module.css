@@ -132,9 +132,9 @@ Doesn't work, use SCSS
 .challengeBox .challengeContainer {
     width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
-    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .challengeBox .challengeTitle {
@@ -149,6 +149,37 @@ Doesn't work, use SCSS
     overflow: hidden;
 }
 
+.buttonsContainer {
+    padding-right: 1rem;
+    margin-top: 0.5rem;
+
+    min-height: 50px;
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.addNoteButton {
+    background-color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1rem;
+    flex-basis: 40%;
+}
+
+.completeChallengeButton {
+    height: auto;
+    flex-basis: 60%;
+
+    background-color: black;
+    color: white;
+
+    font-weight: bold;
+    font-size: 1rem;
+}
+
 .challengeCompleteTag {
     background-color: black;
     color: white;
@@ -156,6 +187,7 @@ Doesn't work, use SCSS
     font-size: 1rem;
     padding: 0.25rem;
     text-transform: uppercase;
+    text-wrap: nowrap;
 }
 
 .challengeBox .challengeExpandableContainer {
@@ -165,13 +197,15 @@ Doesn't work, use SCSS
     overflow: auto;
 }
 
+.challengeBox .challengeExpandableContainerContent {
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+
 .challengeBox.expanded .challengeExpandableContainer {
     max-height: var(--expandableContainerMaxHeight);
 }
 
 .challengeDescription {
-    padding: 0.5rem 0.5rem 0.5rem 1rem;
-
     text-align: left;
 
     font-size: 1rem;

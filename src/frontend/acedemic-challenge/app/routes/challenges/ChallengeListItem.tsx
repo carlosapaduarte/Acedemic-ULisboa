@@ -2,6 +2,7 @@ import styles from "./challengesPage.module.css";
 import classNames from "classnames";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { CutButton } from "~/components/Button/Button";
 
 /*
 * TODO Make sure it adheres to the WAI-ARIA design pattern for the Accordion:
@@ -17,7 +18,8 @@ export function ChallengeListItem(
         lastExpanded,
         expanded,
         reached,
-        onChallengeClick
+        onChallengeClick,
+        onMarkComplete
     }: {
         challengeIndex: number,
         completed: boolean,
@@ -27,7 +29,8 @@ export function ChallengeListItem(
         lastExpanded: boolean,
         expanded: boolean,
         reached: boolean,
-        onChallengeClick: (challengeIndex: number) => void
+        onChallengeClick: (challengeIndex: number) => void,
+        onMarkComplete: () => void
     }
 ) {
     const { t } = useTranslation("dashboard");
@@ -94,8 +97,24 @@ export function ChallengeListItem(
                         id={`challengeDescription-${challengeIndex}`}
                         aria-hidden={!expanded}
                     >
-                        <div className={`${styles.challengeDescription}`}>
-                            {challengeDescription}
+                        <div className={`${styles.challengeExpandableContainerContent}`}>
+                            <div className={`${styles.challengeDescription}`}>
+                                {challengeDescription}
+                            </div>
+                            <div className={styles.buttonsContainer}>
+                                <CutButton className={styles.addNoteButton}>
+                                    {t("dashboard:add_note")}
+                                </CutButton>
+                                {
+                                    completed ?
+                                        <></>
+                                        :
+                                        <CutButton className={styles.completeChallengeButton}
+                                                   onClick={() => onMarkComplete()}>
+                                            {t("dashboard:mark_complete")}
+                                        </CutButton>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>

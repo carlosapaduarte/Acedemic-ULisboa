@@ -1,7 +1,7 @@
 import { Challenge } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
-import { Batch } from "~/service/service";
+import { Batch, service } from "~/service/service";
 import styles from "./challengesPage.module.css";
 import { useChallenges } from "~/hooks/useChallenges";
 import { ChallengeListItem } from "~/routes/challenges/ChallengeListItem";
@@ -10,7 +10,7 @@ function useChallengeList() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
 
     const { t } = useTranslation(["challenges"]);
-    const { batches, currentBatch, currentDayIndex, challenges } = useChallenges();
+    const { batches, currentBatch, currentDayIndex, challenges, fetchUserInfo } = useChallenges();
 
     const [selectedBatch, setSelectedBatch] = useState<Batch | undefined>(undefined);
 
@@ -41,12 +41,21 @@ function useChallengeList() {
         setSelectedChallenge(challengeIndex);
     }
 
-    return { onChallengeClickHandler, listedChallenges };
+    async function onMarkCompleteClickHandler(challenge: Challenge, batch: Batch) {
+        await service.markChallengeAsCompleted(batch.id, challenge.id, challenge.challengeDay)
+            .then(() => {
+                fetchUserInfo();
+            });
+    }
+
+    return { onChallengeClickHandler, listedChallenges, onMarkCompleteClickHandler, selectedBatch };
 }
 
-function ChallengesList({ challenges, onChallengeClickHandler }: {
+function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkCompleteClickHandler }: {
+    batch: Batch | undefined,
     challenges: Challenge[][] | undefined,
-    onChallengeClickHandler: (challengeIndex: number) => void
+    onChallengeClickHandler: (challengeIndex: number) => void,
+    onMarkCompleteClickHandler: (challenge: Challenge, batch: Batch) => void
 }) {
     const [selectedItem, setSelectedItem] = useState<number>(-1);
     const [lastSelectedItem, setLastSelectedItem] = useState<number>(-1);
@@ -88,7 +97,13 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
                                                   lastExpanded={lastSelectedItem == index}
                                                   expanded={selectedItem == index}
                                                   reached={reached}
-                                                  onChallengeClick={onItemClickHandler} />;
+                                                  onChallengeClick={onItemClickHandler}
+                                                  onMarkComplete={() => {
+                                                      if (!challenges || !batch) {
+                                                          return;
+                                                      }
+                                                      onMarkCompleteClickHandler(challenges[index][0], batch);
+                                                  }} />;
                     }
                 )
             }
@@ -98,13 +113,15 @@ function ChallengesList({ challenges, onChallengeClickHandler }: {
 
 export default function ChallengesPage() {
     const { t } = useTranslation(["challenge_overview"]);
-    const { onChallengeClickHandler, listedChallenges } = useChallengeList();
+    const { onChallengeClickHandler, listedChallenges, onMarkCompleteClickHandler, selectedBatch } = useChallengeList();
 
     return (
         <div className={`${styles.challengesPage}`}>
             <div className={`${styles.mainContent}`}>
                 <div className={`${styles.challengesListContainer}`}>
-                    <ChallengesList challenges={listedChallenges} onChallengeClickHandler={onChallengeClickHandler} />
+                    <ChallengesList batch={selectedBatch}
+                                    challenges={listedChallenges} onChallengeClickHandler={onChallengeClickHandler}
+                                    onMarkCompleteClickHandler={onMarkCompleteClickHandler} />
                 </div>
             </div>
         </div>
