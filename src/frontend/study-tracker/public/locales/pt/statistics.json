@@ -1,7 +1,30 @@
 {
+    "title": "Estatísticas",
+    "energy_container_title": "ENERGIA",
     "energy_level": "Nível de energia:",
     "energy_question": "Quanta energia tens hoje?",
-    "save": "Salvar",
-    "secondary_message": "O teu plano de estudo adaptar-se-á a ele",
-    "skip": "Saltar"
+    "i_feel": "Sinto-me",
+    "tired": "Cansado(a)",
+    "energetic": "Energético(a)",
+
+    "focus_container_title": "FOCO",
+    "total_time_study": "Tempo total de estudo",
+    "average_attention_span": "Tempo médio de atenção",
+
+    "workload_distribution_container_title": "DISTRIBUIÇÃO DE CARGA DE TRABALHO",
+
+    "progress_container_title": "PROGRESSO",
+
+    "save": "Guardar",
+    "secondary_message": "O teu plano de estudo irá se adaptar conforme",
+    "skip": "Saltar",
+
+    "no_data_available_yet": "Ainda não há dados disponíveis...",
+
+    "week": "SEMANA",
+    "today": "HOJE",
+    "minutes": "minutos",
+
+    "see_full_history": "Ver histórico completo",
+    "history": "Histórico"
 }

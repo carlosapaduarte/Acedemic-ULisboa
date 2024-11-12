@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
-import { HowMuchEnergyQuestionPage } from "./energy-question/energyQuestion";
+import { HowMuchEnergyQuestionPage } from "./energy-question/EnergyQuestion";
 
 function useHomePage() {
     const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(false);

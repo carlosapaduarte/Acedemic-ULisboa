@@ -67,8 +67,12 @@ export function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => vo
             </div>
 
             <div className={styles.sliderLegend}>
-                <span>Tired</span>
-                <span>Energetic</span>
+                <span>
+                    {t("statistics:tired")}
+                </span>
+                <span>
+                    {t("statistics:energetic")}
+                </span>
             </div>
 
             <div className={styles.buttonsContainer}>
