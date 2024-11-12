@@ -9,7 +9,7 @@
     grid-template-rows: auto auto auto;
     align-items: flex-start;
 
-    max-height: 292px;
+    max-height: 252px;
 }
 
 .settingsButtons {
@@ -96,8 +96,8 @@
 
     background-color: var(--primary-color);
     color: white;
-    width: 5rem;
-    height: 4rem;
+    width: 4rem;
+    height: 3rem;
 
     padding: 0.25rem;
     display: flex;
@@ -120,7 +120,7 @@
         grid-template-rows: auto auto;
         justify-content: space-between;
 
-        max-height: 244px;
+        max-height: 222px;
     }
 
     .greetingsContainer {

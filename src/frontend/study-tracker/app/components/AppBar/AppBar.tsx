@@ -76,8 +76,13 @@ function SideBarNavigationMenu({ setIsSideBarOpen }: { setIsSideBarOpen: (isOpen
 function SideBar() {
     const [isSideBarOpen, setIsSideBarOpen] = useState(false);
 
+    const { appBarVariant } = useContext(AppBarContext);
+
     return (
-        <div data-expanded={isSideBarOpen} className={styles.sideBar}>
+        <div data-expanded={isSideBarOpen} className={classNames(
+            appBarVariant === "default" && styles.sideBar,
+            appBarVariant === "home" && homeAppBarStyles.sideBar)
+        }>
             <div className={styles.sideBarIconContainer}>
                 <button
                     className={styles.sideBarIconButton}
