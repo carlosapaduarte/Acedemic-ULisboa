@@ -27,12 +27,17 @@ function Option({option, onOptionSelected} : {option: string, onOptionSelected: 
     )
 }
 
+// Iterates across options
 function Options({type, options, onOptionSelected} : {type: string, options: string[], onOptionSelected: (opt: string) => void}) {
     return (
-        // Iterates across options
-        options.map((option: string, index: number) => 
-            <Option key={index} option={option} onOptionSelected={() => onOptionSelected(option)} />
-        )
+        <>
+            <h2>
+                Type: {type}
+            </h2>
+            {options.map((option: string, index: number) => 
+                <Option key={index} option={option} onOptionSelected={() => onOptionSelected(option)} />
+            )}
+        </>
     )
 }
 

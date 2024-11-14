@@ -31,10 +31,15 @@ function useHomePage() {
         setDisplayTagsSelection(true)
     }
 
+    function onTagsSubmitted() {
+        setDisplayTagsSelection(false)
+    }
+
     return {
         displayDailyEnergyQuestion,
         displayTagsSelection,
-        onQuestionAnswered
+        onQuestionAnswered,
+        onTagsSubmitted
     }
 }
 
@@ -43,7 +48,8 @@ export default function HomePage() {
     const {
         displayDailyEnergyQuestion,
         displayTagsSelection,
-        onQuestionAnswered
+        onQuestionAnswered,
+        onTagsSubmitted
     } = useHomePage()
 
     useAppBar("home");    
@@ -54,7 +60,7 @@ export default function HomePage() {
                 displayDailyEnergyQuestion ?
                     <HowMuchEnergyQuestionPage onComplete={onQuestionAnswered} />
                     :
-                    <TagsSelection />
+                    <TagsSelection onTagsSubmitted={onTagsSubmitted} />
                 :
                 <div>
                     {t("home:main_question")}

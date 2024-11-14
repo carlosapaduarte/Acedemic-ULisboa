@@ -548,10 +548,26 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             session.commit()
             
+    @staticmethod
+    def is_same_day(date_1: date, date_2: date) -> bool:
+        return date_1.year == date_2.year and date_1.month == date_2.month and date_1.day == date_2.day
+    
     def create_daily_tags(self, user_id: int, tags: list[str], _date: date):
         with Session(engine) as session:
             
             for tag in tags:
+                statement = select(DailyTagModel)\
+                    .where(DailyTagModel.user_id == user_id)\
+                    .where(DailyTagModel.tag == tag)
+                    # checking date doesn't work... Check later
+                    
+                result = session.exec(statement)
+                res = result.first()
+                
+                if res is not None:
+                    if StudyTrackerSqlRepo.is_same_day(res.date_, _date):
+                        continue
+                
                 daily_energy_stat = DailyTagModel(
                     date_=_date,
                     tag=tag,
@@ -559,11 +575,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 )        
                 session.add(daily_energy_stat)            
             
-            session.commit()
-            
-    @staticmethod
-    def is_same_day(date_1: date, date_2: date) -> bool:
-        return date_1.year == date_2.year and date_1.month == date_2.month and date_1.day == date_2.day
+            session.commit()        
             
     def get_daily_tags(self, user_id: int, _date: date) -> list[str]:
         with Session(engine) as session:

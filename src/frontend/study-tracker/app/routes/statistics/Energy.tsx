@@ -91,13 +91,13 @@ function TodayDate() {
     );
 }
 
-const tags = ["sleep weel", "sports", "healthy food", "sun", "friends"]
+//const tags = ["sleep weel", "sports", "healthy food", "sun", "friends"]
 
-function Tags() {
+function Tags({dailyTags} : {dailyTags: string[]}) {
     return (
         <div className={styles.tagsContainer}>
             {
-                tags.map((tag: string, index: number) => 
+                dailyTags.map((tag: string, index: number) => 
                     <span key={index} className={styles.energyTag}>{tag} </span>
                 )
             }
@@ -105,7 +105,7 @@ function Tags() {
     )
 }
 
-function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }) {
+function TodayEnergyStatus({ status, dailyTags }: { status: DailyEnergyStatus | undefined, dailyTags: string[] }) {
     const { t } = useTranslation(["statistics"]);
     return (
         <>
@@ -118,7 +118,7 @@ function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }
                 <NoDataYetAvailableMessage />
             }
             <Spacer />
-            <Tags/>
+            <Tags dailyTags={dailyTags} />
         </>
     );
 }
@@ -126,10 +126,15 @@ function TodayEnergyStatus({ status }: { status: DailyEnergyStatus | undefined }
 function useEnergyStats() {
     const setError = useSetGlobalError();
     const [energyHistory, setEnergyHistory] = useState<DailyEnergyStatus[] | undefined>(undefined);
+    const [dailyTags, setDailyTags] = useState<string[]>([])
 
     useEffect(() => {
         service.fetchEnergyHistory()
             .then((value) => setEnergyHistory(value))
+            .catch((error) => setError(error));
+
+        service.getDailyTags()
+            .then((tags) => setDailyTags(tags.slice(0, 5)))
             .catch((error) => setError(error));
     }, []);
 
@@ -140,7 +145,8 @@ function useEnergyStats() {
 
     return {
         energyHistory,
-        getTodayEnergyStatus
+        getTodayEnergyStatus,
+        dailyTags
     };
 }
 
@@ -148,7 +154,8 @@ export function EnergyStats() {
     const { t } = useTranslation(["statistics"]);
     const {
         energyHistory,
-        getTodayEnergyStatus
+        getTodayEnergyStatus,
+        dailyTags
     } = useEnergyStats();
 
     function onSeeFullHistoryClickHandler() {
@@ -166,7 +173,7 @@ export function EnergyStats() {
                     <TodayDate />
                 </div>
                 
-                <TodayEnergyStatus status={getTodayEnergyStatus()} />
+                <TodayEnergyStatus status={getTodayEnergyStatus()} dailyTags={dailyTags} />
 
                 <br /><br />
 
