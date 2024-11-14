@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -215,13 +215,26 @@ def create_grade(
         value=dto.value,
         weight=dto.weight
     ))
-    
+        
 @router.post("/users/me/statistics/daily-energy-status")
 def create_daily_energy_stat(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateDailyEnergyStatus
 ):
     study_tracker_service.create_daily_energy_status(user_id, dto.level, dto.timeOfDay)
+
+@router.post("/users/me/statistics/daily-tags")
+def create_daily_tags(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    dto: CreateDailyTags
+):
+    study_tracker_service.create_daily_tags(user_id, dto.tags)
+    
+@router.get("/users/me/statistics/daily-tags")
+def get_daily_tags(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) -> list[str]:
+    return study_tracker_service.get_daily_tags(user_id)
     
 @router.get("/users/me/statistics/daily-energy-status")
 def get_daily_energy_history(

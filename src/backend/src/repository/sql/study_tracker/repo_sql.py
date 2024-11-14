@@ -5,7 +5,7 @@ from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Eve
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import DailyEnergyStatusModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel, WeekStudyTimeModel
+from repository.sql.models.models import DailyEnergyStatusModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel, WeekStudyTimeModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from utils import get_datetime_utc
@@ -547,6 +547,38 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 session.add(model)
             
             session.commit()
+            
+    def create_daily_tags(self, user_id: int, tags: list[str], _date: date):
+        with Session(engine) as session:
+            
+            for tag in tags:
+                daily_energy_stat = DailyTagModel(
+                    date_=_date,
+                    tag=tag,
+                    user_id=user_id
+                )        
+                session.add(daily_energy_stat)            
+            
+            session.commit()
+            
+    @staticmethod
+    def is_same_day(date_1: date, date_2: date) -> bool:
+        return date_1.year == date_2.year and date_1.month == date_2.month and date_1.day == date_2.day
+            
+    def get_daily_tags(self, user_id: int, _date: date) -> list[str]:
+        with Session(engine) as session:
+            statement = select(DailyTagModel)\
+                .where(DailyTagModel.user_id == user_id)
+                
+            result = session.exec(statement)
+            daily_tags_models: list[DailyTagModel] = list(result.all())
+            
+            daily_tags: list[str] = []
+            for tag_model in daily_tags_models:
+                if StudyTrackerSqlRepo.is_same_day(tag_model.date_, _date):
+                    daily_tags.append(tag_model.tag)
+                
+            return daily_tags
             
     def is_today_energy_status_created(self, user_id: int) -> bool:
         today = date.today()

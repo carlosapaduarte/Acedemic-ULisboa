@@ -154,6 +154,14 @@ def create_daily_energy_status(user_id: int, level: int, time_of_day: str):
     )
     study_tracker_repo.create_or_override_daily_energy_status(user_id, status)
 
+def create_daily_tags(user_id: int, tags: list[str]):
+    today = date.today()
+    study_tracker_repo.create_daily_tags(user_id, tags, today)
+
+def get_daily_tags(user_id: int) -> list[str]:
+    today = date.today()
+    return study_tracker_repo.get_daily_tags(user_id, today)
+
 def get_daily_energy_history(user_id: int) -> list[DailyEnergyStatus]:
     return study_tracker_repo.get_daily_energy_history(user_id)
 

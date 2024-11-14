@@ -643,6 +643,30 @@ async function createDailyEnergyStat(energyLevel: number, timeOfDay: TimeOfDay) 
         return Promise.reject(new Error("Energy level daily statistic could not be submitted!"));
 }
 
+async function submitDailyTags(tags: string[]) {
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-tags`,
+        method: "POST",
+        body: toJsonBody({tags})
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Daily tags could not be submitted!"));
+}
+
+async function getDailyTags(): Promise<string[]> {
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-tags`,
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: string[] = await response.json();
+        return responseObject;
+    } else
+        return Promise.reject(new Error("Could not obtain task distribution statistics!"));
+}
+
 export type TaskDistributionPerWeek = {
     year: number,
     week: number,
@@ -809,6 +833,8 @@ export const service = {
     createCurricularUnit,
     createGrade,
     createDailyEnergyStat,
+    submitDailyTags,
+    getDailyTags,
     getTaskDistributionStats,
     getThisWeekDailyTasksProgress: getDailyTasksProgress,
     fetchEnergyHistory,
@@ -816,5 +842,5 @@ export const service = {
     //incrementWeekStudyTime,
     //updateWeekAverageAttentionSpan
     startStudySession,
-    finishStudySession
+    finishStudySession,
 };

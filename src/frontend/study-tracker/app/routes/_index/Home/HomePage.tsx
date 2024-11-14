@@ -3,9 +3,11 @@ import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
 import { HowMuchEnergyQuestionPage } from "./energy-question/EnergyQuestion";
+import { TagsSelection } from "./energy-question/TagsSelection";
 
 function useHomePage() {
     const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(false);
+    const [displayTagsSelection, setDisplayTagsSelection] = useState<boolean | undefined>(false);
 
     useEffect(() => {
         const promptedState = localStorage["lastEnergyQuestionPromptedDate"]
@@ -26,10 +28,12 @@ function useHomePage() {
         const today = new Date();
         localStorage["lastEnergyQuestionPromptedDate"] = today;
         setDisplayDailyEnergyQuestion(false) // TODO: uncomment this line. For the beta, show always to fill the home page
+        setDisplayTagsSelection(true)
     }
 
     return {
         displayDailyEnergyQuestion,
+        displayTagsSelection,
         onQuestionAnswered
     }
 }
@@ -38,6 +42,7 @@ export default function HomePage() {
     const { t } = useTranslation(["home"]);
     const {
         displayDailyEnergyQuestion,
+        displayTagsSelection,
         onQuestionAnswered
     } = useHomePage()
 
@@ -45,8 +50,11 @@ export default function HomePage() {
 
     return (
         <div className={styles.homePage}>
-            {displayDailyEnergyQuestion ?
-                <HowMuchEnergyQuestionPage onComplete={onQuestionAnswered} />
+            {displayDailyEnergyQuestion || displayTagsSelection ?
+                displayDailyEnergyQuestion ?
+                    <HowMuchEnergyQuestionPage onComplete={onQuestionAnswered} />
+                    :
+                    <TagsSelection />
                 :
                 <div>
                     {t("home:main_question")}

@@ -74,6 +74,9 @@ class CreateDailyEnergyStatus(BaseModel):
     level: int
     timeOfDay: str
     
+class CreateDailyTags(BaseModel):
+    tags: list[str]
+    
 class UpdateWeekStudyTime(BaseModel):
     year: int
     week: int
