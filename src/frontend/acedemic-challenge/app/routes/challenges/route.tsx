@@ -96,7 +96,7 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
             isFirstScroll.current = false;
 
             setTimeout(() => {
-                if (Number(searchParams.get("challengeDay")) - 1 >= 0 && selectedRef.current) {
+                if (selectedRef.current) {
                     selectedRef.current.scrollIntoView({
                         behavior: "smooth",
                         block: "center"
@@ -117,8 +117,16 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
                         const description = challenges && challenges.length > index ? challenges[index][0].description : undefined;
                         const completed = challenges && challenges.length > index ? challenges[index][0].completionDate != null : false;
 
+                        let ref: React.RefObject<HTMLDivElement> | undefined = undefined;
+                        if (selectedItem != -1 && selectedItem == index) {
+                            ref = selectedRef;
+                        }
+                        else if (selectedItem == -1 && challenges && index == challenges.length - 1) {
+                            ref = selectedRef;
+                        }
+
                         return <ChallengeListItem key={index}
-                                                  ref={selectedItem == index ? selectedRef : undefined}
+                                                  ref={ref}
                                                   completed={completed}
                                                   challengeIndex={index}
                                                   loading={challenges == undefined}
