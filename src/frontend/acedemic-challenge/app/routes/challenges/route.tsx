@@ -1,10 +1,11 @@
 import { Challenge } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Batch, service } from "~/service/service";
 import styles from "./challengesPage.module.css";
 import { useChallenges } from "~/hooks/useChallenges";
 import { ChallengeListItem } from "~/routes/challenges/ChallengeListItem";
+import { useSearchParams } from "@remix-run/react";
 
 function useChallengeList() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
@@ -57,8 +58,11 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
     onChallengeClickHandler: (challengeIndex: number) => void,
     onMarkCompleteClickHandler: (challenge: Challenge, batch: Batch) => void
 }) {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [selectedItem, setSelectedItem] = useState<number>(-1);
     const [lastSelectedItem, setLastSelectedItem] = useState<number>(-1);
+
+    const selectedRef = useRef<HTMLDivElement>(null);
 
     const currentChallenge = challenges?.length;
 
@@ -71,12 +75,37 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
 
         if (selectedItem == index) {
             setSelectedItem(-1);
+            setSearchParams();
             return;
         }
         setLastSelectedItem(selectedItem);
 
         setSelectedItem(index);
+        setSearchParams({ challengeDay: (index + 1).toString() });
     }
+
+    useEffect(() => {
+        setSelectedItem(Number(searchParams.get("challengeDay")) - 1);
+    }, [searchParams]);
+
+
+    const isFirstScroll = useRef(true);
+
+    useEffect(() => {
+        if (isFirstScroll.current && selectedRef.current) {
+            isFirstScroll.current = false;
+
+            setTimeout(() => {
+                if (Number(searchParams.get("challengeDay")) - 1 >= 0 && selectedRef.current) {
+                    selectedRef.current.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+                }
+            }, 200);
+        }
+    }, [selectedRef.current]);
+
 
     return (
         <div className={`${styles.challengesList}`}>
@@ -89,6 +118,7 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
                         const completed = challenges && challenges.length > index ? challenges[index][0].completionDate != null : false;
 
                         return <ChallengeListItem key={index}
+                                                  ref={selectedItem == index ? selectedRef : undefined}
                                                   completed={completed}
                                                   challengeIndex={index}
                                                   loading={challenges == undefined}

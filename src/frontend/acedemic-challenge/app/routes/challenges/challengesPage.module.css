@@ -57,7 +57,7 @@ Doesn't work, use SCSS
     width: 100%;
     height: 100%;
 
-    --expandableContainerMaxHeight: 210px;
+    --expandableContainerMaxHeight: 260px;
 
     display: flex;
     align-items: flex-start;
@@ -233,7 +233,7 @@ Doesn't work, use SCSS
     .challengeBoxContainer {
         --boxContainerMaxHeight: calc(
                 var(--expandableContainerMaxHeight) +
-                var(--title-height) + 8px + 8px + 6px
+                var(--title-height) + 8px + 8px + 6px + 29px
         );
     }
 

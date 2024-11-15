@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "../../calendarPage.module.css";
 import { CutButton } from "~/components/Button/Button";
+import { useNavigate } from "@remix-run/react";
 
 function useSelectedDayChallengeInfo({ challenges, selectedDay }: { challenges: DayChallenges[], selectedDay: Date }) {
     // TODO: only displaying one Challenge!!! There could be more
@@ -30,8 +31,9 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
     challenges: DayChallenges[],
     selectedDay: Date
 }) {
-    const { challengesToDisplay } = useSelectedDayChallengeInfo({ challenges: challenges, selectedDay });
+    const { challengesToDisplay } = useSelectedDayChallengeInfo({ challenges, selectedDay });
     const { t } = useTranslation(["calendar"]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         function applyDynamicLineClamp() {
@@ -42,6 +44,11 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
             setTimeout(() => {
                 const description = document.getElementsByClassName(styles.challengeDescription)[0] as HTMLElement;
                 const descriptionContainer = document.getElementsByClassName(styles.challengeDescriptionContainer)[0] as HTMLElement;
+
+                if (!description || !descriptionContainer) {
+                    return;
+                }
+
                 const lineHeight = parseFloat(getComputedStyle(description).lineHeight);
                 const containerHeight = descriptionContainer.clientHeight;
 
@@ -86,7 +93,10 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
                         </p>
                     </div>
                 </div>
-                <CutButton className={`${styles.seeMoreButton}`}>
+                <CutButton
+                    className={`${styles.seeMoreButton}`}
+                    onClick={() => navigate(`/challenges?challengeDay=${challenge.challengeDay}`)}
+                >
                     {t("calendar:see_more_button_text")}
                 </CutButton>
             </>

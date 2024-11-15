@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Challenge } from "~/challenges/types";
 import { Batch, service, UserNote } from "~/service/service";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
 import { useTranslation } from "react-i18next";
-import { useChallenges } from "~/hooks/useChallenges";
+import { ChallengesContext } from "~/hooks/useChallenges";
 
 function sameDate(date1: Date, date2: Date): boolean {
     return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate();
@@ -21,7 +21,7 @@ function useChallengeView() {
     const {
         userInfo, batches, currentBatch, currentDayIndex, challenges,
         fetchUserInfo
-    } = useChallenges();
+    } = useContext(ChallengesContext);
 
     const [todayChallenges, setTodayChallenges] = useState<Challenge[]>();
 

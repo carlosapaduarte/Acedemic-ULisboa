@@ -1,8 +1,25 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { Batch, service, UserInfo } from "~/service/service";
 import { Challenge } from "~/challenges/types";
 import { getFullChallenge } from "~/challenges/getLevels";
+
+export const ChallengesContext = createContext<{
+    userInfo: UserInfo | undefined,
+    batches: Batch[] | undefined,
+    currentBatch: Batch | undefined,
+    currentDayIndex: number | undefined,
+    challenges: Map<number, Challenge[][]> | undefined,
+    fetchUserInfo: () => void
+}>({
+    userInfo: undefined,
+    batches: undefined,
+    currentBatch: undefined,
+    currentDayIndex: undefined,
+    challenges: undefined,
+    fetchUserInfo: () => {
+    }
+});
 
 export function useChallenges() {
     const { t } = useTranslation(["challenges"]);
@@ -54,7 +71,7 @@ export function useChallenges() {
                 const currentBatch: Batch = sortedBatches[0];
                 setCurrentBatch(currentBatch);
 
-                const DEBUG_DAY_OFFSET = 6;
+                const DEBUG_DAY_OFFSET = 15;
                 const DEBUG_TIME_OFFSET = 1000 * 3600 * 24 * DEBUG_DAY_OFFSET;
 
                 // Calculate the current day index for the most recent batch

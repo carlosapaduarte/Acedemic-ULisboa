@@ -1,6 +1,6 @@
 import styles from "./challengesPage.module.css";
 import classNames from "classnames";
-import React from "react";
+import React, { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { CutButton } from "~/components/Button/Button";
 
@@ -8,7 +8,7 @@ import { CutButton } from "~/components/Button/Button";
 * TODO Make sure it adheres to the WAI-ARIA design pattern for the Accordion:
 *  https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
 * */
-export function ChallengeListItem(
+export const ChallengeListItem = forwardRef(function ChallengeListItem(
     {
         challengeIndex,
         completed,
@@ -31,17 +31,21 @@ export function ChallengeListItem(
         reached: boolean,
         onChallengeClick: (challengeIndex: number) => void,
         onMarkComplete: () => void
-    }
+    },
+    ref?: React.Ref<HTMLDivElement>
 ) {
     const { t } = useTranslation("dashboard");
 
     return (
-        <div className={
-            classNames(
-                styles.challengeBoxContainer,
-                lastExpanded && reached ? styles.lastExpanded : "",
-                expanded && reached ? styles.expanded : ""
-            )}>
+        <div
+            key={challengeIndex}
+            ref={ref}
+            className={
+                classNames(
+                    styles.challengeBoxContainer,
+                    lastExpanded && reached ? styles.lastExpanded : "",
+                    expanded && reached ? styles.expanded : ""
+                )}>
             {loading
                 ?
                 <div className={classNames(
@@ -121,4 +125,4 @@ export function ChallengeListItem(
             }
         </div>
     );
-}
+});
