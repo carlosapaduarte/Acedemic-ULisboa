@@ -72,7 +72,7 @@ function Chart({stats} : {stats: TaskDistributionPerWeek[]}) {
 
     const data: LetterFrequency[] = stats.map((stat: TaskDistributionPerWeek) => {
         return {
-            letter: stat.tag[0],
+            letter: stat.tag.slice(0, 2),
             frequency: stat.time / total
         }
     })
@@ -149,9 +149,12 @@ function useTaskDistribution() {
         return stats.filter((stat: TaskDistributionPerWeek) => stat.year == currentYear && stat.week == currentYearWeekNumber)
     }
 
-    function filterFirstFourTasks(stats: TaskDistributionPerWeek[]): TaskDistributionPerWeek[] {
+    function filterFourPopularTAsks(stats: TaskDistributionPerWeek[]): TaskDistributionPerWeek[] {
         // Sorts by task time, and selects the first four
-        const firstFour = stats.sort((t1, t2) => t1.time + t2.time).slice(0, 4)
+        const firstFour = stats
+            .sort((t1, t2) => t1.time - t2.time)
+            .reverse()
+            .slice(0, 4)
         
         // The others not shown
         const others = stats.filter((stat: TaskDistributionPerWeek) => 
@@ -177,10 +180,38 @@ function useTaskDistribution() {
     useEffect(() => {
         service.getTaskDistributionStats()
             .then((stats: TaskDistributionPerWeek[]) => {
+                /*
+                stats = [
+                    {
+                        year: 2024,
+                        week: 46,
+                        tag: "studying",
+                        time: 10
+                    },
+                    {
+                        year: 2024,
+                        week: 46,
+                        tag: "running",
+                        time: 12
+                    },
+                    {
+                        year: 2024,
+                        week: 46,
+                        tag: "walking",
+                        time: 15
+                    },
+                    {
+                        year: 2024,
+                        week: 46,
+                        tag: "reading",
+                        time: 7
+                    }
+                ]
+                    */
                 console.log(stats)
                 if (stats.length != 0) {
                     const currentWeekStats = filterThisWeekTaskDistribution(stats)
-                    const trimmedWeekStats = filterFirstFourTasks(currentWeekStats)
+                    const trimmedWeekStats = filterFourPopularTAsks(currentWeekStats)
                     setStats(trimmedWeekStats)
                 }
             })

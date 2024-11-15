@@ -98,25 +98,26 @@ function useProgress() {
     const [progressByDay, setProgressByDay] = useState<DailyTasksProgress[]>([]);
 
     useEffect(() => {
+        const today = new Date()
         setProgressByDay([
             {
-                date: new Date(),
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
                 progress: 40
             },
             {
-                date: new Date(),
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
                 progress: 30
             },
             {
-                date: new Date(),
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2),
                 progress: 80
             },
             {
-                date: new Date(),
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3),
                 progress: 25
             },
             {
-                date: new Date(),
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 4),
                 progress: 90
             }
         ])

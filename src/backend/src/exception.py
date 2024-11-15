@@ -14,3 +14,7 @@ class NotAvailableScheduleBlockCollision(Exception):
 class AlreadyExistsException(Exception):
     def __init__(self):
         super().__init__()
+        
+class InvalidDate(Exception):
+    def __init__(self):
+        super().__init__()

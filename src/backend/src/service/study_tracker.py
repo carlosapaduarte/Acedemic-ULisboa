@@ -1,6 +1,6 @@
 from datetime import datetime
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
-from exception import NotAvailableScheduleBlockCollision, NotFoundException
+from exception import InvalidDate, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
 from datetime import date
@@ -23,9 +23,14 @@ def does_not_collide_with_unavailable_block(
     for block in not_available_blocks:
         if event_date_interval.collides_with_unavailable_block(block):
             raise NotAvailableScheduleBlockCollision()
+        
+def verify_start_end_date_validity(date: DateInterval):
+    if date.start_date >= date.end_date:
+        raise InvalidDate()
 
 def create_event(user_id: int, event: Event):
     does_not_collide_with_unavailable_block(user_id, event.date)
+    verify_start_end_date_validity(event.date)
     study_tracker_repo.create_event(user_id, event)
     
 def update_event(user_id: int, event_id: int, event: Event):

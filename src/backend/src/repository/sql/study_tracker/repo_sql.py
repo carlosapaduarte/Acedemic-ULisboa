@@ -632,8 +632,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         # TODO: events that repeat every week
         
         with Session(engine) as session:
-            statement = select(STTaskModel)\
-                .where(STTaskModel.user_id == user_id)
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)
             
             result = session.exec(statement)
             events: list[STEventModel] = list(result.all())

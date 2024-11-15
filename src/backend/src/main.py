@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from exception import AlreadyExistsException, NotFoundException, NotAvailableScheduleBlockCollision, UsernameAlreadyExistsException
+from exception import AlreadyExistsException, InvalidDate, NotFoundException, NotAvailableScheduleBlockCollision, UsernameAlreadyExistsException
 from router.academic_challenge import academic_challenge
 from router.commons import common
 
@@ -63,4 +63,11 @@ async def already_exists_exception_handler(request: Request, exc: AlreadyExistsE
     return JSONResponse(
         status_code=409, # Conflict
         content={"error": "Resource already exists"},
+    )
+    
+@app.exception_handler(InvalidDate)
+async def invalid_date_exception_handler(request: Request, exc: InvalidDate):
+    return JSONResponse(
+        status_code=400, # Conflict
+        content={"error": "Date is invalid"},
     )

@@ -19,13 +19,13 @@ export function SeeFullHistory() {
 
 export function getWeekIntervalStr(date: Date): string {
     const weekDay = date.getDay();
-    const todayDate = date.getDate();
+    const today = date.getDate();
 
     const firstDayOfWeek = new Date(date);
 
     // Offsets date to first day of week
-    firstDayOfWeek.setDate(todayDate - weekDay + 1); // Monday is 1
-    const firstDayOfWeekDate = date.getDate();
+    firstDayOfWeek.setDate(today - weekDay + 1); // Monday is 1
+    const firstDayOfWeekDate = firstDayOfWeek.getDate();
 
     const lastDayOfWeek = new Date(firstDayOfWeek);
 
