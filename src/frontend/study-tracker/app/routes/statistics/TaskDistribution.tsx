@@ -128,7 +128,7 @@ function Chart({stats} : {stats: TaskDistributionPerWeek[]}) {
 
 function ChartAndLegend({stats} : {stats: TaskDistributionPerWeek[]}) {
     return (
-        stats.length != 0 ?
+        stats.length != 1 ? // "1 means empty because the type "others" always exists"
             <div className={styles.chartAndLegendContainer}>
                 <Chart stats={stats} />
                 <Legend stats={stats} />
@@ -208,7 +208,7 @@ function useTaskDistribution() {
                     }
                 ]
                     */
-                console.log(stats)
+                //console.log(stats)
                 if (stats.length != 0) {
                     const currentWeekStats = filterThisWeekTaskDistribution(stats)
                     const trimmedWeekStats = filterFourPopularTAsks(currentWeekStats)

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { DailyTasksProgress, service } from "~/service/service";
 import styles from "./statistics.module.css";
 import { CurWeekDate, NoDataYetAvailableMessage, SeeFullHistory } from "./Commons";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
 function ProgressIcon({progress} : {progress: number}) {
     function getRandomInt(max: number) {
