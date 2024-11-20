@@ -3,7 +3,7 @@ import random
 from sqlalchemy import ScalarResult
 from sqlmodel import Session, select
 
-from domain.commons.user import Batch, User, UserNote, Challenge
+from domain.commons.user import Batch, User, Challenge, BatchDay
 from exception import NotFoundException
 from repository.sql.commons.repo import CommonsRepo
 from repository.sql.models import database
@@ -42,35 +42,34 @@ class CommonsSqlRepo(CommonsRepo):
     def from_user_model(user_model: UserModel) -> User:
         batches_model: list[BatchModel] = user_model.user_batches
 
-        # map() in Python is lazy, not eager!
-        # Therefore, this forces the session to retrieve all completed_challenges, for each batch
-        # Better solutions are appreciated!
+        # Forces batch_days to load eagerly for each batch, avoiding potential lazy-loading issues.
         for batch in batches_model:
-            batch.challenges
-
-        # Build User Notes
-        user_notes: list[UserNote] = []
-        for note in user_model.user_notes:
-            user_notes.append(UserNote(note.text, note.date))
+            batch.batch_days
 
         # Build User Batches
         batches: list[Batch] = []
-        for batch in user_model.user_batches:
+        for batch in batches_model:
+            batch_days: list[BatchDay] = []
 
-            # Build Batch Completed Challenges
-            challenges: list[Challenge] = []
-            for challenge in batch.challenges:
-                challenges.append(Challenge(challenge.challenge_day, challenge.id, challenge.completion_date))
+            # Forces challenges to load eagerly for each day, avoiding potential lazy-loading issues.
+            for batch_day in batch.batch_days:
+                batch_day.challenges
 
-            batches.append(Batch(batch.id, batch.start_date, batch.level, challenges))
+            for batch_day in batch.batch_days:
+                challenges: list[Challenge] = []
+                for challenge in batch_day.challenges:
+                    challenges.append(Challenge(challenge.id, challenge.completion_date))
+
+                batch_days.append(BatchDay(batch_day.id, challenges, batch_day.notes))
+
+            batches.append(Batch(batch.id, batch.start_date, batch.level, batch_days))
 
         return User(
-            user_model.id,
-            user_model.username,
-            user_model.hashed_password,
-            user_model.avatar_filename,
-            user_model.share_progress,
-            user_notes=user_notes,
+            id=user_model.id,
+            username=user_model.username,
+            hashed_password=user_model.hashed_password,
+            avatar_filename=user_model.avatar_filename,
+            share_progress=user_model.share_progress,
             batches=batches
         )
 
@@ -84,7 +83,7 @@ class CommonsSqlRepo(CommonsRepo):
         return CommonsSqlRepo.from_user_model(user_model)
 
     def create_user(self, username: str, hashed_password: str) -> User:
-        "Creates a user without avatar, notes and challenges, in level 1, and share_progress set to false"
+        """Creates a user without avatar, challenges, in level 1, and share_progress set to false"""
 
         with Session(engine) as session:
             db_user = UserModel(

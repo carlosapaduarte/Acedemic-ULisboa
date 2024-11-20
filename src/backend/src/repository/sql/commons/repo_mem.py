@@ -1,7 +1,6 @@
-from domain.commons.user import User
-from datetime import datetime
+import random
 
-from domain.user import User
+from domain.commons.user import User
 from exception import NotFoundException
 from repository.sql.commons.repo import CommonsRepo
 
@@ -17,11 +16,11 @@ class CommonsMemRepo(CommonsRepo):
     def create_user(self, username: str, hashed_password: str):
         "Creates a user without avatar, notes and challenges, in level 1, and share_progress set to false"
         self.users[username] = User(
-            id=id,
+            id=random.randint(1, 999999999),
             username=username,
+            hashed_password=hashed_password,
             avatar_filename=None,
             share_progress=False,
-            user_notes=[],
             batches=[]
         )
 

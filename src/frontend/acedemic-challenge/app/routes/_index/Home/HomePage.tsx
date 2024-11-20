@@ -13,7 +13,7 @@ export default function HomePage() {
     const {
         userInfo,
         batches,
-        challenges,
+        batchDays,
         currentDayIndex,
         currentBatch,
         fetchUserInfo
@@ -22,24 +22,24 @@ export default function HomePage() {
     const [progress, setProgress] = React.useState(0);
 
     useEffect(() => {
-        if (!challenges || !currentBatch || currentDayIndex == undefined)
+        if (!batchDays || !currentBatch || currentDayIndex == undefined)
             return;
 
-        const batchChallenges = challenges.get(currentBatch.id);
+        const batchChallenges = batchDays.get(currentBatch.id);
 
         if (!batchChallenges)
             return;
 
         const completedCount = batchChallenges.reduce(
-            (acc, challenges) => {
-                return acc + (challenges[0].completionDate ? 1 : 0);
+            (acc, batchDay) => {
+                return acc + (batchDay.challenges[0].completionDate ? 1 : 0); // TODO: Check if this is the correct way to check for completion
             }, 0);
         setProgress(completedCount / batchChallenges.length * 100);
-    }, [challenges]);
+    }, [batchDays]);
 
     return (
         <ChallengesContext.Provider
-            value={{ userInfo, batches, challenges, currentDayIndex, currentBatch, fetchUserInfo }}>
+            value={{ userInfo, batches, batchDays, currentDayIndex, currentBatch, fetchUserInfo }}>
             <div className={styles.homePage}>
                 <ProgressBar progress={progress} />
                 <ChallengeView />

@@ -215,6 +215,16 @@ Doesn't work, use SCSS
     color: black;
 }
 
+.challengeNotes {
+    text-align: left;
+
+    font-size: 1rem;
+    font-family: var(--font-family1), sans-serif;
+    text-transform: none;
+    font-weight: bold;
+    color: black;
+}
+
 
 @media (min-width: 580px) {
     :root {

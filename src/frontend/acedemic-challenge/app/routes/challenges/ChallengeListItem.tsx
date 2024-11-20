@@ -15,26 +15,30 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
         loading,
         challengeTitle,
         challengeDescription,
+        challengeNotes,
         lastExpanded,
         expanded,
         reached,
         onChallengeClick,
-        onMarkComplete
+        onMarkComplete,
+        onNoteAddClick
     }: {
         challengeIndex: number,
         completed: boolean,
         loading: boolean,
         challengeTitle: string | undefined,
         challengeDescription: string | undefined,
+        challengeNotes: string | undefined,
         lastExpanded: boolean,
         expanded: boolean,
         reached: boolean,
         onChallengeClick: (challengeIndex: number) => void,
-        onMarkComplete: () => void
+        onMarkComplete: () => void,
+        onNoteAddClick: (notesText: string) => void
     },
     ref?: React.Ref<HTMLDivElement>
 ) {
-    const { t } = useTranslation("dashboard");
+    const { t } = useTranslation(["dashboard", "challenge_overview"]);
 
     return (
         <div
@@ -105,8 +109,15 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                             <div className={`${styles.challengeDescription}`}>
                                 {challengeDescription}
                             </div>
+                            <div className={`${styles.challengeNotes}`}>
+                                <br />
+                                {t("dashboard:notes")}:
+                                <br />
+                                {challengeNotes}
+                            </div>
                             <div className={styles.buttonsContainer}>
-                                <CutButton className={styles.addNoteButton}>
+                                <CutButton className={styles.addNoteButton}
+                                           onClick={() => onNoteAddClick("boolooloo")}>
                                     {t("dashboard:add_note")}
                                 </CutButton>
                                 {

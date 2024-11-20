@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { createContext, useEffect, useState } from "react";
 import { Batch, service, UserInfo } from "~/service/service";
-import { Challenge } from "~/challenges/types";
+import { BatchDay } from "~/challenges/types";
 import { getFullChallenge } from "~/challenges/getLevels";
 
 export const ChallengesContext = createContext<{
@@ -9,14 +9,14 @@ export const ChallengesContext = createContext<{
     batches: Batch[] | undefined,
     currentBatch: Batch | undefined,
     currentDayIndex: number | undefined,
-    challenges: Map<number, Challenge[][]> | undefined,
+    batchDays: Map<number, BatchDay[]> | undefined,
     fetchUserInfo: () => void
 }>({
     userInfo: undefined,
     batches: undefined,
     currentBatch: undefined,
     currentDayIndex: undefined,
-    challenges: undefined,
+    batchDays: undefined,
     fetchUserInfo: () => {
     }
 });
@@ -29,7 +29,7 @@ export function useChallenges() {
     const [batches, setBatches] = useState<Batch[] | undefined>(undefined);
     const [currentBatch, setCurrentBatch] = useState<Batch | undefined>(undefined);
     const [currentDayIndex, setCurrentDayIndex] = useState<number | undefined>(undefined);
-    const [challenges, setChallenges] = useState<Map<number, Challenge[][]> | undefined>(undefined);
+    const [batchDays, setBatchDays] = useState<Map<number, BatchDay[]> | undefined>(undefined);
 
     useEffect(() => {
         fetchUserInfo();
@@ -40,22 +40,21 @@ export function useChallenges() {
             return;
         }
 
-        // Create a map to store challenges for each batch, keyed by batchId
-        const challengesMap = new Map<number, Challenge[][]>();
+        // Create a map to store batch days for each batch, keyed by batchId
+        const batchDaysMap = new Map<number, BatchDay[]>();
         batches.forEach(batch => {
-            challengesMap.set(batch.id, getFullChallenges(batch));
+            batchDaysMap.set(batch.id, getFullBatchDays(batch));
         });
-        setChallenges(challengesMap);
+        setBatchDays(batchDaysMap);
     }, [batches, t]);
 
-    function getFullChallenges(batch: Batch): Challenge[][] {
-        return batch.challenges
-            .map((storedChallengeList) =>
-                storedChallengeList
-                    .map((storedChallenge) =>
-                        getFullChallenge(batch.level, storedChallenge, t)
-                    )
-            );
+    function getFullBatchDays(batch: Batch): BatchDay[] {
+        return batch.batchDays.map((storedBatchDay) => ({
+            id: storedBatchDay.id,
+            challenges: storedBatchDay.challenges.map((storedChallenge) => getFullChallenge(batch.level, storedChallenge, t)),
+            notes: storedBatchDay.notes,
+            date: new Date(batch.startDate * 1000 + 1000 * 3600 * 24 * storedBatchDay.id)
+        }));
     }
 
     function fetchUserInfo() {
@@ -80,5 +79,5 @@ export function useChallenges() {
             });
     }
 
-    return { userInfo, batches, currentBatch, currentDayIndex, challenges, fetchUserInfo };
+    return { userInfo, batches, currentBatch, currentDayIndex, batchDays, fetchUserInfo };
 }

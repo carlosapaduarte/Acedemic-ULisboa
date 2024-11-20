@@ -1,16 +1,18 @@
-import { Challenge } from "~/challenges/types";
+import { BatchDay, Challenge } from "~/challenges/types";
 import { CutButton } from "~/components/Button/Button";
 import React from "react";
 
 import styles from "./challenges.module.css";
 import { useTranslation } from "react-i18next";
 
-export default function Challenges({ currentDayNumber, challenges, onMarkComplete }: {
-    currentDayNumber: number,
-    challenges: Challenge[],
+export default function Challenges({ currentBatchDay, onMarkComplete }: {
+    currentBatchDay: BatchDay,
     onMarkComplete: (challenge: Challenge) => void
 }) {
     const { t } = useTranslation(["dashboard"]);
+
+    const currentDayNumber = currentBatchDay.id;
+    const challenges = currentBatchDay.challenges;
 
     // Per challenge, there is a "Mark Complete" button
     return (
@@ -63,7 +65,8 @@ export default function Challenges({ currentDayNumber, challenges, onMarkComplet
                                 {challenges.map((challenge: Challenge) => {
                                     return (
                                         <div key={challenge.id}
-                                             className={styles.challengeContentContainer} style={{overflow: "visible"}}>
+                                             className={styles.challengeContentContainer}
+                                             style={{ overflow: "visible" }}>
                                             <div className={styles.challengeContentScrollWrapper}>
                                                 <div className={styles.challengeTitleContainer}>
                                                     <h2 className={styles.challengeTitle}>{challenge.title}</h2>

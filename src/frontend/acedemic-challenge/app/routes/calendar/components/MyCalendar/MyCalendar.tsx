@@ -4,7 +4,7 @@ import { Button, CutButton } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
 import styles from "./myCalendar.module.css";
 import classNames from "classnames";
-import { DayChallenges } from "~/challenges/types";
+import { BatchDay } from "~/challenges/types";
 
 const weekdays = ["calendar:weekdays.sunday", "calendar:weekdays.monday", "calendar:weekdays.tuesday",
     "calendar:weekdays.wednesday", "calendar:weekdays.thursday", "calendar:weekdays.friday", "calendar:weekdays.saturday"];
@@ -167,7 +167,7 @@ function CalendarDays(
     {
         challenges, visibleMonth, onDayClick
     }: {
-        challenges: DayChallenges[], visibleMonth: Date, onDayClick: (day: CalendarDay) => void
+        challenges: BatchDay[], visibleMonth: Date, onDayClick: (day: CalendarDay) => void
     }) {
     const { currentDays } = useCalendarDays(visibleMonth);
     const [selectedDay, setSelectedDay] = useState<CalendarDay>({
@@ -207,7 +207,7 @@ function CalendarGrid(
     {
         challenges, visibleMonth, onDayClick
     }: {
-        challenges: DayChallenges[],
+        challenges: BatchDay[],
         visibleMonth: Date, onDayClick: (day: CalendarDay) => void
     }
 ) {
@@ -221,9 +221,9 @@ function CalendarGrid(
 
 export function MyCalendar(
     {
-        challenges, onDayClickHandler
+        daysWithChallenges, onDayClickHandler
     }: {
-        challenges: DayChallenges[],
+        daysWithChallenges: BatchDay[],
         onDayClickHandler: (day: CalendarDay) => void
     }
 ) {
@@ -232,7 +232,7 @@ export function MyCalendar(
     return (
         <div className={`${styles.myCalendar}`}>
             <ChangeViewButtons visibleMonth={visibleMonth} onButtonClick={monthChangeActionHandler} />
-            <CalendarGrid challenges={challenges} visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
+            <CalendarGrid challenges={daysWithChallenges} visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
         </div>
     );
 }

@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 
 from repository.sql.academic_challenge.repo import AcademicChallengeRepo
 from repository.sql.models import database
-from repository.sql.models.models import BatchModel, NoteModel, ChallengeModel
+from repository.sql.models.models import BatchModel, ChallengeModel, BatchDayModel
 
 engine = database.get_engine()
 
@@ -24,68 +24,91 @@ class AcademicChallengeSqlRepo(AcademicChallengeRepo):
             session.add(new_batch)
             session.flush()  # Flush to ensure new_batch.id is available
 
-            # Populate challenges based on level
+            batch_days = []
             challenges = []
+
+            # Populate the batch_days and challenges based on the level
             if new_level in [1, 2]:
                 challenge_ids: list[int]
                 # For levels 1 or 2, create a single challenge per ID
-                for index, challenge_id in enumerate(challenge_ids):
+                for day_index, challenge_id in enumerate(challenge_ids):
+                    new_batch_day = BatchDayModel(
+                        id=day_index + 1,
+                        batch_id=new_batch.id,
+                        user_id=user_id,
+                        notes=""
+                    )
+                    batch_days.append(new_batch_day)
+
                     new_challenge = ChallengeModel(
                         id=challenge_id,
-                        challenge_day=index + 1,  # 1-indexed challenge day
-                        completion_date=None,
+                        batch_day_id=day_index + 1,
+                        batch_id=new_batch.id,
                         user_id=user_id,
-                        batch_id=new_batch.id  # Associate with the new batch
+                        completion_date=None
                     )
                     challenges.append(new_challenge)
 
             elif new_level == 3:
                 challenge_ids: list[list[int]]
                 # For level 3, create challenges with the challenge_day based on the sublist index
-                for sublist_index, sublist in enumerate(challenge_ids):
+                for day_index, sublist in enumerate(challenge_ids):
+                    new_batch_day = BatchDayModel(
+                        id=day_index + 1,
+                        batch_id=new_batch.id,
+                        user_id=user_id,
+                        notes=""
+                    )
+                    batch_days.append(new_batch_day)
+
                     for challenge_id in sublist:
                         new_challenge = ChallengeModel(
                             id=challenge_id,
-                            challenge_day=sublist_index + 1,  # 1-indexed based on the sublist index
-                            completion_date=None,
+                            batch_day_id=day_index + 1,
+                            batch_id=new_batch.id,
                             user_id=user_id,
-                            batch_id=new_batch.id  # Associate with the new batch
+                            completion_date=None
                         )
                         challenges.append(new_challenge)
 
-            # Add all challenges to the session
+            session.add_all(batch_days)
+            session.flush()
             session.add_all(challenges)
             session.commit()
 
             return new_batch.id
 
-    def complete_challenge(self, user_id: int, batch_id: int, challenge_id: int, challenge_day: int,
+    def complete_challenge(self, user_id: int, batch_id: int, batch_day_id: int, challenge_id: int,
                            completion_date: datetime):
         with Session(engine) as session:
-            # Retrieve the existing Challenge row
             statement = select(ChallengeModel).where(
                 ChallengeModel.user_id == user_id,
                 ChallengeModel.batch_id == batch_id,
-                ChallengeModel.id == challenge_id,
-                ChallengeModel.challenge_day == challenge_day
+                ChallengeModel.batch_day_id == batch_day_id,
+                ChallengeModel.id == challenge_id
             )
 
             existing_challenge = session.exec(statement).first()
-
-            if existing_challenge:
-                # Update the completion date
-                existing_challenge.completion_date = completion_date
-                session.add(existing_challenge)  # This is optional; changes are tracked automatically
-                session.commit()
-            else:
+            if not existing_challenge:
                 raise ValueError("Challenge not found")
 
-    def create_new_user_note(self, user_id: int, note: str, date: datetime):
+            existing_challenge.completion_date = completion_date
+            session.add(existing_challenge)  # This is optional; changes are tracked automatically
+            session.commit()
+
+    def edit_day_notes(self, user_id: int, batch_id: int, batch_day_id: int, notes: str, date: datetime):
         with Session(engine) as session:
-            new_note = NoteModel(
-                text=note,
-                date=date,
-                user_id=user_id
+            statement = select(BatchDayModel).where(
+                BatchDayModel.user_id == user_id,
+                BatchDayModel.batch_id == batch_id,
+                BatchDayModel.id == batch_day_id
             )
-            session.add(new_note)
+
+            existing_batch_day = session.exec(statement).first()
+
+            if not existing_batch_day:
+                raise ValueError("Batch day not found")
+
+            existing_batch_day.notes = notes
+            session.add(existing_batch_day)  # This is optional; changes are tracked automatically
             session.commit()

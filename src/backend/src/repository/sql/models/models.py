@@ -18,7 +18,6 @@ class UserModel(SQLModel, table=True):
 
     study_session_time: datetime | None
 
-    user_notes: list["NoteModel"] = Relationship(back_populates="user")
     user_batches: list["BatchModel"] = Relationship(back_populates="user")
     user_st_app_uses: list["STAppUseModel"] = Relationship(back_populates="user")
     st_planning_day: "STWeekDayPlanningModel" = Relationship(back_populates="user")
@@ -31,47 +30,57 @@ class UserModel(SQLModel, table=True):
     week_study_time: list["WeekStudyTimeModel"] = Relationship(back_populates="user")
 
 
-class NoteModel(SQLModel, table=True):
-    __tablename__ = "note"
-
-    id: int = Field(primary_key=True, default=None)
-    text: str
-    date: datetime
-
-    user_id: int = Field(foreign_key="user.id")
-    user: UserModel = Relationship(back_populates="user_notes")
-
-
 class BatchModel(SQLModel, table=True):
     __tablename__ = "batch"
 
     id: int = Field(primary_key=True, default=None)
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+
     start_date: datetime
     level: int
 
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="user_batches")
+    batch_days: list["BatchDayModel"] = Relationship(back_populates="batch")
 
-    challenges: list["ChallengeModel"] = Relationship(back_populates="batch")
 
-
-class ChallengeModel(SQLModel, table=True):
-    __tablename__ = "challenge"
+class BatchDayModel(SQLModel, table=True):
+    __tablename__ = "batch_day"
 
     id: int = Field(primary_key=True)
-    challenge_day: int = Field(primary_key=True)
-    completion_date: datetime | None
-
-    user_id: int = Field(primary_key=True)  # Assuming this should be foreign_key="usermodel.id"
-
     batch_id: int = Field(primary_key=True)
-    batch: BatchModel = Relationship(back_populates="challenges")
+    user_id: int = Field(primary_key=True)
+
+    notes: str
+
+    batch: BatchModel = Relationship(back_populates="batch_days")
+    challenges: list["ChallengeModel"] = Relationship(back_populates="batch_day")
 
     # Composite foreign key constraint
     __table_args__ = (
         ForeignKeyConstraint(
             ['batch_id', 'user_id'],
             ['batch.id', 'batch.user_id']
+        ),
+    )
+
+
+class ChallengeModel(SQLModel, table=True):
+    __tablename__ = "challenge"
+
+    id: int = Field(primary_key=True)
+    batch_day_id: int = Field(primary_key=True)
+    batch_id: int = Field(primary_key=True)
+    user_id: int = Field(primary_key=True)
+
+    completion_date: datetime | None
+
+    batch_day: BatchDayModel = Relationship(back_populates="challenges")
+
+    # Composite foreign key constraint
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['batch_day_id', 'batch_id', 'user_id'],
+            ['batch_day.id', 'batch_day.batch_id', 'batch_day.user_id']
         ),
     )
 

@@ -1,4 +1,4 @@
-import { Challenge } from "~/challenges/types";
+import { BatchDay, Challenge } from "~/challenges/types";
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useRef, useState } from "react";
 import { Batch, service } from "~/service/service";
@@ -11,12 +11,12 @@ function useChallengeList() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
 
     const { t } = useTranslation(["challenges"]);
-    const { batches, currentBatch, currentDayIndex, challenges, fetchUserInfo } = useChallenges();
+    const { batches, currentBatch, currentDayIndex, batchDays, fetchUserInfo } = useChallenges();
 
     const [selectedBatch, setSelectedBatch] = useState<Batch | undefined>(undefined);
 
-    const [listedChallenges, setListedChallenges] = useState<Challenge[][] | undefined>(undefined);
-    const [selectedChallenge, setSelectedChallenge] = useState<number | undefined>(undefined);
+    const [listedBatchDays, setListedBatchDays] = useState<BatchDay[] | undefined>(undefined);
+    const [selectedBatchDay, setSelectedBatchDay] = useState<number | undefined>(undefined);
 
     useEffect(() => {
         if (!batches || !currentBatch) {
@@ -27,36 +27,48 @@ function useChallengeList() {
     }, [batches, currentBatch]);
 
     useEffect(() => {
-        if (!challenges || !currentBatch || currentDayIndex == undefined)
+        if (!batchDays || !currentBatch || currentDayIndex == undefined)
             return;
 
-        const batchChallenges = challenges.get(currentBatch.id);
+        const currentBatchDays = batchDays.get(currentBatch.id);
 
-        if (!batchChallenges)
+        if (!currentBatchDays)
             return;
 
-        setListedChallenges(batchChallenges.slice(0, Math.min(currentDayIndex + 1, 21)));
-    }, [challenges]);
+        setListedBatchDays(currentBatchDays.slice(0, Math.min(currentDayIndex + 1, 21)));
+    }, [batchDays]);
 
-    function onChallengeClickHandler(challengeIndex: number) {
-        setSelectedChallenge(challengeIndex);
+    function onChallengeClickHandler(day: number) {
+        setSelectedBatchDay(day);
     }
 
-    async function onMarkCompleteClickHandler(challenge: Challenge, batch: Batch) {
-        await service.markChallengeAsCompleted(batch.id, challenge.id, challenge.challengeDay)
+    async function onMarkCompleteClickHandler(challenge: Challenge, batchDay: BatchDay, batch: Batch) {
+        await service.markChallengeAsCompleted(batch.id, batchDay.id, challenge.id)
             .then(() => {
                 fetchUserInfo();
             });
     }
 
-    return { onChallengeClickHandler, listedChallenges, onMarkCompleteClickHandler, selectedBatch };
+    async function onNoteAddClick(notesText: string) {
+        if (!selectedBatch || selectedBatchDay == undefined) {
+            return;
+        }
+
+        await service.editDayNote(selectedBatch.id, selectedBatch.batchDays[selectedBatchDay].id, notesText)
+            .then(() => {
+                fetchUserInfo();
+            });
+    }
+
+    return { onChallengeClickHandler, listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick };
 }
 
-function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkCompleteClickHandler }: {
+function ChallengesList({ batch, batchDays, onChallengeClickHandler, onMarkCompleteClickHandler, onNoteAddClick }: {
     batch: Batch | undefined,
-    challenges: Challenge[][] | undefined,
+    batchDays: BatchDay[] | undefined,
     onChallengeClickHandler: (challengeIndex: number) => void,
-    onMarkCompleteClickHandler: (challenge: Challenge, batch: Batch) => void
+    onMarkCompleteClickHandler: (challenge: Challenge, batchDay: BatchDay, batch: Batch) => void,
+    onNoteAddClick: (notesText: string) => void
 }) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectedItem, setSelectedItem] = useState<number>(-1);
@@ -64,7 +76,7 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
 
     const selectedRef = useRef<HTMLDivElement>(null);
 
-    const currentChallenge = challenges?.length;
+    const currentChallenge = batchDays?.length;
 
     function onItemClickHandler(index: number) {
         const reached = currentChallenge ? index <= currentChallenge - 1 : false;
@@ -75,17 +87,17 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
 
         if (selectedItem == index) {
             setSelectedItem(-1);
-            setSearchParams();
+            setSearchParams({}, { replace: true });
             return;
         }
         setLastSelectedItem(selectedItem);
 
         setSelectedItem(index);
-        setSearchParams({ challengeDay: (index + 1).toString() });
+        setSearchParams({ day: (index + 1).toString() }, { replace: true });
     }
 
     useEffect(() => {
-        setSelectedItem(Number(searchParams.get("challengeDay")) - 1);
+        setSelectedItem(Number(searchParams.get("day")) - 1);
     }, [searchParams]);
 
 
@@ -113,15 +125,16 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
                 Array.from({ length: 21 }).map((_, index) => {
                         const reached = currentChallenge ? index <= currentChallenge - 1 : false;
 
-                        const title = challenges && challenges.length > index ? challenges[index][0].title : undefined;
-                        const description = challenges && challenges.length > index ? challenges[index][0].description : undefined;
-                        const completed = challenges && challenges.length > index ? challenges[index][0].completionDate != null : false;
+                        const notes = batchDays && batchDays.length > index ? batchDays[index].notes : undefined;
+
+                        const title = batchDays && batchDays.length > index ? batchDays[index].challenges[0].title : undefined;
+                        const description = batchDays && batchDays.length > index ? batchDays[index].challenges[0].description : undefined;
+                        const completed = batchDays && batchDays.length > index ? batchDays[index].challenges[0].completionDate != null : false;
 
                         let ref: React.RefObject<HTMLDivElement> | undefined = undefined;
                         if (selectedItem != -1 && selectedItem == index) {
                             ref = selectedRef;
-                        }
-                        else if (selectedItem == -1 && challenges && index == challenges.length - 1) {
+                        } else if (selectedItem == -1 && batchDays && index == batchDays.length - 1) {
                             ref = selectedRef;
                         }
 
@@ -129,19 +142,22 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
                                                   ref={ref}
                                                   completed={completed}
                                                   challengeIndex={index}
-                                                  loading={challenges == undefined}
+                                                  loading={batchDays == undefined}
                                                   challengeTitle={title}
                                                   challengeDescription={description}
+                                                  challengeNotes={notes}
                                                   lastExpanded={lastSelectedItem == index}
                                                   expanded={selectedItem == index}
                                                   reached={reached}
                                                   onChallengeClick={onItemClickHandler}
                                                   onMarkComplete={() => {
-                                                      if (!challenges || !batch) {
+                                                      if (!batchDays || !batch) {
                                                           return;
                                                       }
-                                                      onMarkCompleteClickHandler(challenges[index][0], batch);
-                                                  }} />;
+                                                      onMarkCompleteClickHandler(batchDays[index].challenges[0], batchDays[index], batch);
+                                                  }}
+                                                  onNoteAddClick={onNoteAddClick}
+                        />;
                     }
                 )
             }
@@ -151,15 +167,19 @@ function ChallengesList({ batch, challenges, onChallengeClickHandler, onMarkComp
 
 export default function ChallengesPage() {
     const { t } = useTranslation(["challenge_overview"]);
-    const { onChallengeClickHandler, listedChallenges, onMarkCompleteClickHandler, selectedBatch } = useChallengeList();
+    const {
+        onChallengeClickHandler, listedBatchDays, onMarkCompleteClickHandler, selectedBatch,
+        onNoteAddClick
+    } = useChallengeList();
 
     return (
         <div className={`${styles.challengesPage}`}>
             <div className={`${styles.mainContent}`}>
                 <div className={`${styles.challengesListContainer}`}>
                     <ChallengesList batch={selectedBatch}
-                                    challenges={listedChallenges} onChallengeClickHandler={onChallengeClickHandler}
-                                    onMarkCompleteClickHandler={onMarkCompleteClickHandler} />
+                                    batchDays={listedBatchDays} onChallengeClickHandler={onChallengeClickHandler}
+                                    onMarkCompleteClickHandler={onMarkCompleteClickHandler}
+                                    onNoteAddClick={onNoteAddClick} />
                 </div>
             </div>
         </div>

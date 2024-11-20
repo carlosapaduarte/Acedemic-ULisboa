@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Challenge } from "~/challenges/types";
+import { BatchDay, Challenge } from "~/challenges/types";
 import { Batch, service, UserNote } from "~/service/service";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
@@ -19,40 +19,35 @@ function useChallengeView() {
     const { t } = useTranslation(["challenges"]);
 
     const {
-        userInfo, batches, currentBatch, currentDayIndex, challenges,
+        userInfo, batches, currentBatch, currentDayIndex, batchDays,
         fetchUserInfo
     } = useContext(ChallengesContext);
-
-    const [todayChallenges, setTodayChallenges] = useState<Challenge[]>();
-
     const [newNoteText, setNewNoteText] = useState("");
-    const [todayNotes, setTodayNotes] = useState<UserNote[]>();
+
+    const [currentBatchDay, setCurrentBatchDay] = useState<BatchDay | undefined>(undefined);
 
     useEffect(() => {
         if (userInfo != undefined) {
             if (userInfo.batches.length == 0) {
                 return;
             }
-
-            const todaysNotes: UserNote[] = getTodayNotes(userInfo.userNotes);
-            setTodayNotes(todaysNotes);
         }
     }, [userInfo]);
 
     useEffect(() => {
-        if (!challenges || !currentBatch || currentDayIndex == undefined)
+        if (!batchDays || !currentBatch || currentDayIndex == undefined)
             return;
 
-        const batchChallenges = challenges.get(currentBatch.id);
+        const currentBatchDays = batchDays.get(currentBatch.id);
 
-        if (!batchChallenges)
+        if (!currentBatchDays)
             return;
 
-        setTodayChallenges(batchChallenges[currentDayIndex]);
-    }, [challenges]);
+        setCurrentBatchDay(currentBatchDays[currentDayIndex]);
+    }, [batchDays]);
 
-    async function onMarkCompleteClickHandler(challenge: Challenge, batch: Batch) {
-        await service.markChallengeAsCompleted(batch.id, challenge.id, challenge.challengeDay)
+    async function onMarkCompleteClickHandler(challenge: Challenge, batchDay: BatchDay, batch: Batch) {
+        await service.markChallengeAsCompleted(batch.id, batchDay.id, challenge.id)
             .then(() => {
                 fetchUserInfo();
             });
@@ -60,9 +55,7 @@ function useChallengeView() {
 
     return {
         userInfo,
-        currentDayIndex,
-        todayChallenges,
-        todayNotes,
+        currentBatchDay,
         newNoteText,
         currentBatch,
         setNewNoteText,
@@ -73,20 +66,18 @@ function useChallengeView() {
 export function ChallengeView() {
     const {
         userInfo,
-        currentDayIndex,
-        todayChallenges,
-        todayNotes,
+        currentBatchDay,
         currentBatch,
         onMarkCompleteClickHandler
     } = useChallengeView();
 
-    if (userInfo && currentDayIndex != undefined && todayChallenges && todayNotes && currentBatch) {
+    if (userInfo && currentBatchDay != undefined && currentBatch) {
         return (
             <div className={styles.challengesContainerWrapper}>
                 <Challenges
-                    currentDayNumber={currentDayIndex + 1}
-                    challenges={todayChallenges}
-                    onMarkComplete={(challenge: Challenge) => onMarkCompleteClickHandler(challenge, currentBatch)} />
+                    currentBatchDay={currentBatchDay}
+                    onMarkComplete={(challenge: Challenge) =>
+                        onMarkCompleteClickHandler(challenge, currentBatchDay, currentBatch)} />
             </div>
         );
     } else
