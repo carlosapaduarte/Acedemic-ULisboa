@@ -5,9 +5,10 @@ import React from "react";
 import styles from "./challenges.module.css";
 import { useTranslation } from "react-i18next";
 
-export default function Challenges({ currentBatchDay, onMarkComplete }: {
+export default function Challenges({ currentBatchDay, onMarkComplete, onViewNotesButtonClick }: {
     currentBatchDay: BatchDay,
-    onMarkComplete: (challenge: Challenge) => void
+    onMarkComplete: (challenge: Challenge) => void,
+    onViewNotesButtonClick: () => void
 }) {
     const { t } = useTranslation(["dashboard"]);
 
@@ -41,8 +42,9 @@ export default function Challenges({ currentBatchDay, onMarkComplete }: {
                             </p>
                         </div>
                         <div className={styles.buttonsContainer}>
-                            <CutButton className={styles.addNoteButton}>
-                                {t("dashboard:add_note")}
+                            <CutButton className={styles.addNoteButton}
+                                       onClick={() => onViewNotesButtonClick()}>
+                                {t("dashboard:view_edit_notes")}
                             </CutButton>
                             {
                                 challenges[0].completionDate != null ?

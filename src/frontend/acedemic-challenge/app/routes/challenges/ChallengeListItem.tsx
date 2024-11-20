@@ -3,7 +3,7 @@ import classNames from "classnames";
 import React, { forwardRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CutButton } from "~/components/Button/Button";
-import { NotesModal } from "~/routes/challenges/NotesModal/NotesModal";
+import { NotesModal } from "~/components/NotesModal/NotesModal";
 
 
 /*
@@ -135,16 +135,19 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                                 <div className={`${styles.challengeDescription}`}>
                                     {challengeDescription}
                                 </div>
-                                <div className={`${styles.challengeNotes}`}>
-                                    <br />
-                                    {t("dashboard:notes")}:
-                                    <br />
-                                    {challengeNotes}
+                                <div className={classNames(
+                                    styles.challengeNotes,
+                                    challengeNotes == null || challengeNotes == "" ? styles.empty : ""
+                                )}>
+                                    {challengeNotes != null && challengeNotes !== ""
+                                        ? `${t("dashboard:notes")}: ${challengeNotes}`
+                                        : t("dashboard:no_notes")
+                                    }
                                 </div>
                                 <div className={styles.buttonsContainer}>
                                     <CutButton className={styles.addNoteButton}
                                                onClick={() => setIsModalOpen(true)}>
-                                        {t("dashboard:add_note")}
+                                        {t("dashboard:view_edit_notes")}
                                     </CutButton>
                                     {
                                         completed ?

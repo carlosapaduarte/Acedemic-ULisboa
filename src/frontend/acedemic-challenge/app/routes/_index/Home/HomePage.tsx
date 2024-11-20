@@ -5,11 +5,12 @@ import { ProgressBar } from "~/routes/_index/Home/components/ProgressBar/Progres
 import { ChallengeView } from "~/routes/_index/Home/components/ChallengeView/ChallengeView";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { ChallengesContext, useChallenges } from "~/hooks/useChallenges";
+import { NotesModal } from "~/components/NotesModal/NotesModal";
+import { service } from "~/service/service";
 
 const logger = new Logger({ name: "HomePage" });
 
-export default function HomePage() {
-    useAppBar("home");
+function useHomePage() {
     const {
         userInfo,
         batches,
@@ -18,6 +19,8 @@ export default function HomePage() {
         currentBatch,
         fetchUserInfo
     } = useChallenges();
+
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
 
     const [progress, setProgress] = React.useState(0);
 
@@ -37,12 +40,68 @@ export default function HomePage() {
         setProgress(completedCount / batchChallenges.length * 100);
     }, [batchDays]);
 
+    const currentBatchDays =
+        batchDays != undefined && currentBatch != undefined
+            ? batchDays.get(currentBatch.id)
+            : undefined;
+    const notesText = currentBatchDays != undefined && currentDayIndex != undefined ? currentBatchDays[currentDayIndex].notes : "";
+
+    async function onNoteAddClick(notesText: string) {
+        if (currentDayIndex == undefined || !currentBatch)
+            return;
+
+        await service.editDayNote(currentBatch.id, currentDayIndex + 1, notesText)
+            .then(() => {
+                fetchUserInfo();
+            });
+    }
+
+    return {
+        userInfo,
+        batches,
+        batchDays,
+        currentDayIndex,
+        currentBatch,
+        fetchUserInfo,
+        progress,
+        isModalOpen,
+        setIsModalOpen,
+        notesText,
+        onNoteAddClick
+    };
+}
+
+export default function HomePage() {
+    useAppBar("home");
+
+    const {
+        userInfo,
+        batches,
+        batchDays,
+        currentDayIndex,
+        currentBatch,
+        fetchUserInfo,
+        progress,
+        isModalOpen,
+        setIsModalOpen,
+        notesText,
+        onNoteAddClick
+    } = useHomePage();
+
     return (
         <ChallengesContext.Provider
             value={{ userInfo, batches, batchDays, currentDayIndex, currentBatch, fetchUserInfo }}>
             <div className={styles.homePage}>
                 <ProgressBar progress={progress} />
-                <ChallengeView />
+                <ChallengeView onViewNotesButtonClick={() => setIsModalOpen(true)} />
+                {
+                    currentDayIndex != undefined &&
+                    <NotesModal batchDayNumber={currentDayIndex + 1}
+                                isModalOpen={isModalOpen}
+                                setIsModalOpen={setIsModalOpen}
+                                savedNotesText={notesText}
+                                onNotesSave={onNoteAddClick} />
+                }
             </div>
         </ChallengesContext.Provider>
     );

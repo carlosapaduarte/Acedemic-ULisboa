@@ -220,13 +220,6 @@ Doesn't work, use SCSS
     text-wrap: nowrap;
 }
 
-@keyframes jiggle {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    75% { transform: rotate(5deg); }
-    100% { transform: rotate(0deg); }
-}
-
 @keyframes locked-shake {
     0% { transform: translate(0, 0); }
     20% { transform: translate(-2px, 1px); }
@@ -253,9 +246,17 @@ Doesn't work, use SCSS
 
 .challengeBox .challengeExpandableContainerContent {
     padding: 0.5rem 0.5rem 0.5rem 1rem;
+
+    height: 100%;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .challengeDescription {
+    margin-bottom: 0.5rem;
+
     text-align: left;
 
     font-size: 1rem;
@@ -263,16 +264,28 @@ Doesn't work, use SCSS
     text-transform: none;
     font-weight: normal;
     color: black;
+
+    overflow: auto;
 }
 
 .challengeNotes {
+    flex-shrink: 0;
+    margin-top: auto;
+
     text-align: left;
 
+    color: black;
+    font-weight: bold;
     font-size: 1rem;
     font-family: var(--font-family1), sans-serif;
     text-transform: none;
-    font-weight: bold;
-    color: black;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &.empty {
+        opacity: 0.85;
+    }
 }
 
 

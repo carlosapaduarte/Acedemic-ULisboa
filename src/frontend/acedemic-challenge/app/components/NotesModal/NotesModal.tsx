@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
-import { Button, Dialog, Modal, TextArea } from "react-aria-components";
+import { Dialog, Modal, TextArea } from "react-aria-components";
 import classNames from "classnames";
 
 import "./notesModalReactAria.css";
@@ -36,15 +36,15 @@ export function NotesModal(
                         <div className={notesModalStyles.modalHeader}>
                             <h1 className={notesModalStyles.modalTitle}>{t("challenge_overview:day", { day: batchDayNumber })}</h1>
                             <div className={notesModalStyles.buttonsContainer}>
-                                <Button className={classNames(notesModalStyles.saveButton)}
-                                        onPress={() => {
+                                <button className={classNames(notesModalStyles.saveButton)}
+                                        onClick={() => {
                                             onNotesSave(notesText);
                                         }}>
                                     {t("challenge_overview:save")}
-                                </Button>
-                                <Button className={classNames(notesModalStyles.closeButton)} onPress={close}>
+                                </button>
+                                <button className={classNames(notesModalStyles.closeButton)} onClick={close}>
                                     {t("challenge_overview:close")}
-                                </Button>
+                                </button>
                             </div>
                         </div>
 

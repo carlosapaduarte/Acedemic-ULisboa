@@ -63,19 +63,20 @@ function useChallengesList(
     return { selectedItem, lastSelectedItem, selectedRef, onItemClickHandler, currentChallenge };
 }
 
-export function ChallengesList({
-                                   batch,
-                                   batchDays,
-                                   onChallengeClickHandler,
-                                   onMarkCompleteClickHandler,
-                                   onNoteAddClick
-                               }: {
-    batch: Batch | undefined,
-    batchDays: BatchDay[] | undefined,
-    onChallengeClickHandler: (challengeIndex: number) => void,
-    onMarkCompleteClickHandler: (challenge: Challenge, batchDay: BatchDay, batch: Batch) => void,
-    onNoteAddClick: (notesText: string) => void
-}) {
+export function ChallengesList(
+    {
+        batch,
+        batchDays,
+        onChallengeClickHandler,
+        onMarkCompleteClickHandler,
+        onNoteAddClick
+    }: {
+        batch: Batch | undefined,
+        batchDays: BatchDay[] | undefined,
+        onChallengeClickHandler: (challengeIndex: number) => void,
+        onMarkCompleteClickHandler: (challenge: Challenge, batchDay: BatchDay, batch: Batch) => void,
+        onNoteAddClick: (notesText: string) => void
+    }) {
     const { t } = useTranslation(["dashboard", "challenge_overview"]);
     const {
         selectedItem,

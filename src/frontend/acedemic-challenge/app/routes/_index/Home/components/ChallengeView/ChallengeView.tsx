@@ -63,7 +63,7 @@ function useChallengeView() {
     };
 }
 
-export function ChallengeView() {
+export function ChallengeView({ onViewNotesButtonClick }: { onViewNotesButtonClick: () => void }) {
     const {
         userInfo,
         currentBatchDay,
@@ -77,7 +77,8 @@ export function ChallengeView() {
                 <Challenges
                     currentBatchDay={currentBatchDay}
                     onMarkComplete={(challenge: Challenge) =>
-                        onMarkCompleteClickHandler(challenge, currentBatchDay, currentBatch)} />
+                        onMarkCompleteClickHandler(challenge, currentBatchDay, currentBatch)}
+                    onViewNotesButtonClick={onViewNotesButtonClick} />
             </div>
         );
     } else
