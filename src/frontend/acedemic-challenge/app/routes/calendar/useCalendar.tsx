@@ -32,7 +32,7 @@ export function useCalendar() {
 
         batches?.forEach((batch) => {
             batchDays.get(batch.id)?.forEach((batchDay) => {
-                if (batch.id == currentBatch?.id && batchDay.id > currentDayIndex) {
+                if (batch.id == currentBatch?.id && batchDay.id > currentDayIndex + 1) {
                     return;
                 }
                 daysWithChallenges.push(batchDay);

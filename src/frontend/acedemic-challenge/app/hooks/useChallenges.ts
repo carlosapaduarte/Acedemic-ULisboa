@@ -55,7 +55,7 @@ export function useChallenges() {
                 id: storedBatchDay.id,
                 challenges: storedBatchDay.challenges.map((storedChallenge) => getFullChallenge(batch.level, storedChallenge, t)),
                 notes: storedBatchDay.notes,
-                date: new Date(batch.startDate * 1000 + 1000 * 3600 * 24 * storedBatchDay.id)
+                date: new Date(batch.startDate * 1000 + 1000 * 3600 * 24 * (storedBatchDay.id - 1))
             }));
     }
 
