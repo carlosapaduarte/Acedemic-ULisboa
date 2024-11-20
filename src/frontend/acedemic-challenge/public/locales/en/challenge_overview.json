@@ -1,4 +1,7 @@
 {
     "no_reached_message": "Challenge unlocked!",
-    "title": "Challenge Overview"
+    "title": "Challenge Overview",
+    "save": "Save",
+    "close": "Close",
+    "day": "Day {{day}}"
 }

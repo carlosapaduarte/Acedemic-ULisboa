@@ -49,12 +49,14 @@ export function useChallenges() {
     }, [batches, t]);
 
     function getFullBatchDays(batch: Batch): BatchDay[] {
-        return batch.batchDays.map((storedBatchDay) => ({
-            id: storedBatchDay.id,
-            challenges: storedBatchDay.challenges.map((storedChallenge) => getFullChallenge(batch.level, storedChallenge, t)),
-            notes: storedBatchDay.notes,
-            date: new Date(batch.startDate * 1000 + 1000 * 3600 * 24 * storedBatchDay.id)
-        }));
+        return batch.batchDays
+            .sort((a, b) => a.id - b.id)
+            .map((storedBatchDay) => ({
+                id: storedBatchDay.id,
+                challenges: storedBatchDay.challenges.map((storedChallenge) => getFullChallenge(batch.level, storedChallenge, t)),
+                notes: storedBatchDay.notes,
+                date: new Date(batch.startDate * 1000 + 1000 * 3600 * 24 * storedBatchDay.id)
+            }));
     }
 
     function fetchUserInfo() {
