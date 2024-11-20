@@ -128,11 +128,12 @@ function WeekHeader() {
 
 function Day(
     {
-        day, onDayClick, hasChallenge, selected
+        day, onDayClick, hasChallenge, selected, completed
     }: {
         day: CalendarDay, onDayClick: (day: CalendarDay) => void,
         selected: boolean,
-        hasChallenge: boolean
+        hasChallenge: boolean,
+        completed: boolean
     }
 ) {
     const isCurrentMonth = day.currentMonth;
@@ -140,34 +141,40 @@ function Day(
     const isToday = utils.sameDay(day.date, new Date());
 
     return (
-        <CutButton
-            className={classNames(
-                styles.calendarDayContainer,
-                { [styles.today]: isToday },
-                { [styles.notCurrentMonth]: !isCurrentMonth },
-                { [styles.hasChallenge]: hasChallenge },
-                { [styles.selected]: selected }
-            )}
-            onClick={() => onDayClick(day)}
-        >
-            <h1 className={classNames(
-                styles.calendarDayText,
-                { [styles.today]: isToday },
-                { [styles.notCurrentMonth]: !isCurrentMonth },
-                { [styles.hasChallenge]: hasChallenge },
-                { [styles.selected]: selected }
-            )}>
-                {day.number}
-            </h1>
-        </CutButton>
+        <div className={styles.calendarDayContainerWrapper}>
+            <CutButton
+                className={classNames(
+                    styles.calendarDayContainer,
+                    { [styles.today]: isToday },
+                    { [styles.notCurrentMonth]: !isCurrentMonth },
+                    { [styles.hasChallenge]: hasChallenge },
+                    { [styles.selected]: selected }
+                )}
+                onClick={() => onDayClick(day)}
+            >
+                <h1 className={classNames(
+                    styles.calendarDayText,
+                    { [styles.today]: isToday },
+                    { [styles.notCurrentMonth]: !isCurrentMonth },
+                    { [styles.hasChallenge]: hasChallenge },
+                    { [styles.selected]: selected }
+                )}>
+                    {day.number}
+                </h1>
+            </CutButton>
+            {completed
+                ? <div className={styles.dayChallengeCompleteIndicator}>!</div>
+                : null
+            }
+        </div>
     );
 }
 
 function CalendarDays(
     {
-        challenges, visibleMonth, onDayClick
+        batchDays, visibleMonth, onDayClick
     }: {
-        challenges: BatchDay[], visibleMonth: Date, onDayClick: (day: CalendarDay) => void
+        batchDays: BatchDay[], visibleMonth: Date, onDayClick: (day: CalendarDay) => void
     }) {
     const { currentDays } = useCalendarDays(visibleMonth);
     const [selectedDay, setSelectedDay] = useState<CalendarDay>({
@@ -179,7 +186,7 @@ function CalendarDays(
         year: new Date().getFullYear()
     });
 
-    const daysWithChallenges = challenges.map((challenge) => {
+    const daysWithChallenges = batchDays.map((challenge) => {
         return challenge.date.toDateString();
     });
 
@@ -195,7 +202,11 @@ function CalendarDays(
                              onDayClick={(day) => {
                                  setSelectedDay(day);
                                  onDayClick(day);
-                             }} />
+                             }}
+                             completed={batchDays.find((batchDay) =>
+                                 utils.sameDay(batchDay.date, day.date))?.challenges.every((challenge) =>
+                                 challenge.completionDate !== null) ?? false}
+                        />
                     );
                 })
             }
@@ -214,7 +225,7 @@ function CalendarGrid(
     return (
         <div className={`${styles.calendarGridContainer}`}> {/*${styles.switched}*/}
             <WeekHeader />
-            <CalendarDays challenges={challenges} visibleMonth={visibleMonth} onDayClick={onDayClick} />
+            <CalendarDays batchDays={challenges} visibleMonth={visibleMonth} onDayClick={onDayClick} />
         </div>
     );
 }

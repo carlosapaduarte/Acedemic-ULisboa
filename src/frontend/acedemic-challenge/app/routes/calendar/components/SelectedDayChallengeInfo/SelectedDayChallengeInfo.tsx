@@ -84,7 +84,7 @@ export default function SelectedDayChallengeInfo({ daysWithChallenges, selectedD
                 <div className={`${styles.challengeTextContainer}`}>
                     <div className={`${styles.challengeTitleContainer}`}>
                         <h2 className={`${styles.challengeTitle}`}>
-                            {challenge.title}
+                            {selectedBatchDay.id} - {challenge.title}
                         </h2>
                         {
                             challenge.completionDate != null ?
