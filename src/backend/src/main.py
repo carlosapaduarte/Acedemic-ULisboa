@@ -19,8 +19,9 @@ app.include_router(common.router)
 app.include_router(academic_challenge.router)
 app.include_router(study_tracker.router)
 
-origins = [
-    "*" # [DEVELOPMENT ONLY]
+dev_mode = True
+
+origins = ["*"] if dev_mode else [
     "https://acedemic.studentlife.ulisboa.pt",
     "http://localhost:3000",
     "http://localhost:3001",

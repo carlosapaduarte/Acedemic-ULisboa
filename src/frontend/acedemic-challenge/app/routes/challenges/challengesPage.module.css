@@ -190,6 +190,56 @@ Doesn't work, use SCSS
     text-wrap: nowrap;
 }
 
+.challengeIncompleteTag {
+    padding: 0.25rem;
+
+    background-color: transparent;
+
+    outline: 2px solid black;
+    outline-offset: -2px;
+
+    color: black;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
+}
+
+.challengeLockedTag {
+    padding: 0.25rem;
+
+    background-color: transparent;
+
+    outline: 2px solid white;
+    outline-offset: -2px;
+
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
+}
+
+@keyframes jiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes locked-shake {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-2px, 1px); }
+    40% { transform: translate(2px, -1px); }
+    60% { transform: translate(-2px, -1px); }
+    80% { transform: translate(2px, 1px); }
+    100% { transform: translate(0, 0); }
+}
+
+.shakeAnimation {
+    animation: locked-shake 0.3s cubic-bezier(.36,.07,.19,.97);
+}
+
 .challengeBox .challengeExpandableContainer {
     transition: max-height 0.5s cubic-bezier(0.87, 0, 0.13, 1);
     height: 1000vh;
@@ -197,12 +247,12 @@ Doesn't work, use SCSS
     overflow: auto;
 }
 
-.challengeBox .challengeExpandableContainerContent {
-    padding: 0.5rem 0.5rem 0.5rem 1rem;
-}
-
 .challengeBox.expanded .challengeExpandableContainer {
     max-height: var(--expandableContainerMaxHeight);
+}
+
+.challengeBox .challengeExpandableContainerContent {
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
 }
 
 .challengeDescription {

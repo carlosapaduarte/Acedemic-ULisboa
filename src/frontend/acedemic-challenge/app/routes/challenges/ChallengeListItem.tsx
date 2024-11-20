@@ -44,6 +44,8 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const [isLockedShaking, setIsLockedShaking] = useState(false);
+
     return (
         <>
             <NotesModal batchDayNumber={challengeIndex + 1}
@@ -58,7 +60,8 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                     classNames(
                         styles.challengeBoxContainer,
                         lastExpanded && reached ? styles.lastExpanded : "",
-                        expanded && reached ? styles.expanded : ""
+                        expanded && reached ? styles.expanded : "",
+                        !reached && isLockedShaking ? styles.shakeAnimation : ""
                     )}>
                 {loading
                     ?
@@ -82,7 +85,15 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                             className={classNames(styles.challengeBoxButton)}
                             aria-expanded={reached ? (expanded) : undefined}
                             aria-controls={reached ? `challengeDescription-${challengeIndex}` : undefined}
-                            onClick={() => onChallengeClick(challengeIndex)}>
+                            onClick={() => {
+                                if (!reached) {
+                                    setIsLockedShaking(true);
+                                    setTimeout(() => setIsLockedShaking(false), 300);
+                                    return;
+                                }
+
+                                onChallengeClick(challengeIndex)
+                            }}>
                             {
                                 reached ?
                                     <div className={`${styles.challengeContainer}`}
@@ -97,7 +108,9 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                                                     {t("dashboard:challenge_completed")}
                                                 </div>
                                                 :
-                                                <></>
+                                                <div className={styles.challengeIncompleteTag}>
+                                                    {t("dashboard:challenge_incomplete")}
+                                                </div>
                                         }
                                     </div>
                                     :
@@ -105,8 +118,11 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                                          aria-label={"Locked challenge"}
                                     >
                                         <p className={`${styles.challengeTitle}`}>
-                                            ?
+                                            {challengeIndex + 1} - ?
                                         </p>
+                                        <div className={styles.challengeLockedTag}>
+                                            {t("dashboard:challenge_locked")}
+                                        </div>
                                     </div>
                             }
                         </button>

@@ -4,6 +4,8 @@
     "current_challenge": "Desafios Para Hoje",
     "day": "Dia",
     "challenge_completed": "Desafio Completo!",
+    "challenge_incomplete": "Desafio Incompleto",
+    "challenge_locked": "Desafio Bloqueado",
     "main_message": "A melhor maneira de quebrar um hábito é largá-lo",
     "mark_complete": "Marcar Como Completo",
     "my_notes": "As Minhas Notas",
