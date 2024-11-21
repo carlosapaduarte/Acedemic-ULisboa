@@ -17,7 +17,7 @@
 
     overflow: auto;
 
-    color: var(--secondary-text-color);
+    color: var(--text-color-2);
 }
 
 .challengesContainer {

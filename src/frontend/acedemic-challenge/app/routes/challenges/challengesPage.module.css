@@ -68,7 +68,7 @@ Doesn't work, use SCSS
 .challengeBox {
     width: 100%;
 
-    background-color: var(--secondary-color);
+    background-color: var(--color-2);
 
     --edge-size: .5rem;
     clip-path: polygon(
@@ -86,6 +86,27 @@ Doesn't work, use SCSS
 
     display: flex;
     flex-direction: column;
+
+    &.loading {
+        --loadingColor: #1e001e;
+
+        background: linear-gradient(90deg,
+        var(--loadingColor) 25%,
+        #471e47 50%,
+        var(--loadingColor) 75%);
+        background-size: 400px 100%;
+        animation: loadingAnimation 2s infinite linear;
+        color: white;
+    }
+
+    &.expanded {
+        background-color: var(--color-4);
+    }
+
+    &.locked {
+        background-color: var(--color-3);
+        color: white;
+    }
 }
 
 @keyframes loadingAnimation {
@@ -97,33 +118,11 @@ Doesn't work, use SCSS
     }
 }
 
-.challengeBox.loading {
-    --loadingColor: #1e001e;
-
-    background: linear-gradient(90deg,
-    var(--loadingColor) 25%,
-    #471e47 50%,
-    var(--loadingColor) 75%);
-    background-size: 400px 100%;
-    animation: loadingAnimation 2s infinite linear;
-    color: white;
-}
-
-.challengeBox.expanded {
-    background-color: var(--fourth-color);
-}
-
-.challengeBox.locked {
-    background-color: var(--third-color);
-    color: white;
-}
-
 .challengeBox .challengeBoxButton {
     width: 100%;
 
     padding: 0.5rem 0.5rem 0.5rem 1rem;
 
-    background-color: inherit;
     text-transform: uppercase;
     font-family: 'Chakra Petch', sans-serif;
     color: inherit;

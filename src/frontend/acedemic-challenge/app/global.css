@@ -4,16 +4,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
 
 :root {
-    --primary-color: #771480;
-    --secondary-color: #7DF4BE;
-    --third-color: #491351;
-    --fourth-color: #ffe600;
-    --fifth-color: #2e3192;
-    --yellow-85: rgba(255, 230, 0, 0.85);
-    --secondary-85: rgba(125, 244, 190, 0.85);
+    --color-1: #771480;
+    --color-2: hsl(160, 100%, 70%);
+    --color-3: #491351;
+    --color-4: #ffe600;
+    --color-5: #2e3192;
 
-    --primary-text-color: #000000;
-    --secondary-text-color: #ffffff;
+    --color-2-hover: hsl(160, 100%, 60%);
+    --color-4-hover: rgba(255, 230, 0, 0.85);
+
+    --text-color-1: #000000;
+    --text-color-2: #ffffff;
 
     --font-family1: 'DM Sans';
     --font-family2: 'Chakra Petch';
@@ -25,7 +26,7 @@ html, body {
 }
 
 body {
-    background-color: var(--primary-color);
+    background-color: var(--color-1);
     font-family: var(--font-family1), sans-serif;
 
     transition: background-color 300ms ease;

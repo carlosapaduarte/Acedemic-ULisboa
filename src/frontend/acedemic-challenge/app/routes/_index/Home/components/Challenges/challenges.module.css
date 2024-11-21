@@ -67,8 +67,8 @@
     gap: 0.5rem;
 }
 
-.addNoteButton {
-    background-color: var(--secondary-color);
+.viewEditNotesButton {
+    background-color: var(--color-2);
     font-weight: bold;
     font-size: 1rem;
     flex-basis: 40%;

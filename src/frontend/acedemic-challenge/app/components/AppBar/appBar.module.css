@@ -13,7 +13,7 @@
     grid-template-columns: auto auto 1fr auto;
     gap: 0.5rem;
 
-    background-color: var(--third-color);
+    background-color: var(--color-3);
     color: white;
 
     --edge-size: 1.5em;
@@ -31,7 +31,7 @@
     grid-column: 1;
     grid-row: 1;
 
-    background-color: var(--secondary-color);
+    background-color: var(--color-2);
     color: black;
     width: 3rem;
     height: 2rem;
@@ -58,8 +58,8 @@
     width: 3rem;
     height: 2rem;
 
-    background-color: var(--secondary-color);
-    color: var(--secondary-text-color);
+    background-color: var(--color-2);
+    color: var(--text-color-2);
 
     text-align: center;
     font-size: large;

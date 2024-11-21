@@ -78,11 +78,11 @@
     align-items: center;
 
     --edge-size: 0.3rem;
-    background-color: var(--third-color);
+    background-color: var(--color-3);
 }
 
 .calendarDayContainer.hasChallenge {
-    background-color: var(--secondary-color);
+    background-color: var(--color-2);
 }
 
 .calendarDayContainer.notCurrentMonth {
@@ -90,7 +90,7 @@
 }
 
 .calendarDayContainer.selected {
-    background-color: var(--fourth-color);
+    background-color: var(--color-4);
 }
 
 .calendarDayContainerWrapper .dayChallengeCompleteIndicator {

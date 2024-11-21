@@ -36,7 +36,7 @@ function InfoPage1({ handleOnNextClick }: { handleOnNextClick: () => void }) {
                 nulla rhoncus.
             </p>
             <div className={classNames(styles.navigationContainer)}>
-                <div style={{ color: "var(--secondary)" }}>
+                <div style={{ color: "var(--color-2)" }}>
                     Placeholder
                 </div>
                 <CutButton className={styles.proceedButton} onClick={handleOnNextClick}>
@@ -63,7 +63,7 @@ function InfoPage2({ handleOnProceedClick }: { handleOnProceedClick: () => void 
                      className={styles.studyImage} />
             </div>
             <div className={classNames(styles.navigationContainer)}>
-                <div style={{ color: "var(--secondary)" }}>
+                <div style={{ color: "var(--color-2)" }}>
                     Placeholder
                 </div>
                 <CutButton className={styles.proceedButton} onClick={handleOnProceedClick}>

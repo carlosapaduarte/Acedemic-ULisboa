@@ -64,7 +64,7 @@ export default function SelectedDayChallengeInfo({ daysWithChallenges, selectedD
     selectedDay: Date
 }) {
     const { selectedBatchDay } = useSelectedBatchDay({ daysWithChallenges, selectedDay });
-    const { t } = useTranslation(["calendar"]);
+    const { t } = useTranslation(["calendar", "dashboard"]);
     const navigate = useNavigate();
 
     useDescriptionLineClamp({ selectedBatchDay });

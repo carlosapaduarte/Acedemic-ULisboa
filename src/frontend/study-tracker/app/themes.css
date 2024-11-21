@@ -1,10 +1,10 @@
 
 .defaultTheme, .beigeTheme {
-    --primary-color: #f9deb9;
-    --secondary-color: #592e25;
-    --third-color: #703f3a;
-    --fourth-color: #587750;
+    --color-1: #f9deb9;
+    --color-2: #592e25;
+    --color-3: #703f3a;
+    --color-4: #587750;
 
-    --primary-text-color: #000000;
-    --secondary-text-color: #ffffff;
+    --text-color-1: #000000;
+    --text-color-2: #ffffff;
 }

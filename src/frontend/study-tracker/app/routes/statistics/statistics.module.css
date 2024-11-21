@@ -20,7 +20,7 @@
     box-sizing: border-box;
     border: 3px solid;
 
-    border-color: var(--secondary-color);
+    border-color: var(--color-2);
 
     border-radius: 10px;
 
@@ -63,7 +63,7 @@
     position: relative;
     top: -25px;
     left: -17px;
-    background-color: var(--secondary-color);
+    background-color: var(--color-2);
     text-align: center;
 
     font-weight: bolder;
@@ -122,7 +122,7 @@
 
 .containerHeaderDate {
     text-align: end;
-    color: var(--secondary-color);
+    color: var(--color-2);
     font-size: 0.7em;
     flex: 0 0 50%;
 }
@@ -141,7 +141,7 @@
 }
 
 .seeFullHistoryButton {
-    color: var(--secondary-color);
+    color: var(--color-2);
     background-color: transparent;
     font-size: smaller;
 
@@ -159,7 +159,7 @@
     display: flex;
     
     text-align: center;
-    color: var(--secondary-color);
+    color: var(--color-2);
     font-size: 0.7em;
 
     .textAndIconContainer {
@@ -179,7 +179,7 @@
 .focusContainerCurWeekStatisticTitle {
     font-size: large;
     font-weight: bolder;
-    color: var(--secondary-color);
+    color: var(--color-2);
 }
 
 .focusContainerCurWeekStatisticValue {
@@ -211,7 +211,7 @@
 
     height: 100%;
 
-    background-color: var(--fourth-color);
+    background-color: var(--color-4);
     width: var(--bar-width);
     border-radius: 1rem;
 }

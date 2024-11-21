@@ -62,7 +62,7 @@
 }
 
 .avatarContainer {
-    background-color: var(--primary-color);
+    background-color: var(--color-1);
     height: 100%;
 
     img {
@@ -94,7 +94,7 @@
 .navBarButton {
     composes: cutButton from "@/components/Button/button.module.css";
 
-    background-color: var(--primary-color);
+    background-color: var(--color-1);
     color: white;
     width: 4rem;
     height: 3rem;

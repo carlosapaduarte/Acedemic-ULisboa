@@ -14,7 +14,7 @@
 .welcomePage h2, .welcomePage h3 {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--secondary-color);
+    color: var(--color-2);
 }
 
 .welcomePage h2 {
@@ -47,7 +47,7 @@
     font-weight: bold;
     font-family: var(--font-family2), sans-serif;
 
-    color: var(--secondary-color);
+    color: var(--color-2);
 }
 
 .descriptionText {
@@ -78,5 +78,5 @@
 
     font-size: 1.25rem;
     font-weight: 700;
-    background-color: var(--fourth-color);
+    background-color: var(--color-4);
 }

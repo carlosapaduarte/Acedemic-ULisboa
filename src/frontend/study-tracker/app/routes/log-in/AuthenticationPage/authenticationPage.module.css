@@ -17,7 +17,7 @@
 }
 
 .titleText {
-    color: var(--secondary-color);
+    color: var(--color-2);
     font-size: 1.75rem;
     margin-bottom: 0.25rem;
 }
@@ -42,7 +42,7 @@
 }
 
 .formSectionTitle {
-    color: var(--primary-text-color);
+    color: var(--text-color-1);
 }
 .formInput {
     background-color: white;
@@ -67,7 +67,7 @@
 }
 
 .loginLoadingText {
-    color: var(--primary-text-color);
+    color: var(--text-color-1);
     animation: fade 0.5s;
 }
 

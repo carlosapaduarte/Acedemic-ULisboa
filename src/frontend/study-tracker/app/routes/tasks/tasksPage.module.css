@@ -31,7 +31,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.25rem 0.5rem;
-    background-color: var(--fourth-color);
+    background-color: var(--color-4);
     border-radius: 0.25rem;
 }
 

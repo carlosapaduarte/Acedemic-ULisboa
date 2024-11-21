@@ -18,9 +18,9 @@
 }
 
 .pageInnerContainer h1, .pageInnerContainer h2 {
-    color: var(--secondary-color);
+    color: var(--color-2);
 }
 
 .pageInnerContainer h3 {
-    color: var(--secondary-text-color);
+    color: var(--text-color-2);
 }

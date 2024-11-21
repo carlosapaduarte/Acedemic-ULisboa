@@ -44,7 +44,7 @@
 }
 
 .avatarContainer.selected {
-    border-color: var(--fourth-color);
+    border-color: var(--color-4);
     transition: border-color 0.2s;
 }
 
@@ -62,11 +62,11 @@
     font-size: 1.5rem;
     font-weight: bold;
 
-    background-color: var(--fourth-color);
+    background-color: var(--color-4);
 }
 
 @media (hover: hover) {
     .confirmButtonContainer button:hover {
-        background-color: var(--yellow-85);
+        background-color: var(--color-4-hover);
     }
 }

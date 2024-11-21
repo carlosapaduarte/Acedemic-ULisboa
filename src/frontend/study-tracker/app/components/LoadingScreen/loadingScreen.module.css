@@ -5,7 +5,7 @@
     height: 100%;
     position: absolute;
     z-index: 100000;
-    background-color: var(--primary-color);
+    background-color: var(--color-1);
 }
 
 .loadingOverlay.fadeOut {
@@ -56,13 +56,13 @@
 
 .aceText {
     font-size: 3.5rem;
-    color: var(--secondary-color);
+    color: var(--color-2);
     font-weight: 900;
 }
 
 .demicText {
     font-size: 3rem;
-    color: var(--primary-text-color);
+    color: var(--text-color-1);
 }
 
 .trackerAndCheckboxContainer {
@@ -74,5 +74,5 @@
 
 .trackerText {
     font-size: 2rem;
-    color: var(--primary-text-color);
+    color: var(--text-color-1);
 }
