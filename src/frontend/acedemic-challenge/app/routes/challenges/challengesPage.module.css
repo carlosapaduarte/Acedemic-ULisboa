@@ -127,6 +127,11 @@ Doesn't work, use SCSS
     text-transform: uppercase;
     font-family: 'Chakra Petch', sans-serif;
     color: inherit;
+
+    &:focus-visible {
+        outline: 5px solid black;
+        outline-offset: -5px;
+    }
 }
 
 .challengeBox .challengeContainer {
@@ -203,6 +208,8 @@ Doesn't work, use SCSS
     font-size: 1rem;
     text-transform: uppercase;
     text-wrap: nowrap;
+
+    opacity: 0.6;
 }
 
 .challengeLockedTag {
@@ -221,16 +228,28 @@ Doesn't work, use SCSS
 }
 
 @keyframes locked-shake {
-    0% { transform: translate(0, 0); }
-    20% { transform: translate(-2px, 1px); }
-    40% { transform: translate(2px, -1px); }
-    60% { transform: translate(-2px, -1px); }
-    80% { transform: translate(2px, 1px); }
-    100% { transform: translate(0, 0); }
+    0% {
+        transform: translate(0, 0);
+    }
+    20% {
+        transform: translate(-2px, 1px);
+    }
+    40% {
+        transform: translate(2px, -1px);
+    }
+    60% {
+        transform: translate(-2px, -1px);
+    }
+    80% {
+        transform: translate(2px, 1px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
 }
 
 .shakeAnimation {
-    animation: locked-shake 0.3s cubic-bezier(.36,.07,.19,.97);
+    animation: locked-shake 0.3s cubic-bezier(.36, .07, .19, .97);
 }
 
 .challengeBox .challengeExpandableContainer {

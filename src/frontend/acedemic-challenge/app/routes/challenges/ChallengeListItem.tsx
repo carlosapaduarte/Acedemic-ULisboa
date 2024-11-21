@@ -92,7 +92,7 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                                     return;
                                 }
 
-                                onChallengeClick(challengeIndex)
+                                onChallengeClick(challengeIndex);
                             }}>
                             {
                                 reached ?
@@ -146,7 +146,9 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                                 </div>
                                 <div className={styles.buttonsContainer}>
                                     <CutButton className={styles.addNoteButton}
-                                               onClick={() => setIsModalOpen(true)}>
+                                               onClick={() => setIsModalOpen(true)}
+                                               tabIndex={expanded ? 0 : -1}
+                                    >
                                         {t("dashboard:view_edit_notes")}
                                     </CutButton>
                                     {
@@ -154,7 +156,9 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                                             <></>
                                             :
                                             <CutButton className={styles.completeChallengeButton}
-                                                       onClick={() => onMarkComplete()}>
+                                                       onClick={() => onMarkComplete()}
+                                                       tabIndex={expanded ? 0 : -1}
+                                            >
                                                 {t("dashboard:mark_complete")}
                                             </CutButton>
                                     }
