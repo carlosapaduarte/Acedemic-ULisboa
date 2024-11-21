@@ -40,6 +40,12 @@ export default function Challenges({ currentBatchDay, onMarkComplete, onViewNote
                             <p className={styles.challengeDescription}>
                                 {challenges[0].description}
                             </p>
+                            <p className={styles.batchDayNotes}>
+                                {currentBatchDay.notes != null && currentBatchDay.notes !== ""
+                                    ? `${t("dashboard:notes")}: ${currentBatchDay.notes}`
+                                    : t("dashboard:no_notes")
+                                }
+                            </p>
                         </div>
                         <div className={styles.buttonsContainer}>
                             <CutButton className={styles.addNoteButton}

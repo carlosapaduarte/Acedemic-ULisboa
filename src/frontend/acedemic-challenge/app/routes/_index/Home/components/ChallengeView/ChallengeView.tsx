@@ -1,19 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BatchDay, Challenge } from "~/challenges/types";
-import { Batch, service, UserNote } from "~/service/service";
+import { Batch, service } from "~/service/service";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
 import { useTranslation } from "react-i18next";
 import { ChallengesContext } from "~/hooks/useChallenges";
-
-function sameDate(date1: Date, date2: Date): boolean {
-    return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate();
-}
-
-function getTodayNotes(allNotes: UserNote[]): UserNote[] {
-    const today = new Date();
-    return allNotes.filter((userNote: UserNote) => sameDate(new Date(userNote.date * 1000), today));
-}
 
 function useChallengeView() {
     const { t } = useTranslation(["challenges"]);

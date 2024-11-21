@@ -12,12 +12,13 @@
 }
 
 .challengeContentScrollWrapper {
-    flex-grow: 1;
     width: 100%;
     overflow: auto;
     padding-right: 1rem;
     color: white;
 
+    display: flex;
+    flex-direction: column;
 }
 
 .currentDayText {
@@ -46,7 +47,11 @@
     font-weight: 400;
     text-align: left;
     width: 100%;
-    margin-bottom: 1%;
+    margin-bottom: 1rem;
+}
+
+.batchDayNotes {
+    font-weight: bold;
 }
 
 .buttonsContainer {
