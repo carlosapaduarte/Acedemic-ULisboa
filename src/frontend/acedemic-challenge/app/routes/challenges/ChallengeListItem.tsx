@@ -97,7 +97,7 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                             {
                                 reached ?
                                     <div className={`${styles.challengeContainer}`}
-                                         aria-label={`Challenge ${challengeIndex + 1} - ${challengeTitle}`}
+                                         aria-label={`Challenge ${challengeIndex + 1} - ${challengeTitle} - ${completed ? "completed" : "incomplete"}`}
                                     >
                                         <p className={`${styles.challengeTitle}`}>
                                             {challengeIndex + 1} - {challengeTitle}
@@ -115,13 +115,18 @@ export const ChallengeListItem = forwardRef(function ChallengeListItem(
                                     </div>
                                     :
                                     <div className={`${styles.challengeContainer}`}
-                                         aria-label={"Locked challenge"}
+                                         aria-label={t("dashboard:challenge_locked")}
                                     >
                                         <p className={`${styles.challengeTitle}`}>
                                             {challengeIndex + 1} - ?
                                         </p>
-                                        <div className={styles.challengeLockedTag}>
-                                            {t("dashboard:challenge_locked")}
+                                        <div className={styles.challengeLockedTagContainer}>
+                                            <img src="/icons/lock_icon.svg" alt=""
+                                                 width={20} height={20}
+                                                 className={styles.challengeLockedLockIcon} />
+                                            <div className={styles.challengeLockedTag}>
+                                                {t("dashboard:challenge_locked")}
+                                            </div>
                                         </div>
                                     </div>
                             }

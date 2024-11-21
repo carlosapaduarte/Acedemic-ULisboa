@@ -212,6 +212,17 @@ Doesn't work, use SCSS
     opacity: 0.6;
 }
 
+.challengeLockedTagContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.challengeLockedLockIcon {
+    margin-top: -3px;
+}
+
 .challengeLockedTag {
     padding: 0.25rem;
 
