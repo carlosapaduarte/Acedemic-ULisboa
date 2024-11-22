@@ -1,10 +1,10 @@
 import { Batch } from "~/service/service";
 import { BatchDay, Challenge } from "~/challenges/types";
 import { useSearchParams } from "@remix-run/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import styles from "~/routes/challenges/challengesPage.module.css";
-import { ChallengeListItem } from "~/routes/challenges/ChallengeListItem";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Level3ChallengesList } from "~/routes/challenges/Level3ChallengesList/Level3ChallengesList";
+import { Level1And2ChallengesList } from "~/routes/challenges/Level1And2ChallengesList/Level1And2ChallengesList";
 
 function useChallengesList(
     batchDays: BatchDay[] | undefined
@@ -15,10 +15,10 @@ function useChallengesList(
 
     const selectedRef = useRef<HTMLDivElement>(null);
 
-    const currentChallenge = batchDays?.length;
+    const currentBatchDayNumber = batchDays?.length;
 
     function onItemClickHandler(index: number) {
-        const reached = currentChallenge ? index <= currentChallenge - 1 : false;
+        const reached = currentBatchDayNumber ? index <= currentBatchDayNumber - 1 : false;
 
         if (!reached) {
             return;
@@ -58,7 +58,7 @@ function useChallengesList(
         }
     }, [selectedRef.current]);
 
-    return { selectedItem, lastSelectedItem, selectedRef, onItemClickHandler, currentChallenge };
+    return { selectedItem, lastSelectedItem, selectedRef, onItemClickHandler, currentBatchDayNumber };
 }
 
 export function ChallengesList(
@@ -79,64 +79,31 @@ export function ChallengesList(
         lastSelectedItem,
         selectedRef,
         onItemClickHandler,
-        currentChallenge
+        currentBatchDayNumber
     } = useChallengesList(batchDays);
 
-    function Level1And2List() {
-        return (
-            <>{Array.from({ length: 21 }).map((_, index) => {
-                const reached = currentChallenge ? index <= currentChallenge - 1 : false;
-
-                const notes = batchDays && batchDays.length > index ? batchDays[index].notes : undefined;
-
-                const title = batchDays && batchDays.length > index ? batchDays[index].challenges[0].title : undefined;
-                const description = batchDays && batchDays.length > index ? batchDays[index].challenges[0].description : undefined;
-                const completed = batchDays && batchDays.length > index ? batchDays[index].challenges[0].completionDate != null : false;
-
-                let ref: React.RefObject<HTMLDivElement> | undefined = undefined;
-                if (selectedItem != -1 && selectedItem == index) {
-                    ref = selectedRef;
-                } else if (selectedItem == -1 && batchDays && index == batchDays.length - 1) {
-                    ref = selectedRef;
-                }
-
-                return <ChallengeListItem key={index}
-                                          ref={ref}
-                                          completed={completed}
-                                          challengeIndex={index}
-                                          loading={batchDays == undefined}
-                                          challengeTitle={title}
-                                          challengeDescription={description}
-                                          challengeNotes={notes}
-                                          lastExpanded={lastSelectedItem == index}
-                                          expanded={selectedItem == index}
-                                          reached={reached}
-                                          onChallengeClick={onItemClickHandler}
-                                          onMarkComplete={() => {
-                                              if (!batchDays || !batch) {
-                                                  return;
-                                              }
-                                              onMarkCompleteClickHandler(batchDays[index].challenges[0], batchDays[index], batch);
-                                          }}
-                                          onNoteAddClick={(notesText) => {
-                                              onNoteAddClick(index + 1, notesText);
-                                          }}
-                />;
-            })}</>
-        );
-    }
-
-    function Level3List() {
-        return (
-            <></>
-        );
-    }
-
     return (
-        <div className={`${styles.challengesList}`}>
+        <>
             {
-                Level1And2List()
+                batch == undefined || batchDays == undefined || batch.level == 1 || batch.level == 2
+                    ? <Level1And2ChallengesList
+                        batchDays={batchDays}
+                        currentBatchDayNumber={currentBatchDayNumber}
+                        onMarkCompleteClickHandler={onMarkCompleteClickHandler}
+                        onNoteAddClick={onNoteAddClick}
+                        selectedItem={selectedItem}
+                        lastSelectedItem={lastSelectedItem}
+                        selectedRef={selectedRef}
+                        onItemClickHandler={onItemClickHandler}
+                        batch={batch}
+                    />
+                    : <Level3ChallengesList
+                        batch={batch}
+                        batchDays={batchDays}
+                        onMarkCompleteClickHandler={onMarkCompleteClickHandler}
+                        onNoteAddClick={onNoteAddClick}
+                    />
             }
-        </div>
+        </>
     );
 }

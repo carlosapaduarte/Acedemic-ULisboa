@@ -72,7 +72,7 @@ export function useChallenges() {
                 const currentBatch: Batch = sortedBatches[0];
                 setCurrentBatch(currentBatch);
 
-                const DEBUG_DAY_OFFSET = 15;
+                const DEBUG_DAY_OFFSET = 12;
                 const DEBUG_TIME_OFFSET = 1000 * 3600 * 24 * DEBUG_DAY_OFFSET;
 
                 // Calculate the current day index for the most recent batch

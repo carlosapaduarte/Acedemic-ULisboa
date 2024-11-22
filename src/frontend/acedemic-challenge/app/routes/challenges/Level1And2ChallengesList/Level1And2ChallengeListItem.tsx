@@ -1,4 +1,4 @@
-import styles from "./challengesPage.module.css";
+import styles from "./lvl1And2ChallengesList.module.css";
 import classNames from "classnames";
 import React, { forwardRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -141,7 +141,7 @@ function ChallengeBoxExpandableContainer(
 * TODO Make sure it adheres to the WAI-ARIA design pattern for the Accordion:
 *  https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
 * */
-export const ChallengeListItem = forwardRef(function ChallengeListItem(
+export const Level1And2ChallengeListItem = forwardRef(function ChallengeListItem(
     {
         challengeIndex,
         completed,
