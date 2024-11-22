@@ -14,7 +14,6 @@ function useChallengesPage() {
     const [selectedBatch, setSelectedBatch] = useState<Batch | undefined>(undefined);
 
     const [listedBatchDays, setListedBatchDays] = useState<BatchDay[] | undefined>(undefined);
-    const [selectedBatchDayIndex, setSelectedBatchDayIndex] = useState<number | undefined>(undefined);
 
     useEffect(() => {
         if (!batches || !currentBatch) {
@@ -36,10 +35,6 @@ function useChallengesPage() {
         setListedBatchDays(currentBatchDays.slice(0, Math.min(currentDayIndex + 1, 21)));
     }, [batchDays]);
 
-    function onChallengeClickHandler(day: number) {
-        setSelectedBatchDayIndex(day);
-    }
-
     async function onMarkCompleteClickHandler(challenge: Challenge, batchDay: BatchDay, batch: Batch) {
         await service.markChallengeAsCompleted(batch.id, batchDay.id, challenge.id)
             .then(() => {
@@ -47,26 +42,23 @@ function useChallengesPage() {
             });
     }
 
-    async function onNoteAddClick(notesText: string) {
-        if (!selectedBatch || selectedBatchDayIndex == undefined) {
+    async function onNoteAddClick(batchDayNumber: number, notesText: string) {
+        if (!selectedBatch) {
             return;
         }
 
-        await service.editDayNote(selectedBatch.id, selectedBatchDayIndex + 1, notesText)
+        await service.editDayNote(selectedBatch.id, batchDayNumber, notesText)
             .then(() => {
                 fetchUserInfo();
             });
     }
 
-    return { onChallengeClickHandler, listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick };
+    return { listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick };
 }
 
 export default function ChallengesPage() {
     const { t } = useTranslation(["challenge_overview"]);
-    const {
-        onChallengeClickHandler, listedBatchDays, onMarkCompleteClickHandler, selectedBatch,
-        onNoteAddClick
-    } = useChallengesPage();
+    const { listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick } = useChallengesPage();
 
     return (
         <div className={`${styles.challengesPage}`}>
@@ -74,7 +66,6 @@ export default function ChallengesPage() {
                 <div className={`${styles.challengesListContainer}`}>
                     <ChallengesList batch={selectedBatch}
                                     batchDays={listedBatchDays}
-                                    onChallengeClickHandler={onChallengeClickHandler}
                                     onMarkCompleteClickHandler={onMarkCompleteClickHandler}
                                     onNoteAddClick={onNoteAddClick} />
                 </div>

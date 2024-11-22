@@ -1,14 +1,13 @@
 import { Batch } from "~/service/service";
 import { BatchDay, Challenge } from "~/challenges/types";
 import { useSearchParams } from "@remix-run/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "~/routes/challenges/challengesPage.module.css";
 import { ChallengeListItem } from "~/routes/challenges/ChallengeListItem";
 import { useTranslation } from "react-i18next";
 
 function useChallengesList(
-    batchDays: BatchDay[] | undefined,
-    onChallengeClickHandler: (challengeIndex: number) => void
+    batchDays: BatchDay[] | undefined
 ) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectedItem, setSelectedItem] = useState<number>(-1);
@@ -39,7 +38,6 @@ function useChallengesList(
     useEffect(() => {
         const index = Number(searchParams.get("day")) - 1;
         setSelectedItem(index);
-        onChallengeClickHandler(index);
     }, [searchParams]);
 
 
@@ -67,15 +65,13 @@ export function ChallengesList(
     {
         batch,
         batchDays,
-        onChallengeClickHandler,
         onMarkCompleteClickHandler,
         onNoteAddClick
     }: {
         batch: Batch | undefined,
         batchDays: BatchDay[] | undefined,
-        onChallengeClickHandler: (challengeIndex: number) => void,
         onMarkCompleteClickHandler: (challenge: Challenge, batchDay: BatchDay, batch: Batch) => void,
-        onNoteAddClick: (notesText: string) => void
+        onNoteAddClick: (batchDayNumber: number, notesText: string) => void
     }) {
     const { t } = useTranslation(["dashboard", "challenge_overview"]);
     const {
@@ -84,7 +80,7 @@ export function ChallengesList(
         selectedRef,
         onItemClickHandler,
         currentChallenge
-    } = useChallengesList(batchDays, onChallengeClickHandler);
+    } = useChallengesList(batchDays);
 
     function Level1And2List() {
         return (
@@ -122,7 +118,9 @@ export function ChallengesList(
                                               }
                                               onMarkCompleteClickHandler(batchDays[index].challenges[0], batchDays[index], batch);
                                           }}
-                                          onNoteAddClick={onNoteAddClick}
+                                          onNoteAddClick={(notesText) => {
+                                              onNoteAddClick(index + 1, notesText);
+                                          }}
                 />;
             })}</>
         );
