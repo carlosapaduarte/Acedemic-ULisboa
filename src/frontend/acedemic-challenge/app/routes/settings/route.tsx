@@ -2,6 +2,7 @@ import styles from "./settingsPage.module.css";
 import { AppTheme, getAppThemeClassNames, ThemeContext } from "~/components/Theme/ThemeProvider";
 import { useContext } from "react";
 import classNames from "classnames";
+import { InConstructionPage } from "~/Pages/InConstruction";
 
 function ThemePalette({ optionTheme }: { optionTheme: AppTheme }) {
     return (
@@ -42,6 +43,8 @@ function ThemeOption(
 
 export default function SettingsPage() {
     const { theme, setTheme } = useContext(ThemeContext);
+
+    return <InConstructionPage />;
 
     return (
         <div className={styles.settingsPage}>

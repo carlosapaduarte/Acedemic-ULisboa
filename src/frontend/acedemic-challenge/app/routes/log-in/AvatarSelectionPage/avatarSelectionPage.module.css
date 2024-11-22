@@ -44,7 +44,7 @@
 }
 
 .avatarContainer.selected {
-    border-color: var(--fourth-color);
+    border-color: var(--color-4);
     transition: border-color 0.2s;
 }
 
@@ -57,16 +57,13 @@
 }
 
 .confirmAvatarButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: var(--color-4);
+    --cut-button-background-color-hover: var(--color-4-hover);
+
     padding: 0.5rem;
 
     font-size: 1.5rem;
     font-weight: bold;
-
-    background-color: var(--fourth-color);
-}
-
-@media (hover: hover) {
-    .confirmButtonContainer button:hover {
-        background-color: var(--yellow-85);
-    }
 }

@@ -27,17 +27,3 @@ export function Button({ variant = "none", children, ...buttonProps }: ButtonPro
         </button>
     );
 }
-
-interface CutButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    children?: ReactNode;
-}
-
-export function CutButton({ children, ...buttonProps }: CutButtonProps) {
-    return (
-        <Button
-            variant="cut"
-            {...buttonProps}
-            children={children}
-        />
-    );
-}

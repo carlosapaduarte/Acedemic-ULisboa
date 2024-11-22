@@ -65,11 +65,11 @@ async function createUser(username: string, password: string) {
         return Promise.reject(new Error("User creation was not possible!"));
 }
 
-async function createBatch(level: LevelType) {
+async function createBatch(level: LevelType, challengeIds: number[] | number[][]) {
     const request = {
         path: `academic-challenge/users/me/batches`,
         method: "POST",
-        body: toJsonBody({ level: level })
+        body: toJsonBody({ level: level, challengeIds: challengeIds })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -105,23 +105,22 @@ export type UserNote = {
     date: number
 }
 
-// Almost like DayAndChallenge but without challenge description
-export type ChallengeAndDate = {
-    name: string;
-    date: number
+export type StoredChallenge = {
+    id: number,
+    completionDate: number | null
 }
 
-export type CompletedChallenge = {
-    challengeDay: number
-    id: number
-    conclusionDate: number
+export type StoredBatchDay = {
+    id: number,
+    challenges: StoredChallenge[],
+    notes: string
 }
 
 export type Batch = {
     id: number,
     startDate: number,
     level: number,
-    completedChallenges: CompletedChallenge[]
+    batchDays: StoredBatchDay[]
 }
 
 // User info
@@ -130,7 +129,6 @@ export type UserInfo = {
     username: string,
     shareProgress: boolean,
     avatarFilename: string, // TODO: this could be undefined
-    userNotes: UserNote[],
     batches: Batch[]
 };
 
@@ -142,34 +140,32 @@ async function fetchUserInfoFromApi(): Promise<UserInfo> {
     const response: Response = await doFetch(request);
 
     if (response.ok) {
-        const responseObject: UserInfo = await response.json(); // TODO: how
+        const responseObject: UserInfo = await response.json();
         return responseObject;
     } else
         return Promise.reject(new Error("User info could not be obtained!"));
 }
 
-async function createNewUserNote(text: string, userChallengeDate: Date) {
+async function editDayNote(batchId: number, batchDayId: number, notes: string) {
     const request = {
-        path: `academic-challenge/users/me/notes`,
+        path: `academic-challenge/users/me/batches/${batchId}/${batchDayId}/notes`,
         method: "POST",
-        body: toJsonBody({ text, date: Math.trunc(userChallengeDate.getTime() / 1000) }) // Send seconds from 1970
+        body: toJsonBody({ notes })
     };
-
-    //console.log(request)
     const response: Response = await doFetch(request);
     if (!response.ok)
-        return Promise.reject(new Error("Note creation failed!"));
+        return Promise.reject(new Error("Failed to edit note!"));
 }
 
-async function markChallengeAsCompleted(batchId: number, challengeId: number, challengeDay: number) {
+async function markChallengeAsCompleted(batchId: number, batchDayId: number, challengeId: number) {
     const request = {
-        path: `academic-challenge/users/me/batches/${batchId}/completed-challenges`,
+        path: `academic-challenge/users/me/batches/${batchId}/${batchDayId}/completed-challenges`,
         method: "POST",
-        body: toJsonBody({ challengeId, challengeDay })
+        body: toJsonBody({ challengeId })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
-        return Promise.reject(new Error("Challenge finalized selection failed!"));
+        return Promise.reject(new Error("Failed to mark challenge as completed!"));
 }
 
 export const service = {
@@ -180,6 +176,6 @@ export const service = {
     selectShareProgressState,
     selectAvatar,
     fetchUserInfoFromApi,
-    createNewUserNote,
+    editDayNote,
     markChallengeAsCompleted: markChallengeAsCompleted
 };

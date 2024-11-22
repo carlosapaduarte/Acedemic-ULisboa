@@ -1,0 +1,110 @@
+
+.challengesList {
+    display: grid;
+    align-items: start;
+    align-content: start;
+
+    gap: 0.5rem;
+
+    animation: fade 300ms cubic-bezier(0.87, 0, 0.13, 1);
+
+    overflow: hidden;
+}
+
+@keyframes fade {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.challengeTitle {
+    font-size: clamp(1rem, 5vw, 1.25rem);
+
+    margin-right: 0.5rem;
+
+    text-wrap: nowrap;
+    text-align: left;
+    text-overflow: ellipsis;
+
+    overflow: hidden;
+}
+
+.viewEditNotesButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: var(--color-2);
+    --cut-button-background-color-hover: var(--color-2-hover);
+
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.completeChallengeButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    flex-basis: 60%;
+
+    --cut-button-background-color: black;
+    --cut-button-background-color-hover: var(--color-black-hover);
+
+    color: white;
+
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.challengeCompleteTag {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0.25rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
+}
+
+.challengeIncompleteTag {
+    padding: 0.25rem;
+
+    background-color: transparent;
+
+    outline: 2px solid black;
+    outline-offset: -2px;
+
+    color: black;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
+
+    opacity: 0.6;
+}
+
+.challengeDescription {
+    margin-bottom: 0.5rem;
+
+    text-align: left;
+
+    font-size: 1rem;
+    font-family: var(--font-family1), sans-serif;
+    text-transform: none;
+    font-weight: normal;
+    color: black;
+
+    overflow: auto;
+}
+
+@media (min-width: 580px) {
+    .challengesList {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (min-width: 1030px) {
+    .challengesList {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

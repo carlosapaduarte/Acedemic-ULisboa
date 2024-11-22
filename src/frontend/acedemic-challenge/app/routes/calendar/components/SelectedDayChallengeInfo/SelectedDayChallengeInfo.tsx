@@ -1,47 +1,42 @@
-import { Challenge, DayChallenges } from "~/challenges/types";
+import { BatchDay, Challenge } from "~/challenges/types";
 import { utils } from "~/utils";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "../../calendarPage.module.css";
-import { CutButton } from "~/components/Button/Button";
+import { useNavigate } from "@remix-run/react";
 
-function useSelectedDayChallengeInfo({ challenges, selectedDay }: { challenges: DayChallenges[], selectedDay: Date }) {
-    // TODO: only displaying one Challenge!!! There could be more
-
-    function getSelectedDayChallenges(challenges: DayChallenges[]): Challenge[] {
-        const challengesToReturn: Challenge[] = [];
-
-        const challengesForTheDay = challenges.filter((challenge: DayChallenges) => {
-            const date = challenge.date;
-            return utils.sameDay(date, selectedDay);
-        }).map((challenge: DayChallenges) => challenge.challenges);
-
-        challengesForTheDay.forEach((challengesExterior: Challenge[]) => challengesExterior.forEach((challenge: Challenge) => challengesToReturn.push(challenge)));
-
-        return challengesToReturn;
-    }
-
-    const challengesToDisplay = getSelectedDayChallenges(challenges); // Filters today's challenges
-
-    return { challengesToDisplay };
-}
-
-export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
-    challenges: DayChallenges[],
+function useSelectedBatchDay({ daysWithChallenges, selectedDay }: {
+    daysWithChallenges: BatchDay[],
     selectedDay: Date
 }) {
-    const { challengesToDisplay } = useSelectedDayChallengeInfo({ challenges: challenges, selectedDay });
-    const { t } = useTranslation(["calendar"]);
+    const [selectedBatchDay, setSelectedBatchDay] = useState<BatchDay>();
 
     useEffect(() => {
+        setSelectedBatchDay(
+            daysWithChallenges.filter((batchDay: BatchDay) => {
+                return utils.sameDay(batchDay.date, selectedDay);
+            })[0]
+        );
+    }, [daysWithChallenges, selectedDay]);
+
+    return { selectedBatchDay };
+}
+
+function useDescriptionLineClamp({ selectedBatchDay }: { selectedBatchDay: BatchDay | undefined }) {
+    useEffect(() => {
         function applyDynamicLineClamp() {
-            if (challengesToDisplay.length == 0) {
+            if (selectedBatchDay != undefined && selectedBatchDay.challenges.length == 0) {
                 return;
             }
 
             setTimeout(() => {
                 const description = document.getElementsByClassName(styles.challengeDescription)[0] as HTMLElement;
                 const descriptionContainer = document.getElementsByClassName(styles.challengeDescriptionContainer)[0] as HTMLElement;
+
+                if (!description || !descriptionContainer) {
+                    return;
+                }
+
                 const lineHeight = parseFloat(getComputedStyle(description).lineHeight);
                 const containerHeight = descriptionContainer.clientHeight;
 
@@ -56,32 +51,68 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
         // Call the function initially and on window resize
         applyDynamicLineClamp();
         window.addEventListener("resize", applyDynamicLineClamp);
-    }, [challengesToDisplay]);
 
-    if (challengesToDisplay.length == 1) {
-        const challenge = challengesToDisplay[0];
+        return () => {
+            window.removeEventListener("resize", applyDynamicLineClamp);
+        };
+    }, [selectedBatchDay]);
+}
+
+export default function SelectedDayChallengeInfo({ daysWithChallenges, selectedDay }: {
+    daysWithChallenges: BatchDay[],
+    selectedDay: Date
+}) {
+    const { selectedBatchDay } = useSelectedBatchDay({ daysWithChallenges, selectedDay });
+    const { t } = useTranslation(["calendar", "dashboard"]);
+    const navigate = useNavigate();
+
+    useDescriptionLineClamp({ selectedBatchDay });
+
+    if (selectedBatchDay == undefined || selectedBatchDay.challenges.length == 0) {
+        return (
+            <div className={`${styles.noChallengesTextContainer}`}>
+                <h4 className={`${styles.noChallengesText}`}>
+                    {t("calendar:no_challenges_title")}
+                </h4>
+            </div>
+        );
+    } else if (selectedBatchDay.challenges.length == 1) {
+        const challenge = selectedBatchDay.challenges[0];
         return (
             <>
                 <div className={`${styles.challengeTextContainer}`}>
-                    <h2 className={`${styles.challengeTitle}`}>
-                        {challenge.title}
-                    </h2>
+                    <div className={`${styles.challengeTitleContainer}`}>
+                        <h2 className={`${styles.challengeTitle}`}>
+                            {selectedBatchDay.id} - {challenge.title}
+                        </h2>
+                        {
+                            challenge.completionDate != null ?
+                                <div className={styles.challengeCompleteTag}>
+                                    {t("dashboard:challenge_completed")}
+                                </div>
+                                :
+                                <></>
+                        }
+                    </div>
                     <div className={`${styles.challengeDescriptionContainer}`}>
                         <p className={`${styles.challengeDescription}`}>
                             {challenge.description}
                         </p>
                     </div>
                 </div>
-                <CutButton className={`${styles.seeMoreButton}`}>
-                {t("calendar:see_more_button_text")}
-                </CutButton>
+                <button
+                    className={`${styles.seeMoreButton}`}
+                    onClick={() => navigate(`/challenges?day=${selectedBatchDay.id}`)}
+                >
+                    {t("calendar:see_more_button_text")}
+                </button>
             </>
         );
-    } else if (challengesToDisplay.length > 1) {
+    } else if (selectedBatchDay.challenges.length > 1) {
         return (
             <>
                 {
-                    challengesToDisplay.map((challenge: Challenge, index: number) =>
+                    selectedBatchDay.challenges.map((challenge: Challenge, index: number) =>
                         <div key={index}>
                             <h2 className={`${styles.challengeTitle}`}>
                                 {challenge.title}
@@ -94,12 +125,5 @@ export default function SelectedDayChallengeInfo({ challenges, selectedDay }: {
                 }
             </>
         );
-    } else
-        return (
-            <div className={`${styles.noChallengesTextContainer}`}>
-                <h4 className={`${styles.noChallengesText}`}>
-                    {t("calendar:no_challenges_title")}
-                </h4>
-            </div>
-        );
+    }
 }

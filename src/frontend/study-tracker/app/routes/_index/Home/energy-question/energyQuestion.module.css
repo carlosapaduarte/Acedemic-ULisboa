@@ -24,7 +24,7 @@
     width: 8em;
 
     border-radius: 50%; 
-    background: var(--primary-color);
+    background: var(--color-1);
     border: 1px solid black;
 }
 
@@ -33,7 +33,7 @@
     font-weight: bold;
     justify-content: center;
     text-align: center;
-    color: var(--secondary-color);
+    color: var(--color-2);
 }
 
 .buttonsContainer {
@@ -57,7 +57,7 @@
 
     background-color: rgba(188, 153, 107, 0.323);
 
-    color: var(--secondary-color);
+    color: var(--color-2);
 }
 
 .slideContainer {
@@ -85,7 +85,7 @@
     height: 25px;
     
     border-radius: 50%; 
-    background: var(--primary-color);
+    background: var(--color-1);
     border:2px solid black;
 
     cursor: pointer;

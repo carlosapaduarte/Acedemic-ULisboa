@@ -3,20 +3,22 @@ from pydantic import BaseModel
 
 class CreateBatchInputDto(BaseModel):
     level: int
-    # For simplicity, assume that start-date is NOW
+    challengeIds: list[int] | list[list[int]]
+
 
 class SetLevelInputDto(BaseModel):
     user_id: int
-    batch: int # Batch ID (user can have multiple batches)
+    batch: int
     level: int
+
 
 class SetShareProgressPreferenceDto(BaseModel):
     shareProgress: bool
 
+
 class NewUserNoteDto(BaseModel):
-    text: str
-    date: float
+    notes: str
+
 
 class ChallengeCompletedDto(BaseModel):
     challengeId: int
-    challengeDay: int

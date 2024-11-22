@@ -2,8 +2,8 @@
 .roundButton {
     height: 4rem;
     width: 16rem;
-    background-color: var(--secondary-color);
-    color: var(--secondary-text-color);
+    background-color: var(--color-2);
+    color: var(--text-color-2);
     font-size: 1.25rem;
     font-weight: 500;
     border-radius: 0.25rem;
@@ -14,7 +14,7 @@
 
     @media (hover: hover) {
         &:hover {
-            background-color: var(--secondary-color-hover);
+            background-color: var(--color-2-hover);
         }
     }
 }

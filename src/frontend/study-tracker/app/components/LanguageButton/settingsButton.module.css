@@ -12,7 +12,7 @@
 }
 
 .settingsButtonIcon.clean {
-    stroke: var(--primary-text-color);
+    stroke: var(--text-color-1);
     stroke-width: 1px;
     stroke-linejoin: round;
 }

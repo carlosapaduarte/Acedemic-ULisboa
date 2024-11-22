@@ -1,5 +1,5 @@
 @import "../login.module.css";
 
 .titleText {
-    color: var(--secondary-color)
+    color: var(--color-2)
 }

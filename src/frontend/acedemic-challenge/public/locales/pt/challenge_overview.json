@@ -1,4 +1,7 @@
 {
     "no_reached_message": "Desafio bloqueado!",
-    "title": "Desafios"
+    "title": "Desafios",
+    "save": "Salvar",
+    "close": "Fechar",
+    "day": "Dia {{day}}"
 }

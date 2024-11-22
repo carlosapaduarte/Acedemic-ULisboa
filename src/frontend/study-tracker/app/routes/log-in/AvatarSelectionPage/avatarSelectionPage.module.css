@@ -29,7 +29,7 @@
 
 .titleHeading {
     font-size: 1.25rem;
-    color: var(--primary-text-color);
+    color: var(--text-color-1);
     font-weight: 500;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .avatarContainer.selected {
-    border-color: var(--fourth-color);
+    border-color: var(--color-4);
     transition: border-color 0.2s;
 }
 
@@ -63,11 +63,11 @@
     font-size: 1.5rem;
     font-weight: bold;
 
-    background-color: var(--fourth-color);
+    background-color: var(--color-4);
 }
 
 @media (hover: hover) {
     .confirmButtonContainer button:hover {
-        background-color: var(--fourth-color);
+        background-color: var(--color-4);
     }
 }

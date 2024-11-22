@@ -2,7 +2,7 @@
 .roundButton {
     height: 4rem;
     width: 16rem;
-    background-color: var(--secondary-color);
+    background-color: var(--color-2);
     font-size: 1.25rem;
     font-weight: 500;
     border-radius: 0.25rem;
@@ -23,6 +23,18 @@
 
     text-transform: uppercase;
     font-family: 'Chakra Petch', sans-serif;
+
+    background-color: var(--cut-button-background-color);
+
+    &:active {
+        transform: translate(1px, -1px);
+        box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.2) inset,
+        -6px -6px 6px rgba(0, 0, 0, 0.2) inset;
+    }
+
+    &:hover {
+        background-color: var(--cut-button-background-color-hover);
+    }
 }
 
 /*
@@ -39,6 +51,10 @@ Something like this could be very interesting for animating.
 
 @media (hover: hover) {
     .roundButton:hover {
-        background-color: var(--secondary-85);
+        background-color: var(--color-2-hover);
+    }
+
+    .roundButton:hover {
+        opacity: 0.85;
     }
 }

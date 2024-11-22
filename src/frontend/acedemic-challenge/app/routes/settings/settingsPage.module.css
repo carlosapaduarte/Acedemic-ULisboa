@@ -60,13 +60,13 @@
 }
 
 .themePaletteItem:nth-child(1) {
-    background-color: var(--primary-color);
+    background-color: var(--color-1);
 }
 
 .themePaletteItem:nth-child(2) {
-    background-color: var(--secondary-color);
+    background-color: var(--color-2);
 }
 
 .themePaletteItem:nth-child(3) {
-    background-color: var(--third-color);
+    background-color: var(--color-3);
 }

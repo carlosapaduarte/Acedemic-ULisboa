@@ -64,9 +64,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 name="viewport"
                 content="width=device-width, initial-scale=1"
             />
-            <title>Acedemic Challenge</title>
             <Meta />
             <Links />
+            <title>Acedemic Challenge</title>
         </head>
         <body>
         {children}
@@ -117,16 +117,16 @@ export function App() {
     return (
         <AppBarProvider>
             <div className="app">
-                <AppBar />
-                <div className="mainContentContainer">
+                <AppBar aria-hidden={loading ? true : undefined} />
+                <main className="mainContentContainer" aria-hidden={loading}>
                     <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
                         <GlobalErrorController>
                             <Outlet />
                         </GlobalErrorController>
                     </ReactErrorBoundary>
-                </div>
+                </main>
+                <Footer aria-hidden={loading ? true : undefined} />
                 <LoadingOverlay loading={loading} />
-                <Footer />
             </div>
         </AppBarProvider>
     );

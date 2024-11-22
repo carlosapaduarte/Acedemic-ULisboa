@@ -26,7 +26,7 @@
 
     overflow: auto;
 
-    background-color: var(--fourth-color);
+    background-color: var(--color-4);
 
     clip-path: polygon(
             100% 0%,
@@ -64,10 +64,22 @@
     overflow: hidden;
 }
 
+.challengeTitleContainer {
+    margin-bottom: 0.25rem;
+
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
 .challengeTitle {
     flex-shrink: 0;
 
     margin-bottom: 0.25rem;
+    margin-right: 0.5rem;
 
     font-size: 1.25rem;
     font-weight: bold;
@@ -75,6 +87,16 @@
     color: black;
     font-family: var(--font-family2), sans-serif;
     text-transform: uppercase;
+}
+
+.challengeCompleteTag {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0.25rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
 }
 
 .challengeDescriptionContainer {
@@ -101,18 +123,13 @@
     line-height: 1.2;
 }
 
-/*Should have enough compatibility with every recent browser*/
-/*.challengeDescription {
-    height: auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}*/
-
 .seeMoreButton {
-    width: 100%;
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: black;
+    --cut-button-background-color-hover: rgb(20, 20, 20);
+
+    width: calc(100% - 1px);
 
     font-size: 1rem;
     font-weight: bold;
@@ -157,9 +174,11 @@
         flex-direction: row;
         overflow: hidden;
     }
+
     .challengeTextContainer {
         flex-basis: 200%;
     }
+
     .seeMoreButton {
         height: 100%;
         flex-grow: 0;

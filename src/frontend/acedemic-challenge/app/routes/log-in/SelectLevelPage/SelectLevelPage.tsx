@@ -1,9 +1,9 @@
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service } from "~/service/service";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./selectLevelPage.module.css";
-import { CutButton } from "~/components/Button/Button";
+import { getChallengeIdList } from "~/challenges/getLevels";
+import classNames from "classnames";
 
 export default function SelectLevelPage(
     {
@@ -15,8 +15,8 @@ export default function SelectLevelPage(
     }) {
     const { onConfirmClick, selectedLevel, setSelectedLevel } =
         useSelectLevelPage({
-            onLevelSelected: onLevelSelected,
-            onStartQuizClick: onStartQuizClick
+            onLevelSelected,
+            onStartQuizClick
         });
     const { t } = useTranslation(["login"]);
 
@@ -29,14 +29,14 @@ export default function SelectLevelPage(
                     onLevelClick={setSelectedLevel}
                 />
                 <div className={styles.confirmButtonContainer}>
-                    <CutButton className={`${styles.confirmLevelButton}`}
-                               onClick={() => {
-                                   if (selectedLevel !== null)
-                                       onConfirmClick(selectedLevel);
-                               }}
+                    <button className={`${styles.confirmLevelButton}`}
+                            onClick={() => {
+                                if (selectedLevel !== null)
+                                    onConfirmClick(selectedLevel);
+                            }}
                     >
                         {t("login:confirm_level")}
-                    </CutButton>
+                    </button>
                 </div>
             </div>
         </div>
@@ -52,13 +52,10 @@ function useSelectLevelPage(
         null
     );
 
-    const setGlobalError = useSetGlobalError();
-
     async function onConfirmClickHandler(level: LevelType) {
         await service
-            .createBatch(level) // returns if was successful or not
-            .then(() => onLevelSelected())
-            .catch((error) => setGlobalError(error));
+            .createBatch(level, getChallengeIdList(level))
+            .then(() => onLevelSelected());
     }
 
     // TODO Quiz Button
@@ -124,11 +121,14 @@ function Level({
                 />
             </div>
             <div className={styles.levelContentContainer}>
-                <CutButton className={`${styles.levelButton} ${selected ? styles.selected : ""}`}
-                           onClick={() => onLevelClick(levelType)}
+                <button className={classNames(
+                    styles.levelButton,
+                    { [styles.selected]: selected }
+                )}
+                        onClick={() => onLevelClick(levelType)}
                 >
                     {title}
-                </CutButton>
+                </button>
 
                 <div className={styles.levelContentTextContainer}>
                     <p>{description}</p>

@@ -1,7 +1,6 @@
 import { Logger } from "tslog";
 import React from "react";
-import { DayChallenges } from "~/challenges/types";
-import { UserNote } from "~/service/service";
+import { BatchDay } from "~/challenges/types";
 import { MyCalendar } from "~/routes/calendar/components/MyCalendar/MyCalendar";
 import SelectedDayChallengeInfo from "~/routes/calendar/components/SelectedDayChallengeInfo/SelectedDayChallengeInfo";
 import { useCalendar } from "~/routes/calendar/useCalendar";
@@ -9,43 +8,36 @@ import styles from "./calendarPage.module.css";
 
 const logger = new Logger({ name: "Calendar" });
 
-function DayContent({ challenges, selectedDate, userNotes, onConfirmNewNoteSubmitClickHandler }: {
-    challenges: DayChallenges[],
-    selectedDate: Date,
-    userNotes: UserNote[]
-    onConfirmNewNoteSubmitClickHandler: (noteText: string) => void
+function DayContent({ daysWithChallenges, selectedDate }: {
+    daysWithChallenges: BatchDay[],
+    selectedDate: Date
 }) {
     return (
         <div className={`${styles.challengesContainerWrapper}`}>
             <div className={`${styles.challengesContainer}`}>
-                <SelectedDayChallengeInfo challenges={challenges} selectedDay={selectedDate} />
-                {/*<SelectedDayNotes selectedDate={selectedDate} userNotes={userNotes}
-                                  onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler} />*/}
+                <SelectedDayChallengeInfo daysWithChallenges={daysWithChallenges} selectedDay={selectedDate} />
             </div>
         </div>
     );
 }
 
 function MainContent() {
-    const { challenges, userNotes, selectedDate, handleDateClick, onConfirmNewNoteSubmitClickHandler } = useCalendar();
-
+    const { daysWithChallenges, selectedDate, handleDateClick } = useCalendar();
 
     return (
         <div className={`${styles.mainContent}`}>
             {
-                challenges == undefined || userNotes == undefined ?
+                daysWithChallenges == undefined ?
                     <h1 className={`${styles.loadingTextContainer}`}>
                         {`Loading Challenges and Calendar...`}
                     </h1>
                     :
                     (
                         <>
-                            <MyCalendar onDayClickHandler={handleDateClick} />
+                            <MyCalendar daysWithChallenges={daysWithChallenges} onDayClickHandler={handleDateClick} />
                             <DayContent
-                                challenges={challenges}
+                                daysWithChallenges={daysWithChallenges}
                                 selectedDate={selectedDate}
-                                userNotes={userNotes}
-                                onConfirmNewNoteSubmitClickHandler={onConfirmNewNoteSubmitClickHandler}
                             />
                         </>
                     )
