@@ -86,47 +86,58 @@ export function ChallengesList(
         currentChallenge
     } = useChallengesList(batchDays, onChallengeClickHandler);
 
+    function Level1And2List() {
+        return (
+            <>{Array.from({ length: 21 }).map((_, index) => {
+                const reached = currentChallenge ? index <= currentChallenge - 1 : false;
+
+                const notes = batchDays && batchDays.length > index ? batchDays[index].notes : undefined;
+
+                const title = batchDays && batchDays.length > index ? batchDays[index].challenges[0].title : undefined;
+                const description = batchDays && batchDays.length > index ? batchDays[index].challenges[0].description : undefined;
+                const completed = batchDays && batchDays.length > index ? batchDays[index].challenges[0].completionDate != null : false;
+
+                let ref: React.RefObject<HTMLDivElement> | undefined = undefined;
+                if (selectedItem != -1 && selectedItem == index) {
+                    ref = selectedRef;
+                } else if (selectedItem == -1 && batchDays && index == batchDays.length - 1) {
+                    ref = selectedRef;
+                }
+
+                return <ChallengeListItem key={index}
+                                          ref={ref}
+                                          completed={completed}
+                                          challengeIndex={index}
+                                          loading={batchDays == undefined}
+                                          challengeTitle={title}
+                                          challengeDescription={description}
+                                          challengeNotes={notes}
+                                          lastExpanded={lastSelectedItem == index}
+                                          expanded={selectedItem == index}
+                                          reached={reached}
+                                          onChallengeClick={onItemClickHandler}
+                                          onMarkComplete={() => {
+                                              if (!batchDays || !batch) {
+                                                  return;
+                                              }
+                                              onMarkCompleteClickHandler(batchDays[index].challenges[0], batchDays[index], batch);
+                                          }}
+                                          onNoteAddClick={onNoteAddClick}
+                />;
+            })}</>
+        );
+    }
+
+    function Level3List() {
+        return (
+            <></>
+        );
+    }
+
     return (
         <div className={`${styles.challengesList}`}>
             {
-                Array.from({ length: 21 }).map((_, index) => {
-                        const reached = currentChallenge ? index <= currentChallenge - 1 : false;
-
-                        const notes = batchDays && batchDays.length > index ? batchDays[index].notes : undefined;
-
-                        const title = batchDays && batchDays.length > index ? batchDays[index].challenges[0].title : undefined;
-                        const description = batchDays && batchDays.length > index ? batchDays[index].challenges[0].description : undefined;
-                        const completed = batchDays && batchDays.length > index ? batchDays[index].challenges[0].completionDate != null : false;
-
-                        let ref: React.RefObject<HTMLDivElement> | undefined = undefined;
-                        if (selectedItem != -1 && selectedItem == index) {
-                            ref = selectedRef;
-                        } else if (selectedItem == -1 && batchDays && index == batchDays.length - 1) {
-                            ref = selectedRef;
-                        }
-
-                        return <ChallengeListItem key={index}
-                                                  ref={ref}
-                                                  completed={completed}
-                                                  challengeIndex={index}
-                                                  loading={batchDays == undefined}
-                                                  challengeTitle={title}
-                                                  challengeDescription={description}
-                                                  challengeNotes={notes}
-                                                  lastExpanded={lastSelectedItem == index}
-                                                  expanded={selectedItem == index}
-                                                  reached={reached}
-                                                  onChallengeClick={onItemClickHandler}
-                                                  onMarkComplete={() => {
-                                                      if (!batchDays || !batch) {
-                                                          return;
-                                                      }
-                                                      onMarkCompleteClickHandler(batchDays[index].challenges[0], batchDays[index], batch);
-                                                  }}
-                                                  onNoteAddClick={onNoteAddClick}
-                        />;
-                    }
-                )
+                Level1And2List()
             }
         </div>
     );
