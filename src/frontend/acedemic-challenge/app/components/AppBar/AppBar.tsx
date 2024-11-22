@@ -1,4 +1,3 @@
-import { CutButton } from "~/components/Button/Button";
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
 import React, { useContext } from "react";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
@@ -29,13 +28,13 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
                 aria-hidden={ariaHidden}
         >
             {appBarVariant !== "clean" && (
-                <CutButton
+                <button
                     aria-label={t("appbar:back")}
                     className={appBarVariant === "home" ? homeAppBarStyles.backButton : styles.backButton}
                     onClick={() => navigate(-1)}
                 >
                     {"<"}
-                </CutButton>
+                </button>
             )}
             {appBarVariant === "default" && (
                 <div className={styles.homeButtonContainer}>

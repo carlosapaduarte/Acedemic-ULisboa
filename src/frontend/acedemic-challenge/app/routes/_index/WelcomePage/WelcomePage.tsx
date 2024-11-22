@@ -2,7 +2,6 @@ import { useIsLoggedIn } from "~/components/auth/Authn";
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import styles from "~/routes/_index/WelcomePage/welcomePage.module.css";
-import { CutButton } from "~/components/Button/Button";
 import classNames from "classnames";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useState } from "react";
@@ -39,9 +38,9 @@ function InfoPage1({ handleOnNextClick }: { handleOnNextClick: () => void }) {
                 <div style={{ color: "var(--color-2)" }}>
                     Placeholder
                 </div>
-                <CutButton className={styles.proceedButton} onClick={handleOnNextClick}>
+                <button className={styles.proceedButton} onClick={handleOnNextClick}>
                     Next
-                </CutButton>
+                </button>
             </div>
         </>
     );
@@ -66,9 +65,9 @@ function InfoPage2({ handleOnProceedClick }: { handleOnProceedClick: () => void 
                 <div style={{ color: "var(--color-2)" }}>
                     Placeholder
                 </div>
-                <CutButton className={styles.proceedButton} onClick={handleOnProceedClick}>
+                <button className={styles.proceedButton} onClick={handleOnProceedClick}>
                     Next
-                </CutButton>
+                </button>
             </div>
         </>
     );

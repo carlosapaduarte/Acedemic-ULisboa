@@ -40,11 +40,13 @@
 .saveButton {
     composes: cutButton from '@/components/Button/button.module.css';
 
+    --edge-size: 0.25rem;
+    --cut-button-background-color: black;
+    --cut-button-background-color-hover: var(--color-black-hover);
+
     height: 2rem;
     width: 5rem;
 
-    --edge-size: 0.25rem;
-    background-color: black;
     color: white;
     font-weight: bold;
 }
@@ -52,11 +54,13 @@
 .closeButton {
     composes: cutButton from '@/components/Button/button.module.css';
 
+    --edge-size: 0.25rem;
+    --cut-button-background-color: black;
+    --cut-button-background-color-hover: var(--color-black-hover);
+
     height: 2rem;
     width: 5rem;
 
-    --edge-size: 0.25rem;
-    background-color: black;
     color: white;
     font-weight: bold;
 }

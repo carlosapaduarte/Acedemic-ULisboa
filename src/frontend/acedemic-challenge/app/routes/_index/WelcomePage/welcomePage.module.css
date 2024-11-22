@@ -98,6 +98,11 @@
 }
 
 .proceedButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: var(--color-4);
+    --cut-button-background-color-hover: var(--color-4-hover);
+
     margin-bottom: 1rem;
     margin-top: 1rem;
     height: 3rem;
@@ -105,5 +110,4 @@
 
     font-size: 1.25rem;
     font-weight: 700;
-    background-color: var(--color-4);
 }

@@ -80,19 +80,23 @@
 }
 
 .levelButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: var(--color-2);
+    --cut-button-background-color-hover: var(--color-2-hover);
+
     padding: 0.25rem;
 
-    width: 100%;
+    width: calc(100% - 1px);
 
     font-size: clamp(0.75rem, 4vw, 1.25rem);
     font-weight: bold;
     text-wrap: nowrap;
-
-    background-color: var(--color-2);
 }
 
 .levelButton.selected {
-    background-color: var(--color-4);
+    --cut-button-background-color: var(--color-4);
+    --cut-button-background-color-hover: var(--color-4-hover);
 }
 
 .levelContentTextContainer {
@@ -123,22 +127,15 @@
 }
 
 .confirmLevelButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: var(--color-4);
+    --cut-button-background-color-hover: var(--color-4-hover);
+
     padding: 0.5rem;
 
     font-size: 1.5rem;
     font-weight: bold;
-
-    background-color: var(--color-4);
-}
-
-@media (hover: hover) {
-    .levelButton.selected:hover {
-        background-color: var(--color-4-hover);
-    }
-
-    .levelButton:hover {
-        background-color: var(--color-2-hover);
-    }
 }
 
 @media (min-width: 768px) {

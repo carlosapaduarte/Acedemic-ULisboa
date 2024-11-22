@@ -127,6 +127,33 @@ Doesn't work, use SCSS
     font-family: 'Chakra Petch', sans-serif;
     color: inherit;
 
+    background-color: var(--color-3);
+
+    &:hover {
+        background-color: var(--color-3-hover);
+    }
+    &:active {
+        transform: translate(1px, -1px);
+        box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.2) inset,
+        -6px -6px 6px rgba(0, 0, 0, 0.2) inset;
+    }
+
+    &.reached {
+        background-color: var(--color-2);
+
+        &:hover {
+            background-color: var(--color-2-hover);
+        }
+    }
+
+    &.expanded {
+        background-color: var(--color-4);
+
+        &:hover {
+            background-color: var(--color-4-hover);
+        }
+    }
+
     &:focus-visible {
         outline: 5px solid black;
         outline-offset: -5px;
@@ -166,18 +193,25 @@ Doesn't work, use SCSS
     gap: 0.5rem;
 }
 
-.addNoteButton {
-    background-color: var(--secondary-color);
+.viewEditNotesButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: var(--color-2);
+    --cut-button-background-color-hover: var(--color-2-hover);
+
     font-weight: bold;
     font-size: 1rem;
     flex-basis: 40%;
 }
 
 .completeChallengeButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
     height: auto;
     flex-basis: 60%;
 
-    background-color: black;
+    --cut-button-background-color: black;
+    --cut-button-background-color-hover: var(--color-black-hover);
     color: white;
 
     font-weight: bold;
@@ -267,6 +301,8 @@ Doesn't work, use SCSS
     height: 1000vh;
     max-height: 0;
     overflow: auto;
+
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2) inset;
 }
 
 .challengeBox.expanded .challengeExpandableContainer {

@@ -1,5 +1,4 @@
 import { BatchDay, Challenge } from "~/challenges/types";
-import { CutButton } from "~/components/Button/Button";
 import React from "react";
 
 import styles from "./challenges.module.css";
@@ -48,18 +47,18 @@ export default function Challenges({ currentBatchDay, onMarkComplete, onViewNote
                             </p>
                         </div>
                         <div className={styles.buttonsContainer}>
-                            <CutButton className={styles.addNoteButton}
-                                       onClick={() => onViewNotesButtonClick()}>
+                            <button className={styles.viewEditNotesButton}
+                                    onClick={() => onViewNotesButtonClick()}>
                                 {t("dashboard:view_edit_notes")}
-                            </CutButton>
+                            </button>
                             {
                                 challenges[0].completionDate != null ?
                                     <></>
                                     :
-                                    <CutButton className={styles.completeChallengeButton}
-                                               onClick={() => onMarkComplete(challenges[0])}>
+                                    <button className={styles.completeChallengeButton}
+                                            onClick={() => onMarkComplete(challenges[0])}>
                                         {t("dashboard:mark_complete")}
-                                    </CutButton>
+                                    </button>
                             }
                         </div>
                     </div>

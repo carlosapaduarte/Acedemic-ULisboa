@@ -70,27 +70,32 @@
 }
 
 .calendarDayContainer {
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --edge-size: 0.3rem;
+    --cut-button-background-color: var(--color-3);
+    --cut-button-background-color-hover: var(--color-3-hover);
+
     width: 100%;
     height: 100%;
 
     display: flex;
     justify-content: center;
     align-items: center;
-
-    --edge-size: 0.3rem;
-    background-color: var(--color-3);
 }
 
 .calendarDayContainer.hasChallenge {
-    background-color: var(--color-2);
+    --cut-button-background-color: var(--color-2);
+    --cut-button-background-color-hover: var(--color-2-hover);
+}
+
+.calendarDayContainer.selected {
+    --cut-button-background-color: var(--color-4);
+    --cut-button-background-color-hover: var(--color-4-hover);
 }
 
 .calendarDayContainer.notCurrentMonth {
     opacity: 0.75;
-}
-
-.calendarDayContainer.selected {
-    background-color: var(--color-4);
 }
 
 .calendarDayContainerWrapper .dayChallengeCompleteIndicator {
@@ -104,6 +109,12 @@
     color: white;
     text-align: center;
     line-height: 1rem;
+
+    pointer-events: none;
+}
+
+.calendarDayContainerWrapper .calendarDayContainer:active + .dayChallengeCompleteIndicator {
+    transform: translate(1px, -1px);
 }
 
 .calendarDayText {

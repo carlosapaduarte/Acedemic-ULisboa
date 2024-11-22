@@ -68,17 +68,24 @@
 }
 
 .viewEditNotesButton {
-    background-color: var(--color-2);
+    composes: cutButton from '@/components/Button/button.module.css';
+
+    --cut-button-background-color: var(--color-2);
+    --cut-button-background-color-hover: var(--color-2-hover);
+
     font-weight: bold;
     font-size: 1rem;
     flex-basis: 40%;
 }
 
 .completeChallengeButton {
+    composes: cutButton from '@/components/Button/button.module.css';
+
     height: auto;
     flex-basis: 60%;
 
-    background-color: black;
+    --cut-button-background-color: black;
+    --cut-button-background-color-hover: var(--color-black-hover);
     color: white;
 
     font-weight: bold;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { utils } from "~/utils";
-import { Button, CutButton } from "~/components/Button/Button";
+import { Button } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
 import styles from "./myCalendar.module.css";
 import classNames from "classnames";
@@ -142,7 +142,7 @@ function Day(
 
     return (
         <div className={styles.calendarDayContainerWrapper}>
-            <CutButton
+            <button
                 className={classNames(
                     styles.calendarDayContainer,
                     { [styles.today]: isToday },
@@ -161,7 +161,7 @@ function Day(
                 )}>
                     {day.number}
                 </h1>
-            </CutButton>
+            </button>
             {completed
                 ? <div className={styles.dayChallengeCompleteIndicator}>!</div>
                 : null

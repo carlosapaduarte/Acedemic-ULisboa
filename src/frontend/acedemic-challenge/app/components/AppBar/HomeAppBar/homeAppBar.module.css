@@ -94,7 +94,9 @@
 .navBarButton {
     composes: cutButton from "@/components/Button/button.module.css";
 
-    background-color: var(--color-1);
+    --cut-button-background-color: var(--color-1);
+    --cut-button-background-color-hover: var(--color-1-hover);
+
     color: white;
     width: 4rem;
     height: 3rem;

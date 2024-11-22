@@ -3,7 +3,6 @@ import { utils } from "~/utils";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "../../calendarPage.module.css";
-import { CutButton } from "~/components/Button/Button";
 import { useNavigate } from "@remix-run/react";
 
 function useSelectedBatchDay({ daysWithChallenges, selectedDay }: {
@@ -101,12 +100,12 @@ export default function SelectedDayChallengeInfo({ daysWithChallenges, selectedD
                         </p>
                     </div>
                 </div>
-                <CutButton
+                <button
                     className={`${styles.seeMoreButton}`}
                     onClick={() => navigate(`/challenges?day=${selectedBatchDay.id}`)}
                 >
                     {t("calendar:see_more_button_text")}
-                </CutButton>
+                </button>
             </>
         );
     } else if (selectedBatchDay.challenges.length > 1) {
