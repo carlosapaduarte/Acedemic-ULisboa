@@ -26,8 +26,19 @@ function Level3ChallengeListItem(
     return (
         <div className={classNames(styles.challengeBoxLvl3)}>
             <div className={`${styles.challengeBoxHeader}`}>
+                <div className={styles.challengeBoxChallengeCompletionIndicatorContainer}>
+                    <div className={styles.challengeBoxChallengeCompletionIndicator}>
+                        <div className={styles.challengeBoxChallengeCompletionIndicatorPercentage}>
+                            52.38%
+                        </div>
+                        <div className={styles.challengeBoxChallengeCompletionIndicatorFraction}>
+                            (11/21)
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.challengeBoxHeaderText}>
                 <p className={`${styles.challengeTitle}`}>
-                    {challengeIndex + 1} - {challengeTitle}
+                    {challengeTitle}
                 </p>
                 {
                     completed ?
@@ -39,47 +50,21 @@ function Level3ChallengeListItem(
                             {t("dashboard:challenge_incomplete")}
                         </div>
                 }
+                </div>
             </div>
             <div className={`${styles.challengeDescription}`}>
                 {challengeDescription}
             </div>
-            <div className={styles.buttonsContainer}>
-                {
-                    completed ?
-                        <></>
-                        :
+            {
+                !completed &&
+                    <div className={styles.completeChallengeButtonContainer}>
                         <button className={styles.completeChallengeButton}
                                 onClick={() => onMarkComplete()}
                         >
                             {t("dashboard:mark_complete")}
                         </button>
-                }
-            </div>
-            {/*<ChallengeBoxButton
-                batchDayNumber={challengeIndex + 1}
-                challengeTitle={challengeTitle ?? ""}
-                reached={reached}
-                completed={completed}
-                expanded={expanded}
-                onClick={() => {
-                    if (!reached) {
-                        setIsLockedShaking(true);
-                        setTimeout(() => setIsLockedShaking(false), 300);
-                        return;
-                    }
-
-                    onChallengeClick(challengeIndex);
-                }}
-            />
-            <ChallengeBoxExpandableContainer
-                batchDayNumber={challengeIndex + 1}
-                expanded={expanded}
-                completed={completed}
-                challengeDescription={challengeDescription ?? ""}
-                challengeNotes={challengeNotes ?? ""}
-                onViewEditNotesButtonClick={() => setIsNotesModalOpen(true)}
-                onMarkCompleteButtonClick={onMarkComplete}
-            />*/}
+                    </div>
+            }
         </div>
     );
 }
@@ -118,7 +103,7 @@ export function Level3ChallengesList(
             <h1 className={styles.challengesPageLevel3Title}>
                 {t("challenge_overview:day", { day: currentBatchDayNumber })}
             </h1>
-            <div className={styles.buttonsContainer}>
+            <div className={styles.viewEditNotesButtonContainer}>
                 <button className={styles.viewEditNotesButton}
                         onClick={() => setIsNotesModalOpen(true)}
                 >

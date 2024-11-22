@@ -82,10 +82,14 @@ export function ChallengesList(
         currentBatchDayNumber
     } = useChallengesList(batchDays);
 
+    /*const DEBUG_BATCH_LEVEL: number = 3;*/
+
+    const batchLevel = batch?.level;
+
     return (
         <>
             {
-                batch == undefined || batchDays == undefined || batch.level == 1 || batch.level == 2
+                batch == undefined || batchDays == undefined || batchLevel == 1 || batchLevel == 2
                     ? <Level1And2ChallengesList
                         batchDays={batchDays}
                         currentBatchDayNumber={currentBatchDayNumber}

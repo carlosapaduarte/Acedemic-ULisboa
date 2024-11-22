@@ -113,7 +113,7 @@ function ChallengeBoxExpandableContainer(
                         : t("dashboard:no_notes")
                     }
                 </div>
-                <div className={styles.buttonsContainer}>
+                <div className={styles.challengeBoxButtonsContainer}>
                     <button className={styles.viewEditNotesButton}
                             onClick={onViewEditNotesButtonClick}
                             tabIndex={expanded ? 0 : -1}
