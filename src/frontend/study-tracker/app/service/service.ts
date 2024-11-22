@@ -3,6 +3,7 @@
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 import { CreateTaskInputDto } from "~/service/output_dtos";
+import { utils } from "~/utils";
 
 
 // For now, all of these functions will return the expected response.
@@ -427,19 +428,31 @@ async function getTasks(filterUncompletedTasks: boolean): Promise<Task[]> {
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
 
-type DailyTasksProgress = {
+export type DailyTasksProgress = {
+    date: Date,
     progress: number
 }
 
-async function getDailyTasksProgress(): Promise<number> {
+async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
+    
+    function fromDtoToDomain(rsp: any[]): DailyTasksProgress[] {
+        return rsp.map((value: any) => {
+            return {
+                date: new Date(value.date_ * 1000),
+                progress: value.progress    
+            }
+        })
+    }
+
+    const now = new Date()
     const request = {
-        path: `study-tracker/users/me/statistics/daily-tasks-progress`,
+        path: `study-tracker/users/me/statistics/daily-tasks-progress?year=${now.getFullYear()}&week=${utils.getWeekNumber(now)}`,
         method: "GET"
     };
     const response: Response = await doFetch(request);
     if (response.ok) {
-        const responseObject = await response.json();
-        return responseObject.progress;
+        const responseObject: any[] = await response.json();
+        return fromDtoToDomain(responseObject)
     } else
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
@@ -630,7 +643,56 @@ async function createDailyEnergyStat(energyLevel: number, timeOfDay: TimeOfDay) 
         return Promise.reject(new Error("Energy level daily statistic could not be submitted!"));
 }
 
-async function getTaskDistributionStats(): Promise<any> {
+async function submitDailyTags(tags: string[]) {
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-tags`,
+        method: "POST",
+        body: toJsonBody({tags})
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok)
+        return Promise.reject(new Error("Daily tags could not be submitted!"));
+}
+
+async function getDailyTags(): Promise<string[]> {
+    const request = {
+        path: `study-tracker/users/me/statistics/daily-tags`,
+        method: "GET"
+    };
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        const responseObject: string[] = await response.json();
+        return responseObject;
+    } else
+        return Promise.reject(new Error("Could not obtain task distribution statistics!"));
+}
+
+export type TaskDistributionPerWeek = {
+    year: number,
+    week: number,
+    tag: string,
+    time: number
+}
+
+async function getTaskDistributionStats(): Promise<TaskDistributionPerWeek[]> {
+    function toDomain(obj: any): TaskDistributionPerWeek[] {
+        const stats: TaskDistributionPerWeek[] = []
+        
+        for (const [year, weeksObj] of Object.entries<any>(obj)) {
+            for (const [week, tagsObj] of Object.entries<any>(weeksObj)) {
+                for (const [tag, time] of Object.entries(tagsObj)) {
+                    stats.push({
+                        year: Number(year), 
+                        week: Number(week), 
+                        tag, 
+                        time: Number(time)
+                    })
+                }
+            }
+        }
+        return stats
+    }
+
     const request = {
         path: `study-tracker/users/me/statistics/time-by-event-tag`,
         method: "GET"
@@ -638,7 +700,7 @@ async function getTaskDistributionStats(): Promise<any> {
     const response: Response = await doFetch(request);
     if (response.ok) {
         const responseObject: CurricularUnit[] = await response.json();
-        return responseObject;
+        return toDomain(responseObject);
     } else
         return Promise.reject(new Error("Could not obtain task distribution statistics!"));
 }
@@ -771,12 +833,14 @@ export const service = {
     createCurricularUnit,
     createGrade,
     createDailyEnergyStat,
+    submitDailyTags,
+    getDailyTags,
     getTaskDistributionStats,
-    getDailyTasksProgress,
+    getThisWeekDailyTasksProgress: getDailyTasksProgress,
     fetchEnergyHistory,
     getStudyTimeByWeek,
     //incrementWeekStudyTime,
     //updateWeekAverageAttentionSpan
     startStudySession,
-    finishStudySession
+    finishStudySession,
 };

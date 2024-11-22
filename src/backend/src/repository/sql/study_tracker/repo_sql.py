@@ -5,7 +5,7 @@ from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Eve
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import DailyEnergyStatusModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel, WeekStudyTimeModel
+from repository.sql.models.models import DailyEnergyStatusModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, UserModel, WeekStudyTimeModel
 from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from utils import get_datetime_utc
@@ -51,17 +51,26 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def create_event(self, user_id: int, event: Event):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
-        
+            
+            # Generates a random ID, that is not yet taken
+            random_generated_id: int = 0
+            while True:
+                random_generated_id: int = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+                statement = select(STEventModel).where(STEventModel.id == random_generated_id)
+                result = session.exec(statement)
+                if result.first() is None:
+                    break
+
             new_event_model = STEventModel(
-                    id=random.randint(1, 999999999), # For some reason, automatic ID is not working
-                    title=event.title,
-                    start_date=event.date.start_date,
-                    end_date=event.date.end_date,
-                    user_id=user_id,
-                    user=user_model,
-                    tags=[], # tags added next
-                    every_week=event.every_week
-                )
+                id=random_generated_id, # For some reason, automatic ID is not working
+                title=event.title,
+                start_date=event.date.start_date,
+                end_date=event.date.end_date,
+                user_id=user_id,
+                user=user_model,
+                tags=[], # tags added next
+                every_week=event.every_week
+            )
 
             user_model.st_events.append(
                 new_event_model
@@ -275,7 +284,16 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         """
         
             
-    def get_tasks(self, user_id: int, order_by_deadline_and_priority: bool, filter_uncompleted_tasks: bool, filter_deadline_is_today: bool) -> list[Task]:
+    def get_tasks(
+        self, 
+        user_id: int, 
+        order_by_deadline_and_priority: bool, 
+        filter_uncompleted_tasks: bool, 
+        filter_deadline_is_today: bool,
+        year: int | None,
+        week: int | None
+    ) -> list[Task]:
+        
         with Session(engine) as session:
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
@@ -314,7 +332,17 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 for task in tasks:
                     if task.deadline is not None and not StudyTrackerSqlRepo.is_today(task.deadline):
                         tasks.remove(task)
-                
+                        
+            if year:
+                for task in tasks:
+                    if task.deadline is not None and task.deadline.year != year:
+                        tasks.remove(task)
+                    
+            if week:
+                for task in tasks:
+                    if task.deadline is not None and task.deadline.isocalendar().week != week:
+                        tasks.remove(task)
+                        
             return tasks
         
     
@@ -327,8 +355,17 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session: Session
     ) -> int:
         
+        # Generates a random ID, that is not yet taken
+        random_generated_id: int = 0
+        while True:
+            random_generated_id: int = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+            statement = select(STTaskModel).where(STTaskModel.id == random_generated_id)
+            result = session.exec(statement)
+            if result.first() is None:
+                break
+        
         new_task_model = STTaskModel(
-            id=random.randint(1, 999999999), # For some reason, automatic ID is not working
+            id=random_generated_id, # For some reason, automatic ID is not working
             title=task.title,
             description=task.description,
             deadline=task.deadline,
@@ -511,6 +548,50 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             session.commit()
             
+    @staticmethod
+    def is_same_day(date_1: date, date_2: date) -> bool:
+        return date_1.year == date_2.year and date_1.month == date_2.month and date_1.day == date_2.day
+    
+    def create_daily_tags(self, user_id: int, tags: list[str], _date: date):
+        with Session(engine) as session:
+            
+            for tag in tags:
+                statement = select(DailyTagModel)\
+                    .where(DailyTagModel.user_id == user_id)\
+                    .where(DailyTagModel.tag == tag)
+                    # checking date doesn't work... Check later
+                    
+                result = session.exec(statement)
+                res = result.first()
+                
+                if res is not None:
+                    if StudyTrackerSqlRepo.is_same_day(res.date_, _date):
+                        continue
+                
+                daily_energy_stat = DailyTagModel(
+                    date_=_date,
+                    tag=tag,
+                    user_id=user_id
+                )        
+                session.add(daily_energy_stat)            
+            
+            session.commit()        
+            
+    def get_daily_tags(self, user_id: int, _date: date) -> list[str]:
+        with Session(engine) as session:
+            statement = select(DailyTagModel)\
+                .where(DailyTagModel.user_id == user_id)
+                
+            result = session.exec(statement)
+            daily_tags_models: list[DailyTagModel] = list(result.all())
+            
+            daily_tags: list[str] = []
+            for tag_model in daily_tags_models:
+                if StudyTrackerSqlRepo.is_same_day(tag_model.date_, _date):
+                    daily_tags.append(tag_model.tag)
+                
+            return daily_tags
+            
     def is_today_energy_status_created(self, user_id: int) -> bool:
         today = date.today()
         with Session(engine) as session:
@@ -580,7 +661,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                         stats[year][week][tag_name] = 0
                         
                     stats[year][week][tag_name] += elapsed_minutes
-
+                    
             return stats
         
     def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:

@@ -10,5 +10,7 @@ engine = create_engine(os.environ["SQLALCHEMY_DATABASE_URL"], echo=False)
 
 SQLModel.metadata.create_all(engine)
 
+POSTGRES_MAX_INTEGER_VALUE = 2147483647
+
 def get_engine():
     return engine

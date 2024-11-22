@@ -2,9 +2,23 @@ from pydantic import BaseModel
 
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task, WeekTimeStudy
 from utils import get_datetime_utc, get_datetime_utc_from_date
+from datetime import date
 
-class DailyTasksProgress(BaseModel):
+class DailyTasksProgressOutputDto(BaseModel):
+    date_: int
     progress: float
+    
+    @staticmethod
+    def from_domain(domain: list[tuple[date, float]]) -> list['DailyTasksProgressOutputDto']:
+        progress_by_day: list['DailyTasksProgressOutputDto'] = []
+        for (task_date, progress) in domain:
+            progress_by_day.append(
+                DailyTasksProgressOutputDto(
+                    date_=get_datetime_utc_from_date(task_date),
+                    progress=progress
+                )
+            )
+        return progress_by_day
 
 class UserTaskOutputDto(BaseModel):
     id: int

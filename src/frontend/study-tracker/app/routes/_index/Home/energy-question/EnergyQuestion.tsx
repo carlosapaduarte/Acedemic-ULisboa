@@ -3,7 +3,7 @@ import { Button, Input, Label, TextField } from "react-aria-components";
 import { useTranslation } from "react-i18next";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service, TimeOfDay } from "~/service/service";
-import { getEnergyIconByEnergyLevel, levelToStr } from "../statistics/Energy";
+import { getEnergyIconByEnergyLevel, levelToStr } from "../../../statistics/Energy";
 import styles from "./energyQuestion.module.css";
 
 function useHowMuchEnergyQuestionPage(onQuestionSubmitted: () => void) {
@@ -32,7 +32,7 @@ function useHowMuchEnergyQuestionPage(onQuestionSubmitted: () => void) {
     return { level, setLevel, onConfirmPressHandler };
 }
 
-export default function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => void }) {
+export function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => void }) {
     const { t } = useTranslation(["statistics"]);
     const { level: energyLevel, setLevel, onConfirmPressHandler } = useHowMuchEnergyQuestionPage(onComplete);
 
@@ -67,8 +67,12 @@ export default function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: 
             </div>
 
             <div className={styles.sliderLegend}>
-                <span>Tired</span>
-                <span>Energetic</span>
+                <span>
+                    {t("statistics:tired")}
+                </span>
+                <span>
+                    {t("statistics:energetic")}
+                </span>
             </div>
 
             <div className={styles.buttonsContainer}>

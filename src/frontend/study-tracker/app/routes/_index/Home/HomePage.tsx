@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
-import HowMuchEnergyQuestionPage from "~/routes/energy-question/route";
+import { HowMuchEnergyQuestionPage } from "./energy-question/EnergyQuestion";
+import { TagsSelection } from "./energy-question/TagsSelection";
 
 function useHomePage() {
     const [displayDailyEnergyQuestion, setDisplayDailyEnergyQuestion] = useState<boolean | undefined>(false);
+    const [displayTagsSelection, setDisplayTagsSelection] = useState<boolean | undefined>(false);
 
     useEffect(() => {
         const promptedState = localStorage["lastEnergyQuestionPromptedDate"]
@@ -25,12 +27,19 @@ function useHomePage() {
     function onQuestionAnswered() {
         const today = new Date();
         localStorage["lastEnergyQuestionPromptedDate"] = today;
-        // setDisplayDailyEnergyQuestion(false) // TODO: uncomment this line. For the beta, show always to fill the home page
+        setDisplayDailyEnergyQuestion(false) // TODO: uncomment this line. For the beta, show always to fill the home page
+        setDisplayTagsSelection(true)
+    }
+
+    function onTagsSubmitted() {
+        setDisplayTagsSelection(false)
     }
 
     return {
         displayDailyEnergyQuestion,
-        onQuestionAnswered
+        displayTagsSelection,
+        onQuestionAnswered,
+        onTagsSubmitted
     }
 }
 
@@ -38,15 +47,20 @@ export default function HomePage() {
     const { t } = useTranslation(["home"]);
     const {
         displayDailyEnergyQuestion,
-        onQuestionAnswered
+        displayTagsSelection,
+        onQuestionAnswered,
+        onTagsSubmitted
     } = useHomePage()
 
     useAppBar("home");    
 
     return (
         <div className={styles.homePage}>
-            {displayDailyEnergyQuestion ?
-                <HowMuchEnergyQuestionPage onComplete={onQuestionAnswered} />
+            {displayDailyEnergyQuestion || displayTagsSelection ?
+                displayDailyEnergyQuestion ?
+                    <HowMuchEnergyQuestionPage onComplete={onQuestionAnswered} />
+                    :
+                    <TagsSelection onTagsSubmitted={onTagsSubmitted} />
                 :
                 <div>
                     {t("home:main_question")}

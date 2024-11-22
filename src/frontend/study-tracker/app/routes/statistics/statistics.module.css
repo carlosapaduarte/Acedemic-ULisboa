@@ -47,6 +47,7 @@
 .statsContainerTitleAndDateDiv {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 0.8em;
 }
 
@@ -64,11 +65,14 @@
     top: -25px;
     left: -17px;
     background-color: var(--color-2);
-    text-align: center;
 
     font-weight: bolder;
     color: white;
-    
+
+    .fix {
+        font-size: smaller;
+    }
+
 
     --edge-size: .5rem;
     clip-path: polygon(
@@ -120,6 +124,11 @@
     color: red;
 }
 
+.containerAlignRight {
+    display: flex;
+    justify-content: right;
+}
+
 .containerHeaderDate {
     text-align: end;
     color: var(--color-2);
@@ -144,6 +153,7 @@
     color: var(--color-2);
     background-color: transparent;
     font-size: smaller;
+    font-weight: bold;
 
     display: flex;
     align-items: center;
@@ -218,4 +228,137 @@
 
 .spacer {
     height: 0.7em;
+}
+
+.chartAndLegendContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5em;
+
+    .chartContainer {
+        width: 54%;
+    }
+
+    .legendGroupContainer {
+        display: flex;
+        flex-direction: column;
+        width: 41%;
+
+        .legendItemContainer {
+            height: 1.75em;
+            margin-bottom: 0.5em;
+
+            font-weight: bolder;
+            font-size: 0.8em;
+            color: white;
+
+            border-radius: 10px;
+            padding: 0.3em;
+            padding-left: 0.6em;
+        }
+    }
+}
+
+
+.WeekDateAndProgressBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .weekDate {
+        width: 50%;
+        font-size: medium;
+    }
+
+    .progressBarBase {
+        width: 60%;
+        height: 1em;
+        background-color: rgba(180,142,121,255);
+        border-radius: 15px;
+
+        .progressBar {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            height: 100%;
+        }
+    }
+}
+
+.noDataAvailableMessage {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 3em;
+    font-weight: bolder;
+    font-size: small;
+}
+
+:root {
+    --size: 3em;
+    --background-color: var(--primary-color);
+    --mask-color: var(--secondary-color);
+}
+
+* { box-sizing:border-box; }
+
+.wrapper {
+    width: var(--size);
+    height: var(--size);
+    margin: 10px auto;
+    position: relative;
+    background: white;
+    background-color: var(--mask-color);
+    border-radius: 100%;
+}
+
+.pie {
+    width: 50%;
+    height: 100%;
+    transform-origin: 100% 50%;
+    position: absolute;
+    background: var(--background-color);
+}
+
+.spinner:after {
+    position:absolute;
+    width:10px;
+    height:10px;
+    .spinner:after {
+        position:absolute;
+        width:10px;
+        height:10px;
+        background:#fff;
+        border:1px solid rgba(0,0,0,0.5);
+        box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+        border-radius:50%;
+        top:10px;
+        right:10px;
+        content:"";
+        display: none;
+    }  background:#fff;
+    border:1px solid rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+    border-radius:50%;
+    top:10px;
+    right:10px;
+    content:"";
+    display: none;
+}
+
+.filler {
+    border-radius: 0 100% 100% 0 / 0 50% 50% 0;
+    left: 50%;
+    z-index: 100;
+    border-left: none;
+    opacity: 1;
+}
+
+.mask {
+    width: 50%;
+    height: 100%;
+    border-radius: 100% 0 0 100% / 50% 0 0 50%;
+    position: absolute;
+    background: inherit;
+    z-index: 300;
 }

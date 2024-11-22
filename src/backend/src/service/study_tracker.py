@@ -1,6 +1,6 @@
 from datetime import datetime
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
-from exception import AlreadyExistsException, NotAvailableScheduleBlockCollision, NotFoundException
+from exception import InvalidDate, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
 from datetime import date
@@ -23,9 +23,14 @@ def does_not_collide_with_unavailable_block(
     for block in not_available_blocks:
         if event_date_interval.collides_with_unavailable_block(block):
             raise NotAvailableScheduleBlockCollision()
+        
+def verify_start_end_date_validity(date: DateInterval):
+    if date.start_date >= date.end_date:
+        raise InvalidDate()
 
 def create_event(user_id: int, event: Event):
     does_not_collide_with_unavailable_block(user_id, event.date)
+    verify_start_end_date_validity(event.date)
     study_tracker_repo.create_event(user_id, event)
     
 def update_event(user_id: int, event_id: int, event: Event):
@@ -63,20 +68,37 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
         
     return study_tracker_repo.create_task(user_id, task)
 
-def get_user_daily_tasks_progress(user_id: int) -> float:
-    daily_tasks = study_tracker_repo.get_tasks(user_id, False, False, True)
-    number_of_daily_tasks = len(daily_tasks)
+def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tuple[date, float]]:
+    week_tasks = study_tracker_repo.get_tasks(user_id, False, False, False, year, week)
     
-    if number_of_daily_tasks is 0:
-        return 0
-    
-    completed = 0    
-    for task in daily_tasks:
-        if task.status == "completed":
-            completed += 1
+    tasks_by_day: dict[date, list[Task]] = {}
+    for task in week_tasks:
+        deadline = task.deadline
+        
+        # Should not happen because we asked for tasks with a specific year and week
+        if deadline is None:
+            raise
+        
+        
+        task_date = deadline.date()
+        if tasks_by_day.get(task_date) is None:
+            tasks_by_day[task_date] = [task]
+        else:
+            tasks_by_day[task_date].append(task)
             
-    return completed / number_of_daily_tasks
-    
+    progress_by_day: list[tuple[date, float]] = []
+    for task_date, tasks in tasks_by_day.items():
+        number_of_daily_tasks = len(tasks)
+        if number_of_daily_tasks is 0:
+            progress_by_day.append((task_date, 0))
+        else:
+            completed = 0    
+            for task in tasks:
+                if task.status == "completed":
+                    completed += 1
+            progress_by_day.append((task_date, completed / number_of_daily_tasks))
+            
+    return progress_by_day
 
 def get_user_tasks(
     user_id: int,
@@ -88,7 +110,9 @@ def get_user_tasks(
         user_id, 
         order_by_deadline_and_priority, 
         filter_uncompleted_tasks, 
-        filter_deadline_is_today
+        filter_deadline_is_today,
+        None,
+        None
     )
 
 def get_user_task(user_id: int, task_id: int) -> Task:
@@ -134,6 +158,14 @@ def create_daily_energy_status(user_id: int, level: int, time_of_day: str):
         level
     )
     study_tracker_repo.create_or_override_daily_energy_status(user_id, status)
+
+def create_daily_tags(user_id: int, tags: list[str]):
+    today = date.today()
+    study_tracker_repo.create_daily_tags(user_id, tags, today)
+
+def get_daily_tags(user_id: int) -> list[str]:
+    today = date.today()
+    return study_tracker_repo.get_daily_tags(user_id, today)
 
 def get_daily_energy_history(user_id: int) -> list[DailyEnergyStatus]:
     return study_tracker_repo.get_daily_energy_history(user_id)
