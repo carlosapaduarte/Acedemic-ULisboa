@@ -160,6 +160,10 @@ Doesn't work, use SCSS
     }
 }
 
+.challengeBox.loading .challengeBoxButton {
+    background-color: inherit;
+}
+
 .challengeBox .challengeContainer {
     width: 100%;
     display: flex;
