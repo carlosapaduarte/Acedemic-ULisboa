@@ -66,7 +66,10 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
     for slot in slotsToWork:
         create_event_from_task(user_id, task, slot)
         
-    return study_tracker_repo.create_task(user_id, task)
+    return study_tracker_repo.create_task(user_id, task, task_id=None) # Generates random and available task ID
+
+def update_task(user_id: int, task_id: int, task: Task, slotsToWork: list[SlotToWork]):        
+    study_tracker_repo.update_task(user_id, task_id, task)
 
 def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tuple[date, float]]:
     week_tasks = study_tracker_repo.get_tasks(user_id, False, False, False, year, week)

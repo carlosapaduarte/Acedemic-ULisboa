@@ -55,7 +55,7 @@ function useMyCalendar() {
     // If user selects Month view, change to "allEvents" automatically
     useEffect(() => {
         if (calendarView == Views.MONTH)
-            setEventsView("allEvents");
+            setEventsView("allEvents")
     }, [calendarView]);
 
     function toggleEventsView() {
@@ -80,7 +80,7 @@ function useMyCalendar() {
                             const start = new Date(displayedDate);
                             start.setHours(event.startDate.getHours());
                             start.setMinutes(event.startDate.getMinutes());
-
+                            
                             const end = new Date(displayedDate);
                             end.setHours(event.endDate.getHours());
                             end.setMinutes(event.endDate.getMinutes());
@@ -90,7 +90,7 @@ function useMyCalendar() {
                                 start: start,
                                 end: end,
                                 resource: { id: event.id, tags: event.tags, everyWeek: event.everyWeek }
-                            };
+                            }
 
                             calendarEvents.push(calendarEvent);
                         });
@@ -171,19 +171,13 @@ function MyCalendar() {
     const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 400);
 
     useEffect(() => {
-        function handleResize() {
+        window.addEventListener("resize", () => {
             if (window.innerWidth > 400) {
                 setIsWideScreen(true);
             } else {
                 setIsWideScreen(false);
             }
-        }
-
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
+        });
     }, []);
 
     const { tags, appendTag, removeTag } = useTags();
@@ -231,16 +225,16 @@ function MyCalendar() {
 
         // When "agenda" view type is selected
         if (!(range instanceof Array)) {
-            const dates: Date[] = [];
-            let curDate = new Date(range.start);
+            const dates: Date[] = []
+            let curDate = new Date(range.start)
             while (true) {
                 if (utils.sameDay(curDate, range.end))
-                    break;
+                    break
 
-                dates.push(curDate);
+                dates.push(curDate)
 
-                curDate = new Date(curDate);
-                curDate.setDate(curDate.getDate() + 1);
+                curDate = new Date(curDate)
+                curDate.setDate(curDate.getDate() + 1)
             }
             setDisplayedDates(dates);
         } else

@@ -353,19 +353,19 @@ export type TaskData = {
     status: string,
 }
 
-async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
-    function requestBody(newTaskInfo: CreateTaskInputDto): any {
-        return {
-            title: newTaskInfo.title,
-            description: newTaskInfo.description,
-            deadline: newTaskInfo.deadline ? newTaskInfo.deadline.getTime() / 1000 : undefined,
-            priority: newTaskInfo.priority,
-            tags: newTaskInfo.tags,
-            status: newTaskInfo.status,
-            subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) => requestBody(subTaskInfo)),
-        };
-    }
+function requestBody(newTaskInfo: CreateTaskInputDto): any {
+    return {
+        title: newTaskInfo.title,
+        description: newTaskInfo.description,
+        deadline: newTaskInfo.deadline ? newTaskInfo.deadline.getTime() / 1000 : undefined,
+        priority: newTaskInfo.priority,
+        tags: newTaskInfo.tags,
+        status: newTaskInfo.status,
+        subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) => requestBody(subTaskInfo)),
+    };
+}
 
+async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
     const request = {
         path: `study-tracker/users/me/tasks`,
         method: "POST",
@@ -379,6 +379,21 @@ async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
         return fromTaskDtoToTask(responseObject);
     } else
         return Promise.reject(new Error("Task could not be created!"));
+}
+
+async function updateTask(taskId: number, newTaskInfo: CreateTaskInputDto) {
+    const request = {
+        path: `study-tracker/users/me/tasks/${taskId}`,
+        method: "PUT",
+        body: toJsonBody(requestBody(newTaskInfo))
+    };
+
+    // Backend returns the newly created Task!
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+        await response.json();
+    } else
+        return Promise.reject(new Error("Task could not be updated!"));
 }
 
 export type Task = {
@@ -821,6 +836,7 @@ export const service = {
     getTasks,
     getTask,
     createNewTask,
+    updateTask,
     updateTaskStatus,
     createArchive,
     getArchives,

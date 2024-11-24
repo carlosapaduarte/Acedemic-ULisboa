@@ -349,6 +349,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     @staticmethod
     def create_task_with_parent(
         task: Task, 
+        task_id: int | None,
         user_id: int, 
         user_model: UserModel, 
         parent_task_id: int | None, 
@@ -356,16 +357,16 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     ) -> int:
         
         # Generates a random ID, that is not yet taken
-        random_generated_id: int = 0
-        while True:
-            random_generated_id: int = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
-            statement = select(STTaskModel).where(STTaskModel.id == random_generated_id)
-            result = session.exec(statement)
-            if result.first() is None:
-                break
+        if task_id is None:
+            while True:
+                task_id = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE) # For some reason, automatic ID is not working
+                statement = select(STTaskModel).where(STTaskModel.id == task_id)
+                result = session.exec(statement)
+                if result.first() is None:
+                    break
         
         new_task_model = STTaskModel(
-            id=random_generated_id, # For some reason, automatic ID is not working
+            id=task_id, # For some reason, automatic ID is not working
             title=task.title,
             description=task.description,
             deadline=task.deadline,
@@ -401,6 +402,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         for sub_task in task.sub_tasks:
             StudyTrackerSqlRepo.create_task_with_parent(
                 sub_task, 
+                None,
                 user_id, 
                 user_model, 
                 parent_task_id=new_task_model.id, 
@@ -409,12 +411,52 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
         return new_task_model.id
          
-    def create_task(self, user_id: int, task: Task) -> int:
+    def create_task(self, user_id: int, task: Task, task_id: int | None) -> int:
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
             
             # Create parent Task
-            return StudyTrackerSqlRepo.create_task_with_parent(task, user_id, user_model, parent_task_id=None, session=session)
+            return StudyTrackerSqlRepo.create_task_with_parent(task, task_id, user_id, user_model, parent_task_id=None, session=session)
+        
+    def update_task(self, user_id: int, task_id: int, task: Task):
+        with Session(engine) as session:
+            
+            statement = select(STTaskTagModel)\
+                .where(STTaskTagModel.user_id == user_id)\
+                .where(STTaskTagModel.task_id == task_id)
+                
+            result = session.exec(statement)
+            child_tasks_models = result.all()
+            
+            # Delete existent tags
+            for tag in child_tasks_models:
+                session.delete(tag)
+            session.commit()
+            
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)\
+                .where(STTaskModel.id == task_id)
+            
+            result = session.exec(statement)
+            task_model: STTaskModel = result.one()
+            
+            # Delete existent task
+            session.delete(task_model)
+            session.commit()
+            
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)\
+                .where(STTaskModel.parent_task_id == task_id)
+            
+            result = session.exec(statement)
+            child_tasks_models = result.all()
+            
+            # Delete child tasks
+            for child in child_tasks_models:
+                session.delete(child)
+            session.commit()
+            
+            StudyTrackerSqlRepo.create_task(self, user_id, task, task_id)
 
     def update_task_status(self, user_id: int, task_id: int, new_status: str):
         with Session(engine) as session:

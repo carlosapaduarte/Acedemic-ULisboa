@@ -12,7 +12,7 @@ const possibleTags = [
     "fun"
 ];
 
-const TitleSection = React.memo(function TitleSection({ title, setTitle }: {
+export const TitleSection = React.memo(function TitleSection({ title, setTitle }: {
     title: string | undefined,
     setTitle: (title: string) => void
 }) {
@@ -32,7 +32,7 @@ const TitleSection = React.memo(function TitleSection({ title, setTitle }: {
     );
 });
 
-const DateSection = React.memo(function DeadlineSection(
+export const DateSection = React.memo(function DeadlineSection(
     { newEventStartDate, setNewEventStartDate, newEventEndDate, setNewEventEndDate }:
         {
             newEventStartDate: Date,
@@ -137,7 +137,7 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection(
     </div>;
 });
 
-const TagSection = React.memo(function TagSection({ selectedTags, setSelectedTags }: {
+export const TagSection = React.memo(function TagSection({ selectedTags, setSelectedTags }: {
     selectedTags: string[],
     setSelectedTags: (selectedTags: string[]) => void
 }) {

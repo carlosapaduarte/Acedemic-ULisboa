@@ -52,7 +52,7 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def create_task(self, user_id: int, task: Task) -> int:
+    def create_task(self, user_id: int, task: Task, task_id: int | None) -> int:
         pass
 
     @abstractmethod

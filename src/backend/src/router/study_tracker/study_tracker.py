@@ -30,6 +30,24 @@ def create_task(
     task = study_tracker_service.get_user_task(user_id, task_id)
     return UserTaskOutputDto.from_Task(task)
 
+@router.put("/users/me/tasks/{task_id}")
+def update_task(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    task_id: int,
+    dto: CreateTaskInputDto
+):
+    slots_to_work = []
+    if dto.slotsToWork is not None:
+        slots_to_work = dto.slotsToWork
+    
+    # This route returns the newly created task!
+    study_tracker_service.update_task(
+        user_id,
+        task_id,
+        Task.from_create_task_input_dto(dto), 
+        SlotToWork.from_slot_to_work_input_dto(slots_to_work)
+    )
+
 @router.get("/users/me/tasks")
 def get_tasks(
     user_id: Annotated[int, Depends(get_current_user_id)],

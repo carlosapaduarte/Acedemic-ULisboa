@@ -7,6 +7,7 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import React, { memo, useEffect, useState } from "react";
 import { TaskList } from "~/routes/tasks/TaskList";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
+import { EditTaskButton } from "./EditTask";
 
 function useTask(
     tasks: Task[] | undefined,
@@ -16,6 +17,7 @@ function useTask(
     const setGlobalError = useSetGlobalError();
     const [task, setTask] = useState<Task | undefined>(undefined);
 
+    
     useEffect(() => {
         if (!tasks || !taskId) {
             return;
@@ -164,14 +166,17 @@ function RenderPage() {
     const { t } = useTranslation(["task"]);
 
     const { taskId } = useParams();
+    
     const { tasks, refreshTasks } = useOutletContext<{ tasks: Task[], refreshTasks: () => void }>();
-
+    
     const {
         task,
         refreshTask,
         updateTaskStatus
     } = useTask(tasks, refreshTasks, taskId);
-
+    
+    const [editTask, setEditTask] = useState(false)
+    
     if (!tasks) {
         return <h2>Loading task...</h2>;
     }
@@ -180,6 +185,11 @@ function RenderPage() {
         return <h2>Task not found</h2>;
     }
 
+    const taskIdNumber = taskId ? parseInt(taskId, 10) : undefined
+    if (!taskIdNumber) {
+        return <h2>Task ID is not valid</h2>;
+    }
+    
     return (
         <div className={styles.mainTaskContainer}>
             <TitleAndCheckboxSection task={task} updateTaskStatus={updateTaskStatus} />
@@ -188,8 +198,13 @@ function RenderPage() {
             <DeadlineSection deadline={task.data.deadline} />
             <TagsSection tags={task.data.tags} />
             <SubTasksSection subTasks={task.subTasks} />
+            <EditTaskButton taskId={taskIdNumber} onTaskUpdated={(updatedTask: Task) => {
+                setEditTask(false)
+                refreshTask()
+            }} />
         </div>
     );
+
 }
 
 export default function TaskPage() {
