@@ -29,7 +29,11 @@ def init_saml_auth(req: object) -> OneLogin_Saml2_Auth:
 @router.get("/saml/login")
 async def saml_login(request: Request):
     req = await prepare_request(request)
+    print(req)
     auth = init_saml_auth(req)
+    
+    print(auth.login())
+    
     return RedirectResponse(auth.login())
 
 @router.post("/saml/callback")

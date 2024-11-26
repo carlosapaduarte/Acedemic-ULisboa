@@ -76,6 +76,3 @@ $ python3 requirements
 ```
 
 Check the interactive API documention on: `http://<IP>:<PORT>/docs`.
-
-## Database
-
