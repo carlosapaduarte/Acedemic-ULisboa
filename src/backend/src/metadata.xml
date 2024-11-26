@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" ?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="idKpjN1SQqaClzUcD4G_SqOeesEt8" entityID="https://id.ulisboa.pt/nidp/saml2/metadata"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<ds:Reference URI="#idKpjN1SQqaClzUcD4G_SqOeesEt8">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<ds:DigestValue>6LcwY2eRsXkCK/2muvldVeYSNsskrcs14NzS0kk958c=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+hFKKKrB6etMtAMjHOBXNIkI+NIHiq27PG75O+8AlgusMhOrtNVRkuSElcC8YvW9AlRgIwWL0j1v8
+Le0EetFLord43K3jXPjtMS4BLBr6VQGEzakVqxjfPPqwOFeeZDaLRIPC17DDFcQXOB8vQ3gnFaCO
+IxRxY4HCmN03nWreJFYy7jfbCSZRrcYs5SNeHW+fOVb98cK68MTXMfsDqAK1Y5MAOo+xC3VMvMHz
+548SsfdM6WO0UPNKdC1v1ebRqU6ahQIzGI+xXLJQFHc1qYYb945XcxNkEs8w57xeLQ6QqBdj0oNY
+hO/DBy9HN7/uDaisT5pFfOTAfAeXof3BI8ZGDw==
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIIG3zCCBcegAwIBAgIUKDHJ1oxWMdRSjbB04MjDC4SBCRIwDQYJKoZIhvcNAQELBQAwNTEaMBgG
+A1UECxMRT3JnYW5pemF0aW9uYWwgQ0ExFzAVBgNVBAoUDnVsX2FtY3MwMV90cmVlMB4XDTIxMDUy
+NjA4MTMwNloXDTI5MDgyNjA4MTMwNlowcTEbMBkGA1UEAxMSc2lnbi5pZC51bGlzYm9hLnB0MREw
+DwYDVQQLEwhSZWl0b3JpYTEQMA4GA1UEChMHVUxpc2JvYTEPMA0GA1UEBxMGTGlzYm9hMQ8wDQYD
+VQQIEwZMaXNib2ExCzAJBgNVBAYTAlBUMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+6pDaOSlO/ixArVbLnTh7jrmoFrvFKDii4hkdgtzvyHI7k2f0fuqhFZM77td/xvcfo8WBjrmgnUXB
+/n/M99fCvuezbo9IVtXx0GGrVaAj+IlnuQhAlC/4C/zGRkpmWJUEP19UmU/UhqxYWocAC8SPtyPy
+C+Mzuup1EVTykm6KQ0SjCvLd0s21w7z+BZ2qHtQGNdmwASsj29IQv9HVlOcCo5jbRBLPp92EZQp0
+pG08sj9FYdnSUqIOuB6SvwWY+S1f383eZ4i5mACZ4gJ2s2wUriSYc4IW+5gBOIK5jk2WdGX4+tAf
+RcAGaJk8yvluJgnkv5NFYBUWptRnkS1t2DrUdQIDAQABo4IDqTCCA6UwHQYDVR0OBBYEFDwxfBT8
+EuHfcmktcaRELNoQwyUuMB8GA1UdIwQYMBaAFH1meVAt1FXOLHeuqNYwz480ECVRMAsGA1UdDwQE
+AwIEsDCCAcwGC2CGSAGG+DcBCQQBBIIBuzCCAbcEAgEAAQH/Ex1Ob3ZlbGwgU2VjdXJpdHkgQXR0
+cmlidXRlKHRtKRZDaHR0cDovL2RldmVsb3Blci5ub3ZlbGwuY29tL3JlcG9zaXRvcnkvYXR0cmli
+dXRlcy9jZXJ0YXR0cnNfdjEwLmh0bTCCAUigGgEBADAIMAYCAQECAUYwCDAGAgEBAgEKAgFpoRoB
+AQAwCDAGAgEBAgEAMAgwBgIBAQIBAAIBAKIGAgEXAQH/o4IBBKBYAgECAgIA/wIBAAMNAIAAAAAA
+AAAAAAAAAAMJAIAAAAAAAAAAMBgwEAIBAAIIf/////////8BAQACBAbw30gwGDAQAgEAAgh/////
+/////wEBAAIEBvDfSKFYAgECAgIA/wIBAAMNAEAAAAAAAAAAAAAAAAMJAEAAAAAAAAAAMBgwEAIB
+AAIIf/////////8BAQACBBH/pv0wGDAQAgEAAgh//////////wEBAAIEEf+m/aJOMEwCAQICAQAC
+AgD/Aw0AgAAAAAAAAAAAAAAAAwkAgAAAAAAAAAAwEjAQAgEAAgh//////////wEBADASMBACAQAC
+CH//////////AQEAMIIBhAYDVR0fBIIBezCCAXcwKaAnoCWGI2h0dHA6Ly8xMC4xMDAuNi42Mzo4
+MDI4L2NybC9vbmUuY3JsMF2gW6BZhldsZGFwOi8vMTAuMTAwLjYuNjM6Mzg5L0NOPU9uZSxDTj1P
+bmUlMjAtJTIwQ29uZmlndXJhdGlvbixDTj1DUkwlMjBDb250YWluZXIsQ049U2VjdXJpdHkwKqAo
+oCaGJGh0dHBzOi8vMTAuMTAwLjYuNjM6ODAzMC9jcmwvb25lLmNybDBeoFygWoZYbGRhcHM6Ly8x
+MC4xMDAuNi42Mzo2MzYvQ049T25lLENOPU9uZSUyMC0lMjBDb25maWd1cmF0aW9uLENOPUNSTCUy
+MENvbnRhaW5lcixDTj1TZWN1cml0eTBfoF2gW6RZMFcxDDAKBgNVBAMTA09uZTEcMBoGA1UEAxMT
+T25lIC0gQ29uZmlndXJhdGlvbjEWMBQGA1UEAxMNQ1JMIENvbnRhaW5lcjERMA8GA1UEAxMIU2Vj
+dXJpdHkwDQYJKoZIhvcNAQELBQADggEBAGLbHUgGdRoW610m4f2jhbHTGFMn/IaYtEqARaSRFG7R
+yDCTUFuD7APzDFadJDb3b91yC8k4b5Q617IzWT/zZdlRjX6ZaerX6s6IBi2LhhL7uMN7oVPouxBn
+HJm9lUJr77umE+qxGjsVlLo3CR07UUklTwwtHMjxiQyy978BAgwmlUZPxzqcdaRCpa2JqtiGUlEf
+TdizPDbz4JjQTQTS6V2tWSqNKzTv7aqlaOFA/fNmcXwFBXq47l3oTy2b+/nYHTr8CTIu8gntyPQ/
+AM2ODz6SZPywDOhZumi/vVExjDf26vIcbzvVUU29ewwZp8Bdps9QNy5oxaUlpq0UCxMeY7E=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</ds:Signature>
+<md:AttributeAuthorityDescriptor ID="idU-7XgCLWxtlzKIGNWXKRbM2el94" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+<md:KeyDescriptor use="signing">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<ds:X509Certificate>
+MIIG3zCCBcegAwIBAgIUKDHJ1oxWMdRSjbB04MjDC4SBCRIwDQYJKoZIhvcNAQELBQAwNTEaMBgG
+A1UECxMRT3JnYW5pemF0aW9uYWwgQ0ExFzAVBgNVBAoUDnVsX2FtY3MwMV90cmVlMB4XDTIxMDUy
+NjA4MTMwNloXDTI5MDgyNjA4MTMwNlowcTEbMBkGA1UEAxMSc2lnbi5pZC51bGlzYm9hLnB0MREw
+DwYDVQQLEwhSZWl0b3JpYTEQMA4GA1UEChMHVUxpc2JvYTEPMA0GA1UEBxMGTGlzYm9hMQ8wDQYD
+VQQIEwZMaXNib2ExCzAJBgNVBAYTAlBUMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+6pDaOSlO/ixArVbLnTh7jrmoFrvFKDii4hkdgtzvyHI7k2f0fuqhFZM77td/xvcfo8WBjrmgnUXB
+/n/M99fCvuezbo9IVtXx0GGrVaAj+IlnuQhAlC/4C/zGRkpmWJUEP19UmU/UhqxYWocAC8SPtyPy
+C+Mzuup1EVTykm6KQ0SjCvLd0s21w7z+BZ2qHtQGNdmwASsj29IQv9HVlOcCo5jbRBLPp92EZQp0
+pG08sj9FYdnSUqIOuB6SvwWY+S1f383eZ4i5mACZ4gJ2s2wUriSYc4IW+5gBOIK5jk2WdGX4+tAf
+RcAGaJk8yvluJgnkv5NFYBUWptRnkS1t2DrUdQIDAQABo4IDqTCCA6UwHQYDVR0OBBYEFDwxfBT8
+EuHfcmktcaRELNoQwyUuMB8GA1UdIwQYMBaAFH1meVAt1FXOLHeuqNYwz480ECVRMAsGA1UdDwQE
+AwIEsDCCAcwGC2CGSAGG+DcBCQQBBIIBuzCCAbcEAgEAAQH/Ex1Ob3ZlbGwgU2VjdXJpdHkgQXR0
+cmlidXRlKHRtKRZDaHR0cDovL2RldmVsb3Blci5ub3ZlbGwuY29tL3JlcG9zaXRvcnkvYXR0cmli
+dXRlcy9jZXJ0YXR0cnNfdjEwLmh0bTCCAUigGgEBADAIMAYCAQECAUYwCDAGAgEBAgEKAgFpoRoB
+AQAwCDAGAgEBAgEAMAgwBgIBAQIBAAIBAKIGAgEXAQH/o4IBBKBYAgECAgIA/wIBAAMNAIAAAAAA
+AAAAAAAAAAMJAIAAAAAAAAAAMBgwEAIBAAIIf/////////8BAQACBAbw30gwGDAQAgEAAgh/////
+/////wEBAAIEBvDfSKFYAgECAgIA/wIBAAMNAEAAAAAAAAAAAAAAAAMJAEAAAAAAAAAAMBgwEAIB
+AAIIf/////////8BAQACBBH/pv0wGDAQAgEAAgh//////////wEBAAIEEf+m/aJOMEwCAQICAQAC
+AgD/Aw0AgAAAAAAAAAAAAAAAAwkAgAAAAAAAAAAwEjAQAgEAAgh//////////wEBADASMBACAQAC
+CH//////////AQEAMIIBhAYDVR0fBIIBezCCAXcwKaAnoCWGI2h0dHA6Ly8xMC4xMDAuNi42Mzo4
+MDI4L2NybC9vbmUuY3JsMF2gW6BZhldsZGFwOi8vMTAuMTAwLjYuNjM6Mzg5L0NOPU9uZSxDTj1P
+bmUlMjAtJTIwQ29uZmlndXJhdGlvbixDTj1DUkwlMjBDb250YWluZXIsQ049U2VjdXJpdHkwKqAo
+oCaGJGh0dHBzOi8vMTAuMTAwLjYuNjM6ODAzMC9jcmwvb25lLmNybDBeoFygWoZYbGRhcHM6Ly8x
+MC4xMDAuNi42Mzo2MzYvQ049T25lLENOPU9uZSUyMC0lMjBDb25maWd1cmF0aW9uLENOPUNSTCUy
+MENvbnRhaW5lcixDTj1TZWN1cml0eTBfoF2gW6RZMFcxDDAKBgNVBAMTA09uZTEcMBoGA1UEAxMT
+T25lIC0gQ29uZmlndXJhdGlvbjEWMBQGA1UEAxMNQ1JMIENvbnRhaW5lcjERMA8GA1UEAxMIU2Vj
+dXJpdHkwDQYJKoZIhvcNAQELBQADggEBAGLbHUgGdRoW610m4f2jhbHTGFMn/IaYtEqARaSRFG7R
+yDCTUFuD7APzDFadJDb3b91yC8k4b5Q617IzWT/zZdlRjX6ZaerX6s6IBi2LhhL7uMN7oVPouxBn
+HJm9lUJr77umE+qxGjsVlLo3CR07UUklTwwtHMjxiQyy978BAgwmlUZPxzqcdaRCpa2JqtiGUlEf
+TdizPDbz4JjQTQTS6V2tWSqNKzTv7aqlaOFA/fNmcXwFBXq47l3oTy2b+/nYHTr8CTIu8gntyPQ/
+AM2ODz6SZPywDOhZumi/vVExjDf26vIcbzvVUU29ewwZp8Bdps9QNy5oxaUlpq0UCxMeY7E=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+</md:KeyDescriptor>
+<md:KeyDescriptor use="encryption">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<ds:X509Certificate>
+MIIG4jCCBcqgAwIBAgIUC9EQddqoOBeVq68m7wVl/f+p6OkwDQYJKoZIhvcNAQELBQAwNTEaMBgG
+A1UECxMRT3JnYW5pemF0aW9uYWwgQ0ExFzAVBgNVBAoUDnVsX2FtY3MwMV90cmVlMB4XDTIxMDUy
+NjA4MTM1OFoXDTI5MDgyNjA4MTM1OFowdDEeMBwGA1UEAxMVZW5jcnlwdC5pZC51bGlzYm9hLnB0
+MREwDwYDVQQLEwhSZWl0b3JpYTEQMA4GA1UEChMHVUxpc2JvYTEPMA0GA1UEBxMGTGlzYm9hMQ8w
+DQYDVQQIEwZMaXNib2ExCzAJBgNVBAYTAlBUMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAxdFA3iVTUtwHHiBGEcX9JICV6cYiNza0J9MjhVguDYqLbnIs1wPLVAw7YI5e9hN9vKy8IERe
+Ol2h7umAv3g5/pFi0IRRL4/vCuWoucs3e0bmguhmC1mRvInlwZOShns9kQLAI8a/vcd2KG7DhaZA
+WBigFUmsl9yMC3YS4ctnzXOvd8GUStp1IyFpGYkPZOJTvtoaUQZ/g93xtvu7A11yGMl8toLwdKlb
+jIRU4HGMkQIYhABJLxLp/ZCB+CPyRv8sydnqky47XaoA7ujFEr0KxQQvHpzD/aU6GdNuXRjwUAlD
+/kh09xHykRy1crRFPmZlQu+RmspC/Y+2YEGcXmQD2QIDAQABo4IDqTCCA6UwHQYDVR0OBBYEFBsa
+jCdm03nzy6/BfBDXjxPtnMKLMB8GA1UdIwQYMBaAFH1meVAt1FXOLHeuqNYwz480ECVRMAsGA1Ud
+DwQEAwIEsDCCAcwGC2CGSAGG+DcBCQQBBIIBuzCCAbcEAgEAAQH/Ex1Ob3ZlbGwgU2VjdXJpdHkg
+QXR0cmlidXRlKHRtKRZDaHR0cDovL2RldmVsb3Blci5ub3ZlbGwuY29tL3JlcG9zaXRvcnkvYXR0
+cmlidXRlcy9jZXJ0YXR0cnNfdjEwLmh0bTCCAUigGgEBADAIMAYCAQECAUYwCDAGAgEBAgEKAgFp
+oRoBAQAwCDAGAgEBAgEAMAgwBgIBAQIBAAIBAKIGAgEXAQH/o4IBBKBYAgECAgIA/wIBAAMNAIAA
+AAAAAAAAAAAAAAMJAIAAAAAAAAAAMBgwEAIBAAIIf/////////8BAQACBAbw30gwGDAQAgEAAgh/
+/////////wEBAAIEBvDfSKFYAgECAgIA/wIBAAMNAEAAAAAAAAAAAAAAAAMJAEAAAAAAAAAAMBgw
+EAIBAAIIf/////////8BAQACBBH/pv0wGDAQAgEAAgh//////////wEBAAIEEf+m/aJOMEwCAQIC
+AQACAgD/Aw0AgAAAAAAAAAAAAAAAAwkAgAAAAAAAAAAwEjAQAgEAAgh//////////wEBADASMBAC
+AQACCH//////////AQEAMIIBhAYDVR0fBIIBezCCAXcwKaAnoCWGI2h0dHA6Ly8xMC4xMDAuNi42
+Mzo4MDI4L2NybC9vbmUuY3JsMF2gW6BZhldsZGFwOi8vMTAuMTAwLjYuNjM6Mzg5L0NOPU9uZSxD
+Tj1PbmUlMjAtJTIwQ29uZmlndXJhdGlvbixDTj1DUkwlMjBDb250YWluZXIsQ049U2VjdXJpdHkw
+KqAooCaGJGh0dHBzOi8vMTAuMTAwLjYuNjM6ODAzMC9jcmwvb25lLmNybDBeoFygWoZYbGRhcHM6
+Ly8xMC4xMDAuNi42Mzo2MzYvQ049T25lLENOPU9uZSUyMC0lMjBDb25maWd1cmF0aW9uLENOPUNS
+TCUyMENvbnRhaW5lcixDTj1TZWN1cml0eTBfoF2gW6RZMFcxDDAKBgNVBAMTA09uZTEcMBoGA1UE
+AxMTT25lIC0gQ29uZmlndXJhdGlvbjEWMBQGA1UEAxMNQ1JMIENvbnRhaW5lcjERMA8GA1UEAxMI
+U2VjdXJpdHkwDQYJKoZIhvcNAQELBQADggEBABDpeF6fQUJNOsTmozRJE6vdoQLWGr0XRBpa8Pic
+bo199+bRW90zlijTXp02yn4ZV2qfhh4b9ov5/4u6iUHBipufLfxr7kvtyBpCDrYg3Qo6rq/cZjHU
+gMS2nKF4o2SNYff4mh74O8yJJcS8PjT0u7Vl0AvXs7PO/IQS7k3jTZOC+10lS2NYL+S4lJziiyHK
+FYYedtsyneBd0LV9nfB0CT85/YEZZcTdunvG8bPBLl/FUz1oAHzh8oP4irNIqVoJGdhPXNWKtK1I
+Vx6IyQuDbF13OOHRnNrwn88liiJjZSKRjBMLBSPtG4y8ffGZ5A/fKi7C+pFwdC/nwsaTsbb601Q=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+</md:KeyDescriptor>
+<md:AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/soap"/>
+<md:AssertionIDRequestService Binding="urn:oasis:names:tc:SAML:2.0:bindings:URI" Location="https://id.ulisboa.pt/nidp/saml2/assertion"/>
+<md:AssertionIDRequestService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/soap"/>
+</md:AttributeAuthorityDescriptor>
+<md:IDPSSODescriptor ID="idIAVdz7VC_UsMKEkKNzlQMhuffcw" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+<md:KeyDescriptor use="signing">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<ds:X509Certificate>
+MIIG3zCCBcegAwIBAgIUKDHJ1oxWMdRSjbB04MjDC4SBCRIwDQYJKoZIhvcNAQELBQAwNTEaMBgG
+A1UECxMRT3JnYW5pemF0aW9uYWwgQ0ExFzAVBgNVBAoUDnVsX2FtY3MwMV90cmVlMB4XDTIxMDUy
+NjA4MTMwNloXDTI5MDgyNjA4MTMwNlowcTEbMBkGA1UEAxMSc2lnbi5pZC51bGlzYm9hLnB0MREw
+DwYDVQQLEwhSZWl0b3JpYTEQMA4GA1UEChMHVUxpc2JvYTEPMA0GA1UEBxMGTGlzYm9hMQ8wDQYD
+VQQIEwZMaXNib2ExCzAJBgNVBAYTAlBUMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+6pDaOSlO/ixArVbLnTh7jrmoFrvFKDii4hkdgtzvyHI7k2f0fuqhFZM77td/xvcfo8WBjrmgnUXB
+/n/M99fCvuezbo9IVtXx0GGrVaAj+IlnuQhAlC/4C/zGRkpmWJUEP19UmU/UhqxYWocAC8SPtyPy
+C+Mzuup1EVTykm6KQ0SjCvLd0s21w7z+BZ2qHtQGNdmwASsj29IQv9HVlOcCo5jbRBLPp92EZQp0
+pG08sj9FYdnSUqIOuB6SvwWY+S1f383eZ4i5mACZ4gJ2s2wUriSYc4IW+5gBOIK5jk2WdGX4+tAf
+RcAGaJk8yvluJgnkv5NFYBUWptRnkS1t2DrUdQIDAQABo4IDqTCCA6UwHQYDVR0OBBYEFDwxfBT8
+EuHfcmktcaRELNoQwyUuMB8GA1UdIwQYMBaAFH1meVAt1FXOLHeuqNYwz480ECVRMAsGA1UdDwQE
+AwIEsDCCAcwGC2CGSAGG+DcBCQQBBIIBuzCCAbcEAgEAAQH/Ex1Ob3ZlbGwgU2VjdXJpdHkgQXR0
+cmlidXRlKHRtKRZDaHR0cDovL2RldmVsb3Blci5ub3ZlbGwuY29tL3JlcG9zaXRvcnkvYXR0cmli
+dXRlcy9jZXJ0YXR0cnNfdjEwLmh0bTCCAUigGgEBADAIMAYCAQECAUYwCDAGAgEBAgEKAgFpoRoB
+AQAwCDAGAgEBAgEAMAgwBgIBAQIBAAIBAKIGAgEXAQH/o4IBBKBYAgECAgIA/wIBAAMNAIAAAAAA
+AAAAAAAAAAMJAIAAAAAAAAAAMBgwEAIBAAIIf/////////8BAQACBAbw30gwGDAQAgEAAgh/////
+/////wEBAAIEBvDfSKFYAgECAgIA/wIBAAMNAEAAAAAAAAAAAAAAAAMJAEAAAAAAAAAAMBgwEAIB
+AAIIf/////////8BAQACBBH/pv0wGDAQAgEAAgh//////////wEBAAIEEf+m/aJOMEwCAQICAQAC
+AgD/Aw0AgAAAAAAAAAAAAAAAAwkAgAAAAAAAAAAwEjAQAgEAAgh//////////wEBADASMBACAQAC
+CH//////////AQEAMIIBhAYDVR0fBIIBezCCAXcwKaAnoCWGI2h0dHA6Ly8xMC4xMDAuNi42Mzo4
+MDI4L2NybC9vbmUuY3JsMF2gW6BZhldsZGFwOi8vMTAuMTAwLjYuNjM6Mzg5L0NOPU9uZSxDTj1P
+bmUlMjAtJTIwQ29uZmlndXJhdGlvbixDTj1DUkwlMjBDb250YWluZXIsQ049U2VjdXJpdHkwKqAo
+oCaGJGh0dHBzOi8vMTAuMTAwLjYuNjM6ODAzMC9jcmwvb25lLmNybDBeoFygWoZYbGRhcHM6Ly8x
+MC4xMDAuNi42Mzo2MzYvQ049T25lLENOPU9uZSUyMC0lMjBDb25maWd1cmF0aW9uLENOPUNSTCUy
+MENvbnRhaW5lcixDTj1TZWN1cml0eTBfoF2gW6RZMFcxDDAKBgNVBAMTA09uZTEcMBoGA1UEAxMT
+T25lIC0gQ29uZmlndXJhdGlvbjEWMBQGA1UEAxMNQ1JMIENvbnRhaW5lcjERMA8GA1UEAxMIU2Vj
+dXJpdHkwDQYJKoZIhvcNAQELBQADggEBAGLbHUgGdRoW610m4f2jhbHTGFMn/IaYtEqARaSRFG7R
+yDCTUFuD7APzDFadJDb3b91yC8k4b5Q617IzWT/zZdlRjX6ZaerX6s6IBi2LhhL7uMN7oVPouxBn
+HJm9lUJr77umE+qxGjsVlLo3CR07UUklTwwtHMjxiQyy978BAgwmlUZPxzqcdaRCpa2JqtiGUlEf
+TdizPDbz4JjQTQTS6V2tWSqNKzTv7aqlaOFA/fNmcXwFBXq47l3oTy2b+/nYHTr8CTIu8gntyPQ/
+AM2ODz6SZPywDOhZumi/vVExjDf26vIcbzvVUU29ewwZp8Bdps9QNy5oxaUlpq0UCxMeY7E=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+</md:KeyDescriptor>
+<md:KeyDescriptor use="encryption">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<ds:X509Certificate>
+MIIG4jCCBcqgAwIBAgIUC9EQddqoOBeVq68m7wVl/f+p6OkwDQYJKoZIhvcNAQELBQAwNTEaMBgG
+A1UECxMRT3JnYW5pemF0aW9uYWwgQ0ExFzAVBgNVBAoUDnVsX2FtY3MwMV90cmVlMB4XDTIxMDUy
+NjA4MTM1OFoXDTI5MDgyNjA4MTM1OFowdDEeMBwGA1UEAxMVZW5jcnlwdC5pZC51bGlzYm9hLnB0
+MREwDwYDVQQLEwhSZWl0b3JpYTEQMA4GA1UEChMHVUxpc2JvYTEPMA0GA1UEBxMGTGlzYm9hMQ8w
+DQYDVQQIEwZMaXNib2ExCzAJBgNVBAYTAlBUMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAxdFA3iVTUtwHHiBGEcX9JICV6cYiNza0J9MjhVguDYqLbnIs1wPLVAw7YI5e9hN9vKy8IERe
+Ol2h7umAv3g5/pFi0IRRL4/vCuWoucs3e0bmguhmC1mRvInlwZOShns9kQLAI8a/vcd2KG7DhaZA
+WBigFUmsl9yMC3YS4ctnzXOvd8GUStp1IyFpGYkPZOJTvtoaUQZ/g93xtvu7A11yGMl8toLwdKlb
+jIRU4HGMkQIYhABJLxLp/ZCB+CPyRv8sydnqky47XaoA7ujFEr0KxQQvHpzD/aU6GdNuXRjwUAlD
+/kh09xHykRy1crRFPmZlQu+RmspC/Y+2YEGcXmQD2QIDAQABo4IDqTCCA6UwHQYDVR0OBBYEFBsa
+jCdm03nzy6/BfBDXjxPtnMKLMB8GA1UdIwQYMBaAFH1meVAt1FXOLHeuqNYwz480ECVRMAsGA1Ud
+DwQEAwIEsDCCAcwGC2CGSAGG+DcBCQQBBIIBuzCCAbcEAgEAAQH/Ex1Ob3ZlbGwgU2VjdXJpdHkg
+QXR0cmlidXRlKHRtKRZDaHR0cDovL2RldmVsb3Blci5ub3ZlbGwuY29tL3JlcG9zaXRvcnkvYXR0
+cmlidXRlcy9jZXJ0YXR0cnNfdjEwLmh0bTCCAUigGgEBADAIMAYCAQECAUYwCDAGAgEBAgEKAgFp
+oRoBAQAwCDAGAgEBAgEAMAgwBgIBAQIBAAIBAKIGAgEXAQH/o4IBBKBYAgECAgIA/wIBAAMNAIAA
+AAAAAAAAAAAAAAMJAIAAAAAAAAAAMBgwEAIBAAIIf/////////8BAQACBAbw30gwGDAQAgEAAgh/
+/////////wEBAAIEBvDfSKFYAgECAgIA/wIBAAMNAEAAAAAAAAAAAAAAAAMJAEAAAAAAAAAAMBgw
+EAIBAAIIf/////////8BAQACBBH/pv0wGDAQAgEAAgh//////////wEBAAIEEf+m/aJOMEwCAQIC
+AQACAgD/Aw0AgAAAAAAAAAAAAAAAAwkAgAAAAAAAAAAwEjAQAgEAAgh//////////wEBADASMBAC
+AQACCH//////////AQEAMIIBhAYDVR0fBIIBezCCAXcwKaAnoCWGI2h0dHA6Ly8xMC4xMDAuNi42
+Mzo4MDI4L2NybC9vbmUuY3JsMF2gW6BZhldsZGFwOi8vMTAuMTAwLjYuNjM6Mzg5L0NOPU9uZSxD
+Tj1PbmUlMjAtJTIwQ29uZmlndXJhdGlvbixDTj1DUkwlMjBDb250YWluZXIsQ049U2VjdXJpdHkw
+KqAooCaGJGh0dHBzOi8vMTAuMTAwLjYuNjM6ODAzMC9jcmwvb25lLmNybDBeoFygWoZYbGRhcHM6
+Ly8xMC4xMDAuNi42Mzo2MzYvQ049T25lLENOPU9uZSUyMC0lMjBDb25maWd1cmF0aW9uLENOPUNS
+TCUyMENvbnRhaW5lcixDTj1TZWN1cml0eTBfoF2gW6RZMFcxDDAKBgNVBAMTA09uZTEcMBoGA1UE
+AxMTT25lIC0gQ29uZmlndXJhdGlvbjEWMBQGA1UEAxMNQ1JMIENvbnRhaW5lcjERMA8GA1UEAxMI
+U2VjdXJpdHkwDQYJKoZIhvcNAQELBQADggEBABDpeF6fQUJNOsTmozRJE6vdoQLWGr0XRBpa8Pic
+bo199+bRW90zlijTXp02yn4ZV2qfhh4b9ov5/4u6iUHBipufLfxr7kvtyBpCDrYg3Qo6rq/cZjHU
+gMS2nKF4o2SNYff4mh74O8yJJcS8PjT0u7Vl0AvXs7PO/IQS7k3jTZOC+10lS2NYL+S4lJziiyHK
+FYYedtsyneBd0LV9nfB0CT85/YEZZcTdunvG8bPBLl/FUz1oAHzh8oP4irNIqVoJGdhPXNWKtK1I
+Vx6IyQuDbF13OOHRnNrwn88liiJjZSKRjBMLBSPtG4y8ffGZ5A/fKi7C+pFwdC/nwsaTsbb601Q=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+</md:KeyDescriptor>
+<md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/soap" index="0" isDefault="true"/>
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://id.ulisboa.pt/nidp/saml2/slo" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/slo_return"/>
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://id.ulisboa.pt/nidp/saml2/slo" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/slo_return"/>
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/soap"/>
+<md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://id.ulisboa.pt/nidp/saml2/rni" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/rni_return"/>
+<md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://id.ulisboa.pt/nidp/saml2/rni" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/rni_return"/>
+<md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/soap"/>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+<md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://id.ulisboa.pt/nidp/saml2/sso"/>
+<md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://id.ulisboa.pt/nidp/saml2/sso"/>
+<md:NameIDMappingService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/soap"/>
+</md:IDPSSODescriptor>
+<md:SPSSODescriptor ID="idJ-rdlKZnEz414wIvlF21fv9VYx0" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+<md:KeyDescriptor use="signing">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<ds:X509Certificate>
+MIIG3zCCBcegAwIBAgIUKDHJ1oxWMdRSjbB04MjDC4SBCRIwDQYJKoZIhvcNAQELBQAwNTEaMBgG
+A1UECxMRT3JnYW5pemF0aW9uYWwgQ0ExFzAVBgNVBAoUDnVsX2FtY3MwMV90cmVlMB4XDTIxMDUy
+NjA4MTMwNloXDTI5MDgyNjA4MTMwNlowcTEbMBkGA1UEAxMSc2lnbi5pZC51bGlzYm9hLnB0MREw
+DwYDVQQLEwhSZWl0b3JpYTEQMA4GA1UEChMHVUxpc2JvYTEPMA0GA1UEBxMGTGlzYm9hMQ8wDQYD
+VQQIEwZMaXNib2ExCzAJBgNVBAYTAlBUMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+6pDaOSlO/ixArVbLnTh7jrmoFrvFKDii4hkdgtzvyHI7k2f0fuqhFZM77td/xvcfo8WBjrmgnUXB
+/n/M99fCvuezbo9IVtXx0GGrVaAj+IlnuQhAlC/4C/zGRkpmWJUEP19UmU/UhqxYWocAC8SPtyPy
+C+Mzuup1EVTykm6KQ0SjCvLd0s21w7z+BZ2qHtQGNdmwASsj29IQv9HVlOcCo5jbRBLPp92EZQp0
+pG08sj9FYdnSUqIOuB6SvwWY+S1f383eZ4i5mACZ4gJ2s2wUriSYc4IW+5gBOIK5jk2WdGX4+tAf
+RcAGaJk8yvluJgnkv5NFYBUWptRnkS1t2DrUdQIDAQABo4IDqTCCA6UwHQYDVR0OBBYEFDwxfBT8
+EuHfcmktcaRELNoQwyUuMB8GA1UdIwQYMBaAFH1meVAt1FXOLHeuqNYwz480ECVRMAsGA1UdDwQE
+AwIEsDCCAcwGC2CGSAGG+DcBCQQBBIIBuzCCAbcEAgEAAQH/Ex1Ob3ZlbGwgU2VjdXJpdHkgQXR0
+cmlidXRlKHRtKRZDaHR0cDovL2RldmVsb3Blci5ub3ZlbGwuY29tL3JlcG9zaXRvcnkvYXR0cmli
+dXRlcy9jZXJ0YXR0cnNfdjEwLmh0bTCCAUigGgEBADAIMAYCAQECAUYwCDAGAgEBAgEKAgFpoRoB
+AQAwCDAGAgEBAgEAMAgwBgIBAQIBAAIBAKIGAgEXAQH/o4IBBKBYAgECAgIA/wIBAAMNAIAAAAAA
+AAAAAAAAAAMJAIAAAAAAAAAAMBgwEAIBAAIIf/////////8BAQACBAbw30gwGDAQAgEAAgh/////
+/////wEBAAIEBvDfSKFYAgECAgIA/wIBAAMNAEAAAAAAAAAAAAAAAAMJAEAAAAAAAAAAMBgwEAIB
+AAIIf/////////8BAQACBBH/pv0wGDAQAgEAAgh//////////wEBAAIEEf+m/aJOMEwCAQICAQAC
+AgD/Aw0AgAAAAAAAAAAAAAAAAwkAgAAAAAAAAAAwEjAQAgEAAgh//////////wEBADASMBACAQAC
+CH//////////AQEAMIIBhAYDVR0fBIIBezCCAXcwKaAnoCWGI2h0dHA6Ly8xMC4xMDAuNi42Mzo4
+MDI4L2NybC9vbmUuY3JsMF2gW6BZhldsZGFwOi8vMTAuMTAwLjYuNjM6Mzg5L0NOPU9uZSxDTj1P
+bmUlMjAtJTIwQ29uZmlndXJhdGlvbixDTj1DUkwlMjBDb250YWluZXIsQ049U2VjdXJpdHkwKqAo
+oCaGJGh0dHBzOi8vMTAuMTAwLjYuNjM6ODAzMC9jcmwvb25lLmNybDBeoFygWoZYbGRhcHM6Ly8x
+MC4xMDAuNi42Mzo2MzYvQ049T25lLENOPU9uZSUyMC0lMjBDb25maWd1cmF0aW9uLENOPUNSTCUy
+MENvbnRhaW5lcixDTj1TZWN1cml0eTBfoF2gW6RZMFcxDDAKBgNVBAMTA09uZTEcMBoGA1UEAxMT
+T25lIC0gQ29uZmlndXJhdGlvbjEWMBQGA1UEAxMNQ1JMIENvbnRhaW5lcjERMA8GA1UEAxMIU2Vj
+dXJpdHkwDQYJKoZIhvcNAQELBQADggEBAGLbHUgGdRoW610m4f2jhbHTGFMn/IaYtEqARaSRFG7R
+yDCTUFuD7APzDFadJDb3b91yC8k4b5Q617IzWT/zZdlRjX6ZaerX6s6IBi2LhhL7uMN7oVPouxBn
+HJm9lUJr77umE+qxGjsVlLo3CR07UUklTwwtHMjxiQyy978BAgwmlUZPxzqcdaRCpa2JqtiGUlEf
+TdizPDbz4JjQTQTS6V2tWSqNKzTv7aqlaOFA/fNmcXwFBXq47l3oTy2b+/nYHTr8CTIu8gntyPQ/
+AM2ODz6SZPywDOhZumi/vVExjDf26vIcbzvVUU29ewwZp8Bdps9QNy5oxaUlpq0UCxMeY7E=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+</md:KeyDescriptor>
+<md:KeyDescriptor use="encryption">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<ds:X509Certificate>
+MIIG4jCCBcqgAwIBAgIUC9EQddqoOBeVq68m7wVl/f+p6OkwDQYJKoZIhvcNAQELBQAwNTEaMBgG
+A1UECxMRT3JnYW5pemF0aW9uYWwgQ0ExFzAVBgNVBAoUDnVsX2FtY3MwMV90cmVlMB4XDTIxMDUy
+NjA4MTM1OFoXDTI5MDgyNjA4MTM1OFowdDEeMBwGA1UEAxMVZW5jcnlwdC5pZC51bGlzYm9hLnB0
+MREwDwYDVQQLEwhSZWl0b3JpYTEQMA4GA1UEChMHVUxpc2JvYTEPMA0GA1UEBxMGTGlzYm9hMQ8w
+DQYDVQQIEwZMaXNib2ExCzAJBgNVBAYTAlBUMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAxdFA3iVTUtwHHiBGEcX9JICV6cYiNza0J9MjhVguDYqLbnIs1wPLVAw7YI5e9hN9vKy8IERe
+Ol2h7umAv3g5/pFi0IRRL4/vCuWoucs3e0bmguhmC1mRvInlwZOShns9kQLAI8a/vcd2KG7DhaZA
+WBigFUmsl9yMC3YS4ctnzXOvd8GUStp1IyFpGYkPZOJTvtoaUQZ/g93xtvu7A11yGMl8toLwdKlb
+jIRU4HGMkQIYhABJLxLp/ZCB+CPyRv8sydnqky47XaoA7ujFEr0KxQQvHpzD/aU6GdNuXRjwUAlD
+/kh09xHykRy1crRFPmZlQu+RmspC/Y+2YEGcXmQD2QIDAQABo4IDqTCCA6UwHQYDVR0OBBYEFBsa
+jCdm03nzy6/BfBDXjxPtnMKLMB8GA1UdIwQYMBaAFH1meVAt1FXOLHeuqNYwz480ECVRMAsGA1Ud
+DwQEAwIEsDCCAcwGC2CGSAGG+DcBCQQBBIIBuzCCAbcEAgEAAQH/Ex1Ob3ZlbGwgU2VjdXJpdHkg
+QXR0cmlidXRlKHRtKRZDaHR0cDovL2RldmVsb3Blci5ub3ZlbGwuY29tL3JlcG9zaXRvcnkvYXR0
+cmlidXRlcy9jZXJ0YXR0cnNfdjEwLmh0bTCCAUigGgEBADAIMAYCAQECAUYwCDAGAgEBAgEKAgFp
+oRoBAQAwCDAGAgEBAgEAMAgwBgIBAQIBAAIBAKIGAgEXAQH/o4IBBKBYAgECAgIA/wIBAAMNAIAA
+AAAAAAAAAAAAAAMJAIAAAAAAAAAAMBgwEAIBAAIIf/////////8BAQACBAbw30gwGDAQAgEAAgh/
+/////////wEBAAIEBvDfSKFYAgECAgIA/wIBAAMNAEAAAAAAAAAAAAAAAAMJAEAAAAAAAAAAMBgw
+EAIBAAIIf/////////8BAQACBBH/pv0wGDAQAgEAAgh//////////wEBAAIEEf+m/aJOMEwCAQIC
+AQACAgD/Aw0AgAAAAAAAAAAAAAAAAwkAgAAAAAAAAAAwEjAQAgEAAgh//////////wEBADASMBAC
+AQACCH//////////AQEAMIIBhAYDVR0fBIIBezCCAXcwKaAnoCWGI2h0dHA6Ly8xMC4xMDAuNi42
+Mzo4MDI4L2NybC9vbmUuY3JsMF2gW6BZhldsZGFwOi8vMTAuMTAwLjYuNjM6Mzg5L0NOPU9uZSxD
+Tj1PbmUlMjAtJTIwQ29uZmlndXJhdGlvbixDTj1DUkwlMjBDb250YWluZXIsQ049U2VjdXJpdHkw
+KqAooCaGJGh0dHBzOi8vMTAuMTAwLjYuNjM6ODAzMC9jcmwvb25lLmNybDBeoFygWoZYbGRhcHM6
+Ly8xMC4xMDAuNi42Mzo2MzYvQ049T25lLENOPU9uZSUyMC0lMjBDb25maWd1cmF0aW9uLENOPUNS
+TCUyMENvbnRhaW5lcixDTj1TZWN1cml0eTBfoF2gW6RZMFcxDDAKBgNVBAMTA09uZTEcMBoGA1UE
+AxMTT25lIC0gQ29uZmlndXJhdGlvbjEWMBQGA1UEAxMNQ1JMIENvbnRhaW5lcjERMA8GA1UEAxMI
+U2VjdXJpdHkwDQYJKoZIhvcNAQELBQADggEBABDpeF6fQUJNOsTmozRJE6vdoQLWGr0XRBpa8Pic
+bo199+bRW90zlijTXp02yn4ZV2qfhh4b9ov5/4u6iUHBipufLfxr7kvtyBpCDrYg3Qo6rq/cZjHU
+gMS2nKF4o2SNYff4mh74O8yJJcS8PjT0u7Vl0AvXs7PO/IQS7k3jTZOC+10lS2NYL+S4lJziiyHK
+FYYedtsyneBd0LV9nfB0CT85/YEZZcTdunvG8bPBLl/FUz1oAHzh8oP4irNIqVoJGdhPXNWKtK1I
+Vx6IyQuDbF13OOHRnNrwn88liiJjZSKRjBMLBSPtG4y8ffGZ5A/fKi7C+pFwdC/nwsaTsbb601Q=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+</md:KeyDescriptor>
+<md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/spsoap" index="0" isDefault="true"/>
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://id.ulisboa.pt/nidp/saml2/spslo" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/spslo_return"/>
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://id.ulisboa.pt/nidp/saml2/spslo" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/spslo_return"/>
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/spsoap"/>
+<md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://id.ulisboa.pt/nidp/saml2/sprni" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/sprni_return"/>
+<md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://id.ulisboa.pt/nidp/saml2/sprni" ResponseLocation="https://id.ulisboa.pt/nidp/saml2/sprni_return"/>
+<md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://id.ulisboa.pt/nidp/saml2/spsoap"/>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://id.ulisboa.pt/nidp/saml2/spassertion_consumer" index="0" isDefault="true"/>
+<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://id.ulisboa.pt/nidp/saml2/spassertion_consumer" index="1"/>
+<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://id.ulisboa.pt/nidp/saml2/spassertion_consumer" index="2"/>
+</md:SPSSODescriptor>
+<md:Organization>
+<md:OrganizationName xml:lang="en">Universidade de Lisboa</md:OrganizationName>
+<md:OrganizationDisplayName xml:lang="en">Universidade de Lisboa</md:OrganizationDisplayName>
+<md:OrganizationURL xml:lang="en">www.ulisboa.pt</md:OrganizationURL>
+</md:Organization>
+<md:ContactPerson contactType="other"/>
+</md:EntityDescriptor>

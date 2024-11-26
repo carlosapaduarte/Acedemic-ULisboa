@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from exception import AlreadyExistsException, InvalidDate, NotFoundException, NotAvailableScheduleBlockCollision, UsernameAlreadyExistsException
+from router import u_lisboa_auth
 from router.academic_challenge import academic_challenge
 from router.commons import common
 
@@ -18,6 +19,7 @@ app = FastAPI()
 app.include_router(common.router)
 app.include_router(academic_challenge.router)
 app.include_router(study_tracker.router)
+app.include_router(u_lisboa_auth.router)
 
 dev_mode = True
 
