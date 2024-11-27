@@ -10,7 +10,7 @@ export default defineConfig({
     },
     plugins: [
         remix({
-            basename: "/tracker",
+            basename: "/tracker/",
             future: {
                 v3_fetcherPersist: true,
                 v3_relativeSplatPath: true,
