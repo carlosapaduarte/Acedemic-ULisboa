@@ -11,7 +11,7 @@ export function SeeFullHistory() {
     const { t } = useTranslation(["statistics"]);
     return (
         <button className={styles.seeFullHistoryButton}>
-            <img src="/icons/history_icon.svg" alt="History Icon" className={styles.historyIcon}/>
+            <img src="icons/history_icon.svg" alt="History Icon" className={styles.historyIcon}/>
             {t("statistics:see_full_history")}
         </button>
     )

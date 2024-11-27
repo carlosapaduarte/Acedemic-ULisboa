@@ -42,10 +42,10 @@ function ChallengeLogo() {
                 <h1 className={styles.demicText}>DEMIC</h1>
             </div>
             <div className={styles.challengeAndTrophiesContainer}>
-                <img src="/icons/medal_icon.svg" alt="Medal" width={50} height={50}
+                <img src="icons/medal_icon.svg" alt="Medal" width={50} height={50}
                      style={{ marginTop: "-5px" }} />
                 <h1 className={styles.challengeText}>CHALLENGE</h1>
-                <img src="/icons/trophy_icon2.svg" alt="Trophy" width={50} height={50} />
+                <img src="icons/trophy_icon2.svg" alt="Trophy" width={50} height={50} />
             </div>
         </div>
     );
@@ -75,7 +75,7 @@ export default function Index() {
                 <span><span className={styles.homePageTitleAce}>ACE</span>demic</span>
                 <span style={{marginRight: "10px"}}> </span>
                 <div className={styles.homePageTitleHome}>
-                    <img src="/icons/home_title_icon.svg" alt="Home" width={45} height={45} style={{marginTop: "5px", marginRight: "5px"}}/>
+                    <img src="icons/home_title_icon.svg" alt="Home" width={45} height={45} style={{marginTop: "5px", marginRight: "5px"}}/>
                     HOME
                 </div>
             </h1>

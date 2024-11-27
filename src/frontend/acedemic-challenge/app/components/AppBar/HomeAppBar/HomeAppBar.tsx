@@ -115,11 +115,11 @@ export function GreetingsContainer() {
 export function NavBar() {
     return (
         <div className={`${styles.navBar}`}>
-            <NavBarButton text="Challenges" url={"/challenges"} iconSrc={"/icons/challenges_icon.svg"}
+            <NavBarButton text="Challenges" url={"/challenges"} iconSrc={"icons/challenges_icon.svg"}
                           iconAlt={"Challenges Icon"} />
-            <NavBarButton text="Calendar" url={"/calendar"} iconSrc={"/icons/calendar_icon.svg"}
+            <NavBarButton text="Calendar" url={"/calendar"} iconSrc={"icons/calendar_icon.svg"}
                           iconAlt={"Calendar Icon"} />
-            <NavBarButton text="Badges" url={"/badges"} iconSrc={"/icons/badges_icon.svg"} iconAlt={"Badges Icon"} />
+            <NavBarButton text="Badges" url={"/badges"} iconSrc={"icons/badges_icon.svg"} iconAlt={"Badges Icon"} />
         </div>
     );
 }

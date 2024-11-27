@@ -4,11 +4,13 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import * as path from "node:path";
 
 export default defineConfig({
+    base: "/challenge/",
     server: {
         port: 5173
     },
     plugins: [
         remix({
+            basename: "/challenge",
             future: {
                 v3_fetcherPersist: true,
                 v3_relativeSplatPath: true,

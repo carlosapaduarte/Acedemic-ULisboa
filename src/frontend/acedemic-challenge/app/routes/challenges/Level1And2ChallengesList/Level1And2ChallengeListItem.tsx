@@ -60,7 +60,7 @@ function ChallengeBoxButton(
                             {batchDayNumber} - ?
                         </p>
                         <div className={styles.challengeLockedTagContainer}>
-                            <img src="/icons/lock_icon.svg" alt=""
+                            <img src="icons/lock_icon.svg" alt=""
                                  width={20} height={20}
                                  className={styles.challengeLockedLockIcon} />
                             <div className={styles.challengeLockedTag}>

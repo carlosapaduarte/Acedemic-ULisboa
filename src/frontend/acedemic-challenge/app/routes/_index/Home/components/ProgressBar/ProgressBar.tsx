@@ -14,7 +14,7 @@ export function ProgressBar({ progress }: { progress: number }) {
                              } as React.CSSProperties}>
                     </div>
                 </div>
-                <img src="/icons/trophy_icon.svg"
+                <img src="icons/trophy_icon.svg"
                      alt="Trophy Icon"
                      className={styles.progressBarTrophyIcon} />
             </div>

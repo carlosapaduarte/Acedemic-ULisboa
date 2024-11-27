@@ -1,6 +1,6 @@
 FROM node:20.2.0-alpine3.18 as base
 
-FROM base as deps
+FROM base AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm install

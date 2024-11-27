@@ -78,7 +78,7 @@ const TitleAndCheckboxSection = memo(function TitleAndCheckboxSection(
                 {task.data.title}
             </h1>
             {/*<button className={styles.editButton}>
-                <img src="/icons/edit_icon.svg" alt="Edit Icon" />
+                <img src="icons/edit_icon.svg" alt="Edit Icon" />
             </button>*/}
         </div>
     );

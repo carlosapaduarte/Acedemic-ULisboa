@@ -149,7 +149,7 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
                                e.preventDefault();
                                navigate("/");
                            }}>
-                            <img src="/icons/home_icon.svg" alt="Home Icon" />
+                            <img src="icons/home_icon.svg" alt="Home Icon" />
                         </a>
                     </div>
                 )}

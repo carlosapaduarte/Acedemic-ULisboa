@@ -41,10 +41,10 @@ function Logo() {
                 <h1 className={styles.demicText}>DEMIC</h1>
             </div>
             <div className={styles.challengeAndTrophiesContainer}>
-                <img src="/icons/medal_icon.svg" alt="Medal" width={50} height={50}
+                <img src="icons/medal_icon.svg" alt="Medal" width={50} height={50}
                      style={{ marginTop: "-5px" }} />
                 <h1 className={styles.challengeText}>CHALLENGE</h1>
-                <img src="/icons/trophy_icon2.svg" alt="Trophy" width={50} height={50} />
+                <img src="icons/trophy_icon2.svg" alt="Trophy" width={50} height={50} />
             </div>
         </div>
     );

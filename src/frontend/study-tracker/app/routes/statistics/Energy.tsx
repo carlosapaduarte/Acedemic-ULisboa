@@ -8,7 +8,7 @@ import { NoDataYetAvailableMessage, SeeFullHistory, Spacer } from "./Commons";
 import { useTranslation } from "react-i18next";
 
 export function getEnergyIconByEnergyLevel(energyLevel: number): string {
-    const prefix = "/icons/"
+    const prefix = "icons/"
     let filename = ""
     if (energyLevel >= 9) filename = "energy_very_good_icon.png";
     else if (energyLevel >= 7) filename = "energy_good_icon.png";
@@ -167,7 +167,7 @@ export function EnergyStats() {
             <div className={styles.statsContainer}>
                 <div className={styles.statsContainerTitleAndDateDiv}>
                     <div className={styles.statsContainerTitle}>
-                        <img src="/icons/energy_container_title_icon.png" alt="Energy Title Icon" className={styles.titleImg}/>
+                        <img src="icons/energy_container_title_icon.png" alt="Energy Title Icon" className={styles.titleImg}/>
                         {t("statistics:energy_container_title")}
                     </div>
                     <TodayDate />
