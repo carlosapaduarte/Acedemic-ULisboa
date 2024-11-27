@@ -5,7 +5,16 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
+
+import "global.css";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Acedemic Home" },
+    { name: "description", content: "Welcome to Acedemic! Choose between Challenge, Tracker, or learn more!" },
+  ];
+};
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -28,6 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <title>Acedemic Home</title>
       </head>
       <body>
         {children}

@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+
+.homePage {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.optionCardsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    grid-auto-rows: 1fr;
+    grid-gap: 20px;
+    margin: 20px;
+
+    @media (min-width: 900px) {
+        padding: 0 clamp(0px, 20vw - 200px, 500px);
+    }
+}
+
+.optionCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-radius: 10px;
+
+    background-color: #f5f5f5;
+    color: black;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s;
+
+    text-decoration: none;
+
+    font-family: 'Chakra Petch', sans-serif;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    &.challengeCard {
+        background-color: #771480ff;
+    }
+
+    &.trackerCard {
+        background-color: #f9deb9;
+    }
+}
+
+.challengeCardDescription {
+    font-size: 1rem;
+    color: white;
+}
+
+.trackerCardDescription {
+    font-size: 1rem;
+    color: black;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.acedemicTextContainer {
+    display: flex;
+    align-items: center;
+}
+
+.aceText {
+    font-size: 56px;
+    font-weight: 900;
+}
+
+.demicText {
+    font-size: 48px;
+    color: black;
+}
+
+.logoContainer {
+    padding: 0 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    animation: fadeIn 0.5s ease;
+
+    transform: scale(0.8);
+
+    @media (min-width: 300px) {
+        transform: scale(0.9);
+    }
+    @media (min-width: 350px) {
+        transform: scale(1);
+    }
+}
+
+.challengeLogoContainer {
+    .aceText {
+        color: #7df4beff;
+    }
+
+    .demicText {
+        color: white;
+    }
+
+    .challengeAndTrophiesContainer {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .challengeText {
+        font-size: 32px;
+        color: white;
+    }
+}
+
+.trackerLogoContainer {
+    padding: 0 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    animation: fadeIn 0.5s ease;
+
+    .aceText {
+        color: #592e25;
+    }
+
+    .demicText {
+        color: black;
+    }
+
+    .trackerAndCheckboxContainer {
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+    }
+
+    .trackerText {
+        font-size: 32px;
+        color: black;
+    }
+
+    .checkBox {
+        width: 40px;
+        height: 40px;
+
+        background-color: transparent;
+
+        border-radius: 5px;
+        border: 4px solid #592e25;
+
+        position: relative;
+
+        box-sizing: border-box;
+    }
+
+    .checkBox::after {
+        pointer-events: none;
+
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -3px;
+        width: 150%;
+        height: 150%;
+
+        background-repeat: no-repeat;
+        background-position: left center;
+        background-size: contain;
+        background-image: url("../tracker-checkmark.png");
+
+        /*clip-path: inset(0 100% 0 0);*/
+        transition: clip-path 0.5s ease;
+    }
+}

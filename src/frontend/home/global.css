@@ -1,0 +1,65 @@
+/* makes sizing simpler */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* remove default spacing */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* force styling of type through styling, rather than elements */
+input, textarea, button, select {
+    font: inherit;
+}
+
+/* dark mode user-agent-styles */
+/*
+html {
+    color-scheme: dark light;
+}*/
+
+/* min body height */
+
+body {
+    min-height: 100vh;
+}
+
+/* responsive images/videos */
+img,
+picture,
+svg,
+video {
+    display: block;
+    max-width: 100%;
+}
+
+img {
+    font-style: italic;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background-color: white;
+    /*font-family: var(--font-family1), sans-serif;*/
+
+    transition: background-color 300ms ease;
+}
+
+.app {
+    /*width: 100%;
+    height: 100vh;
+    height: 100dvh;*/
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
