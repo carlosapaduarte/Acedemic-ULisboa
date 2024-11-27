@@ -10,7 +10,7 @@ import { CreateTaskForm } from "~/routes/tasks/CreateTask/CreateTaskForm/CreateT
 import { SecondModalContext } from "./SecondModalContext";
 import { useTranslation } from "react-i18next";
 import { useTags } from "~/hooks/useTags";
-import { CreateTaskInputDto } from "~/service/output_dtos";
+import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 
 
 function useCreateNewTask() {
@@ -22,7 +22,7 @@ function useCreateNewTask() {
     const [status, setStatus] = useState<string | undefined>(undefined);
     const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
 
-    const [slotsToWork, setSlotsToWork] = useState<number>(1);
+    const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     function clearFields() {
@@ -33,7 +33,7 @@ function useCreateNewTask() {
         tags.forEach((tag) => removeTag(tag));
         setStatus(undefined);
         setSubTasks([]);
-        setSlotsToWork(1);
+        setSlotsToWork([]);
         setSelectedTags([]);
     }
 
@@ -156,7 +156,8 @@ const CreateTaskModal = React.memo(function CreateTaskModal({ onTaskCreated }: {
                                         priority,
                                         tags: selectedTags,
                                         status: status ?? "not_completed",
-                                        subTasks
+                                        subTasks,
+                                        slotsToWork
                                     });
                                     clearFields();
                                 }}>

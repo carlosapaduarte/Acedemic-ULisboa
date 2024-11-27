@@ -2,7 +2,7 @@
 
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
-import { CreateTaskInputDto } from "~/service/output_dtos";
+import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { utils } from "~/utils";
 
 
@@ -362,10 +362,17 @@ function requestBody(newTaskInfo: CreateTaskInputDto): any {
         tags: newTaskInfo.tags,
         status: newTaskInfo.status,
         subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) => requestBody(subTaskInfo)),
+        slotsToWork: newTaskInfo.slotsToWork.map((slot: SlotToWorkDto) => {
+            return {
+                startTime: slot.start.getTime() / 1000,
+                endTime: slot.end.getTime() / 1000
+            }
+        })
     };
 }
 
 async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
+    console.log(newTaskInfo)
     const request = {
         path: `study-tracker/users/me/tasks`,
         method: "POST",
@@ -382,6 +389,7 @@ async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
 }
 
 async function updateTask(taskId: number, newTaskInfo: CreateTaskInputDto) {
+    console.log(requestBody(newTaskInfo))
     const request = {
         path: `study-tracker/users/me/tasks/${taskId}`,
         method: "PUT",
@@ -484,7 +492,7 @@ async function getTask(taskId: number): Promise<Task> {
 
 async function updateTaskStatus(taskId: number, newStatus: string) {
     const request = {
-        path: `study-tracker/users/me/tasks/${taskId}`,
+        path: `study-tracker/users/me/tasks/${taskId}/status`,
         method: "PUT",
         body: toJsonBody({ newStatus })
     };

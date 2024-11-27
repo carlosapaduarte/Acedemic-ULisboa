@@ -9,11 +9,11 @@ import classNames from "classnames";
 import { CreateTaskForm } from "~/routes/tasks/CreateTask/CreateTaskForm/CreateTaskForm";
 import { useTranslation } from "react-i18next";
 import { useTags } from "~/hooks/useTags";
-import { CreateTaskInputDto } from "~/service/output_dtos";
+import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { SecondModalContext } from "../tasks/CreateTask/SecondModalContext";
 
 
-function useCreateNewTask() {
+function useEditTask() {
     const [title, setTitle] = useState<string | undefined>(undefined);
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [deadline, setDeadline] = useState<Date | undefined>(undefined);
@@ -22,7 +22,7 @@ function useCreateNewTask() {
     const [status, setStatus] = useState<string | undefined>(undefined);
     const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
 
-    const [slotsToWork, setSlotsToWork] = useState<number>(1);
+    const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     function clearFields() {
@@ -33,7 +33,7 @@ function useCreateNewTask() {
         tags.forEach((tag) => removeTag(tag));
         setStatus(undefined);
         setSubTasks([]);
-        setSlotsToWork(1);
+        setSlotsToWork([]);
         setSelectedTags([]);
     }
 
@@ -99,7 +99,7 @@ const EditTaskModal = React.memo(function CreateTaskModal({ taskId, onTaskUpdate
         appendSubSubTask,
         subTasks,
         clearFields
-    } = useCreateNewTask();
+    } = useEditTask();
 
     const { t } = useTranslation(["task"]);
 
@@ -125,7 +125,7 @@ const EditTaskModal = React.memo(function CreateTaskModal({ taskId, onTaskUpdate
                         {t("task:close")}
                     </Button>
                     <h1 className={styles.newTaskTitleText}>
-                        {t("task:new_task_title")}
+                        {t("task:edit_task_title")}
                     </h1>
                     <div className={styles.newTaskFormContainer}>
                         <CreateTaskForm
@@ -158,11 +158,12 @@ const EditTaskModal = React.memo(function CreateTaskModal({ taskId, onTaskUpdate
                                         priority,
                                         tags: selectedTags,
                                         status: status ?? "not_completed",
-                                        subTasks
+                                        subTasks,
+                                        slotsToWork
                                     });
                                     clearFields();
                                 }}>
-                            {t("task:create_task")}
+                            {t("task:update_task")}
                         </Button>
                     </div>
                 </div>

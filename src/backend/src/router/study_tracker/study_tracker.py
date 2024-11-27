@@ -47,6 +47,15 @@ def update_task(
         Task.from_create_task_input_dto(dto), 
         SlotToWork.from_slot_to_work_input_dto(slots_to_work)
     )
+    
+@router.put("/users/me/tasks/{task_id}/status")
+def update_task_status(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    task_id: int,
+    dto: UpdateTaskStatus
+):
+    print("Here")
+    study_tracker_service.update_task_status(user_id, task_id, dto.newStatus)
 
 @router.get("/users/me/tasks")
 def get_tasks(
@@ -65,14 +74,6 @@ def get_daily_tasks_progress(
 ) -> list[DailyTasksProgressOutputDto]:
     res = study_tracker_service.get_user_daily_tasks_progress(user_id, year, week)
     return DailyTasksProgressOutputDto.from_domain(res)
-
-@router.put("/users/me/tasks/{task_id}")
-def update_task_status(
-    user_id: Annotated[int, Depends(get_current_user_id)],
-    task_id: int,
-    dto: UpdateTaskStatus
-):
-    study_tracker_service.update_task_status(user_id, task_id, dto.newStatus)
 
 @router.get("/users/me/events")
 def get_events(

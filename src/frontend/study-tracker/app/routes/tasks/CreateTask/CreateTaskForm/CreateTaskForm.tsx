@@ -4,6 +4,7 @@ import { Button, Input, Label, TextField } from "react-aria-components";
 import { SlotToWork } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
+import { SlotToWorkDto } from "~/service/output_dtos";
 
 const possibleTags = [
     "study",
@@ -64,11 +65,13 @@ const DescriptionSection = React.memo(function DescriptionSection({ description,
 });
 
 const SlotsToWorkSection = React.memo(function SlotsToWorkSection({ slotsToWork, setSlotsToWork }: {
-    slotsToWork: number,
-    setSlotsToWork: (slotsToWork: number) => void
+    slotsToWork: SlotToWorkDto[],
+    setSlotsToWork: (slotsToWork: SlotToWorkDto[]) => void
 }) {
     const { t } = useTranslation(["task"]);
     const [slotAddingQueue, setSlotAddingQueue] = useState<number[]>([]);
+
+    const [slotsToWorkNumber, setSlotsToWorkNumber] = useState(slotsToWork.length)
 
     function addToSlotAddingQueue(index: number) {
         setSlotAddingQueue((slotAddingQueue) => [...slotAddingQueue, index]);
@@ -83,14 +86,26 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({ slotsToWork,
                 {t("task:slots_to_work_label")}
             </h2>
             <div className={styles.slotsToWorkContainer}>
-                {Array.from({ length: slotsToWork }).map((_, index) => (
-                    <SlotToWork key={index} index={index} newlyAdded={slotAddingQueue.includes(index)} />
+                {Array.from({ length: slotsToWorkNumber }).map((_, index) => (
+                    <SlotToWork 
+                        key={index} 
+                        index={index} 
+                        newlyAdded={slotAddingQueue.includes(index)} 
+                        onClosePressed={(slot: SlotToWorkDto | undefined) => {
+                            if (slot) {
+                                const newSlotsToWork = [...slotsToWork]
+                                newSlotsToWork.push(slot)
+                                setSlotsToWork(newSlotsToWork)
+                            } else
+                                console.log("Invalid date")
+                        }}
+                    />
                 ))}
             </div>
             <Button
                 onPress={() => {
-                    setSlotsToWork(slotsToWork + 1);
-                    addToSlotAddingQueue(slotsToWork);
+                    setSlotsToWorkNumber(slotsToWorkNumber + 1);
+                    addToSlotAddingQueue(slotsToWorkNumber);
                 }}
                 className={classNames(styles.addSlotToWorkButton)}>
                 {t("task:add_slot_to_work")}
@@ -234,8 +249,8 @@ export function CreateTaskForm(
     }: {
         description: string | undefined,
         setDescription: (description: string) => void,
-        slotsToWork: number,
-        setSlotsToWork: (slotsToWork: number) => void,
+        slotsToWork: SlotToWorkDto[],
+        setSlotsToWork: (slotsToWork: SlotToWorkDto[]) => void,
         deadline: Date | undefined,
         setDeadline: (deadline: Date | undefined) => void,
         selectedTags: string[],
@@ -248,7 +263,7 @@ export function CreateTaskForm(
     return (<form className={styles.newTaskForm}>
         <TitleSection title={title} setTitle={setTitle} />
         <DescriptionSection description={description} setDescription={setDescription} />
-        {/*<SlotsToWorkSection slotsToWork={slotsToWork} setSlotsToWork={setSlotsToWork} />*/}
+        <SlotsToWorkSection slotsToWork={slotsToWork} setSlotsToWork={setSlotsToWork} />
         <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
         <PrioritySection priority={priority} setPriority={setPriority} />
         <TagSection selectedTags={selectedTags} setSelectedTags={setSelectedTags} />

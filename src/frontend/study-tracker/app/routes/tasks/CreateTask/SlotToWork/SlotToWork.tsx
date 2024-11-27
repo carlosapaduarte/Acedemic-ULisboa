@@ -5,6 +5,7 @@ import classNames from "classnames";
 import { SecondModalContext } from "~/routes/tasks/CreateTask/SecondModalContext";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
+import { SlotToWorkDto } from "~/service/output_dtos";
 
 const formatDate = (dateString: string | undefined) => {
     if (!dateString) return t("task:unset_date");
@@ -26,7 +27,7 @@ const formatTimes = (startTimeString: string | undefined, endTimeString: string 
     return `${formatTime(startTimeString)} to ${formatTime(endTimeString)}`;
 };
 
-export function SlotToWork({ index, newlyAdded }: { index: number, newlyAdded: boolean }) {
+export function SlotToWork({ index, newlyAdded, onClosePressed }: { index: number, newlyAdded: boolean, onClosePressed: (slot: SlotToWorkDto | undefined) => void }) {
     const { t } = useTranslation(["task"]);
     const {
         setIsSecondModalOpen,
@@ -38,6 +39,8 @@ export function SlotToWork({ index, newlyAdded }: { index: number, newlyAdded: b
     const [date, setDate] = useState<string | undefined>(undefined);
     const [startTime, setStartTime] = useState<string | undefined>(undefined);
     const [endTime, setEndTime] = useState<string | undefined>(undefined);
+    
+    console.log(date, startTime, endTime)
 
     const [isThisSlotToWorkModalOpen, setIsThisSlotToWorkModalOpen] = useState<boolean>(false);
 
@@ -46,12 +49,45 @@ export function SlotToWork({ index, newlyAdded }: { index: number, newlyAdded: b
             {({ close }) => (
                 <div className={styles.modalContainer}>
                     <Button className={classNames(styles.closeButton)}
-                            onPress={() => {
-                                close();
-                                setIsThisSlotToWorkModalOpen(false);
-                            }}>
-                        {t("task:close")}
-                    </Button>
+                        onPress={() => {
+                            const createValidDate = (date: string | undefined, time: string | undefined): Date | undefined => {
+                                if (!date || !time) {
+                                    console.error("Date or Time is undefined:", { date, time });
+                                    return undefined;
+                                }
+                            
+                                // Split and parse manually
+                                const [year, month, day] = date.split("-").map(Number); // Month is 0-indexed
+                                const [hours, minutes] = time.split(":").map(Number);
+                            
+                                // Create Date object
+                                const newDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+                                if (isNaN(newDate.getTime())) {
+                                    console.error("Invalid Date Object Created", { year, month, day, hours, minutes });
+                                    return undefined;
+                                }
+                            
+                                console.log("Valid Date Created:", newDate);
+                                return newDate;
+                            };
+
+                            // Usage in onClosePressed
+                            const start = createValidDate(date, startTime);
+                            const end = createValidDate(date, endTime);
+                            
+                            if (start && end) {
+                                onClosePressed({ start, end });
+                            } else {
+                                console.error("Invalid start or end date");
+                                onClosePressed(undefined);
+                            }
+
+                            close()
+                            setIsThisSlotToWorkModalOpen(false);
+                            
+                        }}>
+                    {t("task:close")}
+                </Button>
                     <h1 className={styles.mainFormModalTitleText}>Slot to Work</h1>
                     <div className={styles.slotFormContainer}>
                         <TextField autoFocus>
