@@ -28,16 +28,12 @@ import { GlobalErrorController } from "~/components/error/GlobalErrorController"
 import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
 import { AppBarProvider } from "~/components/AppBar/AppBarProvider";
 
-export const meta: MetaFunction = () => {
-    return [
-        { title: "Acedemic Challenge" },
-        { name: "Acedemic Challenge", content: "Acedemic Challenge" }
-    ];
-};
-
 export async function loader({ request }: LoaderFunctionArgs) {
     let locale = await i18next.getLocale(request);
-    return json({ locale });
+    let t = await i18next.getFixedT(request);
+    let metaDescription = t("common:meta_description");
+
+    return json({ locale, metaDescription });
 }
 
 export let handle = {
@@ -46,6 +42,17 @@ export let handle = {
     // TIP: In most cases, you should set this to your defaultNS from your i18n config
     // or if you did not set one, set it to the i18next default namespace "translation"
     i18n: ["common", "error"]
+};
+
+// @ts-ignore
+export const meta: MetaFunction = ({ data }: { data: { locale: string, metaDescription: string } }) => {
+    return [
+        { title: "Acedemic Challenge" },
+        {
+            name: "description",
+            content: data.metaDescription
+        }
+    ];
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
