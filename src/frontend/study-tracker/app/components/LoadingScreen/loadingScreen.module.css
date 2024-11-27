@@ -29,7 +29,7 @@
     font-family: var(--font-family2), sans-serif;
 }
 
-.contentContainer {
+.logoContainer {
     padding: 0 2rem;
 
     display: flex;

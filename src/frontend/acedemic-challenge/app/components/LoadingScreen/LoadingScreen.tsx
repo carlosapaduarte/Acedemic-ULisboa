@@ -33,18 +33,27 @@ export function LoadingOverlay({ loading }: { loading: boolean }) {
     );
 }
 
+function Logo() {
+    return (
+        <div className={styles.logoContainer}>
+            <div className={styles.acedemicTextContainer}>
+                <h1 className={styles.aceText}>ACE</h1>
+                <h1 className={styles.demicText}>DEMIC</h1>
+            </div>
+            <div className={styles.challengeAndTrophiesContainer}>
+                <img src="/icons/medal_icon.svg" alt="Medal" width={50} height={50}
+                     style={{ marginTop: "-5px" }} />
+                <h1 className={styles.challengeText}>CHALLENGE</h1>
+                <img src="/icons/trophy_icon2.svg" alt="Trophy" width={50} height={50} />
+            </div>
+        </div>
+    );
+}
+
 function LoadingScreen() {
     return (
         <div className={styles.loadingScreen}>
-            <div className={styles.contentContainer}>
-                <div className={styles.acedemicTextContainer}>
-                    <h1 className={styles.aceText}>ACE</h1>
-                    <h1 className={styles.demicText}>DEMIC</h1>
-                </div>
-                <div className={styles.challengeAndCheckboxContainer}>
-                    <h1 className={styles.challengeText}>CHALLENGE</h1>
-                </div>
-            </div>
+            <Logo />
         </div>
     );
 }
