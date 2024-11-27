@@ -48,7 +48,8 @@ html, body {
 }
 
 body {
-    background-color: white;
+    background: linear-gradient(135deg, #ffeecf, #d1b7e6);
+
     /*font-family: var(--font-family1), sans-serif;*/
 
     transition: background-color 300ms ease;
