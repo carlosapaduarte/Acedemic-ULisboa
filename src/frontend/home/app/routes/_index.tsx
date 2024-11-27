@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
 function ChallengeCard() {
-    const href = "http://localhost:5173/"; // "/challenge";
+    const href = "/challenge";
 
     const { t } = useTranslation("common");
 
@@ -19,7 +19,7 @@ function ChallengeCard() {
 }
 
 function TrackerCard() {
-    const href = "http://localhost:5273/"; // "/tracker";
+    const href = "/tracker";
 
     const { t } = useTranslation("common");
 
