@@ -1,3 +1,8 @@
 {
-    "meta_description": "Welcome to ULisboa's Acedemic apps! Choose between Challenge, Tracker, or learn more!"
+    "meta_description": "Welcome to ULisboa's Acedemic apps! Choose between Challenge, Tracker, or learn more!",
+    "ulisboa_logo": "ULisboa Logo",
+    "sucesso_academico_ulisboa_logo": "Sucesso Académico na ULisboa Logo",
+    "home_page_subtitle": "Choose an app:",
+    "challenge_card_description": "Challenge yourself.",
+    "tracker_card_description": "Keep track of your progress."
 }

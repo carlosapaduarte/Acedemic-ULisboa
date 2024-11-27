@@ -1,8 +1,11 @@
 import styles from "../home.module.css";
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 function ChallengeCard() {
     const href = "http://localhost:5173/"; // "/challenge";
+
+    const { t } = useTranslation("common");
 
     return (
         <a
@@ -10,7 +13,7 @@ function ChallengeCard() {
             className={classNames(styles.optionCard, styles.challengeCard)}
         >
             <ChallengeLogo />
-            <p className={styles.challengeCardDescription}>Challenge yourself.</p>
+            <p className={styles.challengeCardDescription}>{t("common:challenge_card_description")}</p>
         </a>
     );
 }
@@ -18,13 +21,15 @@ function ChallengeCard() {
 function TrackerCard() {
     const href = "http://localhost:5273/"; // "/tracker";
 
+    const { t } = useTranslation("common");
+
     return (
         <a
             href={href}
             className={classNames(styles.optionCard, styles.trackerCard)}
         >
             <TrackerLogo />
-            <p className={styles.trackerCardDescription}>Keep track of your progress.</p>
+            <p className={styles.trackerCardDescription}>{t("common:tracker_card_description")}</p>
         </a>
     );
 }
@@ -63,8 +68,18 @@ function TrackerLogo() {
 }
 
 export default function Index() {
+    const { t } = useTranslation("common");
     return (
         <div className={styles.homePage}>
+            <h1 className={styles.homePageTitle}>
+                <span><span className={styles.homePageTitleAce}>ACE</span>demic</span>
+                <span style={{marginRight: "10px"}}> </span>
+                <div className={styles.homePageTitleHome}>
+                    <img src="/icons/home_title_icon.svg" alt="Home" width={45} height={45} style={{marginTop: "5px", marginRight: "5px"}}/>
+                    HOME
+                </div>
+            </h1>
+            <h1 className={styles.homePageSubTitle}>{t("common:home_page_subtitle")}</h1>
             <div className={styles.optionCardsContainer}>
                 <ChallengeCard />
                 <TrackerCard />

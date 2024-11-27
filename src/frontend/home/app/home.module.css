@@ -9,6 +9,35 @@
     justify-content: center;
 
     overflow: hidden;
+
+    font-family: 'Chakra Petch', sans-serif;
+}
+
+.homePageTitle {
+    padding: 1rem;
+    font-size: 3rem;
+    font-weight: 900;
+    color: black;
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .homePageTitleAce {
+        color: #3757ea;
+    }
+
+    .homePageTitleHome {
+        display: flex;
+    }
+}
+.homePageSubTitle {
+    font-size: 2rem;
+    font-weight: 900;
+    color: black;
+    text-align: center;
 }
 
 .optionCardsContainer {
