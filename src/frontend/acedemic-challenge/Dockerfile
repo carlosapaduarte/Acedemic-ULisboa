@@ -1,6 +1,6 @@
 FROM node:20.2.0-alpine3.18 as base
 
-FROM base as deps
+FROM base AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -14,7 +14,7 @@ FROM deps AS prod-deps
 WORKDIR /app
 RUN npm install --production
 
-FROM base AS runner
+FROM base as runner
 WORKDIR /app
 RUN addgroup --system --gid 1001 remix
 RUN adduser --system --uid 1001 remix

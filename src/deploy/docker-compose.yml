@@ -28,11 +28,27 @@ services:
     env_file:
       - env/postgres
 
+  frontend-acedemic-home:
+    build:
+      context: ../frontend/home
+    ports:
+      - "3001:3001"
+    env_file:
+      - env/acedemic-home
+
+  frontend-acedemic-challenge:
+    build:
+      context: ../frontend/acedemic-challenge
+    ports:
+      - "3002:3002"
+    env_file:
+      - env/acedemic-challenge
+
   frontend-acedemic-tracker:
     build:
       context: ../frontend/study-tracker
     ports:
-      - "3000:3002"
+      - "3003:3003"
     env_file:
       - env/acedemic-tracker
 
