@@ -116,7 +116,7 @@ function Level({
         <div className={styles.levelContainer}>
             <div className={styles.levelImageContainer}>
                 <img
-                    src={`/lvl${levelType.valueOf()}.png`}
+                    src={`lvl${levelType.valueOf()}.png`}
                     alt={`Level ${levelType.valueOf()} Image`}
                 />
             </div>

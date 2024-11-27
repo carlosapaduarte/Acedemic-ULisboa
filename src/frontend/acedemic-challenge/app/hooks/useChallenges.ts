@@ -72,11 +72,8 @@ export function useChallenges() {
                 const currentBatch: Batch = sortedBatches[0];
                 setCurrentBatch(currentBatch);
 
-                const DEBUG_DAY_OFFSET = 12;
-                const DEBUG_TIME_OFFSET = 1000 * 3600 * 24 * DEBUG_DAY_OFFSET;
-
                 // Calculate the current day index for the most recent batch
-                const currentDayIndex = Math.round(((new Date().getTime() + DEBUG_TIME_OFFSET) - currentBatch.startDate * 1000) / (1000 * 3600 * 24));
+                const currentDayIndex = Math.round(((new Date().getTime()) - currentBatch.startDate * 1000) / (1000 * 3600 * 24));
                 setCurrentDayIndex(currentDayIndex);
             });
     }
