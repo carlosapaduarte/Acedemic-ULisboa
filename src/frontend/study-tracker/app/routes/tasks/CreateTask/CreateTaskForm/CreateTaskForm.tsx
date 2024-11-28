@@ -93,6 +93,7 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({ slotsToWork,
                         newlyAdded={slotAddingQueue.includes(index)} 
                         onClosePressed={(slot: SlotToWorkDto | undefined) => {
                             if (slot) {
+                                console.log(slot)
                                 const newSlotsToWork = [...slotsToWork]
                                 newSlotsToWork.push(slot)
                                 setSlotsToWork(newSlotsToWork)
