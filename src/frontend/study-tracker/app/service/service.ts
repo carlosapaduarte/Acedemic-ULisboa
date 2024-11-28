@@ -388,12 +388,19 @@ async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
         return Promise.reject(new Error("Task could not be created!"));
 }
 
-async function updateTask(taskId: number, newTaskInfo: CreateTaskInputDto) {
-    console.log(requestBody(newTaskInfo))
+async function updateTask(taskId: number, newTaskInfo: CreateTaskInputDto, previousTaskName: string) {
+    function toUpdateTaskInputDto(newTaskInfo: CreateTaskInputDto, previousTaskName: string): any {
+        return {
+            previous_task_name: previousTaskName,
+            updated_task: requestBody(newTaskInfo)
+        }
+    }
+
+    console.log(toUpdateTaskInputDto(newTaskInfo, previousTaskName))
     const request = {
         path: `study-tracker/users/me/tasks/${taskId}`,
         method: "PUT",
-        body: toJsonBody(requestBody(newTaskInfo))
+        body: toJsonBody(toUpdateTaskInputDto(newTaskInfo, previousTaskName))
     };
 
     // Backend returns the newly created Task!

@@ -40,7 +40,7 @@ class CreateScheduleBlockInputDto(BaseModel):
 class SlotToWorkInputDto(BaseModel):
     startTime: float
     endTime: float
-
+    
 class CreateTaskInputDto(BaseModel):
     title: str
     description: str | None = None
@@ -51,6 +51,10 @@ class CreateTaskInputDto(BaseModel):
     subTasks: list['CreateTaskInputDto']
     slotsToWork: list[SlotToWorkInputDto] | None = []
 
+class EditTaskInputDto(BaseModel):
+    previous_task_name: str
+    updated_task: CreateTaskInputDto
+    
 class UpdateTaskStatus(BaseModel):
     newStatus: str
     

@@ -152,6 +152,21 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             session.delete(event_model)
             session.commit()
+        
+    # Delete events with certain title    
+    def delete_events(self, user_id: int, title: str):
+        with Session(engine) as session:
+            statement = select(STEventModel)\
+                .where(STEventModel.user_id == user_id)\
+                .where(STEventModel.title == title)
+                
+            print(title)
+                
+            result = session.exec(statement)            
+            events_models = result.all()
+            
+            for event in events_models:
+                StudyTrackerSqlRepo.delete_event(self, user_id, event.id)
             
             
     @staticmethod

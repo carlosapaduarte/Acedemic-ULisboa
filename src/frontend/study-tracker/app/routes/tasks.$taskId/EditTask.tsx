@@ -74,8 +74,9 @@ function useEditTask() {
     };
 }
 
-const EditTaskModal = React.memo(function CreateTaskModal({ taskId, onTaskUpdated }: {
+const EditTaskModal = React.memo(function CreateTaskModal({ taskId, task, onTaskUpdated }: {
     taskId: number,
+    task: Task,
     onTaskUpdated: () => void
 }) {
     const {
@@ -105,7 +106,7 @@ const EditTaskModal = React.memo(function CreateTaskModal({ taskId, onTaskUpdate
 
     function updateTask(newTaskInfo: CreateTaskInputDto, onDone: () => void) {
         //console.log(taskId)
-        service.updateTask(taskId, newTaskInfo)
+        service.updateTask(taskId, newTaskInfo, task.data.title)
             .then(() => onDone())
             .catch((error) => {
             }/*setGlobalError(error)*/);
@@ -173,7 +174,7 @@ const EditTaskModal = React.memo(function CreateTaskModal({ taskId, onTaskUpdate
 });
 
 const ModalWrapper = React.memo(function ModalWrapper(
-    { taskId, onTaskUpdated, children }: { taskId: number, onTaskUpdated: () => void, children: JSX.Element }
+    { taskId, task, onTaskUpdated, children }: { taskId: number, task: Task, onTaskUpdated: () => void, children: JSX.Element }
 ) {
     const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
     const [secondModalContent, setSecondModalContent] = useState<JSX.Element | undefined>(undefined);
@@ -192,7 +193,7 @@ const ModalWrapper = React.memo(function ModalWrapper(
         <DialogTrigger>
             {children}
             <SecondModalContext.Provider value={secondModalContextValue}>
-                <EditTaskModal taskId={taskId} onTaskUpdated={onTaskUpdated} />
+                <EditTaskModal task={task} taskId={taskId} onTaskUpdated={onTaskUpdated} />
             </SecondModalContext.Provider>
             <Modal isOpen={isSecondModalOpen} onOpenChange={setIsSecondModalOpen} className={secondModalClass}>
                 {secondModalContent}
@@ -201,11 +202,11 @@ const ModalWrapper = React.memo(function ModalWrapper(
     );
 });
 
-export function EditTaskButton({ taskId, onTaskUpdated }: { taskId: number, onTaskUpdated: () => void }) {
+export function EditTaskButton({ taskId, task, onTaskUpdated }: { taskId: number, task: Task, onTaskUpdated: () => void }) {
     const { t } = useTranslation(["task"]);
 
     return (
-        <ModalWrapper taskId={taskId} onTaskUpdated={onTaskUpdated}>
+        <ModalWrapper taskId={taskId} task={task} onTaskUpdated={onTaskUpdated}>
             <Button className={classNames(styles.createNewTaskButton)}>
                 {t("task:update_task")}
             </Button>

@@ -19,6 +19,10 @@ class StudyTrackerRepo(ABC):
     @abstractmethod
     def delete_event(self, user_id: int, event_id: int):
         pass
+    
+    @abstractmethod
+    def delete_events(self, user_id: int, title: str):
+        pass
 
     @abstractmethod
     def get_events(

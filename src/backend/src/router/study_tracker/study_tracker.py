@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -34,18 +34,19 @@ def create_task(
 def update_task(
     user_id: Annotated[int, Depends(get_current_user_id)],
     task_id: int,
-    dto: CreateTaskInputDto
+    dto: EditTaskInputDto
 ):
     slots_to_work = []
-    if dto.slotsToWork is not None:
-        slots_to_work = dto.slotsToWork
+    if dto.updated_task.slotsToWork is not None:
+        slots_to_work = dto.updated_task.slotsToWork
     
     # This route returns the newly created task!
     study_tracker_service.update_task(
         user_id,
         task_id,
-        Task.from_create_task_input_dto(dto), 
-        SlotToWork.from_slot_to_work_input_dto(slots_to_work)
+        Task.from_create_task_input_dto(dto.updated_task), 
+        SlotToWork.from_slot_to_work_input_dto(slots_to_work),
+        dto.previous_task_name
     )
     
 @router.put("/users/me/tasks/{task_id}/status")

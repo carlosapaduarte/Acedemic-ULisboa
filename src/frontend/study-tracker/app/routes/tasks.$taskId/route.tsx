@@ -30,7 +30,10 @@ function useTask(
             return;
         }
         service.getTask(task.id)
-            .then((updatedTask: Task) => setTask(updatedTask))
+            .then((updatedTask: Task) => {
+                //console.log(updatedTask)
+                setTask(updatedTask)
+            })
             .catch((error) => setGlobalError(error));
     }
 
@@ -39,11 +42,11 @@ function useTask(
             return;
         }
         service.updateTaskStatus(task.id, newStatus)
-            .then(() => {
-                refreshTask();
-                refreshTasks();
-            })
-            .catch((error) => setGlobalError(error));
+        .then(() => {
+            refreshTask();
+            refreshTasks();
+        })
+        .catch((error) => setGlobalError(error));
     }
 
     return { task, refreshTask, updateTaskStatus };
@@ -58,6 +61,8 @@ const TitleAndCheckboxSection = memo(function TitleAndCheckboxSection(
         updateTaskStatus: (newStatus: string) => void
     }) {
     const { t } = useTranslation(["task"]);
+
+    //console.log(task.data.status)
 
     return (
         <div className={classNames(styles.checkboxAndTitleContainer)}>
@@ -198,7 +203,7 @@ function RenderPage() {
             <DeadlineSection deadline={task.data.deadline} />
             <TagsSection tags={task.data.tags} />
             <SubTasksSection subTasks={task.subTasks} />
-            <EditTaskButton taskId={taskIdNumber} onTaskUpdated={(updatedTask: Task) => {
+            <EditTaskButton taskId={taskIdNumber} task={task} onTaskUpdated={() => {
                 setEditTask(false)
                 refreshTask()
             }} />
