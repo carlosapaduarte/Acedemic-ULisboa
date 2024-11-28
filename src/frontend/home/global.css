@@ -25,9 +25,9 @@ html {
 
 /* min body height */
 
-body {
-    min-height: 100vh;
-}
+/*body {
+    min-height: 100%;
+}*/
 
 /* responsive images/videos */
 img,

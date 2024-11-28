@@ -43,9 +43,10 @@ function ChallengeLogo() {
             </div>
             <div className={styles.challengeAndTrophiesContainer}>
                 <img src="icons/medal_icon.svg" alt="Medal" width={50} height={50}
-                     style={{ marginTop: "-5px" }} />
+                     className={styles.medalIcon} />
                 <h1 className={styles.challengeText}>CHALLENGE</h1>
-                <img src="icons/trophy_icon2.svg" alt="Trophy" width={50} height={50} />
+                <img src="icons/trophy_icon2.svg" alt="Trophy" width={50} height={50}
+                     className={styles.trophyIcon} />
             </div>
         </div>
     );
@@ -69,20 +70,27 @@ function TrackerLogo() {
 
 export default function Index() {
     const { t } = useTranslation("common");
+
     return (
-        <div className={styles.homePage}>
-            <h1 className={styles.homePageTitle}>
-                <span><span className={styles.homePageTitleAce}>ACE</span>demic</span>
-                <span style={{marginRight: "10px"}}> </span>
-                <div className={styles.homePageTitleHome}>
-                    <img src="icons/home_title_icon.svg" alt="Home" width={45} height={45} style={{marginTop: "5px", marginRight: "5px"}}/>
-                    HOME
+        <div className={styles.homePageContainer}>
+            <div className={styles.homePage}>
+                <h1 className={styles.homePageTitle}>
+                <span className={styles.homePageTitleAcedemicTextContainer}>
+                    <span className={styles.homePageTitleAce}>ACE</span>
+                    <span className={styles.homePageTitleDemic}>DEMIC</span>
+                </span>
+                    <span style={{ marginRight: "10px" }}> </span>
+                    <div className={styles.homePageTitleHomeContainer}>
+                        <img src="icons/home_title_icon.svg" alt="Home" width={50} height={50}
+                             className={styles.homeTitleIcon} />
+                        <span className={styles.homePageTitleHomeText}>HOME</span>
+                    </div>
+                </h1>
+                <h1 className={styles.homePageSubTitle}>{t("common:home_page_subtitle")}</h1>
+                <div className={styles.optionCardsContainer}>
+                    <ChallengeCard />
+                    <TrackerCard />
                 </div>
-            </h1>
-            <h1 className={styles.homePageSubTitle}>{t("common:home_page_subtitle")}</h1>
-            <div className={styles.optionCardsContainer}>
-                <ChallengeCard />
-                <TrackerCard />
             </div>
         </div>
     );
