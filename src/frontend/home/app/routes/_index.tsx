@@ -11,6 +11,7 @@ function ChallengeCard() {
         <a
             href={href}
             className={classNames(styles.optionCard, styles.challengeCard)}
+            aria-label={`Acedemic Challenge - ${t("common:challenge_card_description")}`}
         >
             <ChallengeLogo />
             <p className={styles.challengeCardDescription}>{t("common:challenge_card_description")}</p>
@@ -27,6 +28,7 @@ function TrackerCard() {
         <a
             href={href}
             className={classNames(styles.optionCard, styles.trackerCard)}
+            aria-label={`Acedemic Tracker - ${t("common:tracker_card_description")}`}
         >
             <TrackerLogo />
             <p className={styles.trackerCardDescription}>{t("common:tracker_card_description")}</p>
@@ -42,10 +44,10 @@ function ChallengeLogo() {
                 <h1 className={styles.demicText}>DEMIC</h1>
             </div>
             <div className={styles.challengeAndTrophiesContainer}>
-                <img src="icons/medal_icon.svg" alt="Medal" width={50} height={50}
+                <img src="icons/medal_icon.svg" alt="" width={50} height={50}
                      className={styles.medalIcon} />
                 <h1 className={styles.challengeText}>CHALLENGE</h1>
-                <img src="icons/trophy_icon2.svg" alt="Trophy" width={50} height={50}
+                <img src="icons/trophy_icon2.svg" alt="" width={50} height={50}
                      className={styles.trophyIcon} />
             </div>
         </div>
@@ -74,14 +76,16 @@ export default function Index() {
     return (
         <div className={styles.homePageContainer}>
             <div className={styles.homePage}>
-                <h1 className={styles.homePageTitle}>
-                <span className={styles.homePageTitleAcedemicTextContainer}>
-                    <span className={styles.homePageTitleAce}>ACE</span>
-                    <span className={styles.homePageTitleDemic}>DEMIC</span>
-                </span>
+                <h1 className={styles.homePageTitle}
+                    aria-label="Acedemic Home"
+                >
+                    <span className={styles.homePageTitleAcedemicTextContainer}>
+                        <span className={styles.homePageTitleAce}>ACE</span>
+                        <span className={styles.homePageTitleDemic}>DEMIC</span>
+                    </span>
                     <span style={{ marginRight: "10px" }}> </span>
                     <div className={styles.homePageTitleHomeContainer}>
-                        <img src="icons/home_title_icon.svg" alt="Home" width={50} height={50}
+                        <img src="icons/home_title_icon.svg" alt="" width={50} height={50}
                              className={styles.homeTitleIcon} />
                         <span className={styles.homePageTitleHomeText}>HOME</span>
                     </div>

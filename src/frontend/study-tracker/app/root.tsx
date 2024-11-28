@@ -74,7 +74,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             />
             <Meta />
             <Links />
-            <title>Acedemic Tracker</title>
         </head>
         <body>
         {children}

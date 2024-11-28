@@ -49,7 +49,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <meta name="viewport" content="width=device-width, initial-scale=1" />
             <Meta />
             <Links />
-            <title>Acedemic Home</title>
         </head>
         <body>
         {children}
@@ -62,7 +61,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
     return <div className="app">
-        <Outlet />
+        <main className="mainContentContainer">
+            <Outlet />
+        </main>
         <Footer />
     </div>;
 }

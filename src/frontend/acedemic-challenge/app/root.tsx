@@ -73,7 +73,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             />
             <Meta />
             <Links />
-            <title>Acedemic Challenge</title>
         </head>
         <body>
         {children}
