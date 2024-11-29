@@ -27,12 +27,13 @@
     "slot_date_to_work": "Date to work",
     "slot_ending_time": "Ending time",
     "slot_starting_time": "Starting time",
-    "slot_to_work": "Slot to work",
+    "slot_to_work": "Slot {{number}}",
     "slots_to_work_label": "Slots to work",
     "subtasks_label": "Subtasks",
     "tags_label": "Tags",
     "tags_list_title": "Tags:",
     "title_label": "Title",
     "unset_date": "Unset date",
-    "unset_time_range": "Unset time range"
+    "unset_time_range": "Unset time range",
+    "time_range": "{{startTime}} to {{endTime}}"
 }

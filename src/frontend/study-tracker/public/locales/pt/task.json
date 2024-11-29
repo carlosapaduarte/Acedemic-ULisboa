@@ -27,12 +27,13 @@
     "slot_date_to_work": "Data para trabalhar",
     "slot_ending_time": "Hora de término",
     "slot_starting_time": "Hora de início",
-    "slot_to_work": "Espaço de trabalho",
+    "slot_to_work": "Espaço {{number}}",
     "slots_to_work_label": "Espaços de trabalho",
     "subtasks_label": "Subtasks",
     "tags_label": "Tags",
     "tags_list_title": "Tags:",
     "title_label": "Título",
     "unset_date": "Data não definida",
-    "unset_time_range": "Intervalo de tempo não definido"
+    "unset_time_range": "Intervalo de tempo não definido",
+    "time_range": "{{startTime}} até {{endTime}}"
 }
