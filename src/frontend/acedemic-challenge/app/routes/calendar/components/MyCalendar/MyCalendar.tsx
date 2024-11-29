@@ -174,9 +174,10 @@ function Day(
                 ? <img
                     src={"icons/lock_icon.svg"}
                     className={classNames(
-                    styles.dayChallengeCompleteIndicator,
-                    styles.locked
-                )} alt={"Locked"}></img>
+                        styles.dayChallengeCompleteIndicator,
+                        styles.locked,
+                        { [styles.notCurrentMonth]: !isCurrentMonth }
+                    )} alt={"Locked"}></img>
                 : null
             }
         </div>

@@ -99,6 +99,23 @@
     text-wrap: nowrap;
 }
 
+.challengeIncompleteTag {
+    padding: 0.25rem;
+
+    background-color: transparent;
+
+    outline: 2px solid black;
+    outline-offset: -2px;
+
+    color: black;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
+
+    opacity: 0.6;
+}
+
 .challengeDescriptionContainer {
     width: 100%;
     flex-grow: 1;
@@ -161,6 +178,32 @@
     align-items: center;
     justify-content: center;
     color: white;
+}
+
+.challengeLockedTagContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.challengeLockedLockIcon {
+    margin-top: -3px;
+}
+
+.challengeLockedTag {
+    padding: 0.25rem;
+
+    background-color: transparent;
+
+    outline: 2px solid black;
+    outline-offset: -2px;
+
+    color: black;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
 }
 
 @media (min-width: 568px) {

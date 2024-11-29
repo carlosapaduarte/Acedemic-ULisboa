@@ -18,7 +18,7 @@ export default function Challenges({ currentBatchDay, onMarkComplete, onViewNote
     return (
         <div className={styles.challengeWrapper}>
             {
-                challenges.length == 1 ?
+                currentBatchDay.level == 1 || currentBatchDay.level == 2 ?
                     <div key={challenges[0].id}
                          className={styles.challengeContentContainer}>
                         <div className={styles.challengeContentScrollWrapper}>
@@ -33,7 +33,9 @@ export default function Challenges({ currentBatchDay, onMarkComplete, onViewNote
                                             {t("dashboard:challenge_completed")}
                                         </div>
                                         :
-                                        <></>
+                                        <div className={styles.challengeIncompleteTag}>
+                                            {t("dashboard:challenge_incomplete")}
+                                        </div>
                                 }
                             </div>
                             <p className={styles.challengeDescription}>
@@ -69,29 +71,54 @@ export default function Challenges({ currentBatchDay, onMarkComplete, onViewNote
                                 <h1 className={styles.currentDayText}>
                                     {t("dashboard:day")} {currentDayNumber}
                                 </h1>
-                                {challenges.map((challenge: Challenge) => {
-                                    return (
-                                        <div key={challenge.id}
-                                             className={styles.challengeContentContainer}
-                                             style={{ overflow: "visible" }}>
-                                            <div className={styles.challengeContentScrollWrapper}>
-                                                <div className={styles.challengeTitleContainer}>
-                                                    <h2 className={styles.challengeTitle}>{challenge.title}</h2>
-                                                    {
-                                                        challenge.completionDate != null ?
-                                                            <div className={styles.challengeCompleteTag}>
-                                                                {t("dashboard:challenge_completed")}
-                                                            </div>
-                                                            :
-                                                            <></>
-                                                    }
+                                <div className={styles.dayContentContainer}>
+                                    <div className={styles.dayContentScrollWrapper}>
+                                        {challenges.map((challenge: Challenge) => {
+                                            return (
+                                                <div key={challenge.id}
+                                                     className={styles.challengeContentContainer}>
+                                                    <div className={styles.challengeContentScrollWrapper}>
+                                                        <div className={styles.challengeTitleContainer}>
+                                                            <h2 className={styles.challengeTitle}>{challenge.title}</h2>
+                                                            {
+                                                                challenge.completionDate != null ?
+                                                                    <div className={styles.challengeCompleteTag}>
+                                                                        {t("dashboard:challenge_completed")}
+                                                                    </div>
+                                                                    :
+                                                                    <div className={styles.challengeIncompleteTag}>
+                                                                        {t("dashboard:challenge_incomplete")}
+                                                                    </div>
+                                                            }
+                                                        </div>
+                                                        <p className={styles.challengeDescription}>
+                                                            {challenge.description}
+                                                        </p>
+                                                        {
+                                                            challenge.completionDate != null ?
+                                                                <></>
+                                                                :
+                                                                <div className={styles.buttonsContainer}>
+
+                                                                    <button className={styles.completeChallengeButton}
+                                                                            onClick={() => onMarkComplete(challenge)}>
+                                                                        {t("dashboard:mark_complete")}
+                                                                    </button>
+
+                                                                </div>
+                                                        }
+                                                    </div>
                                                 </div>
-                                                <p className={styles.challengeDescription}>
-                                                    {challenge.description}
-                                                </p>
-                                            </div>
-                                        </div>);
-                                })}
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                                <div className={styles.buttonsContainer}>
+                                    <button className={styles.viewEditNotesButton}
+                                            onClick={() => onViewNotesButtonClick()}>
+                                        {t("dashboard:view_edit_notes")}
+                                    </button>
+                                </div>
                             </div>
                         }
                     </>

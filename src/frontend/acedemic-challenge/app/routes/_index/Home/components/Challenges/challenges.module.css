@@ -4,11 +4,28 @@
     display: flex;
 }
 
-.challengeContentContainer {
+.dayContentContainer {
     display: flex;
     flex-direction: column;
     justify-content: start;
     overflow: hidden;
+}
+
+.dayContentScrollWrapper {
+    width: 100%;
+    overflow: auto;
+    padding-right: 1rem;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.challengeContentContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
 }
 
 .challengeContentScrollWrapper {
@@ -19,6 +36,7 @@
 
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
 .currentDayText {
@@ -28,9 +46,8 @@
 
 .challengeTitleContainer {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .challengeTitle {
@@ -47,7 +64,7 @@
     font-weight: 400;
     text-align: left;
     width: 100%;
-    margin-bottom: 1rem;
+    /*margin-bottom: 1rem;*/
 }
 
 .batchDayNotes {
@@ -99,4 +116,21 @@
     font-size: 1rem;
     padding: 0.25rem;
     text-transform: uppercase;
+}
+
+.challengeIncompleteTag {
+    padding: 0.25rem;
+
+    background-color: transparent;
+
+    outline: 2px solid white;
+    outline-offset: -2px;
+
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-wrap: nowrap;
+
+    opacity: 0.6;
 }

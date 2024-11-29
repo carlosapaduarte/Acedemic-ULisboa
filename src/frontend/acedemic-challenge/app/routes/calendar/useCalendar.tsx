@@ -34,12 +34,14 @@ export function useCalendar() {
 
         batches?.forEach((batch) => {
             batchDays.get(batch.id)?.forEach((batchDay) => {
+                const newBatchDay = { ...batchDay, level: batch.level };
+
                 if (batch.id == currentBatch?.id && batchDay.id > currentDayIndex + 1) {
-                    unreachedDays.push(batchDay);
+                    unreachedDays.push(newBatchDay);
 
                     return;
                 }
-                daysWithChallenges.push(batchDay);
+                daysWithChallenges.push(newBatchDay);
             });
         });
 

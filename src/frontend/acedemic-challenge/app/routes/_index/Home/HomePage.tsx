@@ -35,9 +35,15 @@ function useHomePage() {
 
         const completedCount = batchChallenges.reduce(
             (acc, batchDay) => {
-                return acc + (batchDay.challenges[0].completionDate ? 1 : 0); // TODO: Check if this is the correct way to check for completion
+                const _acc = 0;
+                batchDay.challenges.forEach(challenge => {
+                    if (challenge.completionDate) {
+                        acc++;
+                    }
+                })
+                return acc + _acc; // TODO: Check if this is the correct way to check for completion
             }, 0);
-        setProgress(completedCount / batchChallenges.length * 100);
+        setProgress(completedCount / batchChallenges.flatMap(b => b.challenges).length * 100);
     }, [batchDays]);
 
     const currentBatchDays =

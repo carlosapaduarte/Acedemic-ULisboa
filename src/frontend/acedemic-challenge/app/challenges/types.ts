@@ -6,6 +6,7 @@ export type Challenge = {
 }
 
 export type BatchDay = {
+    level: number;
     id: number,
     challenges: Challenge[],
     notes: string,

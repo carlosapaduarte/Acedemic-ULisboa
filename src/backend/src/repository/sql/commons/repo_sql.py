@@ -59,7 +59,7 @@ class CommonsSqlRepo(CommonsRepo):
                 challenges: list[Challenge] = []
                 for challenge in batch_day.challenges:
                     challenges.append(Challenge(challenge.id, challenge.completion_date))
-
+                challenges.sort(key=lambda c: c.id)
                 batch_days.append(BatchDay(batch_day.id, challenges, batch_day.notes))
 
             batches.append(Batch(batch.id, batch.start_date, batch.level, batch_days))

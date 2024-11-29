@@ -8,14 +8,17 @@ import styles from "./calendarPage.module.css";
 
 const logger = new Logger({ name: "Calendar" });
 
-function DayContent({ daysWithChallenges, selectedDate }: {
+function DayContent({ daysWithChallenges, unreachedDays, selectedDate }: {
     daysWithChallenges: BatchDay[],
+    unreachedDays: BatchDay[],
     selectedDate: Date
 }) {
     return (
         <div className={`${styles.challengesContainerWrapper}`}>
             <div className={`${styles.challengesContainer}`}>
-                <SelectedDayChallengeInfo daysWithChallenges={daysWithChallenges} selectedDay={selectedDate} />
+                <SelectedDayChallengeInfo daysWithChallenges={daysWithChallenges}
+                                          unreachedDays={unreachedDays}
+                                          selectedDay={selectedDate} />
             </div>
         </div>
     );
@@ -39,6 +42,7 @@ function MainContent() {
                                         onDayClickHandler={handleDateClick} />
                             <DayContent
                                 daysWithChallenges={daysWithChallenges}
+                                unreachedDays={unreachedDays}
                                 selectedDate={selectedDate}
                             />
                         </>

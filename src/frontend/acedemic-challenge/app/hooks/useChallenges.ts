@@ -55,7 +55,8 @@ export function useChallenges() {
                 id: storedBatchDay.id,
                 challenges: storedBatchDay.challenges.map((storedChallenge) => getFullChallenge(batch.level, storedChallenge, t)),
                 notes: storedBatchDay.notes,
-                date: new Date(batch.startDate * 1000 + 1000 * 3600 * 24 * (storedBatchDay.id - 1))
+                date: new Date(batch.startDate * 1000 + 1000 * 3600 * 24 * (storedBatchDay.id - 1)),
+                level: batch.level
             }));
     }
 
@@ -72,7 +73,7 @@ export function useChallenges() {
                 const currentBatch: Batch = sortedBatches[0];
                 setCurrentBatch(currentBatch);
 
-                const DEBUG_DAY_OFFSET = 14;
+                const DEBUG_DAY_OFFSET = 0;
                 const DEBUG_TIME_OFFSET = 1000 * 3600 * 24 * DEBUG_DAY_OFFSET;
 
                 // Calculate the current day index for the most recent batch
