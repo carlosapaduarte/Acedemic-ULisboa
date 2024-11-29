@@ -19,7 +19,11 @@ function useWelcomePage() {
     return { isLoggedIn, handleOnProceedClick };
 }
 
-function InfoPage1({ handleOnNextClick }: { handleOnNextClick: () => void }) {
+function InfoPage1({ handleOnNextClick }: {
+    handleOnNextClick: () => void
+}) {
+    const { t } = useTranslation(["welcome_page"]);
+
     return (
         <>
             <div className={styles.studyImageContainer}>
@@ -27,46 +31,53 @@ function InfoPage1({ handleOnNextClick }: { handleOnNextClick: () => void }) {
                      className={styles.studyImage} />
             </div>
             <h1 className={styles.titleHeading}>
-                Boost your study.
+                {t("welcome_page:info_page_1_title")}
             </h1>
             <p className={classNames(styles.descriptionText)}>
-                Lorem ipsum odor amet, consectetuer adipiscing elit. Euismod facilisis massa, sit phasellus ac sodales
-                per quis. Fusce ultrices mollis fusce pellentesque est rhoncus. Condimentum taciti gravida ante lacinia
-                nulla rhoncus.
+                {t("welcome_page:info_page_1_description")}
             </p>
             <div className={classNames(styles.navigationContainer)}>
-                <div style={{ color: "var(--color-2)" }}>
+                {/*<div style={{ color: "var(--color-2)" }}>
                     Placeholder
-                </div>
+                </div>*/}
+                {/*<button className={styles.proceedButton} onClick={handleOnPreviousClick}>
+                    {t("welcome_page:previous")}
+                </button>*/}
                 <button className={styles.proceedButton} onClick={handleOnNextClick}>
-                    Next
+                    {t("welcome_page:next")}
                 </button>
             </div>
         </>
     );
 }
 
-function InfoPage2({ handleOnProceedClick }: { handleOnProceedClick: () => void }) {
+function InfoPage2({ handleOnNextClick, handleOnPreviousClick }: {
+    handleOnPreviousClick: () => void,
+    handleOnNextClick: () => void
+}) {
+    const { t } = useTranslation(["welcome_page"]);
+
     return (
         <>
             <h1 className={styles.titleHeading}>
-                ACE your tests!
+                {t("welcome_page:info_page_2_title")}
             </h1>
             <p className={classNames(styles.descriptionText)}>
-                Lorem ipsum odor amet, consectetuer adipiscing elit. Euismod facilisis massa, sit phasellus ac sodales
-                per quis. Fusce ultrices mollis fusce pellentesque est rhoncus. Condimentum taciti gravida ante lacinia
-                nulla rhoncus.
+                {t("welcome_page:info_page_2_description")}
             </p>
             <div className={styles.studyImageContainer}>
                 <img src="study2.png" alt="A boy writing in a paper"
                      className={styles.studyImage} />
             </div>
             <div className={classNames(styles.navigationContainer)}>
-                <div style={{ color: "var(--color-2)" }}>
+                {/*<div style={{ color: "var(--color-2)" }}>
                     Placeholder
-                </div>
-                <button className={styles.proceedButton} onClick={handleOnProceedClick}>
-                    Next
+                </div>*/}
+                <button className={styles.proceedButton} onClick={handleOnPreviousClick}>
+                    {t("welcome_page:previous")}
+                </button>
+                <button className={styles.proceedButton} onClick={handleOnNextClick}>
+                    {t("welcome_page:next")}
                 </button>
             </div>
         </>
@@ -81,7 +92,9 @@ function renderInfoPage(currentPage: InfoPage, handleOnNextClick: () => void,
         case 1:
             return <InfoPage1 handleOnNextClick={handleOnNextClick} />;
         case 2:
-            return <InfoPage2 handleOnProceedClick={handleOnProceedClick} />;
+            return <InfoPage2 handleOnPreviousClick={() => {
+            }}
+                              handleOnNextClick={handleOnProceedClick} />;
     }
 }
 
@@ -103,7 +116,9 @@ export default function WelcomePage() {
                 <InfoPage1 handleOnNextClick={() => setCurrentPage(2)} />
             </div>
             <div className={classNames(styles.welcomePage, styles.second, currentPage == 2 && styles.active)}>
-                <InfoPage2 handleOnProceedClick={handleOnProceedClick} />
+                <InfoPage2
+                    handleOnPreviousClick={() => setCurrentPage(1)}
+                    handleOnNextClick={handleOnProceedClick} />
             </div>
         </div>
     );

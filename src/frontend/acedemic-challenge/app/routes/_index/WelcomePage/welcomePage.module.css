@@ -95,6 +95,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
 }
 
 .proceedButton {
@@ -103,10 +104,12 @@
     --cut-button-background-color: var(--color-4);
     --cut-button-background-color-hover: var(--color-4-hover);
 
+    flex-basis: 50%;
+    flex-grow: 1;
+
     margin-bottom: 1rem;
     margin-top: 1rem;
     height: 3rem;
-    width: 8rem;
 
     font-size: 1.25rem;
     font-weight: 700;

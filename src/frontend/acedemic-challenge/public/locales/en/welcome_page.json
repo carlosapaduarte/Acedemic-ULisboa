@@ -1,5 +1,10 @@
 {
-    "description": "Imagine what it would be like to transform your academic performance in three weeks... Seems impossible? Studies show that it only takes 21 days to change or implement a habit. The '21 Days Self-Efficacy Challenge' harnesses that science to help you create more effective study habits and, with that, change your academic trajectory. Are you ready to make the most of your university experience? Start today and see the difference 21 days can make!",
-    "proceed": "Proceed",
+    "info_page_1_title": "21 Days",
+    "info_page_2_title": "For Success",
+    "info_page_1_description": "Imagine what it would be like to transform your academic performance in three weeks... Seems impossible? Studies show that it only takes 21 days to change or implement a habit. ",
+    "info_page_2_description": "The “Acedemic Challenge” harnesses that science to help you create more effective study habits and, with that, change your academic trajectory. Are you ready to make the most of your university experience? Start today and see the difference 21 days can make!",
+
+    "previous": "Previous",
+    "next": "Next",
     "title": "Welcome Page"
 }
