@@ -65,11 +65,13 @@ export function ChallengesList(
     {
         batch,
         batchDays,
+        listedBatchDays,
         onMarkCompleteClickHandler,
         onNoteAddClick
     }: {
         batch: Batch | undefined,
         batchDays: BatchDay[] | undefined,
+        listedBatchDays: BatchDay[] | undefined,
         onMarkCompleteClickHandler: (challenge: Challenge, batchDay: BatchDay, batch: Batch) => void,
         onNoteAddClick: (batchDayNumber: number, notesText: string) => void
     }) {
@@ -89,7 +91,7 @@ export function ChallengesList(
     return (
         <>
             {
-                batch == undefined || batchDays == undefined || batchLevel == 1 || batchLevel == 2
+                batch == undefined || batchDays == undefined || listedBatchDays == undefined || batchLevel == 1 || batchLevel == 2
                     ? <Level1And2ChallengesList
                         batchDays={batchDays}
                         currentBatchDayNumber={currentBatchDayNumber}
@@ -104,6 +106,7 @@ export function ChallengesList(
                     : <Level3ChallengesList
                         batch={batch}
                         batchDays={batchDays}
+                        listedBatchDays={listedBatchDays}
                         onMarkCompleteClickHandler={onMarkCompleteClickHandler}
                         onNoteAddClick={onNoteAddClick}
                     />

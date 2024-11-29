@@ -53,19 +53,26 @@ function useChallengesPage() {
             });
     }
 
-    return { listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick };
+    return { batchDays, listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick };
 }
 
 export default function ChallengesPage() {
     const { t } = useTranslation(["challenge_overview"]);
-    const { listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick } = useChallengesPage();
+    const {
+        batchDays,
+        listedBatchDays,
+        onMarkCompleteClickHandler,
+        selectedBatch,
+        onNoteAddClick
+    } = useChallengesPage();
 
     return (
         <div className={`${styles.challengesPage}`}>
             <div className={`${styles.mainContent}`}>
                 <div className={`${styles.challengesListContainer}`}>
                     <ChallengesList batch={selectedBatch}
-                                    batchDays={listedBatchDays}
+                                    batchDays={selectedBatch != undefined ? batchDays?.get(selectedBatch.id) : undefined}
+                                    listedBatchDays={listedBatchDays}
                                     onMarkCompleteClickHandler={onMarkCompleteClickHandler}
                                     onNoteAddClick={onNoteAddClick} />
                 </div>

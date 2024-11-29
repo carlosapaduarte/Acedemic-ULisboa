@@ -22,19 +22,21 @@ function DayContent({ daysWithChallenges, selectedDate }: {
 }
 
 function MainContent() {
-    const { daysWithChallenges, selectedDate, handleDateClick } = useCalendar();
+    const { daysWithChallenges, unreachedDays, selectedDate, handleDateClick } = useCalendar();
 
     return (
         <div className={`${styles.mainContent}`}>
             {
-                daysWithChallenges == undefined ?
+                daysWithChallenges == undefined || unreachedDays == undefined ?
                     <h1 className={`${styles.loadingTextContainer}`}>
                         {`Loading Challenges and Calendar...`}
                     </h1>
                     :
                     (
                         <>
-                            <MyCalendar daysWithChallenges={daysWithChallenges} onDayClickHandler={handleDateClick} />
+                            <MyCalendar daysWithChallenges={daysWithChallenges}
+                                        unreachedDays={unreachedDays}
+                                        onDayClickHandler={handleDateClick} />
                             <DayContent
                                 daysWithChallenges={daysWithChallenges}
                                 selectedDate={selectedDate}

@@ -10,18 +10,22 @@ import styles from "./lvl3ChallengesList.module.css";
 function Level3ChallengeListItem(
     {
         completed,
-        challengeIndex,
+        idCount,
+        completedIdCount,
         challengeTitle,
         challengeDescription,
         onMarkComplete
     }: {
         completed: boolean,
-        challengeIndex: number,
+        idCount: number,
+        completedIdCount: number,
         challengeTitle: string,
         challengeDescription: string,
         onMarkComplete: () => void
     }) {
     const { t } = useTranslation(["dashboard", "challenge_overview"]);
+
+    const challengeCompletionPercentage = (completedIdCount / idCount * 100).toFixed(2);
 
     return (
         <div className={classNames(styles.challengeBoxLvl3)}>
@@ -29,10 +33,10 @@ function Level3ChallengeListItem(
                 <div className={styles.challengeBoxChallengeCompletionIndicatorContainer}>
                     <div className={styles.challengeBoxChallengeCompletionIndicator}>
                         <div className={styles.challengeBoxChallengeCompletionIndicatorPercentage}>
-                            52.38%
+                            {challengeCompletionPercentage}%
                         </div>
                         <div className={styles.challengeBoxChallengeCompletionIndicatorFraction}>
-                            (11/21)
+                            ({completedIdCount}/{idCount})
                         </div>
                     </div>
                 </div>
@@ -73,11 +77,13 @@ export function Level3ChallengesList(
     {
         batch,
         batchDays,
+        listedBatchDays,
         onMarkCompleteClickHandler,
         onNoteAddClick
     }: {
         batch: Batch,
         batchDays: BatchDay[],
+        listedBatchDays: BatchDay[],
         onMarkCompleteClickHandler: (challenge: Challenge, batchDay: BatchDay, batch: Batch) => void,
         onNoteAddClick: (batchDayNumber: number, notesText: string) => void
     }
@@ -86,9 +92,9 @@ export function Level3ChallengesList(
 
     const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
 
-    const currentBatchDayNumber: number = batchDays.length;
+    const currentBatchDayNumber: number = listedBatchDays.length;
 
-    const notes = batchDays[currentBatchDayNumber - 1].notes;
+    const notes = listedBatchDays[currentBatchDayNumber - 1].notes;
 
     return (
         <>
@@ -111,22 +117,24 @@ export function Level3ChallengesList(
                 </button>
             </div>
             <div className={styles.challengesList}>
-                {batchDays[currentBatchDayNumber - 1]
+                {listedBatchDays[currentBatchDayNumber - 1]
                     .challenges
                     .sort((a, b) => a.id - b.id)
                     .map((challenge, index) => {
-                        const title = challenge.title;
-                        const description = challenge.description;
-                        const completed = challenge.completionDate != null;
+                        const idCount = batchDays.flatMap(batchDay => batchDay.challenges)
+                            .filter(challenge_IdCount => challenge_IdCount.id == challenge.id).length;
+                        const completedIdCount = batchDays.flatMap(batchDay => batchDay.challenges)
+                            .filter(challenge_IdCount => challenge_IdCount.id == challenge.id && challenge_IdCount.completionDate != null).length;
 
                         return <Level3ChallengeListItem
                             key={index}
-                            completed={completed}
-                            challengeIndex={index}
-                            challengeTitle={title}
-                            challengeDescription={description}
+                            completed={challenge.completionDate != null}
+                            idCount={idCount}
+                            completedIdCount={completedIdCount}
+                            challengeTitle={challenge.title}
+                            challengeDescription={challenge.description}
                             onMarkComplete={() => {
-                                onMarkCompleteClickHandler(challenge, batchDays[currentBatchDayNumber - 1], batch);
+                                onMarkCompleteClickHandler(challenge, listedBatchDays[currentBatchDayNumber - 1], batch);
                             }}
                         />;
                     })

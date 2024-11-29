@@ -95,7 +95,7 @@
 }
 
 .calendarDayContainer.notCurrentMonth {
-    opacity: 0.75;
+    opacity: 0.35;
 }
 
 .calendarDayContainerWrapper .dayChallengeCompleteIndicator {
@@ -111,10 +111,18 @@
     line-height: 1rem;
 
     pointer-events: none;
+
+    &.notCurrentMonth {
+        opacity: 0.75;
+    }
 }
 
 .calendarDayContainerWrapper .calendarDayContainer:active + .dayChallengeCompleteIndicator {
     transform: translate(1px, -1px);
+}
+
+.calendarDayContainerWrapper .dayChallengeCompleteIndicator.locked {
+    background-color: transparent;
 }
 
 .calendarDayText {

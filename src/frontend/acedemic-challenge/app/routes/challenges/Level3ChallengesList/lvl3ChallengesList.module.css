@@ -133,6 +133,17 @@
     gap: 0.5rem;
 }
 
+.completeChallengeButton {
+    --cut-button-background-color: var(--color-4);
+    --cut-button-background-color-hover: var(--color-4-hover);
+    color: black;
+}
+
+.challengeCompleteTag {
+    outline: 2px solid var(--color-4);
+    outline-offset: -2px;
+}
+
 .challengeIncompleteTag {
     outline-color: white;
     color: white;

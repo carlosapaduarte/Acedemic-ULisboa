@@ -128,11 +128,12 @@ function WeekHeader() {
 
 function Day(
     {
-        day, onDayClick, hasChallenge, selected, completed
+        day, onDayClick, hasChallenge, selected, reached, completed
     }: {
         day: CalendarDay, onDayClick: (day: CalendarDay) => void,
         selected: boolean,
         hasChallenge: boolean,
+        reached: boolean,
         completed: boolean
     }
 ) {
@@ -163,7 +164,19 @@ function Day(
                 </h1>
             </button>
             {completed
-                ? <div className={styles.dayChallengeCompleteIndicator}>!</div>
+                ? <div className={classNames(
+                    styles.dayChallengeCompleteIndicator,
+                    { [styles.notCurrentMonth]: !isCurrentMonth }
+                )}>!</div>
+                : null
+            }
+            {!reached
+                ? <img
+                    src={"icons/lock_icon.svg"}
+                    className={classNames(
+                    styles.dayChallengeCompleteIndicator,
+                    styles.locked
+                )} alt={"Locked"}></img>
                 : null
             }
         </div>
@@ -172,9 +185,11 @@ function Day(
 
 function CalendarDays(
     {
-        batchDays, visibleMonth, onDayClick
+        batchDays, unreachedDays, visibleMonth, onDayClick
     }: {
-        batchDays: BatchDay[], visibleMonth: Date, onDayClick: (day: CalendarDay) => void
+        batchDays: BatchDay[],
+        unreachedDays: BatchDay[],
+        visibleMonth: Date, onDayClick: (day: CalendarDay) => void
     }) {
     const { currentDays } = useCalendarDays(visibleMonth);
     const [selectedDay, setSelectedDay] = useState<CalendarDay>({
@@ -206,6 +221,7 @@ function CalendarDays(
                              completed={batchDays.find((batchDay) =>
                                  utils.sameDay(batchDay.date, day.date))?.challenges.every((challenge) =>
                                  challenge.completionDate !== null) ?? false}
+                             reached={!unreachedDays.some((batchDay) => utils.sameDay(batchDay.date, day.date))}
                         />
                     );
                 })
@@ -216,25 +232,29 @@ function CalendarDays(
 
 function CalendarGrid(
     {
-        challenges, visibleMonth, onDayClick
+        batchDays, unreachedDays, visibleMonth, onDayClick
     }: {
-        challenges: BatchDay[],
+        batchDays: BatchDay[],
+        unreachedDays: BatchDay[],
         visibleMonth: Date, onDayClick: (day: CalendarDay) => void
     }
 ) {
     return (
         <div className={`${styles.calendarGridContainer}`}> {/*${styles.switched}*/}
             <WeekHeader />
-            <CalendarDays batchDays={challenges} visibleMonth={visibleMonth} onDayClick={onDayClick} />
+            <CalendarDays batchDays={batchDays}
+                          unreachedDays={unreachedDays}
+                          visibleMonth={visibleMonth} onDayClick={onDayClick} />
         </div>
     );
 }
 
 export function MyCalendar(
     {
-        daysWithChallenges, onDayClickHandler
+        daysWithChallenges, unreachedDays, onDayClickHandler
     }: {
         daysWithChallenges: BatchDay[],
+        unreachedDays: BatchDay[],
         onDayClickHandler: (day: CalendarDay) => void
     }
 ) {
@@ -243,7 +263,9 @@ export function MyCalendar(
     return (
         <div className={`${styles.myCalendar}`}>
             <ChangeViewButtons visibleMonth={visibleMonth} onButtonClick={monthChangeActionHandler} />
-            <CalendarGrid challenges={daysWithChallenges} visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
+            <CalendarGrid batchDays={daysWithChallenges}
+                          unreachedDays={unreachedDays}
+                          visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
         </div>
     );
 }
