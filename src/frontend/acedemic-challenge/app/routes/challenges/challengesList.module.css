@@ -84,6 +84,10 @@
     opacity: 0.6;
 }
 
+.challengeCompleteTag, .challengeIncompleteTag {
+    font-size: clamp(0.8rem, 5vw - 2px, 1rem);
+}
+
 .challengeDescription {
     margin-bottom: 0.5rem;
 

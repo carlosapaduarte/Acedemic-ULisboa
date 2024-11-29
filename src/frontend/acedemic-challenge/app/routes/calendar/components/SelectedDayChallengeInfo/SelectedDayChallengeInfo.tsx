@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "../../calendarPage.module.css";
 import { useNavigate } from "@remix-run/react";
+import classNames from "classnames";
 
 function useSelectedBatchDay({ reachedBatchDays, unreachedBatchDays, selectedDay }: {
     reachedBatchDays: BatchDay[],
@@ -113,7 +114,6 @@ export default function SelectedDayChallengeInfo({ reachedBatchDays, unreachedBa
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                             <button
                                 className={`${styles.seeMoreButton}`}
@@ -159,47 +159,61 @@ export default function SelectedDayChallengeInfo({ reachedBatchDays, unreachedBa
     } else if (selectedBatchDay.level == 3) {
         return (
             <>
-                <h2 className={`${styles.challengeTitle}`}>
-                    {t("challenge_overview:day", { day: selectedBatchDay.id })}
-                </h2>
-                {
-                    !reached ?
-                        <div className={styles.challengeLockedTagContainer}>
-                            {/*src="icons/lock_icon.svg"*/}
-                            <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24"
-                                 width="30" height="30"
-                                 fill="black"
-                                 className={styles.challengeLockedLockIcon}>
-                                <path
-                                    d="M19,8V7A7,7,0,0,0,5,7V8H2V21a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V8ZM13,18H11V14h2ZM17,8H7V7A5,5,0,0,1,17,7Z" />
-                            </svg>
-                            <div className={styles.challengeLockedTag}>
-                                {t("dashboard:challenges_locked")}
-                            </div>
-                        </div>
-                        :
-                        selectedBatchDay.challenges.map((challenge: Challenge, index: number) =>
-                            <div key={index}>
-                                <div className={`${styles.challengeTitleContainer}`}>
-                                    <h2 className={`${styles.challengeTitle}`}>
-                                        {challenge.title}
-                                    </h2>
-                                    {
-                                        challenge.completionDate != null ?
-                                            <div className={styles.challengeCompleteTag}>
-                                                {t("dashboard:challenge_completed")}
-                                            </div>
-                                            :
-                                            <div className={styles.challengeIncompleteTag}>
-                                                {t("dashboard:challenge_incomplete")}
-                                            </div>
-                                    }
+                <div className={classNames(
+                    styles.challengeTextContainer,
+                    styles.challengeTextContainerLvl3
+                )}>
+                    <h2 className={`${styles.challengeTitle}`}>
+                        {t("challenge_overview:day", { day: selectedBatchDay.id })}
+                    </h2>
+                    {
+                        !reached ?
+                            <div className={styles.challengeLockedTagContainer}>
+                                {/*src="icons/lock_icon.svg"*/}
+                                <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1"
+                                     viewBox="0 0 24 24"
+                                     width="30" height="30"
+                                     fill="black"
+                                     className={styles.challengeLockedLockIcon}>
+                                    <path
+                                        d="M19,8V7A7,7,0,0,0,5,7V8H2V21a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V8ZM13,18H11V14h2ZM17,8H7V7A5,5,0,0,1,17,7Z" />
+                                </svg>
+                                <div className={styles.challengeLockedTag}>
+                                    {t("dashboard:challenges_locked")}
                                 </div>
-                                <p className={`${styles.challengeDescription}`}>
-                                    {challenge.description}
-                                </p>
                             </div>
-                        )
+                            :
+                            selectedBatchDay.challenges.map((challenge: Challenge, index: number) =>
+                                <div key={index}>
+                                    <div className={`${styles.challengeTitleContainer}`}>
+                                        <h2 className={`${styles.challengeTitle}`}>
+                                            {challenge.title}
+                                        </h2>
+                                        {
+                                            challenge.completionDate != null ?
+                                                <div className={styles.challengeCompleteTag}>
+                                                    {t("dashboard:challenge_completed")}
+                                                </div>
+                                                :
+                                                <div className={styles.challengeIncompleteTag}>
+                                                    {t("dashboard:challenge_incomplete")}
+                                                </div>
+                                        }
+                                    </div>
+                                    <p className={`${styles.challengeDescription}`}>
+                                        {challenge.description}
+                                    </p>
+                                </div>
+                            )
+                    }
+                </div>
+                {
+                    <button
+                        className={`${styles.seeMoreButton}`}
+                        onClick={() => navigate(`/challenges?day=${selectedBatchDay.id}`)}
+                    >
+                        {t("calendar:see_more_button_text")}
+                    </button>
                 }
             </>
         );
