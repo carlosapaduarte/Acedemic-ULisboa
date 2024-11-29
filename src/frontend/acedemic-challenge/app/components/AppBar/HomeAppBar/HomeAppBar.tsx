@@ -90,7 +90,7 @@ export function NavBar() {
                           iconAlt={"Challenges Icon"} />
             <NavBarButton text="Calendar" url={"/calendar"} iconSrc={"icons/calendar_icon.svg"}
                           iconAlt={"Calendar Icon"} />
-            <NavBarButton text="Badges" url={"/badges"} iconSrc={"icons/badges_icon.svg"} iconAlt={"Badges Icon"} />
+            {/*<NavBarButton text="Badges" url={"/badges"} iconSrc={"icons/badges_icon.svg"} iconAlt={"Badges Icon"} />*/}
         </div>
     );
 }
