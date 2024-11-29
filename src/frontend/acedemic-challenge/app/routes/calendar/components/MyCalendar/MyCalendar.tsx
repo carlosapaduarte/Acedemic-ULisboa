@@ -186,10 +186,10 @@ function Day(
 
 function CalendarDays(
     {
-        batchDays, unreachedDays, visibleMonth, onDayClick
+        reachedBatchDays, unreachedBatchDays, visibleMonth, onDayClick
     }: {
-        batchDays: BatchDay[],
-        unreachedDays: BatchDay[],
+        reachedBatchDays: BatchDay[],
+        unreachedBatchDays: BatchDay[],
         visibleMonth: Date, onDayClick: (day: CalendarDay) => void
     }) {
     const { currentDays } = useCalendarDays(visibleMonth);
@@ -202,7 +202,9 @@ function CalendarDays(
         year: new Date().getFullYear()
     });
 
-    const daysWithChallenges = batchDays.map((challenge) => {
+    const allBatchDays: BatchDay[] = reachedBatchDays.concat(unreachedBatchDays);
+
+    const daysWithChallenges = allBatchDays.map((challenge) => {
         return challenge.date.toDateString();
     });
 
@@ -219,10 +221,10 @@ function CalendarDays(
                                  setSelectedDay(day);
                                  onDayClick(day);
                              }}
-                             completed={batchDays.find((batchDay) =>
+                             completed={reachedBatchDays.find((batchDay) =>
                                  utils.sameDay(batchDay.date, day.date))?.challenges.every((challenge) =>
                                  challenge.completionDate !== null) ?? false}
-                             reached={!unreachedDays.some((batchDay) => utils.sameDay(batchDay.date, day.date))}
+                             reached={!unreachedBatchDays.some((batchDay) => utils.sameDay(batchDay.date, day.date))}
                         />
                     );
                 })
@@ -233,18 +235,18 @@ function CalendarDays(
 
 function CalendarGrid(
     {
-        batchDays, unreachedDays, visibleMonth, onDayClick
+        reachedBatchDays, unreachedBatchDays, visibleMonth, onDayClick
     }: {
-        batchDays: BatchDay[],
-        unreachedDays: BatchDay[],
+        reachedBatchDays: BatchDay[],
+        unreachedBatchDays: BatchDay[],
         visibleMonth: Date, onDayClick: (day: CalendarDay) => void
     }
 ) {
     return (
         <div className={`${styles.calendarGridContainer}`}> {/*${styles.switched}*/}
             <WeekHeader />
-            <CalendarDays batchDays={batchDays}
-                          unreachedDays={unreachedDays}
+            <CalendarDays reachedBatchDays={reachedBatchDays}
+                          unreachedBatchDays={unreachedBatchDays}
                           visibleMonth={visibleMonth} onDayClick={onDayClick} />
         </div>
     );
@@ -252,10 +254,10 @@ function CalendarGrid(
 
 export function MyCalendar(
     {
-        daysWithChallenges, unreachedDays, onDayClickHandler
+        reachedBatchDays, unreachedBatchDays, onDayClickHandler
     }: {
-        daysWithChallenges: BatchDay[],
-        unreachedDays: BatchDay[],
+        reachedBatchDays: BatchDay[],
+        unreachedBatchDays: BatchDay[],
         onDayClickHandler: (day: CalendarDay) => void
     }
 ) {
@@ -264,8 +266,8 @@ export function MyCalendar(
     return (
         <div className={`${styles.myCalendar}`}>
             <ChangeViewButtons visibleMonth={visibleMonth} onButtonClick={monthChangeActionHandler} />
-            <CalendarGrid batchDays={daysWithChallenges}
-                          unreachedDays={unreachedDays}
+            <CalendarGrid reachedBatchDays={reachedBatchDays}
+                          unreachedBatchDays={unreachedBatchDays}
                           visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
         </div>
     );

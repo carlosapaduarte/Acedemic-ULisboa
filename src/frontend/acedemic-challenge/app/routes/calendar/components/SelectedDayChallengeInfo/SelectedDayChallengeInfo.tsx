@@ -5,24 +5,24 @@ import { useTranslation } from "react-i18next";
 import styles from "../../calendarPage.module.css";
 import { useNavigate } from "@remix-run/react";
 
-function useSelectedBatchDay({ daysWithChallenges, unreachedDays, selectedDay }: {
-    daysWithChallenges: BatchDay[],
-    unreachedDays: BatchDay[],
+function useSelectedBatchDay({ reachedBatchDays, unreachedBatchDays, selectedDay }: {
+    reachedBatchDays: BatchDay[],
+    unreachedBatchDays: BatchDay[],
     selectedDay: Date
 }) {
     const [selectedBatchDay, setSelectedBatchDay] = useState<BatchDay>();
 
     useEffect(() => {
         const days: BatchDay[] = [];
-        days.push(...daysWithChallenges);
-        days.push(...unreachedDays);
+        days.push(...reachedBatchDays);
+        days.push(...unreachedBatchDays);
 
         setSelectedBatchDay(
             days.filter((batchDay: BatchDay) => {
                 return utils.sameDay(batchDay.date, selectedDay);
             })[0]
         );
-    }, [daysWithChallenges, selectedDay]);
+    }, [reachedBatchDays, selectedDay]);
 
     return { selectedBatchDay };
 }
@@ -63,19 +63,19 @@ function useDescriptionLineClamp({ selectedBatchDay }: { selectedBatchDay: Batch
     }, [selectedBatchDay]);
 }
 
-export default function SelectedDayChallengeInfo({ daysWithChallenges, unreachedDays, selectedDay }: {
-    daysWithChallenges: BatchDay[],
-    unreachedDays: BatchDay[],
+export default function SelectedDayChallengeInfo({ reachedBatchDays, unreachedBatchDays, selectedDay }: {
+    reachedBatchDays: BatchDay[],
+    unreachedBatchDays: BatchDay[],
     selectedDay: Date
 }) {
-    const { selectedBatchDay } = useSelectedBatchDay({ daysWithChallenges, unreachedDays, selectedDay });
+    const { selectedBatchDay } = useSelectedBatchDay({ reachedBatchDays, unreachedBatchDays, selectedDay });
     const { t } = useTranslation(["calendar", "dashboard", "challenge_overview"]);
     const navigate = useNavigate();
 
     useDescriptionLineClamp({ selectedBatchDay });
 
     const reached = selectedBatchDay != undefined
-        ? !unreachedDays.some((batchDay) => utils.sameDay(batchDay.date, selectedBatchDay.date))
+        ? !unreachedBatchDays.some((batchDay) => utils.sameDay(batchDay.date, selectedBatchDay.date))
         : false;
 
     if (selectedBatchDay == undefined || selectedBatchDay.challenges.length == 0) {
@@ -90,34 +90,70 @@ export default function SelectedDayChallengeInfo({ daysWithChallenges, unreached
         const challenge = selectedBatchDay.challenges[0];
         return (
             <>
-                <div className={`${styles.challengeTextContainer}`}>
-                    <div className={`${styles.challengeTitleContainer}`}>
-                        <h2 className={`${styles.challengeTitle}`}>
-                            {selectedBatchDay.id} - {challenge.title}
-                        </h2>
-                        {
-                            challenge.completionDate != null ?
-                                <div className={styles.challengeCompleteTag}>
-                                    {t("dashboard:challenge_completed")}
+                {
+                    !reached ?
+                        <>
+                            <div className={`${styles.challengeTextContainer}`}>
+                                <div className={`${styles.challengeTitleContainer}`}>
+                                    <h2 className={`${styles.challengeTitle}`}>
+                                        {selectedBatchDay.id} - ?
+                                    </h2>
+                                    <div className={styles.challengeLockedTagContainer}>
+                                        {/*src="icons/lock_icon.svg"*/}
+                                        <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1"
+                                             viewBox="0 0 24 24"
+                                             width="30" height="30"
+                                             fill="black"
+                                             className={styles.challengeLockedLockIcon}>
+                                            <path
+                                                d="M19,8V7A7,7,0,0,0,5,7V8H2V21a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V8ZM13,18H11V14h2ZM17,8H7V7A5,5,0,0,1,17,7Z" />
+                                        </svg>
+                                        <div className={styles.challengeLockedTag}>
+                                            {t("dashboard:challenge_locked")}
+                                        </div>
+                                    </div>
                                 </div>
-                                :
-                                <div className={styles.challengeIncompleteTag}>
-                                    {t("dashboard:challenge_incomplete")}
+
+                            </div>
+                            <button
+                                className={`${styles.seeMoreButton}`}
+                                onClick={() => navigate(`/challenges?day=${selectedBatchDay.id}`)}
+                            >
+                                {t("calendar:see_more_button_text")}
+                            </button>
+                        </>
+                        :
+                        <>
+                            <div className={`${styles.challengeTextContainer}`}>
+                                <div className={`${styles.challengeTitleContainer}`}>
+                                    <h2 className={`${styles.challengeTitle}`}>
+                                        {selectedBatchDay.id} - {challenge.title}
+                                    </h2>
+                                    {
+                                        challenge.completionDate != null ?
+                                            <div className={styles.challengeCompleteTag}>
+                                                {t("dashboard:challenge_completed")}
+                                            </div>
+                                            :
+                                            <div className={styles.challengeIncompleteTag}>
+                                                {t("dashboard:challenge_incomplete")}
+                                            </div>
+                                    }
                                 </div>
-                        }
-                    </div>
-                    <div className={`${styles.challengeDescriptionContainer}`}>
-                        <p className={`${styles.challengeDescription}`}>
-                            {challenge.description}
-                        </p>
-                    </div>
-                </div>
-                <button
-                    className={`${styles.seeMoreButton}`}
-                    onClick={() => navigate(`/challenges?day=${selectedBatchDay.id}`)}
-                >
-                    {t("calendar:see_more_button_text")}
-                </button>
+                                <div className={`${styles.challengeDescriptionContainer}`}>
+                                    <p className={`${styles.challengeDescription}`}>
+                                        {challenge.description}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                className={`${styles.seeMoreButton}`}
+                                onClick={() => navigate(`/challenges?day=${selectedBatchDay.id}`)}
+                            >
+                                {t("calendar:see_more_button_text")}
+                            </button>
+                        </>
+                }
             </>
         );
     } else if (selectedBatchDay.level == 3) {
@@ -160,7 +196,7 @@ export default function SelectedDayChallengeInfo({ daysWithChallenges, unreached
                                     }
                                 </div>
                                 <p className={`${styles.challengeDescription}`}>
-                                {challenge.description}
+                                    {challenge.description}
                                 </p>
                             </div>
                         )

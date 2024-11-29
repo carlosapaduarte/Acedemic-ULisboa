@@ -12,8 +12,8 @@ export function useCalendar() {
         fetchUserInfo
     } = useChallenges();
 
-    const [daysWithChallenges, setDaysWithChallenges] = useState<BatchDay[] | undefined>(undefined);
-    const [unreachedDays, setUnreachedDays] = useState<BatchDay[] | undefined>(undefined);
+    const [reachedBatchDays, setReachedBatchDays] = useState<BatchDay[] | undefined>(undefined);
+    const [unreachedBatchDays, setUnreachedBatchDays] = useState<BatchDay[] | undefined>(undefined);
 
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
@@ -29,7 +29,7 @@ export function useCalendar() {
         if (batches == undefined || batchDays == undefined)
             return;
 
-        const daysWithChallenges: BatchDay[] = [];
+        const reachedDays: BatchDay[] = [];
         const unreachedDays: BatchDay[] = [];
 
         batches?.forEach((batch) => {
@@ -45,17 +45,25 @@ export function useCalendar() {
 
                     return;
                 }
-                daysWithChallenges.push(newBatchDay);
+                reachedDays.push(newBatchDay);
             });
         });
 
-        setDaysWithChallenges(daysWithChallenges);
-        setUnreachedDays(unreachedDays);
+        setReachedBatchDays(reachedDays);
+        setUnreachedBatchDays(unreachedDays);
     }, [batches, batchDays]);
 
     const handleDateClick = (clickedDay: CalendarDay) => {
         setSelectedDate(clickedDay.date);
     };
 
-    return { batches, currentBatch, daysWithChallenges, unreachedDays, selectedDate, handleDateClick, fetchUserInfo };
+    return {
+        batches,
+        currentBatch,
+        reachedBatchDays,
+        unreachedBatchDays,
+        selectedDate,
+        handleDateClick,
+        fetchUserInfo
+    };
 }

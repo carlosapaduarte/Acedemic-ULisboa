@@ -9,16 +9,16 @@ import { useTranslation } from "react-i18next";
 
 const logger = new Logger({ name: "Calendar" });
 
-function DayContent({ daysWithChallenges, unreachedDays, selectedDate }: {
-    daysWithChallenges: BatchDay[],
-    unreachedDays: BatchDay[],
+function DayContent({ reachedBatchDays, unreachedBatchDays, selectedDate }: {
+    reachedBatchDays: BatchDay[],
+    unreachedBatchDays: BatchDay[],
     selectedDate: Date
 }) {
     return (
         <div className={`${styles.challengesContainerWrapper}`}>
             <div className={`${styles.challengesContainer}`}>
-                <SelectedDayChallengeInfo daysWithChallenges={daysWithChallenges}
-                                          unreachedDays={unreachedDays}
+                <SelectedDayChallengeInfo reachedBatchDays={reachedBatchDays}
+                                          unreachedBatchDays={unreachedBatchDays}
                                           selectedDay={selectedDate} />
             </div>
         </div>
@@ -27,7 +27,7 @@ function DayContent({ daysWithChallenges, unreachedDays, selectedDate }: {
 
 function MainContent() {
     const {
-        daysWithChallenges, unreachedDays, selectedDate, handleDateClick, fetchUserInfo,
+        reachedBatchDays, unreachedBatchDays, selectedDate, handleDateClick, fetchUserInfo,
         batches, currentBatch
     } = useCalendar();
 
@@ -36,19 +36,19 @@ function MainContent() {
     return (
         <div className={`${styles.mainContent}`}>
             {
-                daysWithChallenges == undefined || unreachedDays == undefined ?
+                reachedBatchDays == undefined || unreachedBatchDays == undefined ?
                     <h1 className={`${styles.loadingTextContainer}`}>
                         {`Loading Challenges and Calendar...`}
                     </h1>
                     :
                     (
                         <>
-                            <MyCalendar daysWithChallenges={daysWithChallenges}
-                                        unreachedDays={unreachedDays}
+                            <MyCalendar reachedBatchDays={reachedBatchDays}
+                                        unreachedBatchDays={unreachedBatchDays}
                                         onDayClickHandler={handleDateClick} />
                             <DayContent
-                                daysWithChallenges={daysWithChallenges}
-                                unreachedDays={unreachedDays}
+                                reachedBatchDays={reachedBatchDays}
+                                unreachedBatchDays={unreachedBatchDays}
                                 selectedDate={selectedDate}
                             />
                         </>
