@@ -10,12 +10,26 @@ import { useTranslation } from "react-i18next";
 export function getEnergyIconByEnergyLevel(energyLevel: number): string {
     const prefix = "icons/";
     let filename = "";
-    if (energyLevel >= 9) filename = "energy_very_good_icon.png";
-    else if (energyLevel >= 7) filename = "energy_good_icon.png";
-    else if (energyLevel >= 5) filename = "energy_bad_icon.png";
+    if (energyLevel >= 4) filename = "energy_very_good_icon.png";
+    else if (energyLevel >= 3) filename = "energy_good_icon.png";
+    else if (energyLevel >= 2) filename = "energy_bad_icon.png";
     else filename = "energy_very_bad_icon.png";
 
     return prefix + filename;
+}
+
+export function levelToStr(level: number): string {
+    if (level >= 4) return "Very Well";
+    if (level >= 3) return "Well";
+    if (level >= 2) return "Bad";
+    return "Very Bad";
+}
+
+function levelToColor(level: number): string {
+    if (level >= 4) return styles.veryWellColor;
+    if (level >= 3) return styles.goodColor;
+    if (level >= 2) return styles.mediumColor;
+    return styles.badColor;
 }
 
 function EnergyStatus({ status }: { status: DailyEnergyStatus }) {
@@ -68,20 +82,6 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
     );
 }
 
-export function levelToStr(level: number): string {
-    if (level >= 4) return "Very Well";
-    if (level >= 3) return "Well";
-    if (level >= 2) return "Bad";
-    return "Very Bad";
-}
-
-function levelToColor(level: number): string {
-    if (level >= 9) return styles.veryWellColor;
-    if (level >= 7) return styles.goodColor;
-    if (level >= 5) return styles.mediumColor;
-    return styles.badColor;
-}
-
 function TodayDate() {
     const { t } = useTranslation(["statistics"]);
     const today = new Date();
@@ -92,7 +92,7 @@ function TodayDate() {
     );
 }
 
-//const tags = ["sleep weel", "sports", "healthy food", "sun", "friends"]
+//const tags = ["sleep well", "sports", "healthy food", "sun", "friends"]
 
 function Tags({ dailyTags }: { dailyTags: string[] }) {
     return (
