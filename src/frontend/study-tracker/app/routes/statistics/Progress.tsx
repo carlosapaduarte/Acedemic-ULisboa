@@ -155,7 +155,7 @@ export function Progress() {
             <div className={styles.statsContainer}>
                 <div className={styles.statsContainerTitle}>
                     <img
-                        src="public/icons/task_progress_icon.svg"
+                        src="icons/task_progress_icon.svg"
                         alt="Task progress icon"
                         className={styles.titleImg}
                     />

@@ -228,7 +228,7 @@ export function TaskDistribution() {
             <div className={styles.statsContainer}>
                 <div className={styles.statsContainerTitle}>
                     <img
-                        src="public/icons/workload_distribution_icon.svg"
+                        src="icons/workload_distribution_icon.svg"
                         alt="Workload distribution icon"
                         className={styles.titleImg}
                     />
