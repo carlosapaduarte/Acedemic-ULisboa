@@ -1,7 +1,17 @@
-import { json, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
+import {
+    isRouteErrorResponse,
+    json,
+    Links,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    useLoaderData,
+    useRouteError
+} from "@remix-run/react";
 import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 
-import "global.css";
+import "~/global.css";
 import { Footer } from "~/components/Footer/Footer";
 import i18next from "~/i18next.server";
 import { useTranslation } from "react-i18next";
@@ -66,4 +76,37 @@ export default function App() {
         </main>
         <Footer />
     </div>;
+}
+
+export function ErrorBoundary() {
+    const error = useRouteError();
+
+    const { t } = useTranslation(["error"]);
+
+    if (isRouteErrorResponse(error)) {
+        if (error.status === 404) {
+            return (
+                <h1>
+                    404 Not Found
+                </h1>
+                /*<NotFoundPage />*/
+            );
+        }
+        return (
+            <div>
+                <h1>
+                    {error.status} {error.statusText}
+                </h1>
+                <p>{error.data}</p>
+            </div>
+        );
+    } else if (error instanceof Error) {
+        return (
+            <div>
+                <h1>{t("error:title")}</h1>
+            </div>
+        );
+    } else {
+        return <h1>Unknown Error</h1>;
+    }
 }
