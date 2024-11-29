@@ -121,8 +121,8 @@ const DeadlineSection = React.memo(function DeadlineSection({ deadline, setDeadl
 }) {
     const { t } = useTranslation(["task"]);
 
-    const [date, setDate] = useState<string>("");
-    const [time, setTime] = useState<string>("");
+    const [date, setDate] = useState<string>(deadline?.toISOString().split("T")[0] ?? "");
+    const [time, setTime] = useState<string>(deadline?.toISOString().split("T")[1].split(".")[0] ?? "");
 
     useEffect(() => {
         if (date) {

@@ -202,7 +202,7 @@ function RenderPage() {
             <PrioritySection priority={task.data.priority} />
             <DeadlineSection deadline={task.data.deadline} />
             <TagsSection tags={task.data.tags} />
-            <SubTasksSection subTasks={task.subTasks} />
+            {/*<SubTasksSection subTasks={task.subTasks} />*/}
             <EditTaskButton taskId={taskIdNumber} task={task} onTaskUpdated={() => {
                 setEditTask(false)
                 refreshTask()

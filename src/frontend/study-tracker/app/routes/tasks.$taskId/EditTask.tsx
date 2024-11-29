@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { service, Task } from "~/service/service";
 
 import { Button, Dialog, DialogTrigger, Modal } from "react-aria-components";
@@ -13,7 +13,7 @@ import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { SecondModalContext } from "../tasks/CreateTask/SecondModalContext";
 
 
-function useEditTask() {
+function useEditTask(task: Task) {
     const [title, setTitle] = useState<string | undefined>(undefined);
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [deadline, setDeadline] = useState<Date | undefined>(undefined);
@@ -24,6 +24,19 @@ function useEditTask() {
 
     const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (task) {
+            setTitle(task.data.title);
+            setDescription(task.data.description);
+            setDeadline(task.data.deadline);
+            setPriority(task.data.priority);
+            setStatus(task.data.status);
+            /*setSubTasks(task.data.subTasks);
+            setSlotsToWork(task.data.slotsToWork);*/
+            setSelectedTags(task.data.tags);
+        }
+    }, [task]);
 
     function clearFields() {
         setTitle(undefined);
@@ -100,7 +113,7 @@ const EditTaskModal = React.memo(function CreateTaskModal({ taskId, task, onTask
         appendSubSubTask,
         subTasks,
         clearFields
-    } = useEditTask();
+    } = useEditTask(task);
 
     const { t } = useTranslation(["task"]);
 
