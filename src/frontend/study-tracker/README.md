@@ -5,12 +5,12 @@
 ### 1. User Onboarding and Personalization
 
 - **User Account Setup**:
-  - Integration with ULisboa accounts for seamless login.
-  - Option to set username, avatar, and email manually if ULisboa integration is unavailable.
+    - Integration with ULisboa accounts for seamless login.
+    - Option to set username, avatar, and email manually if ULisboa integration is unavailable.
 
 - **User Preferences**:
-  - Weekly planning prompts.
-  - Option to share progress with peers or keep it private.
+    - Weekly planning prompts.
+    - Option to share progress with peers or keep it private.
 
 ---
 
@@ -55,7 +55,8 @@
 
 ---
 
-This app combines advanced planning, monitoring, and engagement tools to support students in achieving academic success and personal growth.
+This app combines advanced planning, monitoring, and engagement tools to support students in achieving academic success
+and personal growth.
 
 ---
 

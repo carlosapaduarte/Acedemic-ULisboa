@@ -71,7 +71,7 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({ slotsToWork,
     const { t } = useTranslation(["task"]);
     const [slotAddingQueue, setSlotAddingQueue] = useState<number[]>([]);
 
-    const [slotsToWorkNumber, setSlotsToWorkNumber] = useState(slotsToWork.length)
+    const [slotsToWorkNumber, setSlotsToWorkNumber] = useState(slotsToWork.length);
 
     function addToSlotAddingQueue(index: number) {
         setSlotAddingQueue((slotAddingQueue) => [...slotAddingQueue, index]);
@@ -87,18 +87,18 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({ slotsToWork,
             </h2>
             <div className={styles.slotsToWorkContainer}>
                 {Array.from({ length: slotsToWorkNumber }).map((_, index) => (
-                    <SlotToWork 
-                        key={index} 
-                        index={index} 
-                        newlyAdded={slotAddingQueue.includes(index)} 
+                    <SlotToWork
+                        key={index}
+                        index={index}
+                        newlyAdded={slotAddingQueue.includes(index)}
                         onClosePressed={(slot: SlotToWorkDto | undefined) => {
                             if (slot) {
-                                console.log(slot)
-                                const newSlotsToWork = [...slotsToWork]
-                                newSlotsToWork.push(slot)
-                                setSlotsToWork(newSlotsToWork)
+                                console.log(slot);
+                                const newSlotsToWork = [...slotsToWork];
+                                newSlotsToWork.push(slot);
+                                setSlotsToWork(newSlotsToWork);
                             } else
-                                console.log("Invalid date")
+                                console.log("Invalid date");
                         }}
                     />
                 ))}

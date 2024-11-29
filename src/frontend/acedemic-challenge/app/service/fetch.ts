@@ -40,23 +40,23 @@ export async function doFetch(
         const headers: any = {};
 
         // Adds Content Type only if body is of type JSON
-        const isBodyTypeJson = !(request.body == undefined || request.body instanceof FormData)
+        const isBodyTypeJson = !(request.body == undefined || request.body instanceof FormData);
         if (isBodyTypeJson) {
-            const contentType = isBodyTypeJson ? CONTENT_TYPE_JSON : undefined
-            headers["Content-Type"] = contentType
+            const contentType = isBodyTypeJson ? CONTENT_TYPE_JSON : undefined;
+            headers["Content-Type"] = contentType;
         }
 
         // Add JWT token if is stored in local cache
-        const jwt = localStorage["jwt"]
+        const jwt = localStorage["jwt"];
         if (jwt) {
-            const auth = jwt ? `bearer ${localStorage["jwt"]}` : undefined
-            headers["Authorization"] = auth
+            const auth = jwt ? `bearer ${localStorage["jwt"]}` : undefined;
+            headers["Authorization"] = auth;
         }
 
         // If body is JSON, format with {}
-        let formattedBody: any = request.body
+        let formattedBody: any = request.body;
         if (isBodyTypeJson)
-            formattedBody = toJsonString(formattedBody)
+            formattedBody = toJsonString(formattedBody);
 
         try {
             const res = await fetch(toFullUrl(request), {
@@ -67,9 +67,9 @@ export async function doFetch(
             });
 
             if (res.status == 401)
-                return Promise.reject(new NotAuthorizedError())
+                return Promise.reject(new NotAuthorizedError());
 
-            return res
+            return res;
         } catch (error: any) {
             // Network exception!
             return Promise.reject(new NetworkError(error.message));

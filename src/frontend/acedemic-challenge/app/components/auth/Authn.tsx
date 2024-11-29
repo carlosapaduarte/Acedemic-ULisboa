@@ -52,8 +52,8 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
             service.testTokenValidity()
                 .then(() => {
                     logger.debug("User is logged in");
-                    setIsLoggedIn(true)
-                })
+                    setIsLoggedIn(true);
+                });
         }
 
         fetchUser();

@@ -17,7 +17,7 @@ export function SettingsButton() {
            className={classNames(styles.settingsButton)}
            onClick={(e) => {
                e.preventDefault();
-               navigate("/settings")
+               navigate("/settings");
            }}>
             <IconContext.Provider value={{
                 className: classNames(styles.settingsButtonIcon)

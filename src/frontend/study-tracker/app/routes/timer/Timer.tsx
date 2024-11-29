@@ -29,8 +29,8 @@ export function Timer({ title, stopDate, onStart, onStopClick, onFinish }: {
         useTimer({ expiryTimestamp: stopDate, onExpire: onFinish });
 
     useEffect(() => {
-        onStart()
-    }, [])
+        onStart();
+    }, []);
 
     // This should not be necessary, but, whenever argument [stopDate] changes, the counter doesn't restart, despite the change in [stopDate]
     useEffect(() => {

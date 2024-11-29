@@ -17,7 +17,7 @@ function useTask(
     const setGlobalError = useSetGlobalError();
     const [task, setTask] = useState<Task | undefined>(undefined);
 
-    
+
     useEffect(() => {
         if (!tasks || !taskId) {
             return;
@@ -32,7 +32,7 @@ function useTask(
         service.getTask(task.id)
             .then((updatedTask: Task) => {
                 //console.log(updatedTask)
-                setTask(updatedTask)
+                setTask(updatedTask);
             })
             .catch((error) => setGlobalError(error));
     }
@@ -42,11 +42,11 @@ function useTask(
             return;
         }
         service.updateTaskStatus(task.id, newStatus)
-        .then(() => {
-            refreshTask();
-            refreshTasks();
-        })
-        .catch((error) => setGlobalError(error));
+            .then(() => {
+                refreshTask();
+                refreshTasks();
+            })
+            .catch((error) => setGlobalError(error));
     }
 
     return { task, refreshTask, updateTaskStatus };
@@ -171,17 +171,17 @@ function RenderPage() {
     const { t } = useTranslation(["task"]);
 
     const { taskId } = useParams();
-    
+
     const { tasks, refreshTasks } = useOutletContext<{ tasks: Task[], refreshTasks: () => void }>();
-    
+
     const {
         task,
         refreshTask,
         updateTaskStatus
     } = useTask(tasks, refreshTasks, taskId);
-    
-    const [editTask, setEditTask] = useState(false)
-    
+
+    const [editTask, setEditTask] = useState(false);
+
     if (!tasks) {
         return <h2>Loading task...</h2>;
     }
@@ -190,11 +190,11 @@ function RenderPage() {
         return <h2>Task not found</h2>;
     }
 
-    const taskIdNumber = taskId ? parseInt(taskId, 10) : undefined
+    const taskIdNumber = taskId ? parseInt(taskId, 10) : undefined;
     if (!taskIdNumber) {
         return <h2>Task ID is not valid</h2>;
     }
-    
+
     return (
         <div className={styles.mainTaskContainer}>
             <TitleAndCheckboxSection task={task} updateTaskStatus={updateTaskStatus} />
@@ -204,8 +204,8 @@ function RenderPage() {
             <TagsSection tags={task.data.tags} />
             {/*<SubTasksSection subTasks={task.subTasks} />*/}
             <EditTaskButton taskId={taskIdNumber} task={task} onTaskUpdated={() => {
-                setEditTask(false)
-                refreshTask()
+                setEditTask(false);
+                refreshTask();
             }} />
         </div>
     );

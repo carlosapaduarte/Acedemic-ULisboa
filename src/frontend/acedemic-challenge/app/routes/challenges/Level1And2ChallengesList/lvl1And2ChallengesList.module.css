@@ -80,6 +80,7 @@
     &:hover {
         background-color: var(--color-3-hover);
     }
+
     &:active {
         transform: translate(1px, -1px);
         box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.2) inset,

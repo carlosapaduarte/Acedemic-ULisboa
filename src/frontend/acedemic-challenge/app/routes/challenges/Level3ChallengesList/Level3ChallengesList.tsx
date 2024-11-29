@@ -37,19 +37,19 @@ function Level3ChallengeListItem(
                     </div>
                 </div>
                 <div className={styles.challengeBoxHeaderText}>
-                <p className={`${styles.challengeTitle}`}>
-                    {challengeTitle}
-                </p>
-                {
-                    completed ?
-                        <div className={styles.challengeCompleteTag}>
-                            {t("dashboard:challenge_completed")}
-                        </div>
-                        :
-                        <div className={styles.challengeIncompleteTag}>
-                            {t("dashboard:challenge_incomplete")}
-                        </div>
-                }
+                    <p className={`${styles.challengeTitle}`}>
+                        {challengeTitle}
+                    </p>
+                    {
+                        completed ?
+                            <div className={styles.challengeCompleteTag}>
+                                {t("dashboard:challenge_completed")}
+                            </div>
+                            :
+                            <div className={styles.challengeIncompleteTag}>
+                                {t("dashboard:challenge_incomplete")}
+                            </div>
+                    }
                 </div>
             </div>
             <div className={`${styles.challengeDescription}`}>
@@ -57,13 +57,13 @@ function Level3ChallengeListItem(
             </div>
             {
                 !completed &&
-                    <div className={styles.completeChallengeButtonContainer}>
-                        <button className={styles.completeChallengeButton}
-                                onClick={() => onMarkComplete()}
-                        >
-                            {t("dashboard:mark_complete")}
-                        </button>
-                    </div>
+                <div className={styles.completeChallengeButtonContainer}>
+                    <button className={styles.completeChallengeButton}
+                            onClick={() => onMarkComplete()}
+                    >
+                        {t("dashboard:mark_complete")}
+                    </button>
+                </div>
             }
         </div>
     );

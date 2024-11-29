@@ -4,17 +4,17 @@ import styles from "./statistics.module.css";
 export function Spacer() {
     return (
         <div className={styles.spacer} />
-    )
+    );
 }
 
 export function SeeFullHistory() {
     const { t } = useTranslation(["statistics"]);
     return (
         <button className={styles.seeFullHistoryButton}>
-            <img src="icons/history_icon.svg" alt="History Icon" className={styles.historyIcon}/>
+            <img src="icons/history_icon.svg" alt="History Icon" className={styles.historyIcon} />
             {t("statistics:see_full_history")}
         </button>
-    )
+    );
 }
 
 export function getWeekIntervalStr(date: Date): string {
@@ -32,7 +32,7 @@ export function getWeekIntervalStr(date: Date): string {
     // Offsets date to last day of week
     lastDayOfWeek.setDate(firstDayOfWeekDate + 6);
 
-    return `${firstDayOfWeek.getDate()} ${firstDayOfWeek.toLocaleString('default', { month: 'long' }).substring(0, 3).toUpperCase()}-${lastDayOfWeek.getDate()} ${lastDayOfWeek.toLocaleString('default', { month: 'long' }).substring(0, 3).toUpperCase()}`
+    return `${firstDayOfWeek.getDate()} ${firstDayOfWeek.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}-${lastDayOfWeek.getDate()} ${lastDayOfWeek.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}`;
 }
 
 export function CurWeekDate() {
@@ -50,5 +50,5 @@ export function NoDataYetAvailableMessage() {
         <div className={styles.noDataAvailableMessage}>
             {t("statistics:no_data_available_yet")}
         </div>
-    )
+    );
 }

@@ -10,7 +10,7 @@ function useHomePage() {
     const [displayTagsSelection, setDisplayTagsSelection] = useState<boolean | undefined>(false);
 
     useEffect(() => {
-        const promptedState = localStorage["lastEnergyQuestionPromptedDate"]
+        const promptedState = localStorage["lastEnergyQuestionPromptedDate"];
         const prompted: Date | undefined = promptedState ? new Date(promptedState) : undefined;
         const today = new Date();
         if (
@@ -27,12 +27,12 @@ function useHomePage() {
     function onQuestionAnswered() {
         const today = new Date();
         localStorage["lastEnergyQuestionPromptedDate"] = today;
-        setDisplayDailyEnergyQuestion(false) // TODO: uncomment this line. For the beta, show always to fill the home page
-        setDisplayTagsSelection(true)
+        setDisplayDailyEnergyQuestion(false); // TODO: uncomment this line. For the beta, show always to fill the home page
+        setDisplayTagsSelection(true);
     }
 
     function onTagsSubmitted() {
-        setDisplayTagsSelection(false)
+        setDisplayTagsSelection(false);
     }
 
     return {
@@ -40,7 +40,7 @@ function useHomePage() {
         displayTagsSelection,
         onQuestionAnswered,
         onTagsSubmitted
-    }
+    };
 }
 
 export default function HomePage() {
@@ -50,9 +50,9 @@ export default function HomePage() {
         displayTagsSelection,
         onQuestionAnswered,
         onTagsSubmitted
-    } = useHomePage()
+    } = useHomePage();
 
-    useAppBar("home");    
+    useAppBar("home");
 
     return (
         <div className={styles.homePage}>

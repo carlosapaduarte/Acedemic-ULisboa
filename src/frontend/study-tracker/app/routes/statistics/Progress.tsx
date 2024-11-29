@@ -1,37 +1,38 @@
 import { useEffect, useState } from "react";
-import { DailyTasksProgress, service } from "~/service/service";
+import { DailyTasksProgress } from "~/service/service";
 import styles from "./statistics.module.css";
 import { CurWeekDate, NoDataYetAvailableMessage, SeeFullHistory } from "./Commons";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
-function ProgressIcon({progress} : {progress: number}) {
+function ProgressIcon({ progress }: { progress: number }) {
     function getRandomInt(max: number) {
         return Math.floor(Math.random() * max);
     }
-      
-    const iconRotation = getRandomInt(90)
 
-    const deg = progress * 3.6
-    
-    let fillOpacity
-    let maskOpacity
-    if(progress > 50) {
-        fillOpacity = '0';
-        maskOpacity = '1';
+    const iconRotation = getRandomInt(90);
+
+    const deg = progress * 3.6;
+
+    let fillOpacity;
+    let maskOpacity;
+    if (progress > 50) {
+        fillOpacity = "0";
+        maskOpacity = "1";
     } else {
-        fillOpacity = '1';
-        maskOpacity = '0';
+        fillOpacity = "1";
+        maskOpacity = "0";
     }
 
     return (
-        <div className={styles.wrapper} style={{rotate: `${iconRotation}deg`}}>
-            <div className={classNames(styles.pie, styles.spinner)} style={{transform: 'rotate('+deg+'deg)'}}></div>
-            <div className={classNames(styles.pie, styles.filler)} style={{opacity: fillOpacity}}></div>
-            <div className={styles.mask} style={{opacity: maskOpacity}}></div>
+        <div className={styles.wrapper} style={{ rotate: `${iconRotation}deg` }}>
+            <div className={classNames(styles.pie, styles.spinner)}
+                 style={{ transform: "rotate(" + deg + "deg)" }}></div>
+            <div className={classNames(styles.pie, styles.filler)} style={{ opacity: fillOpacity }}></div>
+            <div className={styles.mask} style={{ opacity: maskOpacity }}></div>
         </div>
-    )
+    );
 }
 
 function DailyProgressStatus({ status }: { status: DailyTasksProgress }) {
@@ -43,25 +44,29 @@ function DailyProgressStatus({ status }: { status: DailyTasksProgress }) {
     );
 }
 
-function WeekDailyProgressStatus({ dailyProgress, onSeeFullHistoryClick }:
-                                 {
-                                    dailyProgress: DailyTasksProgress[],
-                                    onSeeFullHistoryClick: () => void
-                                 }) {
+function WeekDailyProgressStatus(
+    {
+        dailyProgress,
+        onSeeFullHistoryClick
+    }: {
+        dailyProgress: DailyTasksProgress[],
+        onSeeFullHistoryClick: () => void
+    }
+) {
     return (
         dailyProgress.length != 0 ?
             <>
                 <div className={styles.historyStatusAndDate}>
                     {dailyProgress
                         .sort((status1: DailyTasksProgress, status2: DailyTasksProgress) => { // sorts by increasing year and week
-                            const lower = status1.date < status2.date
+                            const lower = status1.date < status2.date;
                             if (lower)
-                                return -1
+                                return -1;
                             else {
                                 if (status1.date > status2.date)
-                                    return 1
+                                    return 1;
 
-                                return 0
+                                return 0;
                             }
                         })
                         .reverse()
@@ -72,8 +77,8 @@ function WeekDailyProgressStatus({ dailyProgress, onSeeFullHistoryClick }:
                         )
                     }
                 </div>
-                
-                <br/>
+
+                <br />
 
                 <SeeFullHistory />
             </>
@@ -82,23 +87,23 @@ function WeekDailyProgressStatus({ dailyProgress, onSeeFullHistoryClick }:
     );
 }
 
-function WeekProgressBar({progress} : {progress: number}) {
+function WeekProgressBar({ progress }: { progress: number }) {
     return (
         <div className={styles.progressBarBase}>
-            <div className={styles.progressBar} style={{width: progress+"%"}}>
-                
-            </div>        
+            <div className={styles.progressBar} style={{ width: progress + "%" }}>
+
+            </div>
         </div>
-    )
+    );
 }
 
 function useProgress() {
     const setError = useSetGlobalError();
-    const [weekProgress, setWeekProgress] = useState(0)
+    const [weekProgress, setWeekProgress] = useState(0);
     const [progressByDay, setProgressByDay] = useState<DailyTasksProgress[]>([]);
 
     useEffect(() => {
-        const today = new Date()
+        const today = new Date();
         setProgressByDay([
             {
                 date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
@@ -120,7 +125,7 @@ function useProgress() {
                 date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 4),
                 progress: 90
             }
-        ])
+        ]);
         /*
         service.getThisWeekDailyTasksProgress()
             .then((res: DailyTasksProgress[]) => {
@@ -138,21 +143,21 @@ function useProgress() {
             */
     }, []);
 
-    return {progressByDay, weekProgress}
+    return { progressByDay, weekProgress };
 }
 
 export function Progress() {
     const { t } = useTranslation(["statistics"]);
-    const {progressByDay, weekProgress} = useProgress()
-    
+    const { progressByDay, weekProgress } = useProgress();
+
     return (
         <>
             <div className={styles.statsContainer}>
                 <div className={styles.statsContainerTitle}>
-                    <img 
-                        src="public/icons/task_progress_icon.svg" 
-                        alt="Task progress icon" 
-                        className={styles.titleImg} 
+                    <img
+                        src="public/icons/task_progress_icon.svg"
+                        alt="Task progress icon"
+                        className={styles.titleImg}
                     />
                     {t("statistics:progress_container_title")}
                 </div>
@@ -161,12 +166,13 @@ export function Progress() {
                     <div className={styles.weekDate}>
                         <CurWeekDate />
                     </div>
-                    <WeekProgressBar progress={weekProgress}/>
+                    <WeekProgressBar progress={weekProgress} />
                 </div>
 
-                <br/>
+                <br />
 
-                <WeekDailyProgressStatus  dailyProgress={progressByDay} onSeeFullHistoryClick={() => {}} />
+                <WeekDailyProgressStatus dailyProgress={progressByDay} onSeeFullHistoryClick={() => {
+                }} />
             </div>
         </>
     );

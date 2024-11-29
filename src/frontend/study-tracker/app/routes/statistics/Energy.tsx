@@ -8,20 +8,21 @@ import { NoDataYetAvailableMessage, SeeFullHistory, Spacer } from "./Commons";
 import { useTranslation } from "react-i18next";
 
 export function getEnergyIconByEnergyLevel(energyLevel: number): string {
-    const prefix = "icons/"
-    let filename = ""
+    const prefix = "icons/";
+    let filename = "";
     if (energyLevel >= 9) filename = "energy_very_good_icon.png";
     else if (energyLevel >= 7) filename = "energy_good_icon.png";
     else if (energyLevel >= 5) filename = "energy_bad_icon.png";
     else filename = "energy_very_bad_icon.png";
-    
-    return prefix + filename
+
+    return prefix + filename;
 }
 
 function EnergyStatus({ status }: { status: DailyEnergyStatus }) {
     return (
         <div className={styles.textAndIconContainer}>
-            <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon" className={styles.energyHistoryStatusIcon}/>
+            <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon"
+                 className={styles.energyHistoryStatusIcon} />
             {status.date.getDate()} {status.date.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}
         </div>
     );
@@ -43,14 +44,14 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
                 <div className={styles.historyStatusAndDate}>
                     {energyHistory
                         .sort((status1: DailyEnergyStatus, status2: DailyEnergyStatus) => { // sorts by increasing year and week
-                            const lower = status1.date < status2.date
+                            const lower = status1.date < status2.date;
                             if (lower)
-                                return -1
+                                return -1;
                             else {
                                 if (status1.date > status2.date)
-                                    return 1
+                                    return 1;
 
-                                return 0
+                                return 0;
                             }
                         })
                         .reverse()
@@ -62,7 +63,7 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
                     }
                 </div>
             </>
-        :
+            :
             <NoDataYetAvailableMessage />
     );
 }
@@ -93,16 +94,16 @@ function TodayDate() {
 
 //const tags = ["sleep weel", "sports", "healthy food", "sun", "friends"]
 
-function Tags({dailyTags} : {dailyTags: string[]}) {
+function Tags({ dailyTags }: { dailyTags: string[] }) {
     return (
         <div className={styles.tagsContainer}>
             {
-                dailyTags.map((tag: string, index: number) => 
+                dailyTags.map((tag: string, index: number) =>
                     <span key={index} className={styles.energyTag}>{tag} </span>
                 )
             }
         </div>
-    )
+    );
 }
 
 function TodayEnergyStatus({ status, dailyTags }: { status: DailyEnergyStatus | undefined, dailyTags: string[] }) {
@@ -111,7 +112,8 @@ function TodayEnergyStatus({ status, dailyTags }: { status: DailyEnergyStatus | 
         <>
             {status ?
                 <div className={classNames(levelToColor(status.level), styles.todayEnergyStatusTitle)}>
-                    <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon" className={styles.icon}/>
+                    <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon"
+                         className={styles.icon} />
                     {t("statistics:i_feel")} {levelToStr(status.level)}
                 </div>
                 :
@@ -126,7 +128,7 @@ function TodayEnergyStatus({ status, dailyTags }: { status: DailyEnergyStatus | 
 function useEnergyStats() {
     const setError = useSetGlobalError();
     const [energyHistory, setEnergyHistory] = useState<DailyEnergyStatus[] | undefined>(undefined);
-    const [dailyTags, setDailyTags] = useState<string[]>([])
+    const [dailyTags, setDailyTags] = useState<string[]>([]);
 
     useEffect(() => {
         service.fetchEnergyHistory()
@@ -167,12 +169,13 @@ export function EnergyStats() {
             <div className={styles.statsContainer}>
                 <div className={styles.statsContainerTitleAndDateDiv}>
                     <div className={styles.statsContainerTitle}>
-                        <img src="icons/energy_container_title_icon.png" alt="Energy Title Icon" className={styles.titleImg}/>
+                        <img src="icons/energy_container_title_icon.png" alt="Energy Title Icon"
+                             className={styles.titleImg} />
                         {t("statistics:energy_container_title")}
                     </div>
                     <TodayDate />
                 </div>
-                
+
                 <TodayEnergyStatus status={getTodayEnergyStatus()} dailyTags={dailyTags} />
 
                 <br /><br />

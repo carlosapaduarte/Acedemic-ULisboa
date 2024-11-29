@@ -1,7 +1,6 @@
-import { useState } from "react"
-import { useTranslation } from "react-i18next"
-import { useSetGlobalError } from "~/components/error/GlobalErrorContainer"
-import { service } from "~/service/service"
+import { useTranslation } from "react-i18next";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { service } from "~/service/service";
 
 const questions = {
     "Dormir": [
@@ -17,49 +16,53 @@ const questions = {
         "festa"
     ],
     "Passatempo": []
-}
+};
 
-function Option({option, onOptionSelected} : {option: string, onOptionSelected: () => void}) {
+function Option({ option, onOptionSelected }: { option: string, onOptionSelected: () => void }) {
     return (
         <span onClick={onOptionSelected}>
             {option}
         </span>
-    )
+    );
 }
 
 // Iterates across options
-function Options({type, options, onOptionSelected} : {type: string, options: string[], onOptionSelected: (opt: string) => void}) {
+function Options({ type, options, onOptionSelected }: {
+    type: string,
+    options: string[],
+    onOptionSelected: (opt: string) => void
+}) {
     return (
         <>
             <h2>
                 Type: {type}
             </h2>
-            {options.map((option: string, index: number) => 
+            {options.map((option: string, index: number) =>
                 <Option key={index} option={option} onOptionSelected={() => onOptionSelected(option)} />
             )}
         </>
-    )
+    );
 }
 
-function QuestionsContainer({onOptionSelected} : {onOptionSelected: (opt: string) => void}) {
+function QuestionsContainer({ onOptionSelected }: { onOptionSelected: (opt: string) => void }) {
     return (
         // Iterates across types
         Object.entries(questions).map((entry, index: number) => {
-            const type: string = entry[0]
-            const options: string[] = entry[1]
+            const type: string = entry[0];
+            const options: string[] = entry[1];
             return (
                 <>
-                    <Options 
-                        key={index} 
-                        type={type} 
-                        options={options} 
+                    <Options
+                        key={index}
+                        type={type}
+                        options={options}
                         onOptionSelected={onOptionSelected}
                     />
-                    <br/>
+                    <br />
                 </>
-            )
+            );
         })
-    )
+    );
 }
 
 function Title() {
@@ -68,18 +71,18 @@ function Title() {
         <span>
             {t("statistics:what_have_you_done_lately")}
         </span>
-    )
+    );
 }
 
 function useTagsSelection() {
     const setError = useSetGlobalError();
-    const tags: string[] = []
+    const tags: string[] = [];
 
     function appendTag(tag: string) {
         if (!tags.includes(tag))
-            tags.push(tag)
+            tags.push(tag);
     }
-    
+
     function submitTags(onTagsSubmitted: () => void) {
         service.submitDailyTags(tags)
             .then(() => onTagsSubmitted)
@@ -89,26 +92,26 @@ function useTagsSelection() {
     return {
         appendTag,
         submitTags
-    }
+    };
 }
 
-export function TagsSelection({onTagsSubmitted} : {onTagsSubmitted: () => void}) {
+export function TagsSelection({ onTagsSubmitted }: { onTagsSubmitted: () => void }) {
     const {
         appendTag,
         submitTags
-    } = useTagsSelection()
+    } = useTagsSelection();
     return (
         <>
             <Title />
-            <br/>
-            
+            <br />
+
             <QuestionsContainer onOptionSelected={appendTag} />
 
-            <br/>
-            
+            <br />
+
             <button onClick={() => submitTags(onTagsSubmitted)}>
                 Confirm Selection
             </button>
         </>
-    )
+    );
 }

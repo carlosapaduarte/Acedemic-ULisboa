@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Input, Label, TextField } from "react-aria-components";
+import { Button } from "react-aria-components";
 import { useTranslation } from "react-i18next";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { service, TimeOfDay } from "~/service/service";
@@ -12,16 +12,16 @@ function useHowMuchEnergyQuestionPage(onQuestionSubmitted: () => void) {
 
     function onConfirmPressHandler() {
         function getCurTimeOfDay(): TimeOfDay {
-            const now = new Date()
-            const hour = now.getHours()
+            const now = new Date();
+            const hour = now.getHours();
             if (hour < 12)
-                return TimeOfDay.MORNING
+                return TimeOfDay.MORNING;
             if (hour < 19)
-                return TimeOfDay.AFTERNOON
-            return TimeOfDay.NIGHT
+                return TimeOfDay.AFTERNOON;
+            return TimeOfDay.NIGHT;
         }
 
-        const timeOfDay = getCurTimeOfDay()
+        const timeOfDay = getCurTimeOfDay();
 
         service.createDailyEnergyStat(level, timeOfDay)
             .catch((error) => setError(error));
@@ -46,10 +46,11 @@ export function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => vo
                 {t("statistics:secondary_message")}
             </div>
 
-            <br/>
+            <br />
 
             <div className={styles.selectedEnergyLevelIconContainer}>
-                <img src={getEnergyIconByEnergyLevel(energyLevel)} alt="Energy Status Icon" className={styles.selectedEnergyLevelIcon}/>
+                <img src={getEnergyIconByEnergyLevel(energyLevel)} alt="Energy Status Icon"
+                     className={styles.selectedEnergyLevelIcon} />
             </div>
 
             <div className={styles.energyLevelSelectedText}>
@@ -57,12 +58,12 @@ export function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => vo
             </div>
 
             <div className={styles.slideContainer}>
-                <input 
-                    type="range" 
-                    min="1" 
-                    max="10" 
-                    value={energyLevel} 
-                    className={styles.slider} onChange={(e) => setLevel(Number(e.target.value))} 
+                <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={energyLevel}
+                    className={styles.slider} onChange={(e) => setLevel(Number(e.target.value))}
                 />
             </div>
 
@@ -77,13 +78,13 @@ export function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => vo
 
             <div className={styles.buttonsContainer}>
                 <Button
-                    onPress={onConfirmPressHandler} 
+                    onPress={onConfirmPressHandler}
                     className={styles.saveButton}
                 >
                     {t("statistics:save")}
                 </Button>
 
-                <Button 
+                <Button
                     onPress={onComplete}
                     className={styles.skipButton}
                 >

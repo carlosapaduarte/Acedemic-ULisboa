@@ -103,6 +103,7 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
 @media (min-width: 1030px) {
     .challengesList {
         grid-template-columns: repeat(3, 1fr);

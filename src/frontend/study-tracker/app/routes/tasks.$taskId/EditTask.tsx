@@ -187,7 +187,12 @@ const EditTaskModal = React.memo(function CreateTaskModal({ taskId, task, onTask
 });
 
 const ModalWrapper = React.memo(function ModalWrapper(
-    { taskId, task, onTaskUpdated, children }: { taskId: number, task: Task, onTaskUpdated: () => void, children: JSX.Element }
+    { taskId, task, onTaskUpdated, children }: {
+        taskId: number,
+        task: Task,
+        onTaskUpdated: () => void,
+        children: JSX.Element
+    }
 ) {
     const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
     const [secondModalContent, setSecondModalContent] = useState<JSX.Element | undefined>(undefined);
@@ -215,7 +220,11 @@ const ModalWrapper = React.memo(function ModalWrapper(
     );
 });
 
-export function EditTaskButton({ taskId, task, onTaskUpdated }: { taskId: number, task: Task, onTaskUpdated: () => void }) {
+export function EditTaskButton({ taskId, task, onTaskUpdated }: {
+    taskId: number,
+    task: Task,
+    onTaskUpdated: () => void
+}) {
     const { t } = useTranslation(["task"]);
 
     return (

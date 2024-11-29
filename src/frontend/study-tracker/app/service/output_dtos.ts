@@ -1,4 +1,3 @@
-
 export type SlotToWorkDto = {
     start: Date
     end: Date

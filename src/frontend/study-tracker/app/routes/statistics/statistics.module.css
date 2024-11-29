@@ -37,7 +37,7 @@
         background-color: green;
         border-radius: 1em;
         font-size: 0.7em;
-        
+
         padding: 0.4em;
         margin-right: 0.5em;
         margin-bottom: 1em;
@@ -167,7 +167,7 @@
 
 .historyStatusAndDate {
     display: flex;
-    
+
     text-align: center;
     color: var(--color-2);
     font-size: 0.7em;
@@ -193,7 +193,7 @@
 }
 
 .focusContainerCurWeekStatisticValue {
-    
+
 }
 
 .focusWeeksContainer {
@@ -273,7 +273,7 @@
     .progressBarBase {
         width: 60%;
         height: 1em;
-        background-color: rgba(180,142,121,255);
+        background-color: rgba(180, 142, 121, 255);
         border-radius: 15px;
 
         .progressBar {
@@ -300,7 +300,9 @@
     --mask-color: var(--secondary-color);
 }
 
-* { box-sizing:border-box; }
+* {
+    box-sizing: border-box;
+}
 
 .wrapper {
     width: var(--size);
@@ -321,28 +323,31 @@
 }
 
 .spinner:after {
-    position:absolute;
-    width:10px;
-    height:10px;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+
     .spinner:after {
-        position:absolute;
-        width:10px;
-        height:10px;
-        background:#fff;
-        border:1px solid rgba(0,0,0,0.5);
-        box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
-        border-radius:50%;
-        top:10px;
-        right:10px;
-        content:"";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+        border-radius: 50%;
+        top: 10px;
+        right: 10px;
+        content: "";
         display: none;
-    }  background:#fff;
-    border:1px solid rgba(0,0,0,0.5);
-    box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
-    border-radius:50%;
-    top:10px;
-    right:10px;
-    content:"";
+    }
+
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    top: 10px;
+    right: 10px;
+    content: "";
     display: none;
 }
 

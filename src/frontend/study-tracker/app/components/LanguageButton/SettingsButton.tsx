@@ -18,7 +18,7 @@ export function SettingsButton({ variant = "default" }: { variant?: AppBarVarian
            className={classNames(styles.settingsButton)}
            onClick={(e) => {
                e.preventDefault();
-               navigate("/settings")
+               navigate("/settings");
            }}>
             <IconContext.Provider value={{
                 className: classNames(styles.settingsButtonIcon, styles[variant])

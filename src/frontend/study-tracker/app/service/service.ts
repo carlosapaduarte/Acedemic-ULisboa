@@ -366,13 +366,13 @@ function requestBody(newTaskInfo: CreateTaskInputDto): any {
             return {
                 startTime: slot.start.getTime() / 1000,
                 endTime: slot.end.getTime() / 1000
-            }
+            };
         })
     };
 }
 
 async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
-    console.log(newTaskInfo)
+    console.log(newTaskInfo);
     const request = {
         path: `study-tracker/users/me/tasks`,
         method: "POST",
@@ -393,10 +393,10 @@ async function updateTask(taskId: number, newTaskInfo: CreateTaskInputDto, previ
         return {
             previous_task_name: previousTaskName,
             updated_task: requestBody(newTaskInfo)
-        }
+        };
     }
 
-    console.log(toUpdateTaskInputDto(newTaskInfo, previousTaskName))
+    console.log(toUpdateTaskInputDto(newTaskInfo, previousTaskName));
     const request = {
         path: `study-tracker/users/me/tasks/${taskId}`,
         method: "PUT",
@@ -464,17 +464,17 @@ export type DailyTasksProgress = {
 }
 
 async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
-    
+
     function fromDtoToDomain(rsp: any[]): DailyTasksProgress[] {
         return rsp.map((value: any) => {
             return {
                 date: new Date(value.date_ * 1000),
-                progress: value.progress    
-            }
-        })
+                progress: value.progress
+            };
+        });
     }
 
-    const now = new Date()
+    const now = new Date();
     const request = {
         path: `study-tracker/users/me/statistics/daily-tasks-progress?year=${now.getFullYear()}&week=${utils.getWeekNumber(now)}`,
         method: "GET"
@@ -482,7 +482,7 @@ async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
     const response: Response = await doFetch(request);
     if (response.ok) {
         const responseObject: any[] = await response.json();
-        return fromDtoToDomain(responseObject)
+        return fromDtoToDomain(responseObject);
     } else
         return Promise.reject(new Error("User tasks could not be obtained!"));
 }
@@ -652,10 +652,10 @@ export enum TimeOfDay {
 async function createDailyEnergyStat(energyLevel: number, timeOfDay: TimeOfDay) {
     function toStr(timeOfDay: TimeOfDay): string {
         if (timeOfDay == TimeOfDay.MORNING)
-            return "morning"
+            return "morning";
         if (timeOfDay == TimeOfDay.AFTERNOON)
-            return "afternoon"
-        return "night"
+            return "afternoon";
+        return "night";
     }
 
     const today = new Date();
@@ -677,7 +677,7 @@ async function submitDailyTags(tags: string[]) {
     const request = {
         path: `study-tracker/users/me/statistics/daily-tags`,
         method: "POST",
-        body: toJsonBody({tags})
+        body: toJsonBody({ tags })
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -706,21 +706,21 @@ export type TaskDistributionPerWeek = {
 
 async function getTaskDistributionStats(): Promise<TaskDistributionPerWeek[]> {
     function toDomain(obj: any): TaskDistributionPerWeek[] {
-        const stats: TaskDistributionPerWeek[] = []
-        
+        const stats: TaskDistributionPerWeek[] = [];
+
         for (const [year, weeksObj] of Object.entries<any>(obj)) {
             for (const [week, tagsObj] of Object.entries<any>(weeksObj)) {
                 for (const [tag, time] of Object.entries(tagsObj)) {
                     stats.push({
-                        year: Number(year), 
-                        week: Number(week), 
-                        tag, 
+                        year: Number(year),
+                        week: Number(week),
+                        tag,
                         time: Number(time)
-                    })
+                    });
                 }
             }
         }
-        return stats
+        return stats;
     }
 
     const request = {
@@ -873,5 +873,5 @@ export const service = {
     //incrementWeekStudyTime,
     //updateWeekAverageAttentionSpan
     startStudySession,
-    finishStudySession,
+    finishStudySession
 };

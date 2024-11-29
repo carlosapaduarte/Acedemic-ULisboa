@@ -159,7 +159,7 @@ function Authenticate({ onActionClicked }: { onActionClicked: (action: AuthActio
 
                     <h2> {loginLoading ?
                         <span className={styles.loginLoadingText}>Logging in...</span>
-                        : <span><br/></span>
+                        : <span><br /></span>
                     }
                     </h2>
                 </div>
