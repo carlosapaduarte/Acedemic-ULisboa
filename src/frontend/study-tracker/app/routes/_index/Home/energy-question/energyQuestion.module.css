@@ -10,18 +10,18 @@
 
 .secondaryMessage {
     text-align: center;
-    font-size: 0.65em;
+    font-size: 1rem;
 }
 
 .selectedEnergyLevelIconContainer {
     display: flex;
     justify-content: center;
-    margin-bottom: 1em;
+    margin-bottom: 1rem;
 }
 
 .selectedEnergyLevelIcon {
-    height: 8em;
-    width: 8em;
+    height: 128px;
+    width: 128px;
 
     border-radius: 50%;
     background: var(--color-1);
@@ -72,7 +72,6 @@
     height: 15px;
     border-radius: 5px;
     background: linear-gradient(to right, rgba(228, 0, 91, 0.921), green);
-    outline: none;
     opacity: 0.7;
     -webkit-transition: .2s;
     transition: opacity .2s;

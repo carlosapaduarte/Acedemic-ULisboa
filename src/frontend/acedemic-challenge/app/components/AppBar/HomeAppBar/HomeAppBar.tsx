@@ -1,11 +1,7 @@
 import styles from "./homeAppBar.module.css";
-import React, { useEffect, useTransition } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useLogOut } from "~/components/auth/Authn";
 import { useNavigate } from "@remix-run/react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-
-import dropdownStyles from "./dropdown.module.css";
 import { service, UserInfo } from "~/service/service";
 
 /**
@@ -52,29 +48,6 @@ function NavBarButton({ text, url, iconSrc, iconAlt }: {
     );
 }
 
-function Dropdown({ trigger }: { trigger: JSX.Element }) {
-    const logout = useLogOut();
-    const [isPending, startTransition] = useTransition();
-
-    return (<DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-                {trigger}
-            </DropdownMenu.Trigger>
-
-            <DropdownMenu.Portal>
-                <DropdownMenu.Content className={dropdownStyles.Content} sideOffset={5}>
-                    <DropdownMenu.Item className={dropdownStyles.Item}
-                                       onClick={() => startTransition(logout)}>
-                        Logout
-                    </DropdownMenu.Item>
-
-                    <DropdownMenu.Arrow className={dropdownStyles.Arrow} />
-                </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-        </DropdownMenu.Root>
-    );
-}
-
 export function GreetingsContainer() {
     const [username, setUsername] = React.useState<string | undefined>(undefined);
     const [avatarFilename, setAvatarFilename] = React.useState<string | undefined>(undefined);
@@ -98,15 +71,13 @@ export function GreetingsContainer() {
                 }
             </h4>
             <div className={`${styles.avatarAndDropdownContainer}`}>
-                <Dropdown trigger={
-                    <button className={`${styles.avatarContainer}`}>
-                        <img
-                            width={92} height={92}
-                            src={`${avatarFilename}`}
-                            alt={`User's Avatar`}
-                        />
-                    </button>
-                } />
+                <div className={`${styles.avatarContainer}`}>
+                    <img
+                        width={92} height={92}
+                        src={`${avatarFilename}`}
+                        alt={`User's Avatar`}
+                    />
+                </div>
             </div>
         </div>
     );

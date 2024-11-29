@@ -61,7 +61,7 @@ export function HowMuchEnergyQuestionPage({ onComplete }: { onComplete: () => vo
                 <input
                     type="range"
                     min="1"
-                    max="10"
+                    max="4"
                     value={energyLevel}
                     className={styles.slider} onChange={(e) => setLevel(Number(e.target.value))}
                 />

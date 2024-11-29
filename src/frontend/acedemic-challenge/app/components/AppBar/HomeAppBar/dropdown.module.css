@@ -2,11 +2,13 @@
 .Content,
 .SubContent {
     min-width: 220px;
-    background-color: white;
-    color: black;
+    background-color: var(--color-1);
+    color: white;
+
+    border-radius: 5px;
 
     padding: 5px;
-    box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+    box-shadow: 0 0 40px 0 rgb(255 255 255 / 35%);
 
     z-index: 100;
 
@@ -35,11 +37,13 @@
     font-size: 1.5rem;
     line-height: 1;
 
-    border-radius: 3px;
+    background-color: var(--color-3);
+    border-radius: 5px;
 
     height: 1.25em;
 
-    padding: 0 5px 0 25px;
+    padding: 0 5px 0 15px;
+    margin-bottom: 3px;
 
     position: relative;
 
@@ -49,18 +53,20 @@
     user-select: none;
     outline: none;
 
+    cursor: pointer;
+
     &[data-disabled] {
         color: lightgray;
         pointer-events: none;
     }
 
     &[data-highlighted] {
-        background-color: mediumpurple;
+        opacity: 0.8;
     }
 }
 
 .Arrow {
-    fill: white;
+    fill: var(--color-1);
 }
 
 @keyframes slideUpAndFade {
@@ -105,4 +111,9 @@
         opacity: 1;
         transform: translateX(0);
     }
+}
+
+.acedemicHomeItem {
+    text-decoration: none;
+    color: white;
 }

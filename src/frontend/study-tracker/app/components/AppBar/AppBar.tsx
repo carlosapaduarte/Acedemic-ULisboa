@@ -56,19 +56,19 @@ function SideBarNavigationMenu({ setIsSideBarOpen }: { setIsSideBarOpen: (isOpen
         <>
             <SideBarNavButton text={t("navigation:calendar")} url={"/calendar"} iconUrl={"icons/calendar_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text={t("navigation:schedule")} url={"/calendar"} iconUrl={"icons/schedule_icon.png"}
-                              setIsSideBarOpen={setIsSideBarOpen} />
+            {/*<SideBarNavButton text={t("navigation:schedule")} url={"/calendar"} iconUrl={"icons/schedule_icon.png"}
+                              setIsSideBarOpen={setIsSideBarOpen} />*/}
             <SideBarNavButton text={t("navigation:tasks")} url={"/tasks"} iconUrl={"icons/tasks_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text={t("navigation:notes")} url={"/archives"} iconUrl={"icons/notes_icon.png"}
-                              setIsSideBarOpen={setIsSideBarOpen} />
+            {/*<SideBarNavButton text={t("navigation:notes")} url={"/archives"} iconUrl={"icons/notes_icon.png"}
+                              setIsSideBarOpen={setIsSideBarOpen} />*/}
             <SideBarNavButton text={t("navigation:study")} url={"/timer"} iconUrl={"icons/study_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
             <SideBarNavButton text={t("navigation:statistics")} url={"/statistics"}
                               iconUrl={"icons/statistics_icon.png"}
                               setIsSideBarOpen={setIsSideBarOpen} />
-            <SideBarNavButton text={t("navigation:badges")} url={"/badges"} iconUrl={"icons/badges_icon.png"}
-                              setIsSideBarOpen={setIsSideBarOpen} />
+            {/*<SideBarNavButton text={t("navigation:badges")} url={"/badges"} iconUrl={"icons/badges_icon.png"}
+                              setIsSideBarOpen={setIsSideBarOpen} />*/}
         </>
     );
 }

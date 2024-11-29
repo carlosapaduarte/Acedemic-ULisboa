@@ -79,7 +79,7 @@
 }
 
 .sideBar[data-expanded="true"] {
-    --side-bar-height: 440px;
+    --side-bar-height: 280px;
     --side-bar-width: 200px;
 }
 

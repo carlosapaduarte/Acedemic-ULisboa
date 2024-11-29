@@ -69,9 +69,9 @@ function EnergyStatusHistory({ energyHistory, onSeeFullHistoryClick }:
 }
 
 export function levelToStr(level: number): string {
-    if (level >= 9) return "Very Well";
-    if (level >= 7) return "Well";
-    if (level >= 5) return "bad";
+    if (level >= 4) return "Very Well";
+    if (level >= 3) return "Well";
+    if (level >= 2) return "Bad";
     return "Very Bad";
 }
 
