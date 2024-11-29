@@ -11,5 +11,6 @@
     "mark_complete": "Mark Complete",
     "my_notes": "My Notes",
     "no_notes": "No notes yet...",
-    "notes": "Notes"
+    "notes": "Notes",
+    "not_on_batch_message": "You are not in a set of 21 challenges yet, select a level to start a new one!"
 }

@@ -42,7 +42,7 @@ export function Level1And2ChallengesList(
                 let ref: React.RefObject<HTMLDivElement> | undefined = undefined;
                 if (selectedItem != -1 && selectedItem == index) {
                     ref = selectedRef;
-                } else if (selectedItem == -1 && batchDays && index == batchDays.length - 1) {
+                } else if (selectedItem == -1 && batchDays && currentBatchDayNumber != undefined && index == currentBatchDayNumber - 1) {
                     ref = selectedRef;
                 }
 

@@ -5,6 +5,7 @@ import { Batch, service } from "~/service/service";
 import styles from "./challengesPage.module.css";
 import { useChallenges } from "~/hooks/useChallenges";
 import { ChallengesList } from "~/routes/challenges/ChallengesList";
+import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 
 function useChallengesPage() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
@@ -53,29 +54,59 @@ function useChallengesPage() {
             });
     }
 
-    return { batchDays, listedBatchDays, onMarkCompleteClickHandler, selectedBatch, onNoteAddClick };
+    return {
+        batches,
+        currentBatch,
+        batchDays,
+        listedBatchDays,
+        onMarkCompleteClickHandler,
+        selectedBatch,
+        onNoteAddClick,
+        fetchUserInfo
+    };
 }
 
 export default function ChallengesPage() {
     const { t } = useTranslation(["challenge_overview"]);
     const {
+        batches,
+        currentBatch,
         batchDays,
         listedBatchDays,
         onMarkCompleteClickHandler,
         selectedBatch,
-        onNoteAddClick
+        onNoteAddClick,
+        fetchUserInfo
     } = useChallengesPage();
 
     return (
         <div className={`${styles.challengesPage}`}>
             <div className={`${styles.mainContent}`}>
-                <div className={`${styles.challengesListContainer}`}>
-                    <ChallengesList batch={selectedBatch}
-                                    batchDays={selectedBatch != undefined ? batchDays?.get(selectedBatch.id) : undefined}
-                                    listedBatchDays={listedBatchDays}
-                                    onMarkCompleteClickHandler={onMarkCompleteClickHandler}
-                                    onNoteAddClick={onNoteAddClick} />
-                </div>
+                {
+                    batches != undefined && currentBatch == undefined ?
+                        <>
+                            <div className={styles.notOnBatchMessageContainer}>
+                                <h1 className={styles.notOnBatchMessage}>
+                                    {t("dashboard:not_on_batch_message")}
+                                </h1>
+                            </div>
+                            <SelectLevelPage
+                                onLevelSelected={() => {
+                                    fetchUserInfo();
+                                }}
+                                onStartQuizClick={() => {
+                                }}
+                            />
+                        </>
+                        :
+                        <div className={`${styles.challengesListContainer}`}>
+                            <ChallengesList batch={selectedBatch}
+                                            batchDays={selectedBatch != undefined ? batchDays?.get(selectedBatch.id) : undefined}
+                                            listedBatchDays={listedBatchDays}
+                                            onMarkCompleteClickHandler={onMarkCompleteClickHandler}
+                                            onNoteAddClick={onNoteAddClick} />
+                        </div>
+                }
             </div>
         </div>
     );

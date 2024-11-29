@@ -36,7 +36,7 @@ export function useChallenges() {
     }, []);
 
     useEffect(() => {
-        if (!batches || !currentBatch) {
+        if (batches == undefined) {
             return;
         }
 
@@ -71,14 +71,16 @@ export function useChallenges() {
 
                 // Set the current batch to the most recent
                 const currentBatch: Batch = sortedBatches[0];
-                setCurrentBatch(currentBatch);
 
                 const DEBUG_DAY_OFFSET = 0;
-                const DEBUG_TIME_OFFSET = 1000 * 3600 * 24 * DEBUG_DAY_OFFSET;
+                const DEBUG_TIME_OFFSET = currentBatch.level == 2? 1000 * 3600 * 24 * DEBUG_DAY_OFFSET : 0;
 
                 // Calculate the current day index for the most recent batch
                 const currentDayIndex = Math.round(((new Date().getTime() + DEBUG_TIME_OFFSET) - currentBatch.startDate * 1000) / (1000 * 3600 * 24));
-                setCurrentDayIndex(currentDayIndex);
+                if (currentDayIndex >= 0 && currentDayIndex < currentBatch.batchDays.length) {
+                    setCurrentBatch(currentBatch);
+                    setCurrentDayIndex(currentDayIndex);
+                }
             });
     }
 

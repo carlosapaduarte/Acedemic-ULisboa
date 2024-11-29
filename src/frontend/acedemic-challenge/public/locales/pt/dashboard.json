@@ -11,5 +11,6 @@
     "mark_complete": "Marcar Como Completo",
     "my_notes": "As Minhas Notas",
     "no_notes": "Não há notas ainda...",
-    "notes": "Notas"
+    "notes": "Notas",
+    "not_on_batch_message": "Ainda não está num conjunto de 21 desafios, selecione um nível para começar um novo!"
 }

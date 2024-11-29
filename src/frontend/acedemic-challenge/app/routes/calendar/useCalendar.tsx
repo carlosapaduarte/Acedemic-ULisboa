@@ -26,7 +26,7 @@ export function useCalendar() {
     }, [userInfo]);
 
     useEffect(() => {
-        if (!batches || !batchDays || !currentBatch || currentDayIndex == undefined)
+        if (batches == undefined || batchDays == undefined)
             return;
 
         const daysWithChallenges: BatchDay[] = [];
@@ -34,9 +34,13 @@ export function useCalendar() {
 
         batches?.forEach((batch) => {
             batchDays.get(batch.id)?.forEach((batchDay) => {
+                if (currentBatch == undefined || currentDayIndex == undefined) {
+                    return;
+                }
+
                 const newBatchDay = { ...batchDay, level: batch.level };
 
-                if (batch.id == currentBatch?.id && batchDay.id > currentDayIndex + 1) {
+                if (batch.id == currentBatch.id && batchDay.id > currentDayIndex + 1) {
                     unreachedDays.push(newBatchDay);
 
                     return;
@@ -53,5 +57,5 @@ export function useCalendar() {
         setSelectedDate(clickedDay.date);
     };
 
-    return { daysWithChallenges, unreachedDays, selectedDate, handleDateClick };
+    return { batches, currentBatch, daysWithChallenges, unreachedDays, selectedDate, handleDateClick, fetchUserInfo };
 }

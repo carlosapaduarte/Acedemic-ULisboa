@@ -82,7 +82,7 @@ export function ChallengesList(
         selectedRef,
         onItemClickHandler,
         currentBatchDayNumber
-    } = useChallengesList(batchDays);
+    } = useChallengesList(listedBatchDays);
 
     /*const DEBUG_BATCH_LEVEL: number = 3;*/
 
@@ -93,7 +93,7 @@ export function ChallengesList(
             {
                 batch == undefined || batchDays == undefined || listedBatchDays == undefined || batchLevel == 1 || batchLevel == 2
                     ? <Level1And2ChallengesList
-                        batchDays={batchDays}
+                        batchDays={listedBatchDays}
                         currentBatchDayNumber={currentBatchDayNumber}
                         onMarkCompleteClickHandler={onMarkCompleteClickHandler}
                         onNoteAddClick={onNoteAddClick}

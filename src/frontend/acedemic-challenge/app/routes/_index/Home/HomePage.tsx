@@ -7,6 +7,8 @@ import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { ChallengesContext, useChallenges } from "~/hooks/useChallenges";
 import { NotesModal } from "~/components/NotesModal/NotesModal";
 import { service } from "~/service/service";
+import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
+import { useTranslation } from "react-i18next";
 
 const logger = new Logger({ name: "HomePage" });
 
@@ -40,7 +42,7 @@ function useHomePage() {
                     if (challenge.completionDate) {
                         acc++;
                     }
-                })
+                });
                 return acc + _acc; // TODO: Check if this is the correct way to check for completion
             }, 0);
         setProgress(completedCount / batchChallenges.flatMap(b => b.challenges).length * 100);
@@ -94,19 +96,41 @@ export default function HomePage() {
         onNoteAddClick
     } = useHomePage();
 
+    const { t } = useTranslation(["dashboard"]);
+
     return (
         <ChallengesContext.Provider
             value={{ userInfo, batches, batchDays, currentDayIndex, currentBatch, fetchUserInfo }}>
             <div className={styles.homePage}>
-                <ProgressBar progress={progress} />
-                <ChallengeView onViewNotesButtonClick={() => setIsModalOpen(true)} />
                 {
-                    currentDayIndex != undefined &&
-                    <NotesModal batchDayNumber={currentDayIndex + 1}
-                                isModalOpen={isModalOpen}
-                                setIsModalOpen={setIsModalOpen}
-                                savedNotesText={notesText}
-                                onNotesSave={onNoteAddClick} />
+                    batches != undefined && currentBatch == undefined ?
+                        <>
+                            <div className={styles.notOnBatchMessageContainer}>
+                                <h1 className={styles.notOnBatchMessage}>
+                                    {t("dashboard:not_on_batch_message")}
+                                </h1>
+                            </div>
+                            <SelectLevelPage
+                                onLevelSelected={() => {
+                                    fetchUserInfo();
+                                }}
+                                onStartQuizClick={() => {
+                                }}
+                            />
+                        </>
+                        :
+                        <>
+                            <ProgressBar progress={progress} />
+                            <ChallengeView onViewNotesButtonClick={() => setIsModalOpen(true)} />
+                            {
+                                currentDayIndex != undefined &&
+                                <NotesModal batchDayNumber={currentDayIndex + 1}
+                                            isModalOpen={isModalOpen}
+                                            setIsModalOpen={setIsModalOpen}
+                                            savedNotesText={notesText}
+                                            onNotesSave={onNoteAddClick} />
+                            }
+                        </>
                 }
             </div>
         </ChallengesContext.Provider>

@@ -5,6 +5,7 @@ import { MyCalendar } from "~/routes/calendar/components/MyCalendar/MyCalendar";
 import SelectedDayChallengeInfo from "~/routes/calendar/components/SelectedDayChallengeInfo/SelectedDayChallengeInfo";
 import { useCalendar } from "~/routes/calendar/useCalendar";
 import styles from "./calendarPage.module.css";
+import { useTranslation } from "react-i18next";
 
 const logger = new Logger({ name: "Calendar" });
 
@@ -25,7 +26,12 @@ function DayContent({ daysWithChallenges, unreachedDays, selectedDate }: {
 }
 
 function MainContent() {
-    const { daysWithChallenges, unreachedDays, selectedDate, handleDateClick } = useCalendar();
+    const {
+        daysWithChallenges, unreachedDays, selectedDate, handleDateClick, fetchUserInfo,
+        batches, currentBatch
+    } = useCalendar();
+
+    const { t } = useTranslation(["dashboard"]);
 
     return (
         <div className={`${styles.mainContent}`}>
