@@ -33,9 +33,6 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         async function fetchUser() {
-            // TODO: this is a solution just for now!!! Later, we won't be storing the user ID in cache
-            // For now, this will ease development...
-            // After Oauth, we need to think of a new solution
             const jtw = localStorage["jwt"];
 
             if (jtw == undefined) {

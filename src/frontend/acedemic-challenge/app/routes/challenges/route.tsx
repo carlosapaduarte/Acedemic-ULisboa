@@ -6,6 +6,7 @@ import styles from "./challengesPage.module.css";
 import { useChallenges } from "~/hooks/useChallenges";
 import { ChallengesList } from "~/routes/challenges/ChallengesList";
 import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 function useChallengesPage() {
     /* TODO: Check if this is the correct way to handle the state, implement level 3 too*/
@@ -66,7 +67,7 @@ function useChallengesPage() {
     };
 }
 
-export default function ChallengesPage() {
+export function ChallengesPage() {
     const { t } = useTranslation(["challenge_overview"]);
     const {
         batches,
@@ -109,5 +110,13 @@ export default function ChallengesPage() {
                 }
             </div>
         </div>
+    );
+}
+
+export default function ChallengesPageAuthControlled() {
+    return (
+        <RequireAuthn>
+            <ChallengesPage />
+        </RequireAuthn>
     );
 }

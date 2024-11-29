@@ -6,6 +6,7 @@ import SelectedDayChallengeInfo from "~/routes/calendar/components/SelectedDayCh
 import { useCalendar } from "~/routes/calendar/useCalendar";
 import styles from "./calendarPage.module.css";
 import { useTranslation } from "react-i18next";
+import { RequireAuthn } from "~/components/auth/RequireAuthn";
 
 const logger = new Logger({ name: "Calendar" });
 
@@ -60,8 +61,10 @@ function MainContent() {
 
 export default function CalendarPage() {
     return (
-        <div className={`${styles.calendarPage}`}>
-            <MainContent />
-        </div>
+        <RequireAuthn>
+            <div className={`${styles.calendarPage}`}>
+                <MainContent />
+            </div>
+        </RequireAuthn>
     );
 }
