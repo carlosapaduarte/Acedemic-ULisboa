@@ -9,7 +9,11 @@ router = APIRouter(
 )
 
 def load_saml_settings():
-    with open("settings.json", "r") as f:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Construct the absolute path to settings.json
+    settings_file_path = os.path.abspath(os.path.join(script_dir, "..", "settings.json"))
+    print(f"Loading settings from: {settings_file_path}")
+    with open(settings_file_path, "r") as f:
         return json.load(f)
 
 async def prepare_request(request: Request) -> object:
@@ -31,9 +35,7 @@ async def saml_login(request: Request):
     req = await prepare_request(request)
     print(req)
     auth = init_saml_auth(req)
-    
-    print(auth.login())
-    
+
     return RedirectResponse(auth.login())
 
 @router.post("/saml/callback")
