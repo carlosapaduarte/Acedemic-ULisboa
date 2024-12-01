@@ -13,7 +13,10 @@ let i18next = new RemixI18Next({
     i18next: {
         ...i18nConfig,
         backend: {
-            loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json")
+            loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json"),
+            requestOptions: {
+                cache: "no-store"
+            }
         }
     },
     // The i18next plugins you want RemixI18next to use for `i18n.getFixedT` inside loaders and actions.
