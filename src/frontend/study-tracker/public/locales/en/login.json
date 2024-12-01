@@ -1,5 +1,6 @@
 {
     "advance_message": "Click here to advance...",
+
     "authenticate_title": "Register or Login",
     "authenticated_message": "Authenticated",
     "confirm": "Confirm",
@@ -8,6 +9,7 @@
     "password_field_name": "Password",
     "receive_notification_title": "Receive notifications",
     "register_button_title": "Register",
+
     "select_avatar_initial_question": "Select your avatar",
     "select_level_initial_question": "How effective have been your study habits lately?",
     "share_progress_question": "Do you want to share your progress?",

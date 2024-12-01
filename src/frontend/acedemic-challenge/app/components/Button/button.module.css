@@ -6,6 +6,16 @@
     font-size: 1.25rem;
     font-weight: 500;
     border-radius: 0.25rem;
+
+    &:disabled {
+        opacity: 0.5;
+    }
+
+    @media (hover: hover) {
+        &:hover {
+            background-color: var(--color-2-hover);
+        }
+    }
 }
 
 .cutButton {
@@ -48,13 +58,3 @@ Something like this could be very interesting for animating.
 .roundButton:active {
     top: 3px;
 }*/
-
-@media (hover: hover) {
-    .roundButton:hover {
-        background-color: var(--color-2-hover);
-    }
-
-    .roundButton:hover {
-        opacity: 0.85;
-    }
-}

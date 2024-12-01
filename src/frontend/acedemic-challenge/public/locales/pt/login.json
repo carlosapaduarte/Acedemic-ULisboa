@@ -6,6 +6,22 @@
     "level_2_title": "Eficaz",
     "level_3_description": "Estudo de forma consistente, foco-me facilmente e obtenho as melhores notas",
     "level_3_title": "Altamente Eficaz",
-    "select_avatar_initial_question": "Escolhe o teu avatar",
-    "select_level_initial_question": "O quão eficaz têm sido os teus hábitos de estudo ultimamente?"
+    "select_avatar_initial_question": "Seleciona o teu avatar",
+    "select_level_initial_question": "O quão eficaz têm sido os teus hábitos de estudo ultimamente?",
+    "advance_message": "Clica aqui para continuar...",
+
+    "authenticate_title": "Registar ou fazer Login",
+    "authenticated_message": "Autenticado",
+    "confirm": "Confirmar",
+    "login_button_title": "Entrar",
+    "no_answer_option": "Não",
+    "password_field_name": "Palavra-passe",
+    "receive_notification_title": "Receber notificações",
+    "register_button_title": "Registar",
+
+    "share_progress_question": "Queres compartilhar o teu progresso?",
+    "submit_selection_message": "Enviar seleção",
+    "usage_objectives_title": "Objetivos de Uso",
+    "username_field_name": "Nome de utilizador",
+    "yes_answer_option": "Sim"
 }
