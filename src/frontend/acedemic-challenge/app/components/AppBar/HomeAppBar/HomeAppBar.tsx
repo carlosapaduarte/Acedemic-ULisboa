@@ -25,8 +25,8 @@ function getHelloQuote(): string {
     }
 }
 
-function NavBarButton({ text, url, iconSrc, iconAlt }: {
-    text: string, url: string, iconSrc?: string, iconAlt?: string
+function NavBarButton({ text, url, iconSrc }: {
+    text: string, url: string, iconSrc?: string
 }) {
     const navigate = useNavigate();
 
@@ -39,9 +39,9 @@ function NavBarButton({ text, url, iconSrc, iconAlt }: {
                }}
                className={`${styles.navBarButton}`}
             >
-                {iconSrc ? <img src={iconSrc} alt={iconAlt} /> : "Icon"}
+                {iconSrc ? <img src={iconSrc} alt={text} /> : text}
             </a>
-            <div className={`${styles.navBarButtonText}`}>
+            <div className={`${styles.navBarButtonText}`} aria-hidden="true">
                 {text}
             </div>
         </div>
@@ -84,12 +84,13 @@ export function GreetingsContainer() {
 }
 
 export function NavBar() {
+    const { t } = useTranslation(["appbar"]);
+
     return (
         <div className={`${styles.navBar}`}>
-            <NavBarButton text="Challenges" url={"/challenges"} iconSrc={"icons/challenges_icon.svg"}
-                          iconAlt={"Challenges Icon"} />
-            <NavBarButton text="Calendar" url={"/calendar"} iconSrc={"icons/calendar_icon.svg"}
-                          iconAlt={"Calendar Icon"} />
+            <NavBarButton text={t("appbar:nav_bar_challenges")} url={"/challenges"}
+                          iconSrc={"icons/challenges_icon.svg"} />
+            <NavBarButton text={t("appbar:nav_bar_calendar")} url={"/calendar"} iconSrc={"icons/calendar_icon.svg"} />
             {/*<NavBarButton text="Badges" url={"/badges"} iconSrc={"icons/badges_icon.svg"} iconAlt={"Badges Icon"} />*/}
         </div>
     );

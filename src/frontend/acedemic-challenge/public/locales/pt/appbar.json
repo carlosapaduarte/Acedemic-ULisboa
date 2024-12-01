@@ -4,5 +4,8 @@
     "settings": "Configurações",
     "portugueseLanguage": "Português",
     "englishLanguage": "Inglês",
-    "language": "Mudar para {{language}}"
+    "language": "Mudar para {{language}}",
+
+    "nav_bar_challenges": "Desafios",
+    "nav_bar_calendar": "Calendário"
 }
