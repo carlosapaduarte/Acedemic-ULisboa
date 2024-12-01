@@ -26,16 +26,18 @@ function InfoPage1({ handleOnNextClick }: {
 
     return (
         <>
-            <div className={styles.studyImageContainer}>
-                <img src="study.png" alt="A girl using her tablet"
-                     className={styles.studyImage} />
-            </div>
-            <h1 className={styles.titleHeading}>
-                {t("welcome_page:info_page_1_title")}
-            </h1>
-            <p className={classNames(styles.descriptionText)}>
-                {t("welcome_page:info_page_1_description")}
-            </p>
+            {/*<div className={styles.infoPageTextContent}>*/}
+                <div className={styles.studyImageContainer}>
+                    <img src="study.png" alt="A girl using her tablet"
+                         className={styles.studyImage} />
+                </div>
+                <h1 className={styles.titleHeading}>
+                    {t("welcome_page:info_page_1_title")}
+                </h1>
+                <p className={classNames(styles.descriptionText)}>
+                    {t("welcome_page:info_page_1_description")}
+                </p>
+            {/*</div>*/}
             <div className={classNames(styles.navigationContainer)}>
                 {/*<div style={{ color: "var(--color-2)" }}>
                     Placeholder
@@ -59,16 +61,18 @@ function InfoPage2({ handleOnNextClick, handleOnPreviousClick }: {
 
     return (
         <>
-            <h1 className={styles.titleHeading}>
-                {t("welcome_page:info_page_2_title")}
-            </h1>
-            <p className={classNames(styles.descriptionText)}>
-                {t("welcome_page:info_page_2_description")}
-            </p>
-            <div className={styles.studyImageContainer}>
-                <img src="study2.png" alt="A boy writing in a paper"
-                     className={styles.studyImage} />
-            </div>
+            {/*<div className={styles.infoPageTextContent}>*/}
+                <h1 className={styles.titleHeading}>
+                    {t("welcome_page:info_page_2_title")}
+                </h1>
+                <p className={classNames(styles.descriptionText)}>
+                    {t("welcome_page:info_page_2_description")}
+                </p>
+                <div className={styles.studyImageContainer}>
+                    <img src="study2.png" alt="A boy writing in a paper"
+                         className={styles.studyImage} />
+                </div>
+            {/*</div>*/}
             <div className={classNames(styles.navigationContainer)}>
                 {/*<div style={{ color: "var(--color-2)" }}>
                     Placeholder

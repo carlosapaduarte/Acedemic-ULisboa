@@ -47,5 +47,7 @@ button {
 }
 
 .mainContentContainer {
+    overflow-y: auto;
+    overflow-x: hidden;
     flex-grow: 1;
 }

@@ -45,6 +45,7 @@
 
     .homePageTitleHomeContainer {
         display: flex;
+        font-size: 0.9em;
     }
 
     .homeTitleIcon {

@@ -5,7 +5,7 @@
     width: 100%;
     height: 100%;
 
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 .welcomePage {
@@ -56,6 +56,17 @@
 .welcomePage p {
 
 }
+
+/*.infoPageTextContent {
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+    }
+
+    height: 100%;
+}*/
 
 .studyImageContainer {
     flex: 2 0 30%;
