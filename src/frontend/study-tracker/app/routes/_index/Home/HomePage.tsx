@@ -21,18 +21,18 @@ function useHomePage() {
         ) {
             setDisplayDailyEnergyQuestion(true);
         }
-        setDisplayDailyEnergyQuestion(true); // TODO: remove this line. For the beta, show always to fill the home page
+        setDisplayDailyEnergyQuestion(true); // TODO: remove this line. For now, showing always to fill the home page
     }, []);
 
     function onQuestionAnswered() {
         const today = new Date();
         localStorage["lastEnergyQuestionPromptedDate"] = today;
-        setDisplayDailyEnergyQuestion(false); // TODO: uncomment this line. For the beta, show always to fill the home page
-        setDisplayTagsSelection(true);
+        /*setDisplayDailyEnergyQuestion(false);*/ // TODO: uncomment this line. For now, showing always to fill the home page
+        /*setDisplayTagsSelection(true);*/
     }
 
     function onTagsSubmitted() {
-        setDisplayTagsSelection(false);
+        /*setDisplayTagsSelection(false);*/
     }
 
     return {

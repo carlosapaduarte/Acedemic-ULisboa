@@ -109,19 +109,19 @@
 }
 
 .veryWellColor {
-    color: green;
+    color: #279A65;
 }
 
-.goodColor {
-    color: yellowgreen;
-}
-
-.mediumColor {
-    color: #7d065d;
+.wellColor {
+    color: #416438;
 }
 
 .badColor {
-    color: red;
+    color: #852E5E;
+}
+
+.veryBadColor {
+    color: #821633;
 }
 
 .containerAlignRight {

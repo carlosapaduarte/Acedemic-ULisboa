@@ -18,6 +18,11 @@
     "save": "Guardar",
     "secondary_message": "O teu plano de estudo irá se adaptar conforme",
     "skip": "Saltar",
+    "saved_level_successfully": "Nível guardado com sucesso!",
+    "energy_very_well": "Muito Bem",
+    "energy_well": "Bem",
+    "energy_bad": "Mal",
+    "energy_very_bad": "Muito Mal",
 
     "no_data_available_yet": "Ainda não há dados disponíveis...",
 

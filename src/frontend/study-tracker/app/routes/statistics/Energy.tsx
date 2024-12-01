@@ -10,8 +10,8 @@ import { useTranslation } from "react-i18next";
 export function getEnergyIconByEnergyLevel(energyLevel: number): string {
     const prefix = "icons/";
     let filename = "";
-    if (energyLevel >= 4) filename = "energy_very_good_icon.png";
-    else if (energyLevel >= 3) filename = "energy_good_icon.png";
+    if (energyLevel >= 4) filename = "energy_very_well_icon.png";
+    else if (energyLevel >= 3) filename = "energy_well_icon.png";
     else if (energyLevel >= 2) filename = "energy_bad_icon.png";
     else filename = "energy_very_bad_icon.png";
 
@@ -19,17 +19,17 @@ export function getEnergyIconByEnergyLevel(energyLevel: number): string {
 }
 
 export function levelToStr(level: number): string {
-    if (level >= 4) return "Very Well";
-    if (level >= 3) return "Well";
-    if (level >= 2) return "Bad";
-    return "Very Bad";
+    if (level >= 4) return "energy_very_well";
+    if (level >= 3) return "energy_well";
+    if (level >= 2) return "energy_bad";
+    return "energy_very_bad";
 }
 
 function levelToColor(level: number): string {
     if (level >= 4) return styles.veryWellColor;
-    if (level >= 3) return styles.goodColor;
-    if (level >= 2) return styles.mediumColor;
-    return styles.badColor;
+    if (level >= 3) return styles.wellColor;
+    if (level >= 2) return styles.badColor;
+    return styles.veryBadColor;
 }
 
 function EnergyStatus({ status }: { status: DailyEnergyStatus }) {
@@ -114,7 +114,7 @@ function TodayEnergyStatus({ status, dailyTags }: { status: DailyEnergyStatus | 
                 <div className={classNames(levelToColor(status.level), styles.todayEnergyStatusTitle)}>
                     <img src={getEnergyIconByEnergyLevel(status.level)} alt="Energy Status Icon"
                          className={styles.icon} />
-                    {t("statistics:i_feel")} {levelToStr(status.level)}
+                    {`${t("statistics:i_feel")} ${t(`statistics:${levelToStr(status.level)}`)}`}
                 </div>
                 :
                 <NoDataYetAvailableMessage />

@@ -18,6 +18,11 @@
     "save": "Save",
     "secondary_message": "Your study plan will adapt to it",
     "skip": "Skip",
+    "saved_level_successfully": "Saved level successfully!",
+    "energy_very_well": "Very Well",
+    "energy_well": "Well",
+    "energy_bad": "Bad",
+    "energy_very_bad": "Very Bad",
 
     "no_data_available_yet": "No data available, yet...",
     
