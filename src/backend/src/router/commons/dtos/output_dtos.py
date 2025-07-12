@@ -1,3 +1,4 @@
+import datetime
 from pydantic import BaseModel
 
 from domain.commons.user import User
@@ -24,3 +25,20 @@ class UserOutputDto(BaseModel):
             shareProgress=user.share_progress,
             batches=BatchDto.fromBatches(user.batches)
         )
+
+class BadgeOutputDto(BaseModel):
+    id: int
+    code: str
+    title: str
+    description: str
+    icon_url: str | None
+
+    
+class UserBadgeOutputDto(BaseModel):
+    badge: BadgeOutputDto
+    earned_at: datetime
+
+    class Config:
+        arbitrary_types_allowed = True  # Allows non-Pydantic types like datetime to be used
+
+    

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
 from pydantic import BaseModel
+from service.common.badge_service import assign_for_event
 
 from router.academic_challenge.dtos.input_dtos import SetShareProgressPreferenceDto
 from router.commons.dtos.input_dtos import CreateUserInputDto, SetUserAvatarDto
@@ -68,6 +69,7 @@ async def login_for_access_token(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
+    assign_for_event(user.id, "first_login")
     return Token(access_token=access_token, token_type="bearer")
 
 @router.get("/test-token")

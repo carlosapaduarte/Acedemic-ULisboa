@@ -25,3 +25,7 @@ def complete_challenge(user_id: int, batch_id: int, batch_day_id: int, challenge
         batch_day_id=batch_day_id,
         challenge_id=challenge_id,
         completion_date=completion_date)
+
+def check_and_award_badges(user_id: int):
+    # TODO: Lógica condicional para ver o progresso e dar medalhas
+    award_badge(user_id, "caloiro-autoeficacia")  # primeiro badge de caloiro antes do novato

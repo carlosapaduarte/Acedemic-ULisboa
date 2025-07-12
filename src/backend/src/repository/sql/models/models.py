@@ -1,9 +1,12 @@
-from datetime import date
-from datetime import datetime
+from datetime import date, timezone, datetime
 from typing import Optional
 
 from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, Relationship, SQLModel
+
+
+from typing import List
+from uuid import UUID
 
 
 class UserModel(SQLModel, table=True):
@@ -338,3 +341,20 @@ class WeekStudyTimeModel(SQLModel, table=True):
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="week_study_time")
+
+
+class UserBadge(SQLModel, table=True):
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    badge_id: int = Field(foreign_key="badge.id", primary_key=True)
+    earned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    badge: "Badge" = Relationship(back_populates="user_badges")
+    
+class Badge(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    code: str = Field(index=True, unique=True)
+    title: str
+    description: str
+    icon_url: Optional[str] = None
+    
+    user_badges: List[UserBadge] = Relationship(back_populates="badge")

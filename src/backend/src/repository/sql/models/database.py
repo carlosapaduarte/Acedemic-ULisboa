@@ -1,5 +1,7 @@
 import os
+from dotenv import load_dotenv  # <-- adiciona isto
 
+load_dotenv() # Load environment variables from .env file
 from sqlalchemy import create_engine
 from sqlmodel import SQLModel
 from repository.sql.models import models

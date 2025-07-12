@@ -1,4 +1,5 @@
 
+import os
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -6,20 +7,24 @@ from exception import AlreadyExistsException, InvalidDate, NotFoundException, No
 from router import u_lisboa_auth
 from router.academic_challenge import academic_challenge
 from router.commons import common
-
+from router.badges import badges
 from fastapi.middleware.cors import CORSMiddleware
 
 from router.study_tracker import study_tracker
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # Check this for error handling: https://fastapi.tiangolo.com/tutorial/handling-errors/?h=error#import-httpexception
 
 app = FastAPI()
 
+print("URL da BD:", os.environ.get("SQLALCHEMY_DATABASE_URL"))
 app.include_router(common.router)
+app.include_router(badges.router)
 app.include_router(academic_challenge.router)
 app.include_router(study_tracker.router)
-app.include_router(u_lisboa_auth.router)
+#app.include_router(u_lisboa_auth.router)
 
 dev_mode = True
 

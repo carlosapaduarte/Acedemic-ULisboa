@@ -4,14 +4,13 @@ import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 
-
 // For now, all of these functions will return the expected response.
 // If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
 // In my opinion, this eases error handling in the caller.
 
 export type LoginResult = {
-    access_token: string,
-    token_type: string
+    access_token: string;
+    token_type: string;
 };
 
 export type AuthErrorType =
@@ -28,7 +27,7 @@ const AUTH_ERROR_MESSAGES: Record<AuthErrorType, string> = {
     INVALID_USERNAME_OR_PASSWORD: "Invalid username or password!",
     INVALID_FORMAT: "Invalid format of username or password!",
     USER_CREATION_FAILED: "User creation was not possible!",
-    LOGIN_FAILED: "Login failed!"
+    LOGIN_FAILED: "Login failed!",
 };
 
 export class AuthError extends Error {
@@ -58,16 +57,17 @@ async function login(username: string, password: string) {
     const request = {
         path: "commons/token",
         method: "POST",
-        body: formData
+        body: formData,
     };
 
-    const response: Response = await doFetch(request)
-        .catch((error) => {
-            if (error instanceof NotAuthorizedError) {
-                return Promise.reject(new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"));
-            }
-            return Promise.reject(new AuthError("LOGIN_FAILED", "password"));
-        });
+    const response: Response = await doFetch(request).catch((error) => {
+        if (error instanceof NotAuthorizedError) {
+            return Promise.reject(
+                new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"),
+            );
+        }
+        return Promise.reject(new AuthError("LOGIN_FAILED", "password"));
+    });
 
     if (response.ok) {
         const responseObject: LoginResult = await response.json();
@@ -76,7 +76,9 @@ async function login(username: string, password: string) {
         if (response.status == 400)
             return Promise.reject(new AuthError("INVALID_FORMAT", "password"));
         else if (response.status == 401)
-            return Promise.reject(new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"));
+            return Promise.reject(
+                new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"),
+            );
         return Promise.reject(new AuthError("LOGIN_FAILED", "password"));
     }
 }
@@ -84,7 +86,7 @@ async function login(username: string, password: string) {
 async function testTokenValidity() {
     const request = {
         path: "commons/test-token",
-        method: "GET"
+        method: "GET",
     };
     const response: Response = await doFetch(request);
     if (!response.ok) {
@@ -96,25 +98,34 @@ async function createUser(username: string, password: string) {
     const request = {
         path: "commons/create-user",
         method: "POST",
-        body: toJsonBody({ username, password })
+        body: toJsonBody({ username, password }),
     };
     const response: Response = await doFetch(request);
 
     if (!response.ok) {
         if (response.status == 409)
-            return Promise.reject(new AuthError("USERNAME_ALREADY_EXISTS", "username"));
+            return Promise.reject(
+                new AuthError("USERNAME_ALREADY_EXISTS", "username"),
+            );
         else if (response.status == 400)
-            return Promise.reject(new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"));
+            return Promise.reject(
+                new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"),
+            );
 
-        return Promise.reject(new AuthError("USER_CREATION_FAILED", "password"));
+        return Promise.reject(
+            new AuthError("USER_CREATION_FAILED", "password"),
+        );
     }
 }
 
-async function createBatch(level: LevelType, challengeIds: number[] | number[][]) {
+async function createBatch(
+    level: LevelType,
+    challengeIds: number[] | number[][],
+) {
     const request = {
         path: `academic-challenge/users/me/batches`,
         method: "POST",
-        body: toJsonBody({ level: level, challengeIds: challengeIds })
+        body: toJsonBody({ level: level, challengeIds: challengeIds }),
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -125,19 +136,21 @@ async function selectShareProgressState(shareProgress: boolean) {
     const request = {
         path: `commons/users/me/publish-state`,
         method: "PUT",
-        body: toJsonBody({ shareProgress })
+        body: toJsonBody({ shareProgress }),
     };
     const response: Response = await doFetch(request);
     //console.log(response)
     if (!response.ok)
-        return Promise.reject(new Error("Progress share preference selection failed!"));
+        return Promise.reject(
+            new Error("Progress share preference selection failed!"),
+        );
 }
 
 async function selectAvatar(avatarFilename: string) {
     const request = {
         path: `commons/users/me/avatar`,
         method: "PUT",
-        body: toJsonBody({ avatarFilename })
+        body: toJsonBody({ avatarFilename }),
     };
     const response: Response = await doFetch(request);
     //console.log(response)
@@ -147,70 +160,74 @@ async function selectAvatar(avatarFilename: string) {
 
 export type UserNote = {
     name: string;
-    date: number
-}
+    date: number;
+};
 
 export type StoredChallenge = {
-    id: number,
-    completionDate: number | null
-}
+    id: number;
+    completionDate: number | null;
+};
 
 export type StoredBatchDay = {
-    id: number,
-    challenges: StoredChallenge[],
-    notes: string
-}
+    id: number;
+    challenges: StoredChallenge[];
+    notes: string;
+};
 
 export type Batch = {
-    id: number,
-    startDate: number,
-    level: number,
-    batchDays: StoredBatchDay[]
-}
+    id: number;
+    startDate: number;
+    level: number;
+    batchDays: StoredBatchDay[];
+};
 
 // User info
 export type UserInfo = {
-    id: number,
-    username: string,
-    shareProgress: boolean,
-    avatarFilename: string, // TODO: this could be undefined
-    batches: Batch[]
+    id: number;
+    username: string;
+    shareProgress: boolean;
+    avatarFilename: string; // TODO: this could be undefined
+    batches: Batch[];
 };
 
 async function fetchUserInfoFromApi(): Promise<UserInfo> {
     const request = {
         path: `commons/users/me`,
-        method: "GET"
+        method: "GET",
     };
     const response: Response = await doFetch(request);
 
     if (response.ok) {
         const responseObject: UserInfo = await response.json();
         return responseObject;
-    } else
-        return Promise.reject(new Error("User info could not be obtained!"));
+    } else return Promise.reject(new Error("User info could not be obtained!"));
 }
 
 async function editDayNote(batchId: number, batchDayId: number, notes: string) {
     const request = {
         path: `academic-challenge/users/me/batches/${batchId}/${batchDayId}/notes`,
         method: "POST",
-        body: toJsonBody({ notes })
+        body: toJsonBody({ notes }),
     };
     const response: Response = await doFetch(request);
-    if (!response.ok)
-        return Promise.reject(new Error("Failed to edit note!"));
+    if (!response.ok) return Promise.reject(new Error("Failed to edit note!"));
 }
 
-async function markChallengeAsCompleted(batchId: number, batchDayId: number, challengeId: number) {
+async function markChallengeAsCompleted(
+    batchId: number,
+    batchDayId: number,
+    challengeId: number,
+) {
     const request = {
         path: `academic-challenge/users/me/batches/${batchId}/${batchDayId}/completed-challenges`,
         method: "POST",
-        body: toJsonBody({ challengeId })
+        body: toJsonBody({ challengeId }),
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
-        return Promise.reject(new Error("Failed to mark challenge as completed!"));
+        return Promise.reject(
+            new Error("Failed to mark challenge as completed!"),
+        );
 }
 
 export const service = {
@@ -222,5 +239,5 @@ export const service = {
     selectAvatar,
     fetchUserInfoFromApi,
     editDayNote,
-    markChallengeAsCompleted: markChallengeAsCompleted
+    markChallengeAsCompleted: markChallengeAsCompleted,
 };
