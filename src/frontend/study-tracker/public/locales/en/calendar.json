@@ -1,56 +1,58 @@
 {
-    "confirm_button": "Confirm",
-    "display_all_events_button": "Click To Display All Events",
-    "display_only_recurring_events_button": "Click To Display Only Recurring Events",
-    "months": {
-        "april": "April",
-        "august": "August",
-        "december": "December",
-        "february": "February",
-        "january": "January",
-        "july": "July",
-        "june": "June",
-        "march": "March",
-        "may": "May",
-        "november": "November",
-        "october": "October",
-        "september": "September"
-    },
-    "new_note_label": "Note",
-    "next_month_but": "Next Month",
-    "no_goals_title": "There are no goals for this day...",
-    "prev_month_but": "Previous Month",
-    "see_more_button_text": "Click to see more",
-    "today": "Today",
-    "very_week_label": "Every Week",
-    "weekdays": {
-        "friday": {
-            "medium": "Fri",
-            "short": "F"
-        },
-        "monday": {
-            "medium": "Mon",
-            "short": "M"
-        },
-        "saturday": {
-            "medium": "Sat",
-            "short": "S"
-        },
-        "sunday": {
-            "medium": "Sun",
-            "short": "S"
-        },
-        "thursday": {
-            "medium": "Thu",
-            "short": "T"
-        },
-        "tuesday": {
-            "medium": "Tue",
-            "short": "T"
-        },
-        "wednesday": {
-            "medium": "Wed",
-            "short": "W"
-        }
-    }
+  "rbc_month_header_format": "MMMM YYYY",
+  "rbc_week_header_format": "MMM D – D",
+  "rbc_day_header_format": "dddd, MMM D",
+  "rbc_agenda_column_format": "ddd MMM D",
+  "rbc_time_format": "h:mm A",
+  "rbc_time_range_format": "h:mm A",
+
+  "new_event_modal_title": "New Event",
+  "edit_event_modal_title": "Edit Event",
+  "display_only_recurring_events_button": "Display Only Recurring Events",
+  "display_all_events_button": "Display All Events",
+  "no_events_in_range": "No events in this range",
+  "allDay": "All Day",
+  "title_label": "Title",
+  "date_section_label": "Date",
+  "start_date_label": "Start Date",
+  "start_time_label": "Start Time",
+  "end_date_label": "End Date",
+  "end_time_label": "End Time",
+  "recurrence_title": "Recurrence",
+  "no_recurrence_label": "No Recurrence",
+  "every_day_label": "Every Day",
+  "every_week_label": "Every Week",
+  "tags_title": "Tags",
+  "study": "Study",
+  "work": "Work",
+  "personal": "Personal",
+  "fun": "Fun",
+  "close_button": "Close",
+  "confirm_button": "Confirm",
+  "save_button": "Save",
+  "delete_button": "Delete",
+  "confirm_delete_event": "Are you sure you want to delete this event?",
+
+  "today": "Today",
+  "prev_month_but": "Previous",
+  "next_month_but": "Next",
+  "month": "Month",
+  "week": "Week",
+  "work_week": "Work Week",
+  "day": "Day",
+  "agenda": "Agenda",
+  "date": "Date",
+  "time": "Time",
+  "event": "Event",
+  "show_more": "Show More (+{{count}})",
+
+  "weekdays": {
+    "sunday": { "medium": "Sunday", "short": "Sun" },
+    "monday": { "medium": "Monday", "short": "Mon" },
+    "tuesday": { "medium": "Tuesday", "short": "Tue" },
+    "wednesday": { "medium": "Wednesday", "short": "Wed" },
+    "thursday": { "medium": "Thursday", "short": "Thu" },
+    "friday": { "medium": "Friday", "short": "Fri" },
+    "saturday": { "medium": "Saturday", "short": "Sat" }
+  }
 }
