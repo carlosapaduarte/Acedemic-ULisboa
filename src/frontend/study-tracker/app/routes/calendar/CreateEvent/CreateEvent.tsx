@@ -17,10 +17,10 @@ import classNames from "classnames";
 import "./createEventReactAriaModal.css";
 import styles from "./createEvent.module.css";
 import React, { useEffect, useState } from "react";
-import { service } from "../../../service/service"; // Certifique-se que o caminho está correto
+import { service } from "../../../service/service";
 
 const possibleTags = ["study", "work", "personal", "fun"];
-export type RecurrenceType = "none" | "daily" | "weekly"; // Adicione aqui mais tipos se necessário
+export type RecurrenceType = "none" | "daily" | "weekly";
 
 export const TitleSection = React.memo(function TitleSection({
   title,
@@ -200,7 +200,6 @@ export const IsRecurrentSection = React.memo(function IsRecurrentSection({
     { id: "none", labelKey: "recurrence_none_label" },
     { id: "daily", labelKey: "recurrence_daily_label" },
     { id: "weekly", labelKey: "recurrence_weekly_label" },
-    // Adicione outras opções aqui se precisar no futuro
   ];
 
   return (
@@ -224,7 +223,6 @@ export const IsRecurrentSection = React.memo(function IsRecurrentSection({
 });
 
 export const TagSection = function TagSection({
-  // Mantido sem React.memo para teste
   selectedTags,
   setSelectedTags,
 }: {
@@ -234,9 +232,6 @@ export const TagSection = function TagSection({
   const { t } = useTranslation("calendar");
 
   function tagButtonClickHandler(tag: string) {
-    // console.log("Tag clicada:", tag);
-    // console.log("selectedTags ANTES da atualização:", selectedTags);
-
     setSelectedTags((prevSelectedTags) => {
       const isSelected = prevSelectedTags.includes(tag);
       let newTags;
@@ -245,7 +240,7 @@ export const TagSection = function TagSection({
       } else {
         newTags = [...prevSelectedTags, tag];
       }
-      // console.log("Tags DEPOIS (adicionar/remover):", newTags);
+
       return newTags;
     });
   }
@@ -258,11 +253,9 @@ export const TagSection = function TagSection({
           <Button
             key={index}
             onPress={() => tagButtonClickHandler(tag)}
-            className={classNames(
-              styles.roundButton,
-              styles.tag,
-              { [styles.selectedTag]: selectedTags.includes(tag) } // Classe condicional para estilo
-            )}
+            className={classNames(styles.roundButton, styles.tag, {
+              [styles.selectedTag]: selectedTags.includes(tag),
+            })}
           >
             {t(tag)}
           </Button>
@@ -295,7 +288,6 @@ function CreateEventForm({
   recurrenceType: RecurrenceType;
   setRecurrenceType: (value: RecurrenceType) => void;
 }) {
-  // As props isNewEventRecurrent e isNewEventEveryDay e seus setters foram removidos daqui
   return (
     <div className={styles.newEventForm}>
       <TitleSection title={newEventTitle} setTitle={setNewEventTitle} />
@@ -339,10 +331,8 @@ export function CreateEventModal({
   refreshUserEvents: () => void;
 }) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  // Estados antigos removidos:
-  // const [isNewEventRecurrent, setIsNewEventRecurrent] = useState<boolean>(false);
-  // const [isNewEventEveryDay, setIsNewEventEveryDay] = useState<boolean>(false);
-  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none"); // Novo estado de recorrência
+
+  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
   const { t } = useTranslation("calendar");
 
   function clearFields() {
@@ -350,7 +340,7 @@ export function CreateEventModal({
     setNewEventStartDate(new Date());
     setNewEventEndDate(new Date());
     setSelectedTags([]);
-    setRecurrenceType("none"); // Limpa para o valor padrão
+    setRecurrenceType("none");
   }
 
   const finishCreatingEventButtonDisabled = !newEventTitle;
