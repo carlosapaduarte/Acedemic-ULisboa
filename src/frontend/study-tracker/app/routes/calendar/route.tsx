@@ -28,8 +28,8 @@ import { getCalendarMessages } from "../../calendarUtils";
 type EventsView = "allEvents" | "recurringEvents";
 
 function inferColorFromTags(tags: string[] = []): string {
-  // Se não houver tags, fallback azul (talvez meter cinzento?)
-  if (!tags.length) return "#3399ff";
+  // Se não houver tags, fallback cinzento (antes #3399ff)
+  if (!tags.length) return "#a0a0a0";
 
   // normalize: lowercase + remover acentos
   const normalize = (s: string) =>
@@ -47,9 +47,32 @@ function inferColorFromTags(tags: string[] = []): string {
       return "#EE6352"; //pensar se é melhor "lazer" ou "diversão"
   }
 
-  // nenhuma tag fica com cinzento
+  //?
   return "#3399ff";
 }
+
+const EventWithTags = ({
+  event,
+}: {
+  event: CalendarEvent & { resource: any };
+}) => (
+  <div style={{ position: "relative", width: "100%", height: "100%" }}>
+    <div>{event.title}</div>
+    <div
+      style={{
+        position: "absolute",
+        bottom: 2,
+        right: 2,
+        fontSize: "0.7em",
+        background: "rgba(0,0,0,0.2)",
+        padding: "3px 8px",
+        borderRadius: "10px",
+      }}
+    >
+      {event.resource.tags.join(", ")}
+    </div>
+  </div>
+);
 
 function useMyCalendar() {
   const setGlobalError = useSetGlobalError();
@@ -465,6 +488,7 @@ function MyCalendar() {
       <div className={styles.calendarContainer}>
         <Calendar
           components={{
+            event: EventWithTags,
             week: {
               header: (props: any) => {
                 const days = [
