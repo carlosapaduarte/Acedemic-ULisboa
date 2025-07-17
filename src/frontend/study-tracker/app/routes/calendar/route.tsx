@@ -27,6 +27,30 @@ import { getCalendarMessages } from "../../calendarUtils";
 
 type EventsView = "allEvents" | "recurringEvents";
 
+function inferColorFromTags(tags: string[] = []): string {
+  // Se não houver tags, fallback azul (talvez meter cinzento?)
+  if (!tags.length) return "#3399ff";
+
+  // normalize: lowercase + remover acentos
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  for (const raw of tags) {
+    const t = normalize(raw);
+    if (t.includes("study") || t.includes("estudo")) return "#009FB7";
+    if (t.includes("work") || t.includes("trabalho")) return "#FF87AB";
+    if (t.includes("personal") || t.includes("pessoal")) return "#B39BEE";
+    if (t.includes("fun") || t.includes("lazer") || t.includes("diversao"))
+      return "#EE6352"; //pensar se é melhor "lazer" ou "diversão"
+  }
+
+  // nenhuma tag fica com cinzento
+  return "#3399ff";
+}
+
 function useMyCalendar() {
   const setGlobalError = useSetGlobalError();
 
@@ -71,12 +95,6 @@ function useMyCalendar() {
   function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
     // service.getUserEvents(false, true) deve buscar apenas eventos recorrentes
     service.getUserEvents(false, true).then((events: Event[]) => {
-      // ESTE É O NOVO CONSOLE.LOG CHAVE
-      console.log(
-        "refreshUserRecurrentEvents: Eventos obtidos do backend (service.getUserEvents(false, true)):",
-        events
-      );
-
       const calendarEvents: CalendarEvent[] = [];
       calendarDisplayedDates.forEach((displayedDate: Date) => {
         events
@@ -104,6 +122,7 @@ function useMyCalendar() {
                 tags: event.tags,
                 everyWeek: event.everyWeek,
                 everyDay: event.everyDay,
+                color: inferColorFromTags(event.tags),
               },
             };
 
@@ -199,6 +218,7 @@ function useMyCalendar() {
                 everyDay: event.everyDay,
                 originalStartDate: event.startDate,
                 originalEndDate: event.endDate,
+                color: inferColorFromTags(event.tags),
               },
             });
           }
@@ -491,6 +511,17 @@ function MyCalendar() {
           messages={calendarMessages}
           culture={i18n.language}
           formats={calendarFormats}
+          eventPropGetter={(event) => {
+            const backgroundColor = event.resource?.color || "#3174ad";
+            return {
+              style: {
+                backgroundColor,
+                borderRadius: "5px",
+                color: "white",
+                border: "none",
+              },
+            };
+          }}
         />
       </div>
     </div>

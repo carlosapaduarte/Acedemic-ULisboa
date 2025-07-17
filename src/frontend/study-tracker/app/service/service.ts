@@ -1,13 +1,7 @@
-// This component could be used to define functions that interact with the Backend
-
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { utils } from "~/utils";
-
-// For now, all of these functions will return the expected response.
-// If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
-// In my opinion, this eases error handling in the caller.
 
 export type LoginResult = {
   access_token: string;
@@ -252,6 +246,7 @@ type EventDto = {
   tags: string[];
   everyWeek: boolean;
   everyDay: boolean;
+  color: string;
 };
 
 export type Event = {
@@ -262,6 +257,7 @@ export type Event = {
   tags: string[];
   everyWeek: boolean;
   everyDay: boolean;
+  color: string;
 };
 
 export type UpdateEventInputDto = {
@@ -301,6 +297,14 @@ async function deleteEvent(eventId: number) {
     return Promise.reject(new Error("Event could not be deleted!"));
 }
 
+function inferColorFromTags(tags?: string[]): string {
+  if (!tags || !tags.length) return "#3174ad";
+  if (tags.some((t) => /exame/i.test(t))) return "#EF4444";
+  if (tags.some((t) => /estudo/i.test(t))) return "#10B981";
+  if (tags.some((t) => /trabalho/i.test(t))) return "#3B82F6";
+  return "#A78BFA";
+}
+
 async function getUserEvents(
   filterTodayEvents: boolean,
   filterRecurrentEvents: boolean
@@ -323,6 +327,7 @@ async function getUserEvents(
         tags: eventDto.tags,
         everyWeek: eventDto.everyWeek,
         everyDay: eventDto.everyDay,
+        color: inferColorFromTags(eventDto.tags),
       };
     });
   } else {
