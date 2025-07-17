@@ -101,7 +101,8 @@ def create_event(
                     end_date=datetime.fromtimestamp(dto.endDate)
                 ),
             tags=dto.tags,
-            every_week=dto.everyWeek
+            every_week=dto.everyWeek,
+            every_day=dto.everyDay
         )
     )
     return Response()
@@ -123,7 +124,8 @@ def update_event(
                     end_date=datetime.fromtimestamp(dto.endDate)
                 ),
             tags=dto.tags,
-            every_week=dto.everyWeek
+            every_week=dto.everyWeek,
+            every_day=dto.everyDay
         )
     )
     return Response()

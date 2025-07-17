@@ -121,12 +121,13 @@ class ScheduleBlock():
 """
 
 class Event():
-    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool):
+    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool, every_day: bool):
         self.id=id
         self.title=title
         self.date=date
         self.tags=tags
         self.every_week=every_week
+        self.every_day=every_day
 
     @staticmethod
     def from_STEventModel(events: list[STEventModel]) -> list['Event']:
@@ -147,7 +148,8 @@ class Event():
                         end_date=event_result.end_date
                     ),
                     tags=tags,
-                    every_week=event_result.every_week
+                    every_week=event_result.every_week,
+                    every_day=event_result.every_day
                 )
             )
         return today_events

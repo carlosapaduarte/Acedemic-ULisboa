@@ -54,5 +54,9 @@
     "thursday": { "medium": "Quinta-feira", "short": "Qui" },
     "friday": { "medium": "Sexta-feira", "short": "Sex" },
     "saturday": { "medium": "Sábado", "short": "Sáb" }
-  }
+  },
+
+  "recurrence_none_label": "Nenhuma",
+  "recurrence_daily_label": "Diária",
+  "recurrence_weekly_label": "Semanal"
 }

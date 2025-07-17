@@ -54,5 +54,9 @@
     "thursday": { "medium": "Thursday", "short": "Thu" },
     "friday": { "medium": "Friday", "short": "Fri" },
     "saturday": { "medium": "Saturday", "short": "Sat" }
-  }
+  },
+
+  "recurrence_none_label": "No repeat",
+  "recurrence_daily_label": "Daily",
+  "recurrence_weekly_label": "Weekly"
 }

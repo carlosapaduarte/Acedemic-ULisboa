@@ -1,88 +1,118 @@
 @import "../../../components/Button/button.module.css";
 @import "../../../components/FormModal/formModal.module.css";
 
-
 .newEventModalContainer {
-    composes: modalContainer;
+  composes: modalContainer;
 }
 
 .newEventTitleText {
-    composes: mainFormModalTitleText;
+  composes: mainFormModalTitleText;
 }
 
 .newEventFormContainer {
-    composes: formContainer;
+  composes: formContainer;
 }
 
 .newEventForm {
-    composes: form;
+  composes: form;
 }
 
 .finishCreatingEventButtonContainer {
-    padding: 0 1rem;
+  padding: 0 1rem;
 
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 .finishCreatingEventButton {
-    composes: roundButton;
-    flex: 1 1 50%;
+  composes: roundButton;
+  flex: 1 1 50%;
 
-    height: 2rem;
+  height: 2rem;
 
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    text-align: center;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  text-align: center;
 }
 
 .deleteEventButton {
-    composes: roundButton;
-    flex: 1 1 25%;
+  composes: roundButton;
+  flex: 1 1 25%;
 
-    height: 2rem;
+  height: 2rem;
 
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    text-align: center;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  text-align: center;
 
-    background-color: #b10f0f;
+  background-color: #911313;
 }
 
 .formTextField {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .titleSectionContainer {
 }
 
 .tagsSectionContainer {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .recurrentEventSectionContainer {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .recurrentEventSectionCheckboxField {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .checkboxInput {
-    width: 2rem;
+  width: 2rem;
 }
 
 .closeButton {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    height: 2rem;
-    width: 5rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  height: 2rem;
+  width: 5rem;
+}
+
+/*dropdown recorrencia*/
+.nativeSelect {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--color-2);
+  border-radius: 6px;
+  background-color: var(--color-1);
+  color: var(--text-color-1);
+  font-family: var(--font-family1), sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  box-sizing: border-box;
+  height: 40px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22var(--text-color-1)%22%20d%3D%22M10%2C13.5L5.5%2C9h9L10%2C13.5z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 15px;
+}
+
+/* tags selecionadas */
+.selectedTag {
+  background-color: rgb(73, 106, 64);
+}
+
+.selectedTag:hover {
+  background-color: rgb(80, 116, 71);
 }

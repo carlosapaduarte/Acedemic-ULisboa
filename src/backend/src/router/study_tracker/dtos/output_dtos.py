@@ -65,6 +65,7 @@ class EventOutputDto(BaseModel):
     title: str
     tags: list[str]
     everyWeek: bool
+    everyDay: bool
 
     @staticmethod
     def from_events(events: list[Event]) -> list['EventOutputDto']:
@@ -81,7 +82,8 @@ class EventOutputDto(BaseModel):
                     endDate=get_datetime_utc(event.date.end_date),
                     title=event.title,
                     tags=event.tags,
-                    everyWeek=event.every_week
+                    everyWeek=event.every_week,
+                    everyDay=event.every_day
                 )
             )
 

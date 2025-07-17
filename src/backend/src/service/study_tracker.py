@@ -58,7 +58,8 @@ def create_event_from_task(user_id: int, task: Task, slot: SlotToWork):
             end_date=slot.end_time
         ),
         tags=task.tags,
-        every_week=False
+        every_week=False,
+        every_day=False
     )
     create_event(user_id, associatedEvent)
 

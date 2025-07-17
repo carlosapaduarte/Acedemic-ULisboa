@@ -223,6 +223,7 @@ export type NewEventInfo = {
   endDate: Date;
   tags: string[];
   everyWeek: boolean;
+  everyDay: boolean;
 };
 
 async function createNewEvent(newEventInfo: NewEventInfo) {
@@ -235,6 +236,7 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
       endDate: newEventInfo.endDate.getTime() / 1000,
       tags: newEventInfo.tags,
       everyWeek: newEventInfo.everyWeek,
+      everyDay: newEventInfo.everyDay,
     }),
   };
   const response: Response = await doFetch(request);
@@ -249,6 +251,7 @@ type EventDto = {
   title: string;
   tags: string[];
   everyWeek: boolean;
+  everyDay: boolean;
 };
 
 export type Event = {
@@ -258,6 +261,7 @@ export type Event = {
   title: string;
   tags: string[];
   everyWeek: boolean;
+  everyDay: boolean;
 };
 
 export type UpdateEventInputDto = {
@@ -266,6 +270,7 @@ export type UpdateEventInputDto = {
   endDate: Date;
   tags: string[];
   everyWeek: boolean;
+  everyDay: boolean;
 };
 
 async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
@@ -278,6 +283,7 @@ async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
       endDate: inputDto.endDate.getTime() / 1000,
       tags: inputDto.tags,
       everyWeek: inputDto.everyWeek,
+      everyDay: inputDto.everyDay,
     }),
   };
   const response: Response = await doFetch(request);
@@ -300,6 +306,7 @@ async function getUserEvents(
   filterRecurrentEvents: boolean
 ): Promise<Event[]> {
   const request = {
+    //study-tracker/users/me/events?today=${filterTodayEvents}&recurrentEvents=${filterRecurrentEvents}
     path: `study-tracker/users/me/events?today=${filterTodayEvents}&recurrentEvents=${filterRecurrentEvents}`,
     method: "GET",
   };
@@ -315,6 +322,7 @@ async function getUserEvents(
         title: eventDto.title,
         tags: eventDto.tags,
         everyWeek: eventDto.everyWeek,
+        everyDay: eventDto.everyDay,
       };
     });
   } else {

@@ -1,5 +1,5 @@
 import random
-from sqlmodel import Session, select
+from sqlmodel import Session, select, or_
 
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 from exception import NotFoundException
@@ -69,7 +69,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 user_id=user_id,
                 user=user_model,
                 tags=[], # tags added next
-                every_week=event.every_week
+                every_week=event.every_week,
+                every_day=event.every_day
             )
 
             user_model.st_events.append(
@@ -109,6 +110,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             event_model.start_date = event.date.start_date
             event_model.end_date = event.date.end_date
             event_model.every_week = event.every_week
+            event_model.every_day = event.every_day
         
             session.add(event_model)
             session.commit()
@@ -193,9 +195,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         with Session(engine) as session:
             statement = select(STEventModel)\
                 .where(STEventModel.user_id == user_id)\
-                    
+            
+            #if recurrentEvents:
+            #    statement = statement.where(or_(STEventModel.every_week == True, STEventModel.every_day == True))
             if recurrentEvents:
-                statement = statement.where(STEventModel.every_week == True)
+                statement = statement.where(or_(STEventModel.every_week == True, STEventModel.every_day == True))
+
                 
             results = session.exec(statement)
             

@@ -1,4 +1,3 @@
-// src/frontend/study-tracker/app/routes/calendar/route.tsx
 import {
   Calendar,
   Event as CalendarEvent,
@@ -44,7 +43,16 @@ function useMyCalendar() {
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
   const [eventsView, setEventsView] = useState<EventsView>("allEvents");
 
-  const [displayedDates, setDisplayedDates] = useState<Date[]>([]);
+  const [displayedDates, setDisplayedDates] = useState<Date[]>(() => {
+    const today = new Date();
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - today.getDay() + i);
+      dates.push(d);
+    }
+    return dates;
+  });
 
   useEffect(() => {
     if (eventsView === "allEvents") refreshUserEvents();
@@ -55,34 +63,28 @@ function useMyCalendar() {
     if (calendarView === Views.MONTH) setEventsView("allEvents");
   }, [calendarView]);
 
-  useEffect(() => {
-    if (displayedDates.length === 0) {
-      const today = new Date();
-      const dates = [];
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - today.getDay() + i);
-        dates.push(d);
-      }
-      setDisplayedDates(dates);
-    }
-  }, [displayedDates]);
-
   function toggleEventsView() {
     if (eventsView === "allEvents") setEventsView("recurringEvents");
     else setEventsView("allEvents");
   }
 
   function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
+    // service.getUserEvents(false, true) deve buscar apenas eventos recorrentes
     service.getUserEvents(false, true).then((events: Event[]) => {
-      console.log(calendarDisplayedDates);
-      console.log(events);
+      // ESTE É O NOVO CONSOLE.LOG CHAVE
+      console.log(
+        "refreshUserRecurrentEvents: Eventos obtidos do backend (service.getUserEvents(false, true)):",
+        events
+      );
+
       const calendarEvents: CalendarEvent[] = [];
       calendarDisplayedDates.forEach((displayedDate: Date) => {
         events
           .filter(
             (event: Event) =>
-              event.startDate.getDay() === displayedDate.getDay()
+              // Esta condição deve incluir tanto eventos semanais quanto diários
+              event.startDate.getDay() === displayedDate.getDay() ||
+              event.everyDay
           )
           .forEach((event: Event) => {
             const start = new Date(displayedDate);
@@ -101,6 +103,7 @@ function useMyCalendar() {
                 id: event.id,
                 tags: event.tags,
                 everyWeek: event.everyWeek,
+                everyDay: event.everyDay,
               },
             };
 
@@ -112,51 +115,105 @@ function useMyCalendar() {
   }
 
   function refreshUserEvents() {
-    if (displayedDates.length === 0) {
-      console.warn("No displayed dates set, cannot fetch events.");
-      return;
-    }
-    service.getAllUserEvents().then((events: Event[]) => {
-      const temp: CalendarEvent[] = [];
+    service.getAllUserEvents().then((eventsFromBackend: Event[]) => {
+      const allOccurrences: CalendarEvent[] = [];
 
-      displayedDates.forEach((date) => {
-        events.forEach((event) => {
-          const isSameDay = utils.sameDay(event.startDate, date);
-          const isRecurringOnDay =
-            event.everyWeek && event.startDate.getDay() === date.getDay();
+      eventsFromBackend.forEach((event) => {
+        displayedDates.forEach((currentDisplayDate) => {
+          let shouldAddEvent = false;
+          let eventOccurrenceStartDate = new Date(currentDisplayDate);
+          let eventOccurrenceEndDate = new Date(currentDisplayDate);
 
-          if (!isSameDay && !isRecurringOnDay) return;
+          const eventStartDay = new Date(event.startDate);
+          eventStartDay.setHours(0, 0, 0, 0);
+          // const eventEndDay = new Date(event.endDate); // Não será mais usado diretamente para o filtro 'everyDay'
+          // eventEndDay.setHours(0, 0, 0, 0);
+          const displayDay = new Date(currentDisplayDate);
+          displayDay.setHours(0, 0, 0, 0);
 
-          const start = new Date(date);
-          start.setHours(
-            event.startDate.getHours(),
-            event.startDate.getMinutes()
-          );
+          if (!event.everyDay && !event.everyWeek) {
+            // Lógica para eventos NÃO recorrentes
+            if (utils.sameDay(event.startDate, currentDisplayDate)) {
+              shouldAddEvent = true;
+              eventOccurrenceStartDate.setHours(
+                event.startDate.getHours(),
+                event.startDate.getMinutes(),
+                event.startDate.getSeconds(),
+                event.startDate.getMilliseconds()
+              );
+              eventOccurrenceEndDate.setHours(
+                event.endDate.getHours(),
+                event.endDate.getMinutes(),
+                event.endDate.getSeconds(),
+                event.endDate.getMilliseconds()
+              );
+            }
+          } else if (event.everyDay) {
+            // Lógica para eventos DIÁRIOS
+            // Se 'everyDay' é true, assume-se que deve ocorrer diariamente a partir do startDate
+            // A endDate do evento original agora define apenas a hora de fim, não o limite de recorrência
+            if (displayDay >= eventStartDay) {
+              // Apenas verifica se o dia atual é a partir da data de início do evento recorrente
+              shouldAddEvent = true;
+              eventOccurrenceStartDate.setHours(
+                event.startDate.getHours(),
+                event.startDate.getMinutes(),
+                event.startDate.getSeconds(),
+                event.startDate.getMilliseconds()
+              );
+              eventOccurrenceEndDate.setHours(
+                event.endDate.getHours(), // Usa a hora de fim original do evento
+                event.endDate.getMinutes(),
+                event.endDate.getSeconds(),
+                event.endDate.getMilliseconds()
+              );
+            }
+          } else if (event.everyWeek) {
+            // Lógica para eventos SEMANAIS
+            if (event.startDate.getDay() === currentDisplayDate.getDay()) {
+              shouldAddEvent = true;
+              eventOccurrenceStartDate.setHours(
+                event.startDate.getHours(),
+                event.startDate.getMinutes(),
+                event.startDate.getSeconds(),
+                event.startDate.getMilliseconds()
+              );
+              eventOccurrenceEndDate.setHours(
+                event.endDate.getHours(),
+                event.endDate.getMinutes(),
+                event.endDate.getSeconds(),
+                event.endDate.getMilliseconds()
+              );
+            }
+          }
 
-          const end = new Date(date);
-          end.setHours(event.endDate.getHours(), event.endDate.getMinutes());
-
-          temp.push({
-            title: event.title,
-            start,
-            end,
-            resource: {
-              id: event.id,
-              tags: event.tags,
-              everyWeek: event.everyWeek,
-            },
-          });
+          if (shouldAddEvent) {
+            allOccurrences.push({
+              title: event.title,
+              start: eventOccurrenceStartDate,
+              end: eventOccurrenceEndDate,
+              resource: {
+                id: event.id,
+                tags: event.tags,
+                everyWeek: event.everyWeek,
+                everyDay: event.everyDay,
+                originalStartDate: event.startDate,
+                originalEndDate: event.endDate,
+              },
+            });
+          }
         });
       });
 
-      const unique = new Map<string, CalendarEvent>();
-      temp.forEach((ev) => {
+      const uniqueEventsMap = new Map<string, CalendarEvent>();
+      allOccurrences.forEach((ev) => {
         const key = `${ev.resource.id}-${ev.start.toISOString().slice(0, 10)}`;
-        if (!unique.has(key)) unique.set(key, ev);
+        if (!uniqueEventsMap.has(key)) {
+          uniqueEventsMap.set(key, ev);
+        }
       });
 
-      const calendarEvents = Array.from(unique.values());
-      setEvents(calendarEvents);
+      setEvents(Array.from(uniqueEventsMap.values()));
     });
   }
 
@@ -298,7 +355,6 @@ function MyCalendar() {
     [setCalendarView]
   );
 
-  // Obtem as mensagens traduzidas para o calendário
   const calendarMessages = getCalendarMessages();
 
   const calendarFormats = {
@@ -321,20 +377,18 @@ function MyCalendar() {
     agendaDayFormat: (date: Date, culture?: string) =>
       moment(date)
         .locale(culture || i18n.language)
-        .format("dddd"), // 'dddd' para nome completo do dia
+        .format("dddd"),
 
     agendaTimeFormat: (date: Date, culture?: string) =>
       moment(date)
         .locale(culture || i18n.language)
         .format(t("rbc_time_format")),
 
-    // Formato de hora no lado esquerdo do calendário (slots de tempo)
     timeGutterFormat: (date: Date, culture?: string) =>
       moment(date)
         .locale(culture || i18n.language)
         .format(t("rbc_time_format")),
 
-    // Formato do intervalo de tempo dos eventos
     eventTimeRangeFormat: (
       range: { start: Date; end: Date },
       culture?: string

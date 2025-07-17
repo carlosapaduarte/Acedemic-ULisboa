@@ -130,6 +130,8 @@ class STEventModel(SQLModel, table=True):
     end_date: datetime
     title: str
     every_week: bool
+    every_day: bool = Field(default=False)
+
 
     tags: list["STEventTagModel"] = Relationship(back_populates="event")
 

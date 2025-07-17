@@ -17,6 +17,7 @@ class CreateEventInputDto(BaseModel):
     title: str
     tags: list[str]
     everyWeek: bool
+    everyDay: bool = False
 
 class UpdateEventInputDto(BaseModel):
     startDate: float
@@ -24,6 +25,7 @@ class UpdateEventInputDto(BaseModel):
     title: str
     tags: list[str]
     everyWeek: bool
+    everyDay: bool = False
 
 class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int
