@@ -1,6 +1,5 @@
 import random
 from sqlmodel import Session, select, or_
-
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
@@ -10,6 +9,10 @@ from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from utils import get_datetime_utc
 from datetime import date
+from domain.study_tracker import (
+    Event, DateInterval, Task, UnavailableScheduleBlock, Archive,
+    CurricularUnit, Grade, DailyEnergyStatus, WeekTimeStudy, WeekAndYear, SlotToWork
+)
 
 engine = database.get_engine()
 
@@ -17,7 +20,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set[int]):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
-
             new_user_study_tracker_app_uses: list[STAppUseModel] = []
             for use_goal in use_goals:
                 new_user_study_tracker_app_uses.append(
@@ -27,7 +29,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                         user=user_model
                     )
                 )
-
             user_model.user_st_app_uses = new_user_study_tracker_app_uses
             session.add(user_model)
             session.commit()
@@ -36,14 +37,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def update_study_tracker_app_planning_day(self, user_id: int, day: int, hour: int):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
-
             user_model.st_planning_day = STWeekDayPlanningModel(
                 week_planning_day=day,
                 hour=hour,
                 user_id=user_id,
                 user=user_model
             )
-
             session.add(user_model)
             session.commit()
             session.refresh(user_model)
@@ -51,7 +50,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def create_event(self, user_id: int, event: Event):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
-            
             # Generates a random ID, that is not yet taken
             random_generated_id: int = 0
             while True:
@@ -60,7 +58,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 result = session.exec(statement)
                 if result.first() is None:
                     break
-
             new_event_model = STEventModel(
                 id=random_generated_id, # For some reason, automatic ID is not working
                 title=event.title,
@@ -72,15 +69,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 every_week=event.every_week,
                 every_day=event.every_day
             )
-
             user_model.st_events.append(
                 new_event_model
             )
-
             session.add(user_model)
             session.commit()
             session.refresh(new_event_model)
-
             tags_model: list[STEventTagModel] = []
             for tag in event.tags:
                 tags_model.append(STEventTagModel(
@@ -89,7 +83,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     event_id=new_event_model.id,
                     event=new_event_model
                 ))
-
             for tag_model in tags_model:
                 session.add(tag_model)
                 session.commit()
@@ -102,26 +95,20 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             result = session.exec(statement)            
             event_model = result.first()
-            
             if event_model == None:
                 raise NotFoundException(user_id)
-            
             event_model.title = event.title
             event_model.start_date = event.date.start_date
             event_model.end_date = event.date.end_date
             event_model.every_week = event.every_week
             event_model.every_day = event.every_day
-        
             session.add(event_model)
             session.commit()
             session.refresh(event_model)
-            
             # First, delete all existent tags  
             for tag in event_model.tags:
                 session.delete(tag)
-            
             session.commit()
-
             # Now, add new ones
             tags_model: list[STEventTagModel] = []
             for tag in event.tags:
@@ -131,7 +118,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     event_id=event_model.id,
                     event=event_model
                 ))
-
             for tag_model in tags_model:
                 session.add(tag_model)
                 session.commit()
@@ -140,18 +126,14 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         with Session(engine) as session:
             statement = select(STEventModel)\
                 .where(STEventModel.user_id == user_id)\
-                .where(STEventModel.id == event_id)
-                
+                .where(STEventModel.id == event_id) 
             result = session.exec(statement)            
             event_model = result.first()
-            
             if event_model is None:
                 raise NotFoundException(user_id)
-            
             # First, delete all existent tags  
             for tag in event_model.tags:
-                session.delete(tag)
-                
+                session.delete(tag)  
             session.delete(event_model)
             session.commit()
         
@@ -160,17 +142,13 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         with Session(engine) as session:
             statement = select(STEventModel)\
                 .where(STEventModel.user_id == user_id)\
-                .where(STEventModel.title == title)
-                
-            print(title)
-                
+                .where(STEventModel.title == title)  
+            print(title)  
             result = session.exec(statement)            
             events_models = result.all()
-            
             for event in events_models:
                 StudyTrackerSqlRepo.delete_event(self, user_id, event.id)
-            
-            
+           
     @staticmethod
     def is_today(date_1: datetime) -> bool:
         today = datetime.today()
@@ -194,24 +172,15 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     ) -> list[Event]:
         with Session(engine) as session:
             statement = select(STEventModel)\
-                .where(STEventModel.user_id == user_id)\
-            
-            #if recurrentEvents:
-            #    statement = statement.where(or_(STEventModel.every_week == True, STEventModel.every_day == True))
+                .where(STEventModel.user_id == user_id)
             if recurrentEvents:
                 statement = statement.where(or_(STEventModel.every_week == True, STEventModel.every_day == True))
-
-                
             results = session.exec(statement)
-            
-            # Ideally, we would use another where statement. Yet, this was not working for me...
             events: list[STEventModel] = []
             for event in results:
                 if (not filter_today or StudyTrackerSqlRepo.is_today(event.start_date)):
                     #print('From DB: ', event.start_date.timestamp())
-                    events.append(event)
-                                
-
+                    events.append(event)               
             # Filter events that has tag "study"
             if study_events:    
                 events_filtered: list[STEventModel] = []
@@ -233,7 +202,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(user_id, session)
             user_model.receive_st_app_notifications = receive            
-
             session.add(user_model)
             session.commit()
 
@@ -246,7 +214,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 duration=info.duration,
                 user_id=user_id
             ))
-
             session.add(user_model)
             session.commit()
 
@@ -267,12 +234,10 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     @staticmethod
     def build_task(task_model: STTaskModel) -> Task:
         
-        # Build Task Sub-Tasks
         subtasks: list[Task] = []
         for sub_task_model in task_model.subtasks:
             subtasks.append(StudyTrackerSqlRepo.build_task(sub_task_model))
-        
-        # Build Task Tags
+
         tags: list[str] = []
         for tag_model in task_model.tags:
             tags.append(tag_model.tag)
@@ -303,7 +268,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         return False
         """
         
-            
     def get_tasks(
         self, 
         user_id: int, 
@@ -365,7 +329,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                         
             return tasks
         
-    
     @staticmethod
     def create_task_with_parent(
         task: Task, 
@@ -399,7 +362,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             parent_task_id=parent_task_id,
             parent_user_id=user_id
         )
-        
         session.add(new_task_model)
         session.commit()
         session.refresh(new_task_model)
@@ -470,7 +432,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             result = session.exec(statement)
             child_tasks_models = result.all()
-            
             # Delete child tasks
             for child in child_tasks_models:
                 session.delete(child)
@@ -482,10 +443,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         with Session(engine) as session:
             statement = select(STTaskModel).where(STTaskModel.user_id == user_id).where(STTaskModel.id == task_id)
             result = session.exec(statement)
-            
             task_model: STTaskModel = result.one()
             task_model.status = new_status
-
             session.add(task_model)
             session.commit()
             
@@ -505,9 +464,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             statement = select(STArchiveModel)\
                 .where(STArchiveModel.user_id == user_id)
             result = session.exec(statement)
-            
             archive_models: list[STArchiveModel] = list(result.all())
-            
             return Archive.from_STArchiveModel(archive_models)
         
     def create_file(self, user_id: int, archive_name: str, name: str):
@@ -516,7 +473,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 .where(STArchiveModel.user_id == user_id)\
                 .where(STArchiveModel.name == archive_name)
             result = session.exec(statement)
-
             archive_model = result.one()            
             archive_model.files.append(STFileModel(
                 name=name,
@@ -536,7 +492,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 .where(STFileModel.name == filename)
                 
             result = session.exec(statement)
-            
             file_model: STFileModel = result.one()
             file_model.text = new_content
             session.add(file_model)
@@ -625,7 +580,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     
                 result = session.exec(statement)
                 res = result.first()
-                
                 if res is not None:
                     if StudyTrackerSqlRepo.is_same_day(res.date_, _date):
                         continue
@@ -646,7 +600,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             result = session.exec(statement)
             daily_tags_models: list[DailyTagModel] = list(result.all())
-            
             daily_tags: list[str] = []
             for tag_model in daily_tags_models:
                 if StudyTrackerSqlRepo.is_same_day(tag_model.date_, _date):
@@ -672,7 +625,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             result = session.exec(statement)
             daily_energy_history_models: list[DailyEnergyStatusModel] = list(result.all())
-            
             daily_energy_history: list[DailyEnergyStatus] = []
             for stat_model in daily_energy_history_models:
                 daily_energy_history.append(
@@ -684,7 +636,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 )
                 
             return daily_energy_history
-            
             
     @staticmethod
     def compute_elapsed_minutes(date1: datetime, date2: datetime) -> int:
@@ -699,13 +650,11 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             result = session.exec(statement)
             events: list[STEventModel] = list(result.all())
-            
             stats: dict[int, dict[int, dict[str, int]]] = {}
 
             for event in events:
                 start_date = event.start_date
                 elapsed_minutes = StudyTrackerSqlRepo.compute_elapsed_minutes(event.end_date, start_date)
-                
                 year = start_date.year
                 week = event.start_date.isocalendar().week
                             
@@ -718,10 +667,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                         
                     if stats[year].get(week) is None:
                         stats[year][week] = {}
-                        
                     if stats[year][week].get(tag_name) is None:
-                        stats[year][week][tag_name] = 0
-                        
+                        stats[year][week][tag_name] = 0 
                     stats[year][week][tag_name] += elapsed_minutes
                     
             return stats
@@ -729,13 +676,11 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:
         with Session(engine) as session:
             statement = select(WeekStudyTimeModel)\
-                .where(WeekStudyTimeModel.user_id == user_id)\
-                    
+                .where(WeekStudyTimeModel.user_id == user_id)
+                
             result = session.exec(statement)
             week_study_time_history: list[WeekStudyTimeModel] = list(result.all())
-            return WeekTimeStudy.from_STCurricularUnitModel(week_study_time_history)
-            
-            
+            return WeekTimeStudy.from_STCurricularUnitModel(week_study_time_history)          
     
     def increment_week_study_time(self, user_id: int, week_and_year: WeekAndYear, minutes: int):
         with Session(engine) as session:
@@ -766,35 +711,28 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def override_study_session_start_date(self, user_id: int):
         with Session(engine) as session:
             statement = select(UserModel)\
-                .where(UserModel.id == user_id)
-                    
+                .where(UserModel.id == user_id)   
             result = session.exec(statement)
             user_model: UserModel | None = result.first()            
-            
             if user_model is None:
                 raise NotFoundException(user_id)
-            
             user_model.study_session_time = datetime.now()
-            
             session.add(user_model)
             session.commit()
             
     def get_study_session_start_date(self, user_id: int) -> datetime:
         with Session(engine) as session:
             statement = select(UserModel)\
-                .where(UserModel.id == user_id)
-                    
+                .where(UserModel.id == user_id)  
             result = session.exec(statement)
             user_model: UserModel | None = result.first()            
-            
             if user_model is None:
                 raise NotFoundException(user_id)
-            
             start = user_model.study_session_time
             if start is None:
                 raise NotFoundException(user_id)
             return start
-            
+
     def update_week_time_average_study_time(self, user_id: int, week_and_year: WeekAndYear, study_session_time: int):
         with Session(engine) as session:
             statement = select(WeekStudyTimeModel)\
@@ -818,3 +756,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 week_study_time_model.n_of_sessions += 1
                 session.add(week_study_time_model)
                 session.commit()
+                
+
+def delete_tag(session: Session, tag_id) -> bool:
+    tag = session.query(models.Tag).filter(models.Tag.id == tag_id).first()
+    if tag is None:
+        return False
+    session.delete(tag)
+    session.commit()
+    return True

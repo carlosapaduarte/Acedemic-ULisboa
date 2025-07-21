@@ -17,6 +17,12 @@ export type AuthErrorType =
 
 type AuthErrorField = "username" | "password";
 
+interface Tag {
+  id: string;
+  name: string;
+  user_id?: number;
+}
+
 const AUTH_ERROR_MESSAGES: Record<AuthErrorType, string> = {
   USERNAME_ALREADY_EXISTS: "Username already exists!",
   INVALID_USERNAME_OR_PASSWORD: "Invalid username or password!",
@@ -118,7 +124,6 @@ async function selectShareProgressState(shareProgress: boolean) {
     body: toJsonBody({ shareProgress }),
   };
   const response: Response = await doFetch(request);
-  //console.log(response)
   if (!response.ok)
     return Promise.reject(
       new Error("Progress share preference selection failed!")
@@ -132,7 +137,6 @@ async function selectAvatar(avatarFilename: string) {
     body: toJsonBody({ avatarFilename }),
   };
   const response: Response = await doFetch(request);
-  //console.log(response)
   if (!response.ok)
     return Promise.reject(new Error("Avatar selection failed!"));
 }
@@ -310,7 +314,6 @@ async function getUserEvents(
   filterRecurrentEvents: boolean
 ): Promise<Event[]> {
   const request = {
-    //study-tracker/users/me/events?today=${filterTodayEvents}&recurrentEvents=${filterRecurrentEvents}
     path: `study-tracker/users/me/events?today=${filterTodayEvents}&recurrentEvents=${filterRecurrentEvents}`,
     method: "GET",
   };
@@ -956,4 +959,47 @@ export const service = {
   //updateWeekAverageAttentionSpan
   startStudySession,
   finishStudySession,
+
+  /**
+   * Busca todas as tags disponíveis do backend.
+   * @returns Uma Promise que resolve para uma lista de Tag.
+   */
+  async fetchAllTags(): Promise<Tag[]> {
+    try {
+      const request = {
+        path: "tags/",
+        method: "GET",
+      };
+      const response = await doFetch(request);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to fetch tags: ${response.status} ${response.statusText} - ${errorText}`
+        );
+      }
+      return response.json();
+    } catch (error) {
+      console.error("Erro ao buscar tags:", error);
+      throw error;
+    }
+  },
+
+  async deleteTag(tagId: string): Promise<void> {
+    try {
+      const request = {
+        path: `tags/${tagId}/`,
+        method: "DELETE",
+      };
+      const response = await doFetch(request);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to delete tag: ${response.status} ${response.statusText} - ${errorText}`
+        );
+      }
+    } catch (error) {
+      console.error(`Erro ao apagar tag com ID ${tagId}:`, error);
+      throw error;
+    }
+  },
 };

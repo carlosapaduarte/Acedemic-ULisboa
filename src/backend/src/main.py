@@ -9,7 +9,7 @@ from router.academic_challenge import academic_challenge
 from router.commons import common
 from router.badges import badges
 from fastapi.middleware.cors import CORSMiddleware
-
+from router import tags
 from router.study_tracker import study_tracker
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,11 +19,21 @@ load_dotenv()
 
 app = FastAPI()
 
+# CORS 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5273", "http://127.0.0.1:5273"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 print("URL da BD:", os.environ.get("SQLALCHEMY_DATABASE_URL"))
 app.include_router(common.router)
 app.include_router(badges.router)
 app.include_router(academic_challenge.router)
 app.include_router(study_tracker.router)
+app.include_router(tags.router)
 #app.include_router(u_lisboa_auth.router)
 
 dev_mode = True

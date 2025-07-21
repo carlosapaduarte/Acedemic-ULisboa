@@ -12,14 +12,18 @@ import {
 } from "react-aria-components";
 
 import { useTranslation } from "react-i18next";
-
+import React, { useEffect, useState, useCallback } from "react";
 import classNames from "classnames";
 import "./createEventReactAriaModal.css";
 import styles from "./createEvent.module.css";
-import React, { useEffect, useState } from "react";
 import { service } from "../../../service/service";
 
-const possibleTags = ["study", "work", "personal", "fun"];
+interface Tag {
+  id: string;
+  name: string;
+  user_id?: number;
+}
+
 export type RecurrenceType = "none" | "daily" | "weekly";
 
 export const TitleSection = React.memo(function TitleSection({
@@ -230,35 +234,80 @@ export const TagSection = function TagSection({
   setSelectedTags: (selectedTags: string[]) => void;
 }) {
   const { t } = useTranslation("calendar");
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  // --- REMOVIDO: Estado para o input de nova tag ---
+  // const [newTagName, setNewTagName] = useState("");
 
-  function tagButtonClickHandler(tag: string) {
+  const fetchTags = useCallback(async () => {
+    try {
+      const fetchedTags = await service.fetchAllTags();
+      console.log("Fetched tags:", fetchedTags);
+      setAvailableTags(fetchedTags);
+    } catch (error) {
+      console.error("Erro ao buscar tags:", error);
+      alert(t("error_fetching_tags"));
+    }
+  }, [t]);
+
+  useEffect(() => {
+    fetchTags();
+  }, [fetchTags]);
+
+  function tagButtonClickHandler(tagId: string) {
     setSelectedTags((prevSelectedTags) => {
-      const isSelected = prevSelectedTags.includes(tag);
-      let newTags;
+      const isSelected = prevSelectedTags.includes(tagId);
       if (isSelected) {
-        newTags = prevSelectedTags.filter((t: string) => t !== tag);
+        return prevSelectedTags.filter((t: string) => t !== tagId);
       } else {
-        newTags = [...prevSelectedTags, tag];
+        return [...prevSelectedTags, tagId];
       }
-
-      return newTags;
     });
+  }
+
+  async function deleteTagHandler(tagToDelete: Tag) {
+    if (
+      !window.confirm(t("confirm_delete_tag", { tagName: t(tagToDelete.name) }))
+    ) {
+      return;
+    }
+    try {
+      await service.deleteTag(tagToDelete.id);
+      setAvailableTags((prevAvailableTags) =>
+        prevAvailableTags.filter((tag) => tag.id !== tagToDelete.id)
+      );
+      setSelectedTags((prevSelectedTags) =>
+        prevSelectedTags.filter((tagId) => tagId !== tagToDelete.id)
+      );
+      alert(t("tag_deleted_success", { tagName: t(tagToDelete.name) }));
+    } catch (error) {
+      console.error(`Erro ao apagar a tag ${tagToDelete.name}:`, error);
+      alert(t("error_deleting_tag", { tagName: t(tagToDelete.name) }));
+    }
   }
 
   return (
     <div className={styles.tagsSectionContainer}>
       <h2 className={styles.formSectionTitle}>{t("tags_title")}</h2>
       <div className={styles.tagsContainer}>
-        {possibleTags.map((tag: string, index: number) => (
-          <Button
-            key={index}
-            onPress={() => tagButtonClickHandler(tag)}
-            className={classNames(styles.roundButton, styles.tag, {
-              [styles.selectedTag]: selectedTags.includes(tag),
-            })}
-          >
-            {t(tag)}
-          </Button>
+        {availableTags.map((tag: Tag) => (
+          <div key={tag.id} className={styles.tagItem}>
+            <Button
+              onPress={() => tagButtonClickHandler(tag.id)}
+              className={classNames(styles.roundButton, styles.tag, {
+                [styles.selectedTag]: selectedTags.includes(tag.id),
+              })}
+            >
+              {t(tag.name)}
+            </Button>
+            <Button
+              onPress={() => deleteTagHandler(tag)}
+              className={styles.deleteTagButton}
+              aria-label={t("delete_tag_aria_label", { tagName: t(tag.name) })}
+              title={t("delete_tag_title", { tagName: t(tag.name) })}
+            >
+              &times;
+            </Button>
+          </div>
         ))}
       </div>
     </div>
@@ -350,7 +399,6 @@ export function CreateEventModal({
       return;
     }
 
-    // Mapear recurrenceType para os campos booleanos esperados pelo backend
     const everyWeek = recurrenceType === "weekly";
     const everyDay = recurrenceType === "daily";
 
@@ -366,6 +414,11 @@ export function CreateEventModal({
       .then(() => {
         clearFields();
         refreshUserEvents();
+        setIsModalOpen(false);
+      })
+      .catch((error) => {
+        console.error("Erro ao criar evento:", error);
+        alert(t("error_creating_event"));
       });
   }
 
@@ -376,7 +429,10 @@ export function CreateEventModal({
           <div className={styles.newEventModalContainer}>
             <Button
               className={classNames(styles.roundButton, styles.closeButton)}
-              onPress={close}
+              onPress={() => {
+                clearFields();
+                close();
+              }}
             >
               {t("close_button")}
             </Button>
