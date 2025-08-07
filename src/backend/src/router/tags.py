@@ -76,7 +76,6 @@ async def create_new_tag(
         session.add(new_tag)
         session.flush() 
         tag_to_associate = new_tag
-        print(f"Criada nova tag global: '{tag_data.name}' (ID: {tag_to_associate.id})")
     else:
         tag_to_associate = existing_global_tag
         print(f"Tag global '{tag_data.name}' já existe (ID: {tag_to_associate.id}). Associando ao usuário.")

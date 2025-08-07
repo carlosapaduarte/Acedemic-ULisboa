@@ -58,5 +58,10 @@
 
   "recurrence_none_label": "Nenhuma",
   "recurrence_daily_label": "Diária",
-  "recurrence_weekly_label": "Semanal"
+  "recurrence_weekly_label": "Semanal",
+
+  "name_cannot_be_empty": "O nome da tag não pode estar vazio.",
+  "tag_already_exists_for_user": "Esta tag já existe para o seu utilizador.",
+  "created_successfully": "Tag criada com sucesso!",
+  "error_creating": "Erro ao criar a tag. Por favor, tente novamente."
 }

@@ -1,6 +1,8 @@
 import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import List, Optional
 
+from domain.study_tracker import Event
 from domain.commons.user import User
 from router.academic_challenge.dtos.output_dtos import BatchDto
 
@@ -26,19 +28,37 @@ class UserOutputDto(BaseModel):
             batches=BatchDto.fromBatches(user.batches)
         )
 
-class BadgeOutputDto(BaseModel):
+class TagOutputDto(BaseModel):
+    id: str
+    name: str
+    user_id: int
+    is_custom: bool
+
+class EventOutputDto(BaseModel):
     id: int
-    code: str
+    startDate: float
+    endDate: float
     title: str
-    description: str
-    icon_url: str | None
+    tags: Optional[List[str]] = None
+    everyWeek: bool
+    everyDay: bool
+    notes: Optional[str] = None
+    color: str
 
-    
-class UserBadgeOutputDto(BaseModel):
-    badge: BadgeOutputDto
-    earned_at: datetime
+    @classmethod
+    def from_event(cls, event: Event) -> "EventOutputDto":
+        """Converte um objeto de domínio Event para um EventOutputDto."""
+        start_ts = event.date.start_date.timestamp() if event.date and event.date.start_date else 0.0
+        end_ts = event.date.end_date.timestamp() if event.date and event.date.end_date else 0.0
 
-    class Config:
-        arbitrary_types_allowed = True  # Allows non-Pydantic types like datetime to be used
-
-    
+        return cls(
+            id=event.id,
+            startDate=start_ts,
+            endDate=end_ts,
+            title=event.title,
+            tags=event.tags,
+            everyWeek=event.every_week,
+            everyDay=event.every_day,
+            notes=event.notes,
+            color=event.color
+        )

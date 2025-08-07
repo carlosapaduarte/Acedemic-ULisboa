@@ -1,4 +1,5 @@
 from datetime import datetime
+from http.client import HTTPException
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
@@ -90,19 +91,21 @@ def get_events(
 def create_event(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateEventInputDto
-) -> Response:
+) ->  Response:
     study_tracker_service.create_event(
         user_id, 
         Event(
-            id=None,
-            title=dto.title,
-            date=DateInterval(
-                    start_date=datetime.fromtimestamp(dto.startDate),
-                    end_date=datetime.fromtimestamp(dto.endDate)
-                ),
-            tags=dto.tags,
-            every_week=dto.everyWeek,
-            every_day=dto.everyDay
+        id=None,
+        title=dto.title,
+        date=DateInterval(
+            start_date=datetime.fromtimestamp(dto.startDate),
+            end_date=datetime.fromtimestamp(dto.endDate)
+        ),
+        tags=dto.tags,
+        every_week=dto.everyWeek,
+        every_day=dto.everyDay,
+        color=dto.color,
+        notes=dto.notes
         )
     )
     return Response()
@@ -125,7 +128,9 @@ def update_event(
                 ),
             tags=dto.tags,
             every_week=dto.everyWeek,
-            every_day=dto.everyDay
+            every_day=dto.everyDay,
+            color=dto.color,
+            notes=dto.notes
         )
     )
     return Response()

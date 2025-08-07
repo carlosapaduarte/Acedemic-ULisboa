@@ -2,13 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 import jwt
 from pydantic import BaseModel
-from repository.sql.commons.repo_sql import CommonsSqlRepo
 from passlib.context import CryptContext
-
-# TODO: this is a problem for the mem repo, since data is stored inside the object.
-# Instead, pass a common dependency to the services.
-# Same for other services...
-commons_repo = CommonsSqlRepo()
 
 # Use: $ openssl rand -hex 32
 # to generate a secure random secret key

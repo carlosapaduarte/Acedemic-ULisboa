@@ -2,6 +2,7 @@ import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { utils } from "~/utils";
+import { Tag } from "~/routes/calendar/CreateEvent/CreateEvent";
 
 export type LoginResult = {
   access_token: string;
@@ -13,15 +14,11 @@ export type AuthErrorType =
   | "INVALID_USERNAME_OR_PASSWORD"
   | "INVALID_FORMAT"
   | "USER_CREATION_FAILED"
-  | "LOGIN_FAILED";
+  | "LOGIN_FAILED"
+  | "TAG_ALREADY_EXISTS_FOR_USER"
+  | "TAG_NAME_ALREADY_EXISTS_GLOBAL";
 
-type AuthErrorField = "username" | "password";
-
-interface Tag {
-  id: string;
-  name: string;
-  user_id?: number;
-}
+type AuthErrorField = "username" | "password" | "tag_name" | "general";
 
 const AUTH_ERROR_MESSAGES: Record<AuthErrorType, string> = {
   USERNAME_ALREADY_EXISTS: "Username already exists!",
@@ -29,6 +26,9 @@ const AUTH_ERROR_MESSAGES: Record<AuthErrorType, string> = {
   INVALID_FORMAT: "Invalid format of username or password!",
   USER_CREATION_FAILED: "User creation was not possible!",
   LOGIN_FAILED: "Login failed!",
+  TAG_ALREADY_EXISTS_FOR_USER: "You already have this tag.",
+  TAG_NAME_ALREADY_EXISTS_GLOBAL:
+    "A tag with this name already exists. Please choose a unique name.",
 };
 
 export class AuthError extends Error {
@@ -148,7 +148,7 @@ export type UserInfo = {
   level: number;
   startDate: number;
   shareProgress: boolean;
-  avatarFilename: string; // TODO: this could be undefined
+  avatarFilename: string;
 };
 
 async function fetchUserInfo(): Promise<UserInfo> {
@@ -165,7 +165,6 @@ async function fetchUserInfo(): Promise<UserInfo> {
 }
 
 async function updateAppUseGoals(uses: Set<number>) {
-  // Set needs to be converted to list
   const usesList = Array.from(uses);
   const request = {
     path: `study-tracker/users/me/use-goals`,
@@ -222,9 +221,15 @@ export type NewEventInfo = {
   tags: string[];
   everyWeek: boolean;
   everyDay: boolean;
+  notes: string;
+  color: string;
 };
 
 async function createNewEvent(newEventInfo: NewEventInfo) {
+  console.log(
+    "Service LOG: createNewEvent - Enviando cor:",
+    newEventInfo.color
+  );
   const request = {
     path: `study-tracker/users/me/events`,
     method: "POST",
@@ -235,11 +240,33 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
       tags: newEventInfo.tags,
       everyWeek: newEventInfo.everyWeek,
       everyDay: newEventInfo.everyDay,
+      notes: newEventInfo.notes,
+      color: newEventInfo.color,
     }),
   };
-  const response: Response = await doFetch(request);
-  if (!response.ok)
-    return Promise.reject(new Error("New event could not be created!"));
+
+  try {
+    const response: Response = await doFetch(request);
+    if (!response.ok) {
+      console.error("Service: Falha ao criar novo evento. Resposta:", response);
+      try {
+        const errorText = await response.text();
+        console.error("Service: Resposta de erro do backend:", errorText);
+      } catch (e) {
+        console.error(
+          "Service: Não foi possível ler o texto do erro da resposta."
+        );
+      }
+      throw new Error("New event could not be created!");
+    }
+    console.log(
+      "Service: Novo evento criado com sucesso! cor do evento: ",
+      newEventInfo.color
+    );
+  } catch (error) {
+    console.error("Service: Erro durante a criação do evento:", error);
+    return Promise.reject(error);
+  }
 }
 
 type EventDto = {
@@ -250,7 +277,8 @@ type EventDto = {
   tags: string[];
   everyWeek: boolean;
   everyDay: boolean;
-  color: string;
+  color?: string;
+  notes: string;
 };
 
 export type Event = {
@@ -262,6 +290,7 @@ export type Event = {
   everyWeek: boolean;
   everyDay: boolean;
   color: string;
+  notes: string;
 };
 
 export type UpdateEventInputDto = {
@@ -271,6 +300,8 @@ export type UpdateEventInputDto = {
   tags: string[];
   everyWeek: boolean;
   everyDay: boolean;
+  notes: string;
+  color?: string;
 };
 
 async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
@@ -284,6 +315,8 @@ async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
       tags: inputDto.tags,
       everyWeek: inputDto.everyWeek,
       everyDay: inputDto.everyDay,
+      notes: inputDto.notes,
+      color: inputDto.color,
     }),
   };
   const response: Response = await doFetch(request);
@@ -301,14 +334,6 @@ async function deleteEvent(eventId: number) {
     return Promise.reject(new Error("Event could not be deleted!"));
 }
 
-function inferColorFromTags(tags?: string[]): string {
-  if (!tags || !tags.length) return "#3174ad";
-  if (tags.some((t) => /exame/i.test(t))) return "#EF4444";
-  if (tags.some((t) => /estudo/i.test(t))) return "#10B981";
-  if (tags.some((t) => /trabalho/i.test(t))) return "#3B82F6";
-  return "#A78BFA";
-}
-
 async function getUserEvents(
   filterTodayEvents: boolean,
   filterRecurrentEvents: boolean
@@ -321,6 +346,7 @@ async function getUserEvents(
 
   if (response.ok) {
     const responseObject: EventDto[] = await response.json();
+    console.log("Service: Eventos recebidos do backend:", responseObject);
     return responseObject.map((eventDto: EventDto) => {
       return {
         id: eventDto.id,
@@ -330,7 +356,8 @@ async function getUserEvents(
         tags: eventDto.tags,
         everyWeek: eventDto.everyWeek,
         everyDay: eventDto.everyDay,
-        color: inferColorFromTags(eventDto.tags),
+        notes: eventDto.notes,
+        color: eventDto.color || "#3399FF",
       };
     });
   } else {
@@ -345,7 +372,6 @@ async function getUserEvents(
 async function getAllUserEvents(): Promise<Event[]> {
   const normalEvents = await getUserEvents(false, false);
   const recurrentEvents = await getUserEvents(false, true);
-  //console.log("normal:", normalEvents, "------recorrentes:", recurrentEvents);
   return [...normalEvents, ...recurrentEvents];
 }
 
@@ -361,7 +387,6 @@ async function getStudyBlockHappeningNow(): Promise<Event | undefined> {
 
   const recurrentEvents = await getUserEvents(false, true);
 
-  // Study blocks happening now!
   const now = new Date();
   return recurrentEvents.find(
     (event: Event) =>
@@ -435,7 +460,6 @@ async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
     body: toJsonBody(requestBody(newTaskInfo)),
   };
 
-  // Backend returns the newly created Task!
   const response: Response = await doFetch(request);
   if (response.ok) {
     const responseObject: TaskDto = await response.json();
@@ -465,7 +489,6 @@ async function updateTask(
     body: toJsonBody(toUpdateTaskInputDto(newTaskInfo, previousTaskName)),
   };
 
-  // Backend returns the newly created Task!
   const response: Response = await doFetch(request);
   if (response.ok) {
     await response.json();
@@ -550,8 +573,6 @@ async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
 }
 
 async function getTask(taskId: number): Promise<Task> {
-  // For now, just fetch all tasks and return the one that we want
-
   const tasks = await getTasks(false);
   const task = tasks.find((task: Task) => task.id == taskId);
   if (task != undefined) return task;
@@ -603,9 +624,8 @@ async function getArchives(): Promise<Archive[]> {
 }
 
 async function getArchive(archiveName: string): Promise<Archive> {
-  // To simplify for now...
-  const archives = await getArchives();
-  const archive = archives.find(
+  const userArchives = await getArchives();
+  const archive = userArchives.find(
     (archive: Archive) => archive.name == archiveName
   );
   if (archive == undefined)
@@ -625,8 +645,6 @@ async function createFile(archiveName: string, name: string) {
 }
 
 async function getFile(archiveName: string, filename: string): Promise<File> {
-  // To simplify for now...
-
   const userArchives = await getArchives();
   const file = userArchives
     .find((archive: Archive) => archive.name == archiveName)
@@ -676,8 +694,6 @@ async function getCurricularUnits(): Promise<CurricularUnit[]> {
 }
 
 async function getCurricularUnit(name: string): Promise<CurricularUnit> {
-  // To simplify for now...
-
   const curricularUnitList = await getCurricularUnits();
   const curricularUnit = curricularUnitList.find(
     (cu: CurricularUnit) => cu.name == name
@@ -849,9 +865,9 @@ async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
 export type WeekTimeStudy = {
   year: number;
   week: number;
-  total: number; // in minutes
-  averageBySession: number; // in minutes
-  target: number; // in minutes
+  total: number;
+  averageBySession: number;
+  target: number;
 };
 
 async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
@@ -868,32 +884,6 @@ async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
       new Error("Could not obtain total time study this week!")
     );
 }
-
-/*
-async function incrementWeekStudyTime(year: number, week: number, time: number) {
-    const request = {
-        path: `study-tracker/users/me/statistics/week-study-time/total`,
-        method: "PUT",
-        body: toJsonBody({ year, week, time })
-    };
-    const response: Response = await doFetch(request);
-    if (!response.ok)
-        return Promise.reject(new Error("Could not update study time!"));
-}
-*/
-
-/*
-async function updateWeekAverageAttentionSpan(year: number, week: number, time: number) {
-    const request = {
-        path: `study-tracker/users/me/statistics/week-study-time/average-per-session`,
-        method: "PUT",
-        body: toJsonBody({ year, week, time })
-    };
-    const response: Response = await doFetch(request);
-    if (!response.ok)
-        return Promise.reject(new Error("Could not update week average study attention span!"));
-}
-*/
 
 async function startStudySession() {
   const request = {
@@ -955,26 +945,20 @@ export const service = {
   getThisWeekDailyTasksProgress: getDailyTasksProgress,
   fetchEnergyHistory,
   getStudyTimeByWeek,
-  //incrementWeekStudyTime,
-  //updateWeekAverageAttentionSpan
   startStudySession,
   finishStudySession,
 
-  /**
-   * Busca todas as tags disponíveis do backend.
-   * @returns Uma Promise que resolve para uma lista de Tag.
-   */
-  async fetchAllTags(): Promise<Tag[]> {
+  async fetchUserTags(): Promise<Tag[]> {
     try {
       const request = {
-        path: "tags/",
+        path: "commons/users/me/tags",
         method: "GET",
       };
       const response = await doFetch(request);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Failed to fetch tags: ${response.status} ${response.statusText} - ${errorText}`
+          `Failed to fetch user tags: ${response.status} ${response.statusText} - ${errorText}`
         );
       }
       return response.json();
@@ -984,19 +968,51 @@ export const service = {
     }
   },
 
-  async deleteTag(tagId: string): Promise<void> {
+  async createTag(tagName: string, tagColor: string): Promise<Tag> {
     try {
       const request = {
-        path: `tags/${tagId}/`,
+        path: "commons/users/me/tags",
+        method: "POST",
+        body: toJsonBody({ name: tagName, color: tagColor }),
+      };
+      const response = await doFetch(request);
+      if (response.ok) {
+        const newTag: Tag = await response.json();
+        return newTag;
+      } else {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Erro desconhecido da API." }));
+
+        console.error("API respondeu com erro:", response.status, errorData);
+
+        if (response.status === 409) {
+          const error = new Error("TagAlreadyExists");
+          (error as any).type = "TAG_ALREADY_EXISTS_FOR_USER";
+          throw error;
+        } else if (response.status === 400) {
+          throw new Error(
+            errorData.message || "Dados inválidos para criar tag."
+          );
+        } else {
+          throw new Error(
+            errorData.message || `Erro do servidor: ${response.status}`
+          );
+        }
+      }
+    } catch (error) {
+      console.error(`Erro ao criar tag "${tagName}":`, error);
+      throw error;
+    }
+  },
+
+  async deleteTag(tagId: number): Promise<void> {
+    try {
+      const request = {
+        path: `commons/users/me/tags/${tagId}`,
         method: "DELETE",
       };
       const response = await doFetch(request);
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Failed to delete tag: ${response.status} ${response.statusText} - ${errorText}`
-        );
-      }
     } catch (error) {
       console.error(`Erro ao apagar tag com ID ${tagId}:`, error);
       throw error;

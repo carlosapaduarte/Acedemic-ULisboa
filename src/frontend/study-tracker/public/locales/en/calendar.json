@@ -58,5 +58,10 @@
 
   "recurrence_none_label": "No repeat",
   "recurrence_daily_label": "Daily",
-  "recurrence_weekly_label": "Weekly"
+  "recurrence_weekly_label": "Weekly",
+
+  "name_cannot_be_empty": "Tag name cannot be empty.",
+  "tag_already_exists_for_user": "This tag already exists for your user.",
+  "created_successfully": "Tag created successfully!",
+  "error_creating": "Error creating tag. Please try again."
 }

@@ -5,6 +5,10 @@ from uuid import UUID
 from sqlalchemy import ForeignKeyConstraint, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
+from sqlalchemy import Column as SAColumn
+from sqlalchemy.dialects.postgresql import JSON, ARRAY as pg_ARRAY 
+from sqlalchemy import String
+
 class UserModel(SQLModel, table=True):
     __tablename__ = "user"
 
@@ -31,12 +35,14 @@ class UserModel(SQLModel, table=True):
 
     week_study_time: list["WeekStudyTimeModel"] = Relationship(back_populates="user")
 
-    #user_tags: List["UserTagLink"] = Relationship(back_populates="user")
-
     user_tags: List["UserTagLink"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
+    
+    earned_badges: List["UserBadge"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    metrics: Optional["UserMetric"] = Relationship(back_populates="user", sa_relationship_kwargs={"uselist": False})
+    league_memberships: List["UserLeague"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
 class TagModel(SQLModel, table=True):
     __tablename__ = "tags"
@@ -44,7 +50,10 @@ class TagModel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True, index=True)
 
-    user_links: List["UserTagLink"] = Relationship(back_populates="tag")
+    user_links: List["UserTagLink"] = Relationship(
+        back_populates="tag",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
     event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
     task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
     daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
@@ -54,10 +63,10 @@ class UserTagLink(SQLModel, table=True):
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     tag_id: int = Field(foreign_key="tags.id", primary_key=True)
-
+    is_custom: bool = Field(default=False, nullable=False)
+    
     user: UserModel = Relationship(back_populates="user_tags")
     tag: TagModel = Relationship(back_populates="user_links")
-    
 
 class STEventTagModel(SQLModel, table=True):
     __tablename__ = "st_event_tag"
@@ -77,7 +86,6 @@ class STEventTagModel(SQLModel, table=True):
         ),
         UniqueConstraint('event_id', 'tag_id', name='uq_st_event_tag'),
     )
-
 
 class STTaskTagModel(SQLModel, table=True):
     __tablename__ = "st_task_tag"
@@ -107,12 +115,20 @@ class STEventModel(SQLModel, table=True):
     title: str
     every_week: bool
     every_day: bool = Field(default=False)
-
-    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event")
+    notes: str = Field(default="", nullable=False)
+    color: str = Field(nullable=False)
+    
+    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event",sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
-
+    
+    @property
+    def tags(self) -> List[str]:
+        """Retorna uma lista de nomes de tags associadas a este evento."""
+        if not self.tags_associations:
+            return []
+        return [association.tag_ref.name for association in self.tags_associations if association.tag_ref]
 
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"
@@ -125,6 +141,7 @@ class STTaskModel(SQLModel, table=True):
     deadline: datetime | None
     priority: str
     status: str
+    
 
     user: "UserModel" = Relationship(back_populates="st_tasks")
 
@@ -281,15 +298,93 @@ class WeekStudyTimeModel(SQLModel, table=True):
     user: UserModel = Relationship(back_populates="week_study_time")
 
 class UserBadge(SQLModel, table=True):
+    __tablename__ = "user_badges"
     user_id: int = Field(foreign_key="user.id", primary_key=True)
-    badge_id: int = Field(foreign_key="badge.id", primary_key=True)
-    earned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    badge_id: int = Field(foreign_key="badges.id", primary_key=True)
+    awarded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    # Para metadata_json
+    metadata_json: Optional[dict] = Field(
+        default=None,
+        sa_column=SAColumn(JSON, nullable=True)
+    )
+
+    user: UserModel = Relationship(back_populates="earned_badges")
     badge: "Badge" = Relationship(back_populates="user_badges")
     
-class Badge(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint('user_id', 'badge_id', name='_user_badge_uc'),
+    )
+
+class League(SQLModel, table=True):
+    __tablename__ = "leagues"
+
     id: Optional[int] = Field(default=None, primary_key=True)
-    code: str = Field(index=True, unique=True)
-    title: str
-    description: str
-    icon_url: Optional[str] = None
-    user_badges: List[UserBadge] = Relationship(back_populates="badge")
+    code: str = Field(index=True, unique=True, nullable=False)
+    name: str = Field(nullable=False) # Ex: "Liga Bronze", "Liga Prata"
+    description: Optional[str] = Field(default=None)
+    rank: int = Field(unique=True, nullable=False) # 1 para Bronze, 2 para Prata, etc.
+    badge_icon_url: Optional[str] = Field(default=None)
+    
+    #Critérios para ENTRAR nesta liga
+    promotion_criteria_json: Optional[dict] = Field(
+        default=None,
+        sa_column=SAColumn(JSON, nullable=True)
+    )
+
+    #Recompensas associadas a esta liga: badges visíveis, personalização de avatar, etc.
+    rewards_json: Optional[dict] = Field(
+        default=None,
+        sa_column=SAColumn(JSON, nullable=True) # Ex: {"badge_visibility": "silver", "avatar_customization": ["hair", "accessories"], "exclusive_themes": ["blue_theme"]}
+    )
+
+    badges: List["Badge"] = Relationship(back_populates="league")
+
+    user_league_memberships: List["UserLeague"] = Relationship(back_populates="league")
+
+class Badge(SQLModel, table=True):
+    __tablename__ = "badges"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    code: str = Field(index=True, unique=True, nullable=False)
+    title: str = Field(nullable=False)
+    description: str = Field(nullable=False)
+    icon_url: Optional[str] = Field(default=None)
+    app_scope: str = Field(default="common", nullable=False) # 'common', 'academic_challenge', 'study_tracker', 'all'
+    is_active: bool = Field(default=True, nullable=False) # Para ativar/desativar medalhas
+    criteria_json: Optional[dict] = Field(default=None, sa_column=SAColumn(JSON, nullable=True))
+
+    user_badges: List["UserBadge"] = Relationship(back_populates="badge")
+    league_id: Optional[int] = Field(default=None, foreign_key="leagues.id")
+    league: Optional[League] = Relationship(back_populates="badges")
+
+class UserMetric(SQLModel, table=True):
+    __tablename__ = "user_metrics"
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    
+    login_streak: int = Field(default=0, nullable=False)
+    last_login_at: Optional[datetime] = Field(default=None) 
+    
+    completed_challenges: List[str] = Field(
+        default_factory=list, # Default é uma lista vazia
+        sa_column=SAColumn(pg_ARRAY(String), nullable=False)
+    )
+    
+    study_sessions_completed: int = Field(default=0, nullable=False)
+    total_points: int = Field(default=0, nullable=False)
+
+    user: UserModel = Relationship(back_populates="metrics")
+    
+class UserLeague(SQLModel, table=True):
+    __tablename__ = "user_leagues"
+
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    league_id: int = Field(foreign_key="leagues.id", primary_key=True)
+    joined_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    current_level_progress: Optional[int] = Field(default=0) #Para ligas com níveis
+    
+    user: UserModel = Relationship(back_populates="league_memberships")
+    league: League = Relationship(back_populates="user_league_memberships")
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'league_id', name='_user_league_uc'),
+    )

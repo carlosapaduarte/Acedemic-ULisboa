@@ -28,10 +28,17 @@ def verify_start_end_date_validity(date: DateInterval):
     if date.start_date >= date.end_date:
         raise InvalidDate()
 
-def create_event(user_id: int, event: Event):
+def create_event(user_id: int, event: Event) -> Event:
+
+    print(f"\n[SERVICE] create_event: Recebido Evento de domínio no serviço (ANTES de chamar o repo):")
+    print(f"Cor: {event.color}")
+    print(f"Notas: {event.notes}")
+    
     does_not_collide_with_unavailable_block(user_id, event.date)
     verify_start_end_date_validity(event.date)
-    study_tracker_repo.create_event(user_id, event)
+    #study_tracker_repo.create_event(user_id, event)
+    created_event = study_tracker_repo.create_event(user_id, event)
+    return created_event
     
 def update_event(user_id: int, event_id: int, event: Event):
     does_not_collide_with_unavailable_block(user_id, event.date)
