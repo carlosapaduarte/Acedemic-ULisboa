@@ -121,12 +121,15 @@ class ScheduleBlock():
 """
 
 class Event():
-    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool):
+    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool, every_day: bool, color: str,notes: str = ""):
         self.id=id
         self.title=title
         self.date=date
-        self.tags=tags
+        self.tags=tags if tags is not None else []
         self.every_week=every_week
+        self.every_day=every_day
+        self.color = color
+        self.notes = notes
 
     @staticmethod
     def from_STEventModel(events: list[STEventModel]) -> list['Event']:
@@ -134,10 +137,8 @@ class Event():
         for event_result in events:
 
             # Obtain Tags first
-            tags: list[str] = []
-            for tag_model in event_result.tags:
-                tags.append(tag_model.tag)
-
+            tags: list[str] = event_result.tags
+            
             today_events.append(
                 Event(
                     id=event_result.id,
@@ -147,7 +148,10 @@ class Event():
                         end_date=event_result.end_date
                     ),
                     tags=tags,
-                    every_week=event_result.every_week
+                    every_week=event_result.every_week,
+                    every_day=event_result.every_day,
+                    notes=event_result.notes,
+                    color=event_result.color
                 )
             )
         return today_events

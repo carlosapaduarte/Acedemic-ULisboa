@@ -1,56 +1,67 @@
 {
-    "confirm_button": "Confirmar",
-    "display_all_events_button": "Clicar para mostrar todos os Eventos",
-    "display_only_recurring_events_button": "Clicar para mostrar só Eventos recorrentes",
-    "months": {
-        "april": "Abril",
-        "august": "Agosto",
-        "december": "Dezembro",
-        "february": "Fevereiro",
-        "january": "Janeiro",
-        "july": "Julho",
-        "june": "Junho",
-        "march": "Março",
-        "may": "Maio",
-        "november": "Novembro",
-        "october": "Outubro",
-        "september": "Setembro"
-    },
-    "new_note_label": "Nota",
-    "next_month_but": "Próximo",
-    "no_goals_title": "Não há desafios para este dia...",
-    "prev_month_but": "Anterior",
-    "see_more_button_text": "Clicar para ver mais",
-    "today": "Hoje",
-    "very_week_label": "Todas as semanas",
-    "weekdays": {
-        "friday": {
-            "medium": "Sex",
-            "short": "S"
-        },
-        "monday": {
-            "medium": "Seg",
-            "short": "S"
-        },
-        "saturday": {
-            "medium": "Sáb",
-            "short": "S"
-        },
-        "sunday": {
-            "medium": "Dom",
-            "short": "D"
-        },
-        "thursday": {
-            "medium": "Qui",
-            "short": "Q"
-        },
-        "tuesday": {
-            "medium": "Ter",
-            "short": "T"
-        },
-        "wednesday": {
-            "medium": "Qua",
-            "short": "Q"
-        }
-    }
+  "rbc_month_header_format": "MMMM YYYY",
+  "rbc_week_header_format": "D [–] D MMMM",
+  "rbc_day_header_format": "dddd, D MMMM",
+  "rbc_agenda_column_format": "ddd D MMM",
+  "rbc_time_format": "HH:mm",
+  "rbc_time_range_format": "HH:mm",
+
+  "new_event_modal_title": "Novo Evento",
+  "edit_event_modal_title": "Editar Evento",
+  "display_only_recurring_events_button": "Ver Apenas Eventos Recorrentes",
+  "display_all_events_button": "Ver Todos os Eventos",
+  "no_events_in_range": "Nenhum evento neste intervalo",
+  "allDay": "Todo o Dia",
+  "title_label": "Título",
+  "date_section_label": "Data",
+  "start_date_label": "Data de Início",
+  "start_time_label": "Hora de Início",
+  "end_date_label": "Data de Fim",
+  "end_time_label": "Hora de Fim",
+  "recurrence_title": "Recorrência",
+  "no_recurrence_label": "Sem Recorrência",
+  "every_day_label": "Todos os Dias",
+  "every_week_label": "Todas as Semanas",
+  "tags_title": "Etiquetas",
+  "study": "Estudo",
+  "work": "Trabalho",
+  "personal": "Pessoal",
+  "fun": "Lazer",
+  "close_button": "Fechar",
+  "confirm_button": "Confirmar",
+  "save_button": "Guardar",
+  "delete_button": "Apagar",
+  "confirm_delete_event": "Tem a certeza que quer apagar este evento?",
+
+  "today": "Hoje",
+  "prev_month_but": "Anterior",
+  "next_month_but": "Próximo",
+  "month": "Mês",
+  "week": "Semana",
+  "work_week": "Semana de Trabalho",
+  "day": "Dia",
+  "agenda": "Agenda",
+  "date": "Data",
+  "time": "Hora",
+  "event": "Evento",
+  "show_more": "Ver Mais (+{{count}})",
+
+  "weekdays": {
+    "sunday": { "medium": "Domingo", "short": "Dom" },
+    "monday": { "medium": "Segunda-feira", "short": "Seg" },
+    "tuesday": { "medium": "Terça-feira", "short": "Ter" },
+    "wednesday": { "medium": "Quarta-feira", "short": "Qua" },
+    "thursday": { "medium": "Quinta-feira", "short": "Qui" },
+    "friday": { "medium": "Sexta-feira", "short": "Sex" },
+    "saturday": { "medium": "Sábado", "short": "Sáb" }
+  },
+
+  "recurrence_none_label": "Nenhuma",
+  "recurrence_daily_label": "Diária",
+  "recurrence_weekly_label": "Semanal",
+
+  "name_cannot_be_empty": "O nome da tag não pode estar vazio.",
+  "tag_already_exists_for_user": "Esta tag já existe para o seu utilizador.",
+  "created_successfully": "Tag criada com sucesso!",
+  "error_creating": "Erro ao criar a tag. Por favor, tente novamente."
 }

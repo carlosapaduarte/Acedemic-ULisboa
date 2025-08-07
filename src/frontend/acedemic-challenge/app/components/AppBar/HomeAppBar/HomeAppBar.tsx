@@ -25,19 +25,26 @@ function getHelloQuote(): string {
     }
 }
 
-function NavBarButton({ text, url, iconSrc }: {
-    text: string, url: string, iconSrc?: string
+function NavBarButton({
+    text,
+    url,
+    iconSrc,
+}: {
+    text: string;
+    url: string;
+    iconSrc?: string;
 }) {
     const navigate = useNavigate();
 
     return (
         <div className={`${styles.navBarButtonContainer}`}>
-            <a href={url}
-               onClick={(e) => {
-                   e.preventDefault();
-                   navigate(url);
-               }}
-               className={`${styles.navBarButton}`}
+            <a
+                href={url}
+                onClick={(e) => {
+                    e.preventDefault();
+                    navigate(url);
+                }}
+                className={`${styles.navBarButton}`}
             >
                 {iconSrc ? <img src={iconSrc} alt={text} /> : text}
             </a>
@@ -49,15 +56,18 @@ function NavBarButton({ text, url, iconSrc }: {
 }
 
 export function GreetingsContainer() {
-    const [username, setUsername] = React.useState<string | undefined>(undefined);
-    const [avatarFilename, setAvatarFilename] = React.useState<string | undefined>(undefined);
+    const [username, setUsername] = React.useState<string | undefined>(
+        undefined,
+    );
+    const [avatarFilename, setAvatarFilename] = React.useState<
+        string | undefined
+    >(undefined);
 
     useEffect(() => {
-        service.fetchUserInfoFromApi()
-            .then((userInfo: UserInfo) => {
-                setAvatarFilename(userInfo.avatarFilename);
-                setUsername(userInfo.username);
-            });
+        service.fetchUserInfoFromApi().then((userInfo: UserInfo) => {
+            setAvatarFilename(userInfo.avatarFilename);
+            setUsername(userInfo.username);
+        });
     }, []);
 
     let helloQuote = getHelloQuote();
@@ -65,15 +75,19 @@ export function GreetingsContainer() {
     return (
         <div className={styles.greetingsContainer}>
             <h4 className={styles.helloQuote}>
-                {username ?
-                    <span>{helloQuote}, {username}</span>
-                    : <span>Loading...</span>
-                }
+                {username ? (
+                    <span>
+                        {helloQuote}, {username}
+                    </span>
+                ) : (
+                    <span>Loading...</span>
+                )}
             </h4>
             <div className={`${styles.avatarAndDropdownContainer}`}>
                 <div className={`${styles.avatarContainer}`}>
                     <img
-                        width={92} height={92}
+                        width={92}
+                        height={92}
                         src={`${avatarFilename}`}
                         alt={`User's Avatar`}
                     />
@@ -88,10 +102,21 @@ export function NavBar() {
 
     return (
         <div className={`${styles.navBar}`}>
-            <NavBarButton text={t("appbar:nav_bar_challenges")} url={"/challenges"}
-                          iconSrc={"icons/challenges_icon.svg"} />
-            <NavBarButton text={t("appbar:nav_bar_calendar")} url={"/calendar"} iconSrc={"icons/calendar_icon.svg"} />
-            {/*<NavBarButton text="Badges" url={"/badges"} iconSrc={"icons/badges_icon.svg"} iconAlt={"Badges Icon"} />*/}
+            <NavBarButton
+                text={t("appbar:nav_bar_challenges")}
+                url={"/challenges"}
+                iconSrc={"icons/challenges_icon.svg"}
+            />
+            <NavBarButton
+                text={t("appbar:nav_bar_calendar")}
+                url={"/calendar"}
+                iconSrc={"icons/calendar_icon.svg"}
+            />
+            <NavBarButton
+                text={t("appbar:nav_bar_badges")}
+                url={"/badges"}
+                iconSrc={"icons/badges_icon.svg"}
+            />
         </div>
     );
 }

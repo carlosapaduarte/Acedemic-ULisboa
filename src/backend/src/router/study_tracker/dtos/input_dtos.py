@@ -1,3 +1,5 @@
+from dataclasses import Field
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -15,8 +17,11 @@ class CreateEventInputDto(BaseModel):
     startDate: float
     endDate: float
     title: str
-    tags: list[str]
+    tags: Optional[List[str]] = None
     everyWeek: bool
+    everyDay: bool = False
+    notes: str | None = None
+    color: str = "#3399FF"
 
 class UpdateEventInputDto(BaseModel):
     startDate: float
@@ -24,6 +29,9 @@ class UpdateEventInputDto(BaseModel):
     title: str
     tags: list[str]
     everyWeek: bool
+    everyDay: bool = False
+    notes: Optional[str] = None
+    color: str = None
 
 class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int

@@ -4,25 +4,27 @@ import { InvalidRequest, NetworkError, NotAuthorizedError } from "./error";
 const CONTENT_TYPE_JSON = "application/json";
 
 function toFullUrl(request: Request): string {
-    return BASE_API_URL + request.path;
+    const base = BASE_API_URL.replace(/\/+$/, ""); // remove barras finais
+    const path = request.path.replace(/^\/+/, ""); // remove barras iniciais
+    return `${base}/${path}`;
 }
 
 export type KeyValuePair = {
-    name: string,
-    value: string
-}
+    name: string;
+    value: string;
+};
 
-type JsonBody = KeyValuePair[]
+type JsonBody = KeyValuePair[];
 
 export type Request = {
-    path: string
-    method: string
-    body?: JsonBody | FormData
-}
+    path: string;
+    method: string;
+    body?: JsonBody | FormData;
+};
 
 function toJsonString(fields: KeyValuePair[]): string {
     const body: any = {};
-    fields.forEach(field => {
+    fields.forEach((field) => {
         body[field.name] = field.value;
     });
     return JSON.stringify(body);
@@ -30,17 +32,23 @@ function toJsonString(fields: KeyValuePair[]): string {
 
 function validateRequestMethod(request: Request): boolean {
     const method = request.method.toUpperCase();
-    return request.path !== undefined && (method === "GET" || method === "POST" || method === "PUT" || method === "DELETE");
+    return (
+        request.path !== undefined &&
+        (method === "GET" ||
+            method === "POST" ||
+            method === "PUT" ||
+            method === "DELETE")
+    );
 }
 
-export async function doFetch(
-    request: Request
-): Promise<Response> {
+export async function doFetch(request: Request): Promise<Response> {
     if (request && validateRequestMethod(request)) {
         const headers: any = {};
 
         // Adds Content Type only if body is of type JSON
-        const isBodyTypeJson = !(request.body == undefined || request.body instanceof FormData);
+        const isBodyTypeJson = !(
+            request.body == undefined || request.body instanceof FormData
+        );
         if (isBodyTypeJson) {
             const contentType = isBodyTypeJson ? CONTENT_TYPE_JSON : undefined;
             headers["Content-Type"] = contentType;
@@ -55,15 +63,14 @@ export async function doFetch(
 
         // If body is JSON, format with {}
         let formattedBody: any = request.body;
-        if (isBodyTypeJson)
-            formattedBody = toJsonString(formattedBody);
+        if (isBodyTypeJson) formattedBody = toJsonString(formattedBody);
 
         try {
             const res = await fetch(toFullUrl(request), {
                 method: request.method,
                 headers,
                 //credentials: 'include', // TODO: see what this does later!
-                body: formattedBody
+                body: formattedBody,
             });
 
             if (res.status == 401)
