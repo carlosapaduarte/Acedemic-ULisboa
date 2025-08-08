@@ -2,7 +2,7 @@ import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { utils } from "~/utils";
-import { Tag } from "~/routes/calendar/CreateEvent/CreateEvent";
+import { Tag } from "~/routes/calendar/CreateEvent/EventModal";
 
 export type LoginResult = {
   access_token: string;
