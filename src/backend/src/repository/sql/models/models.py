@@ -84,17 +84,14 @@ class TagModel(SQLModel, table=True):
         back_populates="tag",
         sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
-    #event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
-    #events: List["STEventModel"] = Relationship(back_populates="tags", link_model=STEventTagModel)
+    events: List["STEventModel"] = Relationship(back_populates="tags", link_model=STEventTagModel)
     event_links: List["STEventTagModel"] = Relationship(
         back_populates="tag_ref",
         sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
-    events: List["STEventModel"] = Relationship(back_populates="tags", link_model=STEventTagModel)
 
     task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
     daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
-
 
 class STTaskTagModel(SQLModel, table=True):
     __tablename__ = "st_task_tag"
@@ -130,7 +127,7 @@ class STEventModel(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
     
-    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event")
+    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
     tags: List[TagModel] = Relationship(back_populates="events", link_model=STEventTagModel)
     
 class STTaskModel(SQLModel, table=True):

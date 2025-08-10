@@ -47,7 +47,7 @@
 }
 
 .deleteEventButton:hover {
-  background-color: var(--color-text-danger-hover);
+  background-color: var(--color-2-hover);
 }
 
 .formTextField {
@@ -181,7 +181,7 @@
 }
 
 .deleteTagButton:hover {
-  background-color: var(--color-text-danger-hover);
+  background-color: var(--color-2-hover);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 

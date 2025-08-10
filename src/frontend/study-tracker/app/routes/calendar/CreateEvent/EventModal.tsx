@@ -259,8 +259,7 @@ const TagSection = React.memo(function TagSection({
     }
   };
 
-  const handleDeleteTag = async (tagToDelete: Tag, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDeleteTag = async (tagToDelete: Tag) => {
     if (
       !window.confirm(
         t("tag_delete_confirmation", { tagName: t(tagToDelete.name) })
@@ -269,7 +268,8 @@ const TagSection = React.memo(function TagSection({
       return;
     }
     try {
-      await service.deleteTag(tagToDelete.id);
+      //await service.deleteTag(tagToDelete.id);
+      await service.deleteTag(Number(tagToDelete.id));
       setAvailableTags((prev) =>
         prev.filter((tag) => tag.id !== tagToDelete.id)
       );
@@ -305,7 +305,7 @@ const TagSection = React.memo(function TagSection({
                 >
                   <span className={styles.tagLabel}>{t(tag.name)}</span>
                   <Button
-                    onPress={(e) => handleDeleteTag(tag, e as any)}
+                    onPress={(e) => handleDeleteTag(tag)}
                     className={styles.deleteTagButton}
                     aria-label={t("delete_tag_aria_label", {
                       tagName: t(tag.name),
