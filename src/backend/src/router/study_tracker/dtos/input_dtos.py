@@ -20,7 +20,7 @@ class CreateEventInputDto(BaseModel):
     tags: Optional[List[str]] = None
     everyWeek: bool
     everyDay: bool = False
-    notes: str | None = None
+    notes: str | None
     color: str = "#3399FF"
 
 class UpdateEventInputDto(BaseModel):

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Button,
@@ -20,7 +20,6 @@ interface Tag {
   user_id: number;
 }
 
-//prop para edição
 export interface EventData {
   id: number;
   title: string;
@@ -43,6 +42,7 @@ interface EventModalProps {
   initialStartDate?: Date;
   initialEndDate?: Date;
 }
+
 const TitleSection = React.memo(function TitleSection({
   title,
   setTitle,
@@ -104,75 +104,49 @@ const DateSection = React.memo(function DateSection({
   setEventEndDate: (endDate: Date) => void;
 }) {
   const { t } = useTranslation("calendar");
-  const [startDate, setStartDate] = useState(
-    () => eventStartDate.toISOString().split("T")[0]
-  );
-  const [endDate, setEndDate] = useState(
-    () => eventEndDate.toISOString().split("T")[0]
-  );
-  const [startTime, setStartTime] = useState(() =>
-    eventStartDate.toTimeString().slice(0, 5)
-  );
-  const [endTime, setEndTime] = useState(() =>
-    eventEndDate.toTimeString().slice(0, 5)
-  );
 
-  useEffect(() => {
-    setStartDate(eventStartDate.toISOString().split("T")[0]);
-    setStartTime(eventStartDate.toTimeString().slice(0, 5));
-  }, [eventStartDate]);
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+  const formatTime = (date: Date) => date.toTimeString().slice(0, 5);
 
-  useEffect(() => {
-    setEndDate(eventEndDate.toISOString().split("T")[0]);
-    setEndTime(eventEndDate.toTimeString().slice(0, 5));
-  }, [eventEndDate]);
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [year, month, day] = e.target.value.split("-").map(Number);
+    const newStartDate = new Date(eventStartDate);
+    newStartDate.setFullYear(year, month - 1, day);
+    setEventStartDate(newStartDate);
+  };
 
-  useEffect(() => {
-    const [startDateYear, startDateMonth, startDateDay] = startDate
-      .split("-")
-      .map(Number);
-    const [endDateYear, endDateMonth, endDateDay] = endDate
-      .split("-")
-      .map(Number);
-    const [startHours, startMinutes] = startTime.split(":").map(Number);
-    const [endHours, endMinutes] = endTime.split(":").map(Number);
+  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [hours, minutes] = e.target.value.split(":").map(Number);
+    const newStartDate = new Date(eventStartDate);
+    newStartDate.setHours(hours, minutes);
+    setEventStartDate(newStartDate);
+  };
 
-    setEventStartDate(
-      new Date(
-        startDateYear,
-        startDateMonth - 1,
-        startDateDay,
-        startHours,
-        startMinutes
-      )
-    );
-    setEventEndDate(
-      new Date(endDateYear, endDateMonth - 1, endDateDay, endHours, endMinutes)
-    );
-  }, [
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    setEventStartDate,
-    setEventEndDate,
-  ]);
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [year, month, day] = e.target.value.split("-").map(Number);
+    const newEndDate = new Date(eventEndDate);
+    newEndDate.setFullYear(year, month - 1, day);
+    setEventEndDate(newEndDate);
+  };
+
+  const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [hours, minutes] = e.target.value.split(":").map(Number);
+    const newEndDate = new Date(eventEndDate);
+    newEndDate.setHours(hours, minutes);
+    setEventEndDate(newEndDate);
+  };
 
   return (
     <div className={styles.dateSectionContainer}>
-      <div
-        aria-label={t("date_section_label")}
-        className={styles.deadlineInputsContainer}
-      >
+      <div className={styles.deadlineInputsContainer}>
         <TextField className={styles.formTextField}>
           <Label className={styles.formSectionTitle}>
             {t("start_date_label")}
           </Label>
           <Input
             type={"date"}
-            aria-label={t("start_date_label")}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            value={formatDate(eventStartDate)}
+            onChange={handleStartDateChange}
             className={classNames(styles.dateInput)}
           />
         </TextField>
@@ -182,9 +156,8 @@ const DateSection = React.memo(function DateSection({
           </Label>
           <Input
             type={"time"}
-            aria-label={t("start_time_label")}
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value || "12:00")}
+            value={formatTime(eventStartDate)}
+            onChange={handleStartTimeChange}
             className={classNames(styles.timeInput)}
           />
         </TextField>
@@ -194,9 +167,8 @@ const DateSection = React.memo(function DateSection({
           </Label>
           <Input
             type={"date"}
-            aria-label={t("end_date_label")}
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            value={formatDate(eventEndDate)}
+            onChange={handleEndDateChange}
             className={classNames(styles.dateInput)}
           />
         </TextField>
@@ -206,9 +178,8 @@ const DateSection = React.memo(function DateSection({
           </Label>
           <Input
             type={"time"}
-            aria-label={t("end_time_label")}
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value || "12:00")}
+            value={formatTime(eventEndDate)}
+            onChange={handleEndTimeChange}
             className={classNames(styles.timeInput)}
           />
         </TextField>
@@ -243,7 +214,8 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection({
       >
         {recurrenceOptions.map((option) => (
           <option key={option.id} value={option.id}>
-            {t(option.labelKey)}
+            {" "}
+            {t(option.labelKey)}{" "}
           </option>
         ))}
       </select>
@@ -378,7 +350,6 @@ const TagSection = React.memo(function TagSection({
 });
 
 const EventForm = (props: any) => {
-  const { t } = useTranslation("calendar");
   return (
     <div className={styles.newEventForm}>
       <TitleSection title={props.title} setTitle={props.setTitle} />
@@ -400,7 +371,7 @@ const EventForm = (props: any) => {
         setAvailableTags={props.setAvailableTags}
       />
       <ColorPickerInput
-        label={t("custom_color_label")}
+        label={props.label}
         color={props.color}
         setColor={props.setColor}
         clearColor={() => props.setColor("#3399FF")}
@@ -415,38 +386,36 @@ export function EventModal({
   refreshUserEvents,
   eventToEdit,
   initialStartDate = new Date(),
-  initialEndDate = new Date(Date.now() + 60 * 60 * 1000), // Padrão de 1h
+  initialEndDate = new Date(Date.now() + 60 * 60 * 1000),
 }: EventModalProps) {
-  const { t } = useTranslation("calendar");
+  console.log("Dados recebidos em eventToEdit:", eventToEdit);
 
+  const { t } = useTranslation("calendar");
   const isEditMode = !!eventToEdit;
 
   const [title, setTitle] = useState("");
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
   const [notes, setNotes] = useState("");
   const [color, setColor] = useState("#3399FF");
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
-
-  const fetchTags = useCallback(async () => {
-    try {
-      const fetchedTags = await service.fetchUserTags();
-      setAvailableTags(fetchedTags);
-      return fetchedTags;
-    } catch (error) {
-      console.error("Erro ao buscar tags:", error);
-      return []; //vazio em caso de erro
-    }
-  }, []);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (isModalOpen) {
-      fetchTags().then((fetchedTags) => {
-        if (isEditMode && eventToEdit) {
-          //EDIÇÃO: Preenche com os dados do evento
-          setTitle(eventToEdit.title);
+    if (!isModalOpen) {
+      return;
+    }
+
+    const initializeForm = async () => {
+      try {
+        const fetchedTags = await service.fetchUserTags();
+        setAvailableTags(fetchedTags);
+
+        if (eventToEdit) {
+          //preenche o formulário com os dados do evento
+          setTitle(eventToEdit.title ?? "");
           setStartDate(new Date(eventToEdit.start));
           setEndDate(new Date(eventToEdit.end));
           setNotes(eventToEdit.notes || "");
@@ -455,9 +424,11 @@ export function EventModal({
           if (eventToEdit.everyDay) setRecurrenceType("daily");
           else if (eventToEdit.everyWeek) setRecurrenceType("weekly");
           else setRecurrenceType("none");
+
           const tagIdsToSelect = eventToEdit.tags
             .map((tagName) => fetchedTags.find((t) => t.name === tagName)?.id)
             .filter((id): id is string => !!id);
+
           setSelectedTagIds(tagIdsToSelect);
         } else {
           setTitle("");
@@ -468,16 +439,15 @@ export function EventModal({
           setRecurrenceType("none");
           setSelectedTagIds([]);
         }
-      });
-    }
-  }, [
-    isModalOpen,
-    eventToEdit,
-    isEditMode,
-    initialStartDate,
-    initialEndDate,
-    fetchTags,
-  ]);
+      } catch (err) {
+        console.error("Erro ao inicializar o formulário do evento:", err);
+        setAvailableTags([]);
+        setSelectedTagIds([]);
+      }
+    };
+
+    initializeForm();
+  }, [isModalOpen, eventToEdit]);
 
   const clearFormAndClose = () => {
     setIsModalOpen(false);
@@ -489,23 +459,21 @@ export function EventModal({
       return;
     }
 
-    const tagNamesToSend = selectedTagIds
-      .map((id) => availableTags.find((t) => t.id === id)?.name)
-      .filter((name): name is string => !!name);
-
+    const tagIdsToSend = selectedTagIds.slice();
     const eventPayload = {
       title,
       startDate,
       endDate,
       notes,
       color,
-      tags: tagNamesToSend,
+      tags: tagIdsToSend,
       everyDay: recurrenceType === "daily",
       everyWeek: recurrenceType === "weekly",
     };
 
+    setSaving(true);
     try {
-      if (isEditMode) {
+      if (isEditMode && eventToEdit) {
         await service.updateEvent(eventToEdit.id, eventPayload);
       } else {
         await service.createNewEvent(eventPayload);
@@ -515,12 +483,15 @@ export function EventModal({
     } catch (error) {
       console.error("Erro ao salvar evento:", error);
       alert(t("error_saving_event"));
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!isEditMode) return;
+    if (!isEditMode || !eventToEdit) return;
     if (window.confirm(t("confirm_delete_event"))) {
+      setSaving(true);
       try {
         await service.deleteEvent(eventToEdit.id);
         refreshUserEvents();
@@ -528,6 +499,8 @@ export function EventModal({
       } catch (error) {
         console.error("Erro ao apagar evento:", error);
         alert(t("error_deleting_event_generic"));
+      } finally {
+        setSaving(false);
       }
     }
   };
@@ -539,21 +512,20 @@ export function EventModal({
           isEditMode ? "edit_event_modal_title" : "new_event_modal_title"
         )}
       >
-        {({ close }) => (
+        {() => (
           <div className={styles.newEventModalContainer}>
             <Button
               className={classNames(styles.roundButton, styles.closeButton)}
               onPress={clearFormAndClose}
+              isDisabled={saving}
             >
               {t("close_button")}
             </Button>
-
             <h1 className={styles.newEventTitleText}>
               {t(
                 isEditMode ? "edit_event_modal_title" : "new_event_modal_title"
               )}
             </h1>
-
             <div className={styles.newEventFormContainer}>
               <EventForm
                 title={title}
@@ -572,24 +544,27 @@ export function EventModal({
                 setAvailableTags={setAvailableTags}
                 color={color}
                 setColor={setColor}
+                label={t("custom_color_label")}
               />
             </div>
-
             <div className={styles.finishCreatingEventButtonContainer}>
               {isEditMode && (
                 <Button
                   className={classNames(styles.deleteEventButton)}
                   onPress={handleDelete}
+                  isDisabled={saving}
                 >
                   {t("delete_button")}
                 </Button>
               )}
               <Button
                 className={classNames(styles.finishCreatingEventButton)}
-                isDisabled={!title}
+                isDisabled={!title || saving}
                 onPress={handleSave}
               >
-                {t(isEditMode ? "save_button" : "confirm_button")}
+                {saving
+                  ? t("saving_label")
+                  : t(isEditMode ? "save_button" : "confirm_button")}
               </Button>
             </div>
           </div>

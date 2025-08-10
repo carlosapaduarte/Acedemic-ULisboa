@@ -132,30 +132,32 @@ class Event():
         self.notes = notes
 
     @staticmethod
-    def from_STEventModel(events: list[STEventModel]) -> list['Event']:
-        today_events: list[Event] = []
-        for event_result in events:
-
-            # Obtain Tags first
-            tags: list[str] = event_result.tags
+    def from_STEventModel(events: list['STEventModel']) -> list['Event']:
+        domain_events: list[Event] = []
+        for event_model in events:
+            tag_names = [
+                assoc.tag_ref.name
+                for assoc in event_model.tags_associations
+                if assoc.tag_ref
+            ]
             
-            today_events.append(
+            domain_events.append(
                 Event(
-                    id=event_result.id,
-                    title=event_result.title,
+                    id=event_model.id,
+                    title=event_model.title,
                     date=DateInterval(
-                        start_date=event_result.start_date,
-                        end_date=event_result.end_date
+                        start_date=event_model.start_date,
+                        end_date=event_model.end_date
                     ),
-                    tags=tags,
-                    every_week=event_result.every_week,
-                    every_day=event_result.every_day,
-                    notes=event_result.notes,
-                    color=event_result.color
+                    tags=tag_names,
+                    every_week=event_model.every_week,
+                    every_day=event_model.every_day,
+                    notes=event_model.notes,
+                    color=event_model.color
                 )
             )
-        return today_events
-
+        return domain_events
+    
 class File():
     def __init__(self, name: str, text: str):
         self.name=name
