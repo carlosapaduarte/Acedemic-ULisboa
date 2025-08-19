@@ -369,6 +369,11 @@ class UserMetric(SQLModel, table=True):
         sa_column=SAColumn(pg_ARRAY(String), nullable=False)
     )
     
+    completed_challenges_count: int = Field(default=0, nullable=False)
+    
+    challenge_completion_streak: int = Field(default=0, nullable=False)
+    last_challenge_completion_date: Optional[date] = Field(default=None)
+    
     study_sessions_completed: int = Field(default=0, nullable=False)
     total_points: int = Field(default=0, nullable=False)
 

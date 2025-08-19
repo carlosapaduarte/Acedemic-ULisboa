@@ -1,11 +1,10 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session
 import logging
 
 from repository.sql.models.database import get_session as get_db_session
 from router.commons.common import get_current_user_id
-from router.commons.dtos.gamification_dtos import BadgeResponse
 from router.commons.dtos.gamification_dtos import (
     BadgeResponse,
     LeagueResponse,
@@ -34,7 +33,9 @@ def get_my_earned_badges(
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db_session)
 ):
-    earned_badges =  gamification_service.get_user_earned_badges(db, user_id)
+    user_badge_associations = gamification_service.get_user_earned_badges(db, user_id)
+    earned_badges = [user_badge.badge for user_badge in user_badge_associations if user_badge.badge]
+    
     return earned_badges
 
 @router.get("/badges/status",response_model=List[UserBadgesStatusDto],summary="Obter todas as medalhas com o status de conquista do utilizador atual",description="Retorna todas as medalhas disponíveis, indicando quais o utilizador autenticado já conquistou.")
@@ -47,11 +48,11 @@ def get_all_badges_with_user_status(
     try:
         scope = app_scope if app_scope else "common"
 
-        all_badges =  gamification_service.get_all_badges_for_app_scope(db, scope)
+        all_badges = gamification_service.get_all_badges_for_app_scope(db, scope)
 
-        earned_badges =  gamification_service.get_user_earned_badges(db, user_id)
-
-        earned_badge_ids: Set[int] = {badge.id for badge in earned_badges}
+        user_badge_associations = gamification_service.get_user_earned_badges(db, user_id)
+        # Cria um conjunto de IDs de medalhas conquistadas pelo utilizador
+        earned_badge_ids: Set[int] = {user_badge.badge_id for user_badge in user_badge_associations}
 
         response_badges = []
         for badge in all_badges:
@@ -64,14 +65,16 @@ def get_all_badges_with_user_status(
                     icon_url=badge.icon_url,
                     app_scope=badge.app_scope,
                     is_active=badge.is_active,
+                    league_id=badge.league_id,
+                    league=badge.league,
                     has_earned=badge.id in earned_badge_ids
                 )
             )
         return response_badges
 
     except Exception as e:
+        logger.error(f"Erro detalhado em /badges/status: {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro interno no servidor ao obter medalhas: {e}")
-
 
 @router.get(
     "/leagues",
@@ -116,15 +119,17 @@ def get_my_metrics(
 @router.post(
     "/evaluate/badges",
     status_code=status.HTTP_200_OK,
-    summary="Desencadear avaliação de medalhas para o utilizador atual (uso interno)",
-    description="Este endpoint destina-se a ser chamado internamente ou por jobs para re-avaliar as medalhas de um utilizador. Não deve ser exposto a clientes externos diretamente."
+    summary="Desencadear avaliação de medalhas E LIGAS para o utilizador atual",
+    description="Este endpoint avalia e atribui medalhas, e de seguida avalia e promove ligas."
 )
 def trigger_badge_evaluation(
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db_session)
 ):
-    gamification_service.evaluate_and_award_badges(db, user_id)
-    return {"message": "Avaliação de medalhas concluída."}
+    _, all_earned_codes = gamification_service.evaluate_and_award_badges(db, user_id)
+    gamification_service.evaluate_and_promote_leagues(db, user_id, all_earned_codes)
+    return {"message": "Avaliação de medalhas e ligas concluída."}
+
 
 @router.post(
     "/evaluate/leagues",

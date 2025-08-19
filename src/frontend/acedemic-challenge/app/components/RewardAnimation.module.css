@@ -1,0 +1,64 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.rewardCard {
+    background-color: #4a044e;
+    color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    text-align: center;
+    border: 4px solid #f3e8ff;
+    max-width: 400px;
+    animation: fadeIn 0.5s ease-out;
+}
+.levelUpCard {
+    border-color: #facc15;
+    transform: scale(1.1);
+}
+.badgeImage {
+    width: 150px;
+    height: 150px;
+    margin: 1rem auto;
+}
+.badgeTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+.badgeDescription {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+.closeButton {
+    background-color: #f3e8ff;
+    color: #4a044e;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.closeButton:hover {
+    transform: scale(1.05);
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
