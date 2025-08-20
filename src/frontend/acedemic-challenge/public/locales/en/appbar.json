@@ -7,5 +7,6 @@
     "language": "Switch to {{language}}",
 
     "nav_bar_challenges": "Challenges",
-    "nav_bar_calendar": "Calendar"
+    "nav_bar_calendar": "Calendar",
+    "nav_bar_badges": "Badges"
 }

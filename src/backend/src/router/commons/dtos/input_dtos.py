@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class LoginInputDto(BaseModel):
     username: str
@@ -11,3 +12,6 @@ class CreateUserInputDto(BaseModel):
 class SetUserAvatarDto(BaseModel):
     avatarFilename: str
 
+class CreateTagInputDto(BaseModel):
+    name: str
+    tagDescription: Optional[str] = None

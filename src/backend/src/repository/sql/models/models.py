@@ -1,10 +1,13 @@
-from datetime import date
-from datetime import datetime
-from typing import Optional
+from datetime import date, timezone, datetime
+from typing import Optional, List # Importar List
+from uuid import UUID
 
-from sqlalchemy import ForeignKeyConstraint
+from sqlalchemy import ForeignKeyConstraint, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
+from sqlalchemy import Column as SAColumn
+from sqlalchemy.dialects.postgresql import JSON, ARRAY as pg_ARRAY 
+from sqlalchemy import String
 
 class UserModel(SQLModel, table=True):
     __tablename__ = "user"
@@ -32,92 +35,76 @@ class UserModel(SQLModel, table=True):
 
     week_study_time: list["WeekStudyTimeModel"] = Relationship(back_populates="user")
 
+    user_tags: List["UserTagLink"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    
+    earned_badges: List["UserBadge"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    metrics: Optional["UserMetric"] = Relationship(back_populates="user", sa_relationship_kwargs={"uselist": False})
+    league_memberships: List["UserLeague"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
-class BatchModel(SQLModel, table=True):
-    __tablename__ = "batch"
+class TagModel(SQLModel, table=True):
+    __tablename__ = "tags"
 
-    id: int = Field(primary_key=True, default=None)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True, index=True)
+
+    user_links: List["UserTagLink"] = Relationship(
+        back_populates="tag",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
+    task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
+    daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
+
+class UserTagLink(SQLModel, table=True):
+    __tablename__ = "user_tag_link"
+
     user_id: int = Field(foreign_key="user.id", primary_key=True)
+    tag_id: int = Field(foreign_key="tags.id", primary_key=True)
+    is_custom: bool = Field(default=False, nullable=False)
+    
+    user: UserModel = Relationship(back_populates="user_tags")
+    tag: TagModel = Relationship(back_populates="user_links")
 
-    start_date: datetime
-    level: int
+class STEventTagModel(SQLModel, table=True):
+    __tablename__ = "st_event_tag"
 
-    user: UserModel = Relationship(back_populates="user_batches")
-    batch_days: list["BatchDayModel"] = Relationship(back_populates="batch")
+    tag_id: int = Field(foreign_key="tags.id", primary_key=True)
+    event_id: int = Field(primary_key=True)
+    user_id: int
 
+    event: "STEventModel" = Relationship(back_populates="tags_associations")
+    tag_ref: TagModel = Relationship(back_populates="event_links")
 
-class BatchDayModel(SQLModel, table=True):
-    __tablename__ = "batch_day"
-
-    id: int = Field(primary_key=True)
-    batch_id: int = Field(primary_key=True)
-    user_id: int = Field(primary_key=True)
-
-    notes: str
-
-    batch: BatchModel = Relationship(back_populates="batch_days")
-    challenges: list["ChallengeModel"] = Relationship(back_populates="batch_day")
-
-    # Composite foreign key constraint
     __table_args__ = (
         ForeignKeyConstraint(
-            ['batch_id', 'user_id'],
-            ['batch.id', 'batch.user_id']
+            ['event_id', 'user_id'],
+            ['st_event.id', 'st_event.user_id'],
+            name="fk_st_event_tag_event_composite"
         ),
+        UniqueConstraint('event_id', 'tag_id', name='uq_st_event_tag'),
     )
 
+class STTaskTagModel(SQLModel, table=True):
+    __tablename__ = "st_task_tag"
 
-class ChallengeModel(SQLModel, table=True):
-    __tablename__ = "challenge"
+    tag_id: int = Field(foreign_key="tags.id", primary_key=True)
+    task_id: int = Field(primary_key=True)
+    user_id: int
 
-    id: int = Field(primary_key=True)
-    batch_day_id: int = Field(primary_key=True)
-    batch_id: int = Field(primary_key=True)
-    user_id: int = Field(primary_key=True)
+    task: "STTaskModel" = Relationship(back_populates="tags_associations")
+    tag_ref: TagModel = Relationship(back_populates="task_links")
 
-    completion_date: datetime | None
-
-    batch_day: BatchDayModel = Relationship(back_populates="challenges")
-
-    # Composite foreign key constraint
     __table_args__ = (
         ForeignKeyConstraint(
-            ['batch_day_id', 'batch_id', 'user_id'],
-            ['batch_day.id', 'batch_day.batch_id', 'batch_day.user_id']
+            ['task_id', 'user_id'],
+            ['st_task.id', 'st_task.user_id'],
+            name="fk_st_task_tag_task_composite"
         ),
+        UniqueConstraint('task_id', 'tag_id', name='uq_st_task_tag'),
     )
-
-
-""" 
-    Each user could be connected to multiple instances of this type.
-    This type has an id, where each id should correspond to one of these possibilities:
-    - Melhorar as minhas notas/classificações
-    - Acompanhar o meu progresso
-    - Preparar-me para exames específicos
-    - Personalizar o meu plano de estudo
-    - Cumprir prazos e entregas
-    - Gerir os estudos com as outras áreas da minha vida
-"""
-
-
-class STAppUseModel(SQLModel, table=True):
-    __tablename__ = "st_app_use_model"
-
-    id: int = Field(primary_key=True)
-
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
-    user: UserModel = Relationship(back_populates="user_st_app_uses")
-
-
-class STWeekDayPlanningModel(SQLModel, table=True):
-    __tablename__ = "st_week_day_planning"
-
-    week_planning_day: int | None
-    hour: int | None
-
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
-    user: UserModel = Relationship(back_populates="st_planning_day")
-
 
 class STEventModel(SQLModel, table=True):
     __tablename__ = "st_event"
@@ -127,77 +114,42 @@ class STEventModel(SQLModel, table=True):
     end_date: datetime
     title: str
     every_week: bool
-
-    tags: list["STEventTagModel"] = Relationship(back_populates="event")
+    every_day: bool = Field(default=False)
+    notes: str = Field(default="", nullable=False)
+    color: str = Field(nullable=False)
+    
+    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event",sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
-
-
-class STEventTagModel(SQLModel, table=True):
-    __tablename__ = "st_event_tag"
-
-    # Primary key: Tag
-    tag: str = Field(primary_key=True)
-
-    # Foreign key: Composite key referencing st_event
-    event_id: int = Field(primary_key=True)
-    user_id: int = Field(primary_key=True)
-
-    # Composite foreign key constraint
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['event_id', 'user_id'],
-            ['st_event.id', 'st_event.user_id']
-        ),
-    )
-
-    # Relationship with STTaskModel
-    event: "STEventModel" = Relationship(back_populates="tags")
-
-
-class STScheduleBlockNotAvailableModel(SQLModel, table=True):
-    __tablename__ = "st_schedule_block_not_available"
-
-    week_day: int = Field(primary_key=True)
-    start_hour: int = Field(primary_key=True)
-    duration: int = Field(primary_key=True)
-
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
-    user: UserModel = Relationship(back_populates="schedule_unavailable_blocks")
-
+    
+    @property
+    def tags(self) -> List[str]:
+        """Retorna uma lista de nomes de tags associadas a este evento."""
+        if not self.tags_associations:
+            return []
+        return [association.tag_ref.name for association in self.tags_associations if association.tag_ref]
 
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"
 
-    # Composite primary key
     id: int = Field(primary_key=True, default=None)
     user_id: int = Field(foreign_key="user.id", primary_key=True)
 
-    # Task details
     title: str
     description: str
     deadline: datetime | None
     priority: str
     status: str
+    
 
-    # Relationship with User
     user: "UserModel" = Relationship(back_populates="st_tasks")
 
-    # Tags (assuming another table/model exists for tags)
-    tags: list["STTaskTagModel"] = Relationship(back_populates="task")
+    tags_associations: List["STTaskTagModel"] = Relationship(back_populates="task")
 
-    # Self-referencing foreign key to handle subtasks
-    parent_task_id: Optional[int] = Field(
-        default=None,
-        nullable=True
-    )
-    parent_user_id: Optional[int] = Field(
-        default=None,
-        nullable=True
-    )
+    parent_task_id: Optional[int] = Field(default=None, nullable=True)
+    parent_user_id: Optional[int] = Field(default=None, nullable=True)
 
-    # Composite foreign key constraint for parent task
     __table_args__ = (
         ForeignKeyConstraint(
             ['parent_task_id', 'parent_user_id'],
@@ -205,7 +157,6 @@ class STTaskModel(SQLModel, table=True):
         ),
     )
 
-    # Parent task relationship (many-to-one)
     parent_task: Optional["STTaskModel"] = Relationship(
         back_populates="subtasks",
         sa_relationship_kwargs=dict(
@@ -213,128 +164,227 @@ class STTaskModel(SQLModel, table=True):
         )
     )
 
-    # Maybe, this model should have as well a sub-task-id that could be null.
-    # This allows to use new IDs for the sub tasks, and not compete against the IDs of the tasks.
-
     subtasks: list["STTaskModel"] = Relationship(back_populates="parent_task")
 
+class DailyTagModel(SQLModel, table=True):
+    __tablename__ = "daily_tag"
 
-class STTaskTagModel(SQLModel, table=True):
-    __tablename__ = "st_task_tag"
+    date_: date = Field(primary_key=True, default=None)
+    tag_id: int = Field(foreign_key="tags.id", primary_key=True)
 
-    # Primary key: Tag
-    tag: str = Field(primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    user: UserModel = Relationship(back_populates="daily_tag")
+    tag: TagModel = Relationship(back_populates="daily_tag_links")
 
-    # Foreign key: Composite key referencing st_task
-    task_id: int = Field(primary_key=True)
+class BatchModel(SQLModel, table=True):
+    __tablename__ = "batch"
+    id: int = Field(primary_key=True, default=None)
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    start_date: datetime
+    level: int
+    user: UserModel = Relationship(back_populates="user_batches")
+    batch_days: list["BatchDayModel"] = Relationship(back_populates="batch")
+
+class BatchDayModel(SQLModel, table=True):
+    __tablename__ = "batch_day"
+    id: int = Field(primary_key=True)
+    batch_id: int = Field(primary_key=True)
     user_id: int = Field(primary_key=True)
-
-    # Composite foreign key constraint
+    notes: str
+    batch: BatchModel = Relationship(back_populates="batch_days")
+    challenges: list["ChallengeModel"] = Relationship(back_populates="batch_day")
     __table_args__ = (
         ForeignKeyConstraint(
-            ['task_id', 'user_id'],
-            ['st_task.id', 'st_task.user_id']
+            ['batch_id', 'user_id'],
+            ['batch.id', 'batch.user_id']
         ),
     )
 
-    # Relationship with STTaskModel
-    task: "STTaskModel" = Relationship(back_populates="tags")
+class ChallengeModel(SQLModel, table=True):
+    __tablename__ = "challenge"
+    id: int = Field(primary_key=True)
+    batch_day_id: int = Field(primary_key=True)
+    batch_id: int = Field(primary_key=True)
+    user_id: int = Field(primary_key=True)
+    completion_date: datetime | None
+    batch_day: BatchDayModel = Relationship(back_populates="challenges")
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['batch_day_id', 'batch_id', 'user_id'],
+            ['batch_day.id', 'batch_day.batch_id', 'batch_day.user_id']
+        ),
+    )
 
+class STAppUseModel(SQLModel, table=True):
+    __tablename__ = "st_app_use_model"
+    id: int = Field(primary_key=True)
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    user: UserModel = Relationship(back_populates="user_st_app_uses")
+
+class STWeekDayPlanningModel(SQLModel, table=True):
+    __tablename__ = "st_week_day_planning"
+    week_planning_day: int | None
+    hour: int | None
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    user: UserModel = Relationship(back_populates="st_planning_day")
+
+class STScheduleBlockNotAvailableModel(SQLModel, table=True):
+    __tablename__ = "st_schedule_block_not_available"
+    week_day: int = Field(primary_key=True)
+    start_hour: int = Field(primary_key=True)
+    duration: int = Field(primary_key=True)
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    user: UserModel = Relationship(back_populates="schedule_unavailable_blocks")
 
 class STArchiveModel(SQLModel, table=True):
     __tablename__ = "st_archive"
-
     name: str = Field(primary_key=True, default=None)
-
     files: list["STFileModel"] = Relationship(back_populates="archive")
-
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_archives")
 
-
 class STFileModel(SQLModel, table=True):
     __tablename__ = "st_file"
-
     name: str = Field(primary_key=True)
     text: str
-
-    # Foreign key: Composite key referencing st_task
     archive_name: str = Field(primary_key=True)
     user_id: int = Field(primary_key=True)
-
-    # Composite foreign key constraint
     __table_args__ = (
         ForeignKeyConstraint(
             ['archive_name', 'user_id'],
             ['st_archive.name', 'st_archive.user_id']
         ),
     )
-
-    # Relationship with STTaskModel
     archive: "STArchiveModel" = Relationship(back_populates="files")
-
 
 class STCurricularUnitModel(SQLModel, table=True):
     __tablename__ = "st_curricular_unit"
-
     name: str = Field(primary_key=True, default=None)
-
     grades: list["STGradeModel"] = Relationship(back_populates="curricular_unit")
-
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_curricular_units")
 
-
 class STGradeModel(SQLModel, table=True):
     __tablename__ = "st_grade"
-
     id: int = Field(primary_key=True)
     value: float
     weight: float
-
-    # Foreign key: Composite key referencing st_task
     curricular_unit_name: str = Field(primary_key=True)
     user_id: int = Field(primary_key=True)
-
-    # Composite foreign key constraint
     __table_args__ = (
         ForeignKeyConstraint(
             ['curricular_unit_name', 'user_id'],
             ['st_curricular_unit.name', 'st_curricular_unit.user_id']
         ),
     )
-
-    # Relationship with STTaskModel
     curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")
-
 
 class DailyEnergyStatusModel(SQLModel, table=True):
     __tablename__ = "daily_energy_status"
-
     date_: date = Field(primary_key=True, default=None)
     time_of_day: str
     level: int
-
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="daily_energy_status")
 
-class DailyTagModel(SQLModel, table=True):
-    __tablename__ = "daily_tag"
-
-    date_: date = Field(primary_key=True, default=None)
-    tag: str = Field(primary_key=True, default=None)
-
-    user_id: int = Field(foreign_key="user.id")
-    user: UserModel = Relationship(back_populates="daily_tag")
-
 class WeekStudyTimeModel(SQLModel, table=True):
     __tablename__ = "week_study_time"
-
     year: int = Field(primary_key=True, default=None)
     week: int = Field(primary_key=True, default=None)
     total: int
     average_by_session: float
     n_of_sessions: int
-
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="week_study_time")
+
+class UserBadge(SQLModel, table=True):
+    __tablename__ = "user_badges"
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    badge_id: int = Field(foreign_key="badges.id", primary_key=True)
+    awarded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    # Para metadata_json
+    metadata_json: Optional[dict] = Field(
+        default=None,
+        sa_column=SAColumn(JSON, nullable=True)
+    )
+
+    user: UserModel = Relationship(back_populates="earned_badges")
+    badge: "Badge" = Relationship(back_populates="user_badges")
+    
+    __table_args__ = (
+        UniqueConstraint('user_id', 'badge_id', name='_user_badge_uc'),
+    )
+
+class League(SQLModel, table=True):
+    __tablename__ = "leagues"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    code: str = Field(index=True, unique=True, nullable=False)
+    name: str = Field(nullable=False) # Ex: "Liga Bronze", "Liga Prata"
+    description: Optional[str] = Field(default=None)
+    rank: int = Field(unique=True, nullable=False) # 1 para Bronze, 2 para Prata, etc.
+    badge_icon_url: Optional[str] = Field(default=None)
+    
+    #Critérios para ENTRAR nesta liga
+    promotion_criteria_json: Optional[dict] = Field(
+        default=None,
+        sa_column=SAColumn(JSON, nullable=True)
+    )
+
+    #Recompensas associadas a esta liga: badges visíveis, personalização de avatar, etc.
+    rewards_json: Optional[dict] = Field(
+        default=None,
+        sa_column=SAColumn(JSON, nullable=True) # Ex: {"badge_visibility": "silver", "avatar_customization": ["hair", "accessories"], "exclusive_themes": ["blue_theme"]}
+    )
+
+    badges: List["Badge"] = Relationship(back_populates="league")
+
+    user_league_memberships: List["UserLeague"] = Relationship(back_populates="league")
+
+class Badge(SQLModel, table=True):
+    __tablename__ = "badges"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    code: str = Field(index=True, unique=True, nullable=False)
+    title: str = Field(nullable=False)
+    description: str = Field(nullable=False)
+    icon_url: Optional[str] = Field(default=None)
+    app_scope: str = Field(default="common", nullable=False) # 'common', 'academic_challenge', 'study_tracker', 'all'
+    is_active: bool = Field(default=True, nullable=False) # Para ativar/desativar medalhas
+    criteria_json: Optional[dict] = Field(default=None, sa_column=SAColumn(JSON, nullable=True))
+
+    user_badges: List["UserBadge"] = Relationship(back_populates="badge")
+    league_id: Optional[int] = Field(default=None, foreign_key="leagues.id")
+    league: Optional[League] = Relationship(back_populates="badges")
+
+class UserMetric(SQLModel, table=True):
+    __tablename__ = "user_metrics"
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    
+    login_streak: int = Field(default=0, nullable=False)
+    last_login_at: Optional[datetime] = Field(default=None) 
+    
+    completed_challenges: List[str] = Field(
+        default_factory=list, # Default é uma lista vazia
+        sa_column=SAColumn(pg_ARRAY(String), nullable=False)
+    )
+    
+    study_sessions_completed: int = Field(default=0, nullable=False)
+    total_points: int = Field(default=0, nullable=False)
+
+    user: UserModel = Relationship(back_populates="metrics")
+    
+class UserLeague(SQLModel, table=True):
+    __tablename__ = "user_leagues"
+
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    league_id: int = Field(foreign_key="leagues.id", primary_key=True)
+    joined_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    current_level_progress: Optional[int] = Field(default=0) #Para ligas com níveis
+    
+    user: UserModel = Relationship(back_populates="league_memberships")
+    league: League = Relationship(back_populates="user_league_memberships")
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'league_id', name='_user_league_uc'),
+    )

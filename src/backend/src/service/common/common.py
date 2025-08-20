@@ -1,44 +1,63 @@
-from domain.commons.user import User
-from exception import UsernameAlreadyExistsException
-from repository.sql.commons.repo_sql import CommonsSqlRepo
-
+from typing import Optional, List
+from sqlmodel import select, Session
 from service.common.security import get_password_hash, verify_password
+from repository.sql.models.models import UserModel, TagModel, UserTagLink
+from repository.sql.models.database import predefined_global_tag_names
+from repository.sql.commons.repo_sql import CommonsSqlRepo
+from router.commons.dtos.input_dtos import CreateUserInputDto
+from exception import UsernameAlreadyExistsException
+from domain.commons.user import User 
 
-# TODO: this is a problem for the mem repo, since data is stored inside the object.
-# Instead, pass a common dependency to the services.
-# Same for other services...
-commons_repo = CommonsSqlRepo()
-
-def authenticate_user(username: str, password: str):
-    user = commons_repo.get_user_by_username(username)
+def authenticate_user(db: Session, username: str, password: str) -> Optional[User]: 
+    user = CommonsSqlRepo.get_user_by_username(db, username) 
     if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
+        return None
+    if not verify_password(password, user.hashed_password): 
+        return None
     return user
-
-def create_user(username: str, password: str) -> int:
-    if not commons_repo.exists_user_by_username(username):
-        hashed_password = get_password_hash(password)
-        user = commons_repo.create_user(username, hashed_password)
-        return user.id
     
-    raise UsernameAlreadyExistsException()
+def create_user(db: Session, user_data: CreateUserInputDto) -> User: 
+    existing_user = CommonsSqlRepo.exists_user_by_username(db, user_data.username) 
+    if existing_user:
+        raise UsernameAlreadyExistsException()
 
-def get_user_id_from_username(username: str) -> int | None:
-    user = commons_repo.get_user_by_username(username)
-    if user != None:
+    hashed_password = get_password_hash(user_data.password)
+    
+    new_user_model = CommonsSqlRepo.create_user(db, user_data.username, hashed_password) 
+
+    predefined_tags_in_db = db.exec( 
+        select(TagModel).where(TagModel.name.in_(predefined_global_tag_names))
+    ).all()
+
+    for tag_model in predefined_tags_in_db:
+        user_tag_association = UserTagLink(
+            user_id=new_user_model.id,
+            tag_id=tag_model.id,
+            is_custom=False
+        )
+        db.add(user_tag_association)
+
+    db.commit() 
+    db.refresh(new_user_model) 
+
+    new_user_domain = CommonsSqlRepo.from_user_model(new_user_model)
+    
+    return new_user_domain
+
+def get_user_id_from_username(db: Session, username: str) -> Optional[int]: 
+    user = CommonsSqlRepo.get_user_by_username(db, username) 
+    if user is not None:
         return user.id
     return None
 
-def get_user_info(user_id: int) -> User | None:
-    user = commons_repo.get_user_by_id(user_id)
-    if user != None:
+def get_user_info(db: Session, user_id: int) -> Optional[User]:
+    user = CommonsSqlRepo.get_user_by_id(db, user_id) 
+    if user is not None:
         return user
     return None
 
-def set_user_avatar(user_id: int, avatar_filename: str):
-    commons_repo.update_user_avatar(user_id, avatar_filename)
+def set_user_avatar(db: Session, user_id: int, avatar_filename: str): 
+    CommonsSqlRepo.update_user_avatar(db, user_id, avatar_filename) 
 
-def set_share_progress_preference(user_id: int, share_progress: bool):
-    commons_repo.update_share_progress_state(user_id, share_progress)
+def set_share_progress_preference(db: Session, user_id: int, share_progress: bool): 
+    CommonsSqlRepo.update_share_progress_state(db, user_id, share_progress) 
