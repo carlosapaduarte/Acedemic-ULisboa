@@ -286,6 +286,27 @@ function useMyCalendar() {
   };
 }
 
+const AgendaEvent = ({ event }) => {
+  // Obter a cor da tag
+  const tagColor =
+    event.resource?.color || event.resource?.tags?.[0]?.color || "#ccc";
+
+  return (
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <div
+        style={{
+          width: "10px",
+          height: "10px",
+          borderRadius: "50%",
+          backgroundColor: tagColor,
+          marginRight: "8px",
+        }}
+      />
+      <div>{event.title}</div>
+    </div>
+  );
+};
+
 function MyCalendar() {
   const {
     events,
@@ -437,6 +458,9 @@ function MyCalendar() {
       <div className={styles.calendarContainer}>
         <Calendar
           components={{
+            agenda: {
+              event: AgendaEvent, // Usar o novo componente para a agenda
+            },
             event: EventWithTags,
             week: {
               header: (props: any) => {
@@ -485,8 +509,12 @@ function MyCalendar() {
           culture={i18n.language}
           formats={calendarFormats}
           eventPropGetter={(
-            event: CalendarEvent & { resource?: CalendarEventResource }
+            event: CalendarEvent & { resource?: CalendarEventResource },
+            start,
+            end,
+            isSelected
           ) => {
+            // Sua lógica de cores existente
             const colorFromPickerOrBackend = event.resource?.color;
             const inferredTagColor = inferColorFromTags(event.resource?.tags);
 
@@ -510,15 +538,24 @@ function MyCalendar() {
               border: "none",
             };
 
-            if (
-              typeof effectiveColor === "string" &&
-              (effectiveColor.startsWith("linear-gradient") ||
-                effectiveColor.includes("gradient"))
-            ) {
-              style.backgroundImage = effectiveColor;
+            // Condicional para a vista de agenda
+            if (calendarView === Views.AGENDA) {
+              style.backgroundColor = "transparent"; // Remove a cor de fundo
+              style.color = "black"; // Ou outra cor para o texto
+              // Note: O chip colorido será adicionado no componente de evento da agenda
             } else {
-              style.backgroundColor = effectiveColor;
+              // Lógica de cores para outras vistas (month, week, day)
+              if (
+                typeof effectiveColor === "string" &&
+                (effectiveColor.startsWith("linear-gradient") ||
+                  effectiveColor.includes("gradient"))
+              ) {
+                style.backgroundImage = effectiveColor;
+              } else {
+                style.backgroundColor = effectiveColor;
+              }
             }
+
             return { style };
           }}
         />

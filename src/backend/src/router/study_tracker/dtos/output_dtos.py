@@ -197,3 +197,10 @@ class WeekTimeStudyOutputDto(BaseModel):
                 )
             )
         return dtos
+    
+class TagOutputDto(BaseModel):
+    id: int
+    name: str
+    color: str
+    description: str
+    user_id: int

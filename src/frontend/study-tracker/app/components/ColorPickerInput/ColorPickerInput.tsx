@@ -4,8 +4,8 @@ import { Label, Input, Button } from "react-aria-components";
 import styles from "./ColorPickerInput.module.css";
 
 interface ColorPickerInputProps {
-  label: string;
-  color: string;
+  label?: string;
+  color?: string;
   setColor: (color: string) => void;
   clearColor: () => void;
 }

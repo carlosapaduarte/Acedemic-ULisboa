@@ -145,6 +145,7 @@
   font-family: var(--font-family1), sans-serif;
   font-size: 1rem;
   font-weight: 500;
+  border: 2px solid transparent;
 }
 
 .tagItem:hover {
@@ -229,4 +230,24 @@
   color: var(--color-text-danger);
   font-size: 0.9em;
   text-align: center;
+}
+
+/*MODAL DE EDIÇÃO DE TAG*/
+
+.editTagModalContainer {
+  composes: modalContainer;
+}
+.editFormContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-2);
+  border-radius: 8px;
+  margin-top: 1rem;
+  background-color: var(--color-3-transparent);
+}
+
+.currentlyEditingTag {
+  background-color: var(--color-4) !important;
 }

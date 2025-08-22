@@ -11,7 +11,3 @@ class CreateUserInputDto(BaseModel):
 
 class SetUserAvatarDto(BaseModel):
     avatarFilename: str
-
-class CreateTagInputDto(BaseModel):
-    name: str
-    tagDescription: Optional[str] = None

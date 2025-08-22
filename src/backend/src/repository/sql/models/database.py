@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Configuração da bd
 DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
-
+print("url bd:",DATABASE_URL)
 if not DATABASE_URL:
     raise ValueError("SQLALCHEMY_DATABASE_URL não está definida no ambiente.")
 
@@ -19,10 +19,6 @@ engine = create_engine(DATABASE_URL, echo=False)
 
 POSTGRES_MAX_INTEGER_VALUE = 2147483647
 
-def create_db_and_tables():
-    """Cria as tabelas na bd com base nos metadados do SQLModel."""
-    SQLModel.metadata.create_all(engine)
-    logger.info("Tabelas na bd criadas (ou já existentes).")
 
 def get_engine():
     """Retorna a instância do engine da bd."""
@@ -36,19 +32,30 @@ def get_session() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
 
-predefined_global_tag_names = ["fun", "work", "personal", "study"]
+predefined_global_tag_names = [
+    ("fun", "#FF5733"),
+    ("work", "#33A1FF"),
+    ("personal", "#8E44AD"),
+    ("study", "#27AE60")
+]
+
+def create_db_and_tables():
+    """Cria as tabelas na bd com base nos metadados do SQLModel."""
+    SQLModel.metadata.create_all(engine)
+    logger.info("Tabelas na bd criadas (ou já existentes).")
+
 
 def seed_global_tags(session: Session):
     """Seed das tags globais padrão."""
     logger.info("A semear tags globais...")
-    for tag_name in predefined_global_tag_names:
+    for tag_name, tag_color in predefined_global_tag_names:
         existing_tag = session.exec(
             select(TagModel).where(TagModel.name == tag_name)
         ).first()
         if not existing_tag:
-            new_tag = TagModel(name=tag_name)
+            new_tag = TagModel(name=tag_name, color=tag_color, description=f"Tag para atividades de {tag_name}.")
             session.add(new_tag)
-            logger.info(f"-> Adicionada Tag: '{tag_name}'")
+            logger.info(f"-> Adicionada Tag: '{tag_name}' com a cor {tag_color}")
     session.commit()
 
 
@@ -181,7 +188,6 @@ def seed_gamification_data(session: Session):
     session.commit()
 
     logger.info("Seeding de dados de gamificação concluído.")
-
 
 def seed_all_data():
     """Função principal para semear todos os dados."""

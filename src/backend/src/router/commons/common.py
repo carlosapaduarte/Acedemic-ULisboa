@@ -13,7 +13,8 @@ from typing import Annotated, Any, List
 
 from router.commons.dtos.output_dtos import TagOutputDto
 from router.academic_challenge.dtos.input_dtos import SetShareProgressPreferenceDto
-from router.commons.dtos.input_dtos import CreateUserInputDto, SetUserAvatarDto, CreateTagInputDto
+from router.commons.dtos.input_dtos import CreateUserInputDto, SetUserAvatarDto
+from router.study_tracker.dtos.input_dtos import CreateTagInputDto, UpdateTagInputDto
 from router.commons.dtos.output_dtos import UserOutputDto
 from service.common import common as common_service
 from service.common.security import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, TokenData, create_access_token
@@ -195,18 +196,18 @@ def delete_user_tag(
             detail="Falha ao apagar tag."
         )
 
+
+
 @router.post("/users/me/tags", response_model=TagOutputDto, status_code=status.HTTP_201_CREATED)
 def create_user_tag(
     tag_input: CreateTagInputDto,
     current_user_id: Annotated[int, Depends(get_current_user_id)],
     db: Annotated[Session, Depends(get_db_session)]
 ):
-    print(f"DEBUG: Dados recebidos no backend para criar tag: {tag_input.model_dump()}") # Ou tag_input.dict()
     try:
-
-        existing_tag = (db.exec(
+        existing_tag = db.exec(
             select(TagModel).where(TagModel.name == tag_input.name)
-        )).first()
+        ).first()
 
         if existing_tag:
     
@@ -229,8 +230,12 @@ def create_user_tag(
                 db.refresh(new_user_tag_link)
                 return TagOutputDto(id=str(existing_tag.id), name=existing_tag.name, user_id=current_user_id,is_custom=new_user_tag_link.is_custom)
         else:
-            new_tag = TagModel(name=tag_input.name)
-
+            # A tag não existe globalmente, cria uma nova
+            new_tag = TagModel(
+                name=tag_input.name, 
+                color=tag_input.color, 
+                description=tag_input.description
+            )
             db.add(new_tag)
             db.commit()
             db.refresh(new_tag)
@@ -238,7 +243,6 @@ def create_user_tag(
             new_user_tag_link = UserTagLink(user_id=current_user_id, tag_id=new_tag.id,is_custom=True)
             db.add(new_user_tag_link)
             db.commit()
-            db.refresh(new_user_tag_link)
             
             return TagOutputDto(id=str(new_tag.id), name=new_tag.name, user_id=current_user_id, is_custom=new_user_tag_link.is_custom)
 
@@ -249,5 +253,38 @@ def create_user_tag(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Falha ao criar tag."
-        )
+)
         
+@router.put("/users/me/tags/{tag_id}", response_model=TagOutputDto)
+def update_user_tag(
+    tag_id: int,
+    tag_input: UpdateTagInputDto,
+    current_user_id: Annotated[int, Depends(get_current_user_id)],
+    db: Annotated[Session, Depends(get_db_session)]
+):
+    #Verificar se a tag existe e se o utilizador tem permissão para a editar
+    #esta query verifica se existe uma ligação entre o utilizador e a tag.
+    user_tag_link = db.exec(select(UserTagLink).where(
+        UserTagLink.user_id == current_user_id,
+        UserTagLink.tag_id == tag_id
+    )).first()
+
+    if not user_tag_link:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag não encontrada ou sem permissão para editar.")
+
+    #Se a permissão for válida, procura a tag principal para a atualizar.
+    tag_to_update = db.get(TagModel, tag_id)
+    if not tag_to_update:
+        #para confirmar
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag não encontrada.")
+
+    #atualiza os campos da tag com os dados recebidos.
+    tag_to_update.name = tag_input.name
+    tag_to_update.color = tag_input.color
+    tag_to_update.description = tag_input.description
+
+    db.add(tag_to_update)
+    db.commit()
+    db.refresh(tag_to_update)
+
+    return tag_to_update

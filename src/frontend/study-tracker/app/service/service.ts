@@ -48,9 +48,6 @@ export class AuthError extends Error {
  * should be used on sub-sequenced calls, as an authorization mechanism.
  */
 async function login(username: string, password: string) {
-  // NOTE: for now, this function will store the JWT in cache, for simplicity.
-  // TODO: think if there is another place to store the token.
-
   const formData = new FormData();
   formData.append("username", username);
   formData.append("password", password);
@@ -226,10 +223,6 @@ export type NewEventInfo = {
 };
 
 async function createNewEvent(newEventInfo: NewEventInfo) {
-  console.log(
-    "Service LOG: createNewEvent - Enviando cor:",
-    newEventInfo.color
-  );
   const request = {
     path: `study-tracker/users/me/events`,
     method: "POST",
@@ -259,10 +252,6 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
       }
       throw new Error("New event could not be created!");
     }
-    console.log(
-      "Service: Novo evento criado com sucesso! cor do evento: ",
-      newEventInfo.color
-    );
   } catch (error) {
     console.error("Service: Erro durante a criação do evento:", error);
     return Promise.reject(error);
@@ -346,7 +335,6 @@ async function getUserEvents(
 
   if (response.ok) {
     const responseObject: EventDto[] = await response.json();
-    console.log("Service: Eventos recebidos do backend:", responseObject);
     return responseObject.map((eventDto: EventDto) => {
       return {
         id: eventDto.id,
@@ -453,7 +441,6 @@ function requestBody(newTaskInfo: CreateTaskInputDto): any {
 }
 
 async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
-  console.log(newTaskInfo);
   const request = {
     path: `study-tracker/users/me/tasks`,
     method: "POST",
@@ -482,7 +469,6 @@ async function updateTask(
     };
   }
 
-  console.log(toUpdateTaskInputDto(newTaskInfo, previousTaskName));
   const request = {
     path: `study-tracker/users/me/tasks/${taskId}`,
     method: "PUT",
@@ -968,42 +954,53 @@ export const service = {
     }
   },
 
-  async createTag(tagName: string, tagColor: string): Promise<Tag> {
-    try {
-      const request = {
-        path: "commons/users/me/tags",
-        method: "POST",
-        body: toJsonBody({ name: tagName, color: tagColor }),
-      };
-      const response = await doFetch(request);
-      if (response.ok) {
-        const newTag: Tag = await response.json();
-        return newTag;
+  async createTag(tagData: {
+    name: string;
+    color: string;
+    description?: string;
+  }): Promise<Tag> {
+    const request = {
+      path: `commons/users/me/tags`,
+      method: "POST",
+      body: toJsonBody(tagData),
+    };
+    const response = await doFetch(request);
+
+    if (!response.ok) {
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: "Erro desconhecido da API." }));
+      console.error("API respondeu com erro:", response.status, errorData);
+      if (response.status === 409) {
+        const error = new Error("TagAlreadyExists");
+        (error as any).type = "TAG_ALREADY_EXISTS_FOR_USER";
+        throw error;
+      } else if (response.status === 400) {
+        throw new Error(errorData.message || "Dados inválidos para criar tag.");
       } else {
-        const errorData = await response
-          .json()
-          .catch(() => ({ message: "Erro desconhecido da API." }));
-
-        console.error("API respondeu com erro:", response.status, errorData);
-
-        if (response.status === 409) {
-          const error = new Error("TagAlreadyExists");
-          (error as any).type = "TAG_ALREADY_EXISTS_FOR_USER";
-          throw error;
-        } else if (response.status === 400) {
-          throw new Error(
-            errorData.message || "Dados inválidos para criar tag."
-          );
-        } else {
-          throw new Error(
-            errorData.message || `Erro do servidor: ${response.status}`
-          );
-        }
+        throw new Error(
+          errorData.message || `Erro do servidor: ${response.status}`
+        );
       }
-    } catch (error) {
-      console.error(`Erro ao criar tag "${tagName}":`, error);
-      throw error;
     }
+    return response.json();
+  },
+
+  async updateTag(
+    tagId: string | number,
+    tagData: { name: string; color: string; description?: string }
+  ): Promise<Tag> {
+    const request = {
+      path: `commons/users/me/tags/${tagId}`,
+      method: "PUT",
+      body: toJsonBody(tagData),
+    };
+    const response = await doFetch(request);
+
+    if (!response.ok) {
+      throw new Error("Falha ao atualizar tag");
+    }
+    return response.json();
   },
 
   async deleteTag(tagId: number): Promise<void> {

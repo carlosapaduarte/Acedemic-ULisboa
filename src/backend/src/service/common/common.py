@@ -24,9 +24,10 @@ def create_user(db: Session, user_data: CreateUserInputDto) -> User:
     hashed_password = get_password_hash(user_data.password)
     
     new_user_model = CommonsSqlRepo.create_user(db, user_data.username, hashed_password) 
+    tag_names = [name for name, _ in predefined_global_tag_names]
 
     predefined_tags_in_db = db.exec( 
-        select(TagModel).where(TagModel.name.in_(predefined_global_tag_names))
+        select(TagModel).where(TagModel.name.in_(tag_names))
     ).all()
 
     for tag_model in predefined_tags_in_db:

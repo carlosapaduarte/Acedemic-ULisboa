@@ -93,3 +93,13 @@ class UpdateWeekStudyTime(BaseModel):
     year: int
     week: int
     time: int # in minutes
+    
+class CreateTagInputDto(BaseModel):
+    name: str
+    color: str
+    description: str = ""
+
+class UpdateTagInputDto(BaseModel):
+    name: str
+    color: str
+    description: Optional[str] = None
