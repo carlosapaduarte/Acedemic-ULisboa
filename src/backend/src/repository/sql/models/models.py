@@ -364,6 +364,7 @@ class UserMetric(SQLModel, table=True):
     login_streak: int = Field(default=0, nullable=False)
     last_login_at: Optional[datetime] = Field(default=None) 
     
+    # Para o Study Tracker
     completed_challenges: List[str] = Field(
         default_factory=list, # Default é uma lista vazia
         sa_column=SAColumn(pg_ARRAY(String), nullable=False)

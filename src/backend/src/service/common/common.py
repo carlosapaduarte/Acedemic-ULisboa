@@ -25,10 +25,13 @@ def create_user(db: Session, user_data: CreateUserInputDto) -> User:
     
     new_user_model = CommonsSqlRepo.create_user(db, user_data.username, hashed_password) 
 
-    predefined_tags_in_db = db.exec( 
-        select(TagModel).where(TagModel.name.in_(predefined_global_tag_names))
-    ).all()
+    tag_names_to_query = [tag[0] for tag in predefined_global_tag_names]
 
+    
+    predefined_tags_in_db = db.exec( 
+        select(TagModel).where(TagModel.name.in_(tag_names_to_query))
+    ).all()
+    
     for tag_model in predefined_tags_in_db:
         user_tag_association = UserTagLink(
             user_id=new_user_model.id,

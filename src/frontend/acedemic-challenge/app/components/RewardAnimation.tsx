@@ -14,14 +14,19 @@ export default function RewardAnimation({
     awardedBadge,
     onClose,
 }: RewardAnimationProps) {
-    const imageUrl =
-        awardedBadge.icon_url || `${APP_BASE_PATH}assets/default-badge.png`;
-
     // Verifica se a medalha é uma de "fim de nível" para uma animação maior com a imagem do nivel
     const isLevelUp =
         awardedBadge.code.includes("iniciante_determinado") ||
         awardedBadge.code.includes("cavaleiro_persistencia") ||
         awardedBadge.code.includes("campeao_autoeficacia");
+
+    const cleanIconUrl = awardedBadge.icon_url?.startsWith("/")
+        ? awardedBadge.icon_url.substring(1)
+        : awardedBadge.icon_url;
+
+    const imageUrl = cleanIconUrl
+        ? `${APP_BASE_PATH}${cleanIconUrl}`
+        : `${APP_BASE_PATH}assets/badgesdefault-badge.png`;
 
     return (
         <div className={styles.overlay}>

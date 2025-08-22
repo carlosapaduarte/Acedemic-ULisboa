@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Configuração da bd
 DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
-
+print("url bd:", DATABASE_URL)
 if not DATABASE_URL:
     raise ValueError("SQLALCHEMY_DATABASE_URL não está definida no ambiente.")
 
@@ -22,125 +22,85 @@ POSTGRES_MAX_INTEGER_VALUE = 2147483647
 def create_db_and_tables():
     """Cria as tabelas na bd com base nos metadados do SQLModel."""
     SQLModel.metadata.create_all(engine)
-    logger.info("Tabelas na bd criadas ou já existentes")
+    logger.info("Tabelas na bd criadas (ou já existentes).")
 
 def get_engine():
     """Retorna a instância do engine da bd."""
     return engine
 
 def get_session() -> Generator[Session, None, None]:
-    """
-    Dependency para fornecer uma sessão de banco de dados síncrona.
-    Usada com `FastAPI.Depends`.
-    """
+    """Dependency para fornecer uma sessão de banco de dados síncrona."""
     with Session(engine) as session:
         yield session
 
-predefined_global_tag_names = ["fun", "work", "personal", "study"]
+predefined_global_tag_names = [
+    ("fun", "#FF5733"),
+    ("work", "#33A1FF"),
+    ("personal", "#8E44AD"),
+    ("study", "#27AE60")
+]
 
 def seed_global_tags(session: Session):
     """Seed das tags globais padrão."""
     logger.info("A semear tags globais...")
-    for tag_name in predefined_global_tag_names:
+    for tag_name, tag_color in predefined_global_tag_names:
         existing_tag = session.exec(
             select(TagModel).where(TagModel.name == tag_name)
         ).first()
-        if not existing_tag:
-            new_tag = TagModel(name=tag_name)
-            session.add(new_tag)
-            logger.info(f"-> Adicionada Tag: '{tag_name}'")
+    if not existing_tag:
+        new_tag = TagModel(name=tag_name, color=tag_color, description=f"Tag para atividades de {tag_name}.")
+        session.add(new_tag)
+        logger.info(f"-> Adicionada Tag: '{tag_name}' com a cor {tag_color}")
     session.commit()
 
 def seed_gamification_data(session: Session):
-    """Seed dos Níveis e Medalhas (Troféus) para o Academic Challenge."""
-    logger.info("A semear dados de gamificação para o Academic Challenge...")
+    """Seed dos Níveis e Troféus para o ACEdemic Challenge."""
+    logger.info("A semear dados de gamificação para o ACEdemic Challenge...")
 
     initial_levels = [
-        {
-            "code": "level_0", "name": "Início", "rank": 0,
-            "description": "Nível inicial para todos os novos aventureiros.",
-            "badge_icon_url": "/assets/badges/levels/level_0.png",
-            "promotion_criteria_json": None
-        },
-        {
-            "code": "level_1", "name": "Nível 1", "rank": 1,
-            "description": "Complete os desafios iniciais para dominar a autoeficácia.",
-            "badge_icon_url": "/assets/badges/levels/level_1.png",
-            #promoção para o nível 1 acontece ao ganhar o troféu 'novato'
-            "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_novato"], "min_count": 1}
-        },
-        {
-            "code": "level_2", "name": "Nível 2", "rank": 2,
-            "description": "Aprofunde a sua determinação e torne-se um pioneiro.",
-            "badge_icon_url": "/assets/badges/levels/level_2.png",
-            #promoção para o nível 2 acontece ao ganhar o troféu 'iniciante_determinado'
-            "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_iniciante_determinado"], "min_count": 1}
-        },
-        {
-            "code": "level_3", "name": "Nível 3", "rank": 3,
-            "description": "Construa hábitos sólidos para se tornar um campeão.",
-            "badge_icon_url": "/assets/badges/levels/level_3.png",
-            #promoção para o nível 3 acontece ao ganhar o troféu 'cavaleiro_persistencia'
-            "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_cavaleiro_persistencia"], "min_count": 1}
-        }
+        {"code": "level_0", "name": "Início", "rank": 0, "description": "Nível inicial para todos os novos aventureiros.", "badge_icon_url": "/assets/badges/levels/level_0.png", "promotion_criteria_json": None},
+        {"code": "level_1", "name": "Nível 1", "rank": 1, "description": "Complete os desafios iniciais para dominar a autoeficácia.", "badge_icon_url": "/assets/badges/levels/level_1.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_novato"], "min_count": 1}},
+        {"code": "level_2", "name": "Nível 2", "rank": 2, "description": "Aprofunde a sua determinação e torne-se um pioneiro.", "badge_icon_url": "/assets/badges/levels/level_2.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_iniciante_determinado"], "min_count": 1}},
+        {"code": "level_3", "name": "Nível 3", "rank": 3, "description": "Construa hábitos sólidos para se tornar um campeão.", "badge_icon_url": "/assets/badges/levels/level_3.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_cavaleiro_persistencia"], "min_count": 1}},
     ]
     
     level_codes_to_ids = {}
-
     for level_data in initial_levels:
-        existing_level = session.exec(
-            select(League).where(League.code == level_data["code"])
-        ).first()
+        existing_level = session.exec(select(League).where(League.code == level_data["code"])).first()
         if not existing_level:
             new_level = League(**level_data)
             session.add(new_level)
-            session.flush() 
+            session.flush()
             level_codes_to_ids[new_level.code] = new_level.id
         else:
-            existing_level.name = level_data['name']
-            existing_level.description = level_data['description']
-            existing_level.rank = level_data['rank']
-            existing_level.promotion_criteria_json = level_data['promotion_criteria_json']
-            session.add(existing_level)
             level_codes_to_ids[existing_level.code] = existing_level.id
-            
     session.commit()
 
     initial_badges_data = [
         # Início
         {"code": "ac_novato", "title": "Novato", "description": "Após finalizar a autenticação na app.", "level_code": "level_0", "criteria_json": {"type": "login_streak", "value": 1}},
-
         # Nível 1
-        {"code": "ac_caloiro_autoeficacia", "title": "Caloiro da Autoeficácia", "description": "Após completar o primeiro desafio.", "level_code": "level_1", "criteria_json": {"type": "completed_challenges", "value": 1}},
-        {"code": "ac_prodigio_autoeficacia", "title": "Prodígio da Autoeficácia", "description": "Após completar os três primeiros desafios.", "level_code": "level_1", "criteria_json": {"type": "completed_challenges", "value": 3}},
+        {"code": "ac_caloiro_autoeficacia", "title": "Caloiro da Autoeficácia", "description": "Após completar o primeiro desafio.", "level_code": "level_1", "criteria_json": {"type": "completed_challenges_count", "value": 1}},
+        {"code": "ac_prodigio_autoeficacia", "title": "Prodígio da Autoeficácia", "description": "Após completar os três primeiros desafios.", "level_code": "level_1", "criteria_json": {"type": "completed_challenges_count", "value": 3}},
         {"code": "ac_mestre_disciplina", "title": "Mestre da Disciplina", "description": "Se cumprir 1 semana de desafios na totalidade (7 desafios seguidos).", "level_code": "level_1", "criteria_json": {"type": "challenge_streak", "value": 7}},
         {"code": "ac_campeao_consistencia", "title": "Campeão da Consistência", "description": "Se cumprir 2 semanas de desafios na totalidade (14 desafios seguidos).", "level_code": "level_1", "criteria_json": {"type": "challenge_streak", "value": 14}},
-        {"code": "ac_iniciante_determinado", "title": "Iniciante Determinado", "description": "Após finalizar o Nível 1.", "level_code": "level_1", "criteria_json": {"type": "total_badges_count", "value": 5}},
-
+        {"code": "ac_iniciante_determinado", "title": "Iniciante Determinado", "description": "Após finalizar o Nível 1.", "level_code": "level_1", "criteria_json": {"type": "required_badges", "badges": ["ac_caloiro_autoeficacia", "ac_prodigio_autoeficacia", "ac_mestre_disciplina", "ac_campeao_consistencia"], "min_count": 4}},
         # Nível 2
-        {"code": "ac_pioneiro_determinacao", "title": "Pioneiro da Determinação", "description": "Após completar o primeiro desafio do Nível 2 (total 15).", "level_code": "level_2", "criteria_json": {"type": "completed_challenges", "value": 15}},
-        {"code": "ac_desbravador_autoeficacia", "title": "Desbravador da Autoeficácia", "description": "Após completar três desafios do Nível 2 (total 17).", "level_code": "level_2", "criteria_json": {"type": "completed_challenges", "value": 17}},
+        {"code": "ac_pioneiro_determinacao", "title": "Pioneiro da Determinação", "description": "Após completar o primeiro desafio do Nível 2 (total 15).", "level_code": "level_2", "criteria_json": {"type": "completed_challenges_count", "value": 15}},
+        {"code": "ac_desbravador_autoeficacia", "title": "Desbravador da Autoeficácia", "description": "Após completar três desafios do Nível 2 (total 17).", "level_code": "level_2", "criteria_json": {"type": "completed_challenges_count", "value": 17}},
         {"code": "ac_mestre_desafio", "title": "Mestre do Desafio", "description": "Se cumprir 1 semana de desafios no Nível 2 (total 21 seguidos).", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 21}},
         {"code": "ac_guerreiro_resiliente", "title": "Guerreiro Resiliente", "description": "Se cumprir 2 semanas de desafios no Nível 2 (total 28 seguidos).", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 28}},
-        {"code": "ac_cavaleiro_persistencia", "title": "Cavaleiro da Persistência", "description": "Após finalizar o Nível 2.", "level_code": "level_2", "criteria_json": {"type": "total_badges_count", "value": 10}},
-
+        {"code": "ac_cavaleiro_persistencia", "title": "Cavaleiro da Persistência", "description": "Após finalizar o Nível 2.", "level_code": "level_2", "criteria_json": {"type": "required_badges", "badges": ["ac_pioneiro_determinacao", "ac_desbravador_autoeficacia", "ac_mestre_desafio", "ac_guerreiro_resiliente"], "min_count": 4}},
         # Nível 3
         {"code": "ac_construtor_habitos", "title": "Construtor de Hábitos", "description": "Se cumprir 1 semana de desafios no Nível 3 (total 33 seguidos).", "level_code": "level_3", "criteria_json": {"type": "challenge_streak", "value": 33}},
-        {"code": "ac_campeao_autoeficacia", "title": "Campeão da Autoeficácia", "description": "Após finalizar o Nível 3.", "level_code": "level_3", "criteria_json": {"type": "total_badges_count", "value": 11}},
+        {"code": "ac_campeao_autoeficacia", "title": "Campeão da Autoeficácia", "description": "Após finalizar o Nível 3.", "level_code": "level_3", "criteria_json": {"type": "required_badges", "badges": ["ac_construtor_habitos"], "min_count": 1}},
     ]
     
-    logger.info("A semear e associar medalhas aos níveis...")
     for badge_data in initial_badges_data:
         badge_code = badge_data["code"]
         level_code = badge_data.pop("level_code")
-        
         level_id = level_codes_to_ids.get(level_code)
-        if not level_id:
-            logger.warning(f"ID do Nível '{level_code}' não encontrado para o troféu '{badge_code}'.")
-
-        existing_badge = session.exec(
-            select(Badge).where(Badge.code == badge_code)
-        ).first()
+        existing_badge = session.exec(select(Badge).where(Badge.code == badge_code)).first()
 
         badge_fields = {
             "title": badge_data["title"],
@@ -151,7 +111,6 @@ def seed_gamification_data(session: Session):
             "criteria_json": badge_data["criteria_json"],
             "league_id": level_id
         }
-
         if existing_badge:
             for key, value in badge_fields.items():
                 setattr(existing_badge, key, value)
@@ -159,9 +118,8 @@ def seed_gamification_data(session: Session):
         else:
             new_badge = Badge(code=badge_code, **badge_fields)
             session.add(new_badge)
-
     session.commit()
-    logger.info("Seeding de dados de gamificação concluído.")
+    logger.info("Seeding de dados de gamificação para o ACEdemic Challenge concluído.")
 
 
 def seed_all_data():
@@ -169,15 +127,12 @@ def seed_all_data():
     session = None
     try:
         session = next(get_session())
+        # seed_global_tags(session) # Descomentado por agora
         seed_gamification_data(session)
         session.commit()
-        logger.info("Dados de seed de gamificação inseridos ou já existentes.")
     except Exception as e:
         logger.error(f"Erro ao inserir dados de seed: {e}", exc_info=True)
-        if session:
-            session.rollback()
+        if session: session.rollback()
         raise
     finally:
-        if session:
-            session.close()
-    logger.info("Seeding de dados concluído.")
+        if session: session.close()
