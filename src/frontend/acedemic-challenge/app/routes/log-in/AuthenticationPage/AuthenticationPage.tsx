@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import { AuthError, service } from "~/service/service";
 import styles from "./authenticationPage.module.css";
 import { useTranslation } from "react-i18next";
+
 import {
     Button,
     FieldError,
@@ -12,11 +13,9 @@ import {
     TextField,
 } from "react-aria-components";
 import classNames from "classnames";
-import { ChallengesContext } from "~/hooks/useChallenges";
 
 function useAuthenticationPage() {
     const logIn = useLogIn();
-    const { showBadgeAnimation } = useContext(ChallengesContext);
     const [authError, setAuthError] = useState<AuthError | null>(null);
 
     // This function should redirect user to ULisboa authentication page,
@@ -42,7 +41,10 @@ function useAuthenticationPage() {
                     loginResponse.newly_awarded_badges &&
                     loginResponse.newly_awarded_badges.length > 0
                 ) {
-                    showBadgeAnimation(loginResponse.newly_awarded_badges[0]);
+                    sessionStorage.setItem(
+                        "pendingBadgeAnimation",
+                        JSON.stringify(loginResponse.newly_awarded_badges[0]),
+                    );
                 }
                 logIn(); // Continua o processo de login normal
             })

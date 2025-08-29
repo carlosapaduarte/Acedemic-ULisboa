@@ -140,13 +140,35 @@ function HomePageContent() {
 export default function HomePage() {
     const challengeData = useChallenges();
 
+    // --- AQUI ESTÁ A LÓGICA FINAL ---
+    useEffect(() => {
+        // Tenta ler o "bilhete" do sessionStorage
+        const pendingBadgeJSON = sessionStorage.getItem(
+            "pendingBadgeAnimation",
+        );
+
+        if (pendingBadgeJSON) {
+            try {
+                // Se o bilhete existe, converte-o de volta para um objeto
+                const badge = JSON.parse(pendingBadgeJSON);
+                // Chama a função de animação do nosso contexto
+                challengeData.showBadgeAnimation(badge);
+                // MUITO IMPORTANTE: Apaga o bilhete para não mostrar a animação outra vez se o utilizador recarregar a página
+                sessionStorage.removeItem("pendingBadgeAnimation");
+            } catch (error) {
+                console.error(
+                    "Falha ao processar a animação de medalha pendente:",
+                    error,
+                );
+                sessionStorage.removeItem("pendingBadgeAnimation"); // Limpa em caso de erro
+            }
+        }
+    }, []); // O array vazio `[]` garante que isto só executa UMA VEZ, quando a página carrega.
+
     return (
-        // 2. O Provider envolve a sua UI e partilha a "caixa de ferramentas" completa.
         <ChallengesContext.Provider value={challengeData}>
             <HomePageContent />
 
-            {/* 3. A Animação fica aqui, a escutar o estado global. */}
-            {/* Seja o login ou um desafio a chamar `showBadgeAnimation`, esta animação será mostrada. */}
             {challengeData.badgeForAnimation && (
                 <RewardAnimation
                     awardedBadge={challengeData.badgeForAnimation}
