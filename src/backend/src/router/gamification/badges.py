@@ -10,7 +10,9 @@ from router.commons.dtos.gamification_dtos import (
     LeagueResponse,
     UserLeagueResponse,
     UserMetricsResponse,
-    UserBadgesStatusDto
+    UserBadgesStatusDto,
+    GamificationProfileResponse,
+    AwardedBadgeHistoryItem
 )
 from repository.sql.commons.repo_badge import BadgeRepo
 from service.gamification import core as gamification_service
@@ -37,6 +39,19 @@ def get_my_earned_badges(
     earned_badges = [user_badge.badge for user_badge in user_badge_associations if user_badge.badge]
     
     return earned_badges
+
+@router.get(
+    "/badges/me/history",
+    response_model=List[AwardedBadgeHistoryItem],
+    summary="Obter o histórico de medalhas do utilizador",
+    description="Retorna todas as medalhas que o utilizador ganhou e quando as ganhou."
+)
+def get_my_badge_history(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db_session)
+):
+    history = gamification_service.get_user_badge_history(db, user_id)
+    return history
 
 @router.get("/badges/status",response_model=List[UserBadgesStatusDto],summary="Obter todas as medalhas com o status de conquista do utilizador atual",description="Retorna todas as medalhas disponíveis, indicando quais o utilizador autenticado já conquistou.")
 def get_all_badges_with_user_status(
@@ -142,3 +157,60 @@ def trigger_league_evaluation(
     db: Session = Depends(get_db_session)
 ):
     return {"message": "Avaliação de ligas concluída."}
+
+@router.get(
+    "/profile/me",
+    response_model=GamificationProfileResponse,
+    summary="Obter o perfil de gamificação completo do utilizador atual",
+    description="Retorna todas as medalhas com status e o nível de desafio ativo do utilizador."
+)
+def get_gamification_profile(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db_session),
+    app_scope: str = Query("academic_challenge", description="Scope da aplicação.")
+):
+    try:
+        # 1. Obter os dados base
+        all_badges_with_leagues = gamification_service.get_all_badges_for_app_scope(db, app_scope)
+        user_badge_associations = gamification_service.get_user_earned_badges(db, user_id)
+        earned_badge_ids: Set[int] = {ub.badge_id for ub in user_badge_associations}
+        badges_status_list = []
+        
+        for badge, league in all_badges_with_leagues:
+            badge.league = league # Atribui o objeto league ao badge
+            
+            context = {'earned_badge_ids': earned_badge_ids}
+            badge_dto = UserBadgesStatusDto.model_validate(badge, context=context)
+            badges_status_list.append(badge_dto)
+            
+        # 2. Obter o nível de desafio atual
+        user_metrics = gamification_service._get_or_create_user_metrics(db, user_id)
+        
+        level_completion_badge_codes = {
+            "ac_iniciante_determinado", # Completa Nível 1
+            "ac_cavaleiro_persistencia", # Completa Nível 2
+            "ac_campeao_autoeficacia"    # Completa Nível 3
+        }
+        
+        # Filtra as medalhas ganhas para encontrar as meta-medalhas
+        earned_badge_codes: Set[str] = {ub.badge.code for ub in user_badge_associations if ub.badge}
+        completed_meta_badges = earned_badge_codes.intersection(level_completion_badge_codes)
+        
+        # Mapeia os códigos das meta-medalhas para os ranks dos níveis
+        badge_code_to_rank_map = {
+            "ac_iniciante_determinado": 1,
+            "ac_cavaleiro_persistencia": 2,
+            "ac_campeao_autoeficacia": 3
+        }
+
+        completed_ranks = [badge_code_to_rank_map[code] for code in completed_meta_badges]
+        # ▲▲▲ FIM DA LÓGICA ADICIONADA ▲▲▲
+
+        return GamificationProfileResponse(
+            badges_status=badges_status_list,
+            current_challenge_level=user_metrics.current_challenge_level,
+            completed_level_ranks=completed_ranks # <-- Envia a nova informação
+        )
+    except Exception as e:
+        logger.error(f"Erro detalhado em /profile/me: {e}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro interno no servidor: {e}")

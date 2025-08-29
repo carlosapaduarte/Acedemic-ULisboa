@@ -2,80 +2,94 @@ import React, { useState, useEffect, useMemo } from "react";
 import type { CombinedBadgeStatus, League } from "~/types/Badge";
 import classNames from "classnames";
 import styles from "./badgesPage.module.css";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { useNavigate } from "@remix-run/react";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 const APP_BASE_PATH = import.meta.env.BASE_URL || "/";
 
+interface GamificationProfile {
+    badges_status: CombinedBadgeStatus[];
+    current_challenge_level: number | null;
+    completed_level_ranks: number[];
+}
+
+// Componente para o Chip de Status
+const LevelStatusChip = ({ status }: { status: string }) => {
+    const chipStyles: { [key: string]: string } = {
+        "EM CURSO": styles.chipInProgress,
+        "NÍVEL COMPLETADO": styles.chipCompleted,
+        "PRÓXIMO NÍVEL": styles.chipNextLevel,
+        "NÃO SELECIONADO": styles.chipNotSelected,
+    };
+    return (
+        <div className={classNames(styles.chip, chipStyles[status])}>
+            {status}
+        </div>
+    );
+};
+
 export async function loader({ request }: LoaderFunctionArgs) {
-    console.log("--- EXECUTANDO O LOADER DA PÁGINA DE MEDALHAS ---");
     return json({ locale: "pt" });
 }
 
 export default function BadgesPage() {
+    const navigate = useNavigate();
     const [badges, setBadges] = useState<CombinedBadgeStatus[]>([]);
-    const [currentUserLevelRank, setCurrentUserLevelRank] = useState<number>(0);
+    const [currentUserChallengeLevel, setCurrentUserChallengeLevel] = useState<
+        number | null
+    >(null);
+    const [completedLevelRanks, setCompletedLevelRanks] = useState<number[]>(
+        [],
+    );
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const token = localStorage.getItem("jwt");
+    const [expandedLevels, setExpandedLevels] = useState<Set<number>>(
+        new Set(),
+    );
 
-        const fetchPageData = async () => {
+    useEffect(() => {
+        const fetchGamificationProfile = async () => {
+            const token = localStorage.getItem("jwt");
             if (!token) {
                 setError(
                     "Utilizador não autenticado. Faça login para ver as medalhas.",
                 );
-                setLoading(false);
+                navigate("/log-in");
                 return;
             }
 
             try {
                 setLoading(true);
-
-                const [badgesResponse, leagueResponse] = await Promise.all([
-                    fetch(
-                        `${API_BASE_URL}/gamification/badges/status?app_scope=academic_challenge`,
-                        {
-                            headers: { Authorization: `Bearer ${token}` },
-                        },
-                    ),
-                    fetch(`${API_BASE_URL}/gamification/leagues/me`, {
+                const response = await fetch(
+                    `${API_BASE_URL}/gamification/profile/me?app_scope=academic_challenge`,
+                    {
                         headers: { Authorization: `Bearer ${token}` },
-                    }),
-                ]);
+                    },
+                );
 
-                if (!badgesResponse.ok || !leagueResponse.ok) {
-                    let errorDetail = "Ocorreu um erro no servidor.";
-                    // Tenta obter a mensagem de erro detalhada do backend
-                    if (!badgesResponse.ok) {
-                        try {
-                            const errorJson = await badgesResponse.json();
-                            errorDetail = `Erro ao buscar medalhas: ${errorJson.detail || badgesResponse.statusText}`;
-                        } catch {
-                            errorDetail = `Erro ao buscar medalhas: ${badgesResponse.statusText}`;
-                        }
-                    } else if (!leagueResponse.ok) {
-                        try {
-                            const errorJson = await leagueResponse.json();
-                            errorDetail = `Erro ao buscar liga: ${errorJson.detail || leagueResponse.statusText}`;
-                        } catch {
-                            errorDetail = `Erro ao buscar liga: ${leagueResponse.statusText}`;
-                        }
+                if (!response.ok) {
+                    // Se o erro for de não autorizado, redireciona para o login
+                    if (response.status === 401) {
+                        navigate("/log-in");
+                        return;
                     }
-                    throw new Error(errorDetail);
+                    const errorJson = await response.json();
+                    throw new Error(
+                        errorJson.detail ||
+                            "Falha ao carregar o perfil de gamificação.",
+                    );
                 }
 
-                // Se ambas as respostas estiverem OK, processa os dados
-                const badgesData: CombinedBadgeStatus[] =
-                    await badgesResponse.json();
-                setBadges(badgesData);
+                const data: GamificationProfile = await response.json();
+                setBadges(data.badges_status);
+                setCurrentUserChallengeLevel(data.current_challenge_level);
+                setCompletedLevelRanks(data.completed_level_ranks);
 
-                const leagueData = await leagueResponse.json();
-                if (leagueData && leagueData.league) {
-                    setCurrentUserLevelRank(leagueData.league.rank);
+                if (data.current_challenge_level) {
+                    setExpandedLevels(new Set([data.current_challenge_level]));
                 }
             } catch (err: any) {
                 console.error(
@@ -88,8 +102,21 @@ export default function BadgesPage() {
             }
         };
 
-        fetchPageData();
-    }, []);
+        fetchGamificationProfile();
+    }, [navigate]);
+
+    // Função para abrir/fechar um nível
+    const toggleLevelExpansion = (rank: number) => {
+        setExpandedLevels((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(rank)) {
+                newSet.delete(rank);
+            } else {
+                newSet.add(rank);
+            }
+            return newSet;
+        });
+    };
 
     const groupedAndSortedBadgesByLevel = useMemo(() => {
         const grouped = new Map<
@@ -105,6 +132,7 @@ export default function BadgesPage() {
                 grouped.get(leagueId)?.badges.push(badge);
             }
         });
+
         return Array.from(grouped.values()).sort(
             (a, b) => a.league.rank - b.league.rank,
         );
@@ -116,39 +144,67 @@ export default function BadgesPage() {
 
     return (
         <div className="p-4 min-h-screen bg-purple-900 text-gray-100">
-            <h1 className="text-3xl font-bold mb-6 text-center text-gray-50">
-                Medalhas
-            </h1>
+            {groupedAndSortedBadgesByLevel.map(
+                ({ league, badges: levelBadges }) => {
+                    const isCurrent = league.rank === currentUserChallengeLevel;
+                    const allBadgesInLevelEarned =
+                        levelBadges.length > 0 &&
+                        levelBadges.every((b) => b.has_earned);
 
-            {groupedAndSortedBadgesByLevel.length === 0 && !loading ? (
-                <p className="text-center text-gray-400">
-                    Não há medalhas para exibir.
-                </p>
-            ) : (
-                groupedAndSortedBadgesByLevel.map(
-                    ({ league, badges: levelBadges }) => {
-                        const isLevelCompleted = levelBadges.every(
-                            (b) => b.has_earned,
-                        );
-                        // O nível está bloqueado se o rank for superior ao do utilizador (exceto para o nível 0, que está sempre desbloqueado)
-                        const isLevelLocked =
-                            league.rank > currentUserLevelRank &&
-                            league.rank !== 0;
+                    // Um nível está completo se o seu rank estiver na lista OU se for o nível 0 e todas as suas medalhas tiverem sido ganhas
+                    const isCompleted =
+                        completedLevelRanks.includes(league.rank) ||
+                        (league.rank === 0 && allBadgesInLevelEarned);
+                    const isFuture =
+                        currentUserChallengeLevel !== null &&
+                        league.rank > currentUserChallengeLevel;
+                    const isLocked = isFuture && !isCompleted;
 
-                        return (
+                    let statusText = "";
+                    if (isCurrent) statusText = "EM CURSO";
+                    else if (isCompleted) statusText = "NÍVEL COMPLETADO";
+                    else if (isFuture) statusText = "PRÓXIMO NÍVEL";
+                    else statusText = "NÃO SELECIONADO";
+
+                    const isExpanded = expandedLevels.has(league.rank);
+
+                    return (
+                        <div
+                            key={league.id}
+                            className={classNames(styles.levelContainer, {
+                                [styles.levelLocked]: isLocked,
+                            })}
+                        >
                             <div
-                                key={league.id}
-                                className={classNames(styles.levelContainer, {
-                                    [styles.levelCompleted]: isLevelCompleted,
-                                    [styles.levelLocked]: isLevelLocked,
-                                })}
+                                className={styles.levelHeaderContainer}
+                                onClick={() =>
+                                    toggleLevelExpansion(league.rank)
+                                }
                             >
                                 <h2 className={styles.levelHeader}>
                                     {league.name}
                                 </h2>
+                                <div className={styles.headerRight}>
+                                    <LevelStatusChip status={statusText} />
+                                    {/* --- 3. ÍCONE DE SETA RETRÁTIL --- */}
+                                    <span
+                                        className={classNames(
+                                            styles.arrowIcon,
+                                            {
+                                                [styles.arrowExpanded]:
+                                                    isExpanded,
+                                            },
+                                        )}
+                                    >
+                                        ▼
+                                    </span>
+                                </div>
+                            </div>
 
+                            {/* --- Renderização condicional do conteúdo do nível --- */}
+                            {isExpanded && (
                                 <div className={styles.levelContent}>
-                                    {isLevelLocked && (
+                                    {isLocked && (
                                         <div className={styles.lockedOverlay}>
                                             <div
                                                 className={
@@ -157,7 +213,6 @@ export default function BadgesPage() {
                                             >
                                                 <img
                                                     src={`${APP_BASE_PATH}icons/padlock.svg`}
-                                                    //src\frontend\acedemic_challenge\public\icons\padlock.svg
                                                     alt="Nível Bloqueado"
                                                     className={
                                                         styles.lockIconSvg
@@ -168,83 +223,58 @@ export default function BadgesPage() {
                                     )}
                                     <ul className={styles.badgesGrid}>
                                         {levelBadges.map(
-                                            (badge: CombinedBadgeStatus) => {
-                                                const cleanIconUrl =
-                                                    badge.icon_url?.startsWith(
-                                                        "/",
-                                                    )
-                                                        ? badge.icon_url.substring(
-                                                              1,
-                                                          )
-                                                        : badge.icon_url;
-
-                                                const imageUrl = cleanIconUrl
-                                                    ? `${APP_BASE_PATH}${cleanIconUrl}`
-                                                    : `${APP_BASE_PATH}assets/default-badge.png`;
-                                                {
-                                                    /* TODO: adicionar imagens de medalhas específicas*/
-                                                }
-
-                                                return (
-                                                    <li
-                                                        key={badge.id}
+                                            (badge: CombinedBadgeStatus) => (
+                                                <li
+                                                    key={badge.id}
+                                                    className={classNames(
+                                                        styles.badgeItem,
+                                                        {
+                                                            [styles.badgeEarned]:
+                                                                badge.has_earned,
+                                                            [styles.badgeLocked]:
+                                                                !badge.has_earned,
+                                                        },
+                                                    )}
+                                                >
+                                                    <img
+                                                        src={
+                                                            badge.icon_url
+                                                                ? `${APP_BASE_PATH}${badge.icon_url.substring(1)}`
+                                                                : ""
+                                                        }
+                                                        alt={badge.title}
                                                         className={classNames(
-                                                            styles.badgeItem,
+                                                            styles.badgeImage,
                                                             {
-                                                                [styles.badgeEarned]:
-                                                                    badge.has_earned,
-                                                                [styles.badgeLocked]:
+                                                                [styles.badgeImageLocked]:
                                                                     !badge.has_earned,
                                                             },
                                                         )}
+                                                    />
+                                                    <h3
+                                                        className={
+                                                            styles.badgeTitle
+                                                        }
                                                     >
-                                                        <img
-                                                            src={imageUrl}
-                                                            alt={badge.title}
-                                                            className={classNames(
-                                                                styles.badgeImage,
-                                                                {
-                                                                    [styles.badgeImageLocked]:
-                                                                        !badge.has_earned,
-                                                                },
-                                                            )}
-                                                        />
-                                                        <h3
-                                                            className={
-                                                                styles.badgeTitle
-                                                            }
-                                                        >
-                                                            {badge.title}
-                                                        </h3>
-                                                        <p
-                                                            className={
-                                                                styles.badgeDescription
-                                                            }
-                                                        >
-                                                            {badge.description}
-                                                        </p>
-                                                        <div
-                                                            className={classNames(
-                                                                styles.badgeStatusText,
-                                                                badge.has_earned
-                                                                    ? styles.badgeStatusEarned
-                                                                    : styles.badgeStatusLocked,
-                                                            )}
-                                                        >
-                                                            {badge.has_earned
-                                                                ? "CONQUISTADO"
-                                                                : "BLOQUEADO"}
-                                                        </div>
-                                                    </li>
-                                                );
-                                            },
+                                                        {badge.title}
+                                                    </h3>
+                                                    {/* --- 4. MOSTRAR A DESCRIÇÃO DA MEDALHA --- */}
+                                                    <p
+                                                        className={
+                                                            styles.badgeDescription
+                                                        }
+                                                    >
+                                                        {badge.description}
+                                                    </p>
+                                                </li>
+                                            ),
                                         )}
                                     </ul>
                                 </div>
-                            </div>
-                        );
-                    },
-                )
+                            )}
+                        </div>
+                    );
+                },
             )}
         </div>
     );

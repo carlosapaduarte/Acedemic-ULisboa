@@ -59,11 +59,11 @@ def seed_gamification_data(session: Session):
 
     initial_levels = [
         {"code": "level_0", "name": "Início", "rank": 0, "description": "Nível inicial para todos os novos aventureiros.", "badge_icon_url": "/assets/badges/levels/level_0.png", "promotion_criteria_json": None},
-        {"code": "level_1", "name": "Nível 1", "rank": 1, "description": "Complete os desafios iniciais para dominar a autoeficácia.", "badge_icon_url": "/assets/badges/levels/level_1.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_novato"], "min_count": 1}},
-        {"code": "level_2", "name": "Nível 2", "rank": 2, "description": "Aprofunde a sua determinação e torne-se um pioneiro.", "badge_icon_url": "/assets/badges/levels/level_2.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_iniciante_determinado"], "min_count": 1}},
-        {"code": "level_3", "name": "Nível 3", "rank": 3, "description": "Construa hábitos sólidos para se tornar um campeão.", "badge_icon_url": "/assets/badges/levels/level_3.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["ac_cavaleiro_persistencia"], "min_count": 1}},
+        {"code": "level_1", "name": "Nível 1", "rank": 1, "description": "Complete os desafios iniciais para dominar a autoeficácia.", "badge_icon_url": "/assets/badges/levels/level_1.png", "promotion_criteria_json": None},
+        {"code": "level_2", "name": "Nível 2", "rank": 2, "description": "Aprofunde a sua determinação e torne-se um pioneiro.", "badge_icon_url": "/assets/badges/levels/level_2.png", "promotion_criteria_json": None},
+        {"code": "level_3", "name": "Nível 3", "rank": 3, "description": "Construa hábitos sólidos para se tornar um campeão.", "badge_icon_url": "/assets/badges/levels/level_3.png", "promotion_criteria_json": None},
     ]
-    
+
     level_codes_to_ids = {}
     for level_data in initial_levels:
         existing_level = session.exec(select(League).where(League.code == level_data["code"])).first()
@@ -80,23 +80,24 @@ def seed_gamification_data(session: Session):
         # Início
         {"code": "ac_novato", "title": "Novato", "description": "Após finalizar a autenticação na app.", "level_code": "level_0", "criteria_json": {"type": "login_streak", "value": 1}},
         # Nível 1
-        {"code": "ac_caloiro_autoeficacia", "title": "Caloiro da Autoeficácia", "description": "Após completar o primeiro desafio.", "level_code": "level_1", "criteria_json": {"type": "completed_challenges_count", "value": 1}},
-        {"code": "ac_prodigio_autoeficacia", "title": "Prodígio da Autoeficácia", "description": "Após completar os três primeiros desafios.", "level_code": "level_1", "criteria_json": {"type": "completed_challenges_count", "value": 3}},
+        {"code": "ac_caloiro_autoeficacia", "title": "Caloiro da Autoeficácia", "description": "Após completar o primeiro desafio.", "level_code": "level_1", "criteria_json": {"type": "challenges_in_level", "value": 1}},
+        {"code": "ac_prodigio_autoeficacia", "title": "Prodígio da Autoeficácia", "description": "Após completar os três primeiros desafios.", "level_code": "level_1", "criteria_json": {"type": "challenges_in_level", "value": 3}},
         {"code": "ac_mestre_disciplina", "title": "Mestre da Disciplina", "description": "Se cumprir 1 semana de desafios na totalidade (7 desafios seguidos).", "level_code": "level_1", "criteria_json": {"type": "challenge_streak", "value": 7}},
         {"code": "ac_campeao_consistencia", "title": "Campeão da Consistência", "description": "Se cumprir 2 semanas de desafios na totalidade (14 desafios seguidos).", "level_code": "level_1", "criteria_json": {"type": "challenge_streak", "value": 14}},
-        {"code": "ac_iniciante_determinado", "title": "Iniciante Determinado", "description": "Após finalizar o Nível 1.", "level_code": "level_1", "criteria_json": {"type": "required_badges", "badges": ["ac_caloiro_autoeficacia", "ac_prodigio_autoeficacia", "ac_mestre_disciplina", "ac_campeao_consistencia"], "min_count": 4}},
+        {"code": "ac_iniciante_determinado", "title": "Iniciante Determinado", "description": "Após finalizar o Nível 1 (21 desafios).", "level_code": "level_1", "criteria_json": {"type": "challenges_in_level", "value": 21}},
         # Nível 2
-        {"code": "ac_pioneiro_determinacao", "title": "Pioneiro da Determinação", "description": "Após completar o primeiro desafio do Nível 2 (total 15).", "level_code": "level_2", "criteria_json": {"type": "completed_challenges_count", "value": 15}},
-        {"code": "ac_desbravador_autoeficacia", "title": "Desbravador da Autoeficácia", "description": "Após completar três desafios do Nível 2 (total 17).", "level_code": "level_2", "criteria_json": {"type": "completed_challenges_count", "value": 17}},
-        {"code": "ac_mestre_desafio", "title": "Mestre do Desafio", "description": "Se cumprir 1 semana de desafios no Nível 2 (total 21 seguidos).", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 21}},
-        {"code": "ac_guerreiro_resiliente", "title": "Guerreiro Resiliente", "description": "Se cumprir 2 semanas de desafios no Nível 2 (total 28 seguidos).", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 28}},
-        {"code": "ac_cavaleiro_persistencia", "title": "Cavaleiro da Persistência", "description": "Após finalizar o Nível 2.", "level_code": "level_2", "criteria_json": {"type": "required_badges", "badges": ["ac_pioneiro_determinacao", "ac_desbravador_autoeficacia", "ac_mestre_desafio", "ac_guerreiro_resiliente"], "min_count": 4}},
+        {"code": "ac_pioneiro_determinacao", "title": "Pioneiro da Determinação", "description": "Após completar o primeiro desafio do Nível 2.", "level_code": "level_2", "criteria_json": {"type": "challenges_in_level", "value": 1}},
+        {"code": "ac_desbravador_autoeficacia", "title": "Desbravador da Autoeficácia", "description": "Após completar três desafios do Nível 2.", "level_code": "level_2", "criteria_json": {"type": "challenges_in_level", "value": 3}},
+        {"code": "ac_mestre_desafio", "title": "Mestre do Desafio", "description": "Se cumprir 1 semana de desafios no Nível 2", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 7}},
+        {"code": "ac_guerreiro_resiliente", "title": "Guerreiro Resiliente", "description": "Se cumprir 2 semanas de desafios no Nível 2", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 14}},
+        {"code": "ac_cavaleiro_persistencia", "title": "Cavaleiro da Persistência", "description": "Após finalizar o Nível 2 (21 desafios).", "level_code": "level_2", "criteria_json": {"type": "challenges_in_level", "value": 21}},
         # Nível 3
-        {"code": "ac_construtor_habitos", "title": "Construtor de Hábitos", "description": "Se cumprir 1 semana de desafios no Nível 3 (total 33 seguidos).", "level_code": "level_3", "criteria_json": {"type": "challenge_streak", "value": 33}},
-        {"code": "ac_campeao_autoeficacia", "title": "Campeão da Autoeficácia", "description": "Após finalizar o Nível 3.", "level_code": "level_3", "criteria_json": {"type": "required_badges", "badges": ["ac_construtor_habitos"], "min_count": 1}},
+        {"code": "ac_construtor_habitos", "title": "Construtor de Hábitos", "description": "Se cumprir 1 semana de desafios no Nível 3", "level_code": "level_3", "criteria_json": {"type": "challenge_streak", "value": 7}},
+        {"code": "ac_campeao_autoeficacia", "title": "Campeão da Autoeficácia", "description": "Após finalizar o Nível 3 (21 desafios)", "level_code": "level_3", "criteria_json": {"type": "challenges_in_level", "value": 21}},
     ]
-    
-    for badge_data in initial_badges_data:
+
+
+    for i, badge_data in enumerate(initial_badges_data):
         badge_code = badge_data["code"]
         level_code = badge_data.pop("level_code")
         level_id = level_codes_to_ids.get(level_code)
@@ -109,7 +110,8 @@ def seed_gamification_data(session: Session):
             "app_scope": "academic_challenge",
             "is_active": True,
             "criteria_json": badge_data["criteria_json"],
-            "league_id": level_id
+            "league_id": level_id,
+            "display_order": i
         }
         if existing_badge:
             for key, value in badge_fields.items():

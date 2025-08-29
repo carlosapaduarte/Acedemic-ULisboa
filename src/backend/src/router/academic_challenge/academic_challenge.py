@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Response
-
+from service.gamification import core as gamification_service
 from router.academic_challenge.dtos.input_dtos import CreateBatchInputDto, ChallengeCompletedDto, NewUserNoteDto
 from router.commons.common import get_current_user_id
 from router.commons.dtos.gamification_dtos import BadgeResponse
@@ -18,9 +18,21 @@ router = APIRouter(
 @router.post("/users/me/batches")
 def create_batch(
         user_id: Annotated[int, Depends(get_current_user_id)],
-        input_dto: CreateBatchInputDto
+        input_dto: CreateBatchInputDto,
+        db: Session = Depends(get_db_session)
 ):
-    return academic_challenge_service.create_batch(user_id, input_dto.level, input_dto.challengeIds)
+        # Ação 1: Criar o registo histórico do batch (como já fazia)
+    batch_id = academic_challenge_service.create_batch(
+        user_id, input_dto.level, input_dto.challengeIds
+    )
+
+    # Ação 2: Guardar o nível no "estado atual" do utilizador para a gamificação
+    gamification_service.set_user_challenge_level(
+        db=db, user_id=user_id, level=input_dto.level
+    )
+    
+    #return academic_challenge_service.create_batch(user_id, input_dto.level, input_dto.challengeIds)
+    return {"batch_id": batch_id, "status": "success", "level_set": input_dto.level}
 
 
 @router.post("/users/me/batches/{batch_id}/{batch_day_id}/notes")

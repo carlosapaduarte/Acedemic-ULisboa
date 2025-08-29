@@ -120,42 +120,41 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.refresh(new_event_model)
             
         return new_event_model
-                
+
     def update_event(self, user_id: int, event_id: int, event: Event):
-            with Session(engine) as session:            
-                statement = select(STEventModel)\
-                    .where(STEventModel.user_id == user_id)\
-                    .where(STEventModel.id == event_id)
-                    
-                result = session.exec(statement)            
-                event_model = result.first()
-                if event_model == None:
-                    raise NotFoundException(user_id)
-                event_model.title = event.title
-                event_model.start_date = event.date.start_date
-                event_model.end_date = event.date.end_date
-                event_model.every_week = event.every_week
-                event_model.every_day = event.every_day
-                event_model.notes = event.notes
-                session.add(event_model)
-                session.commit()
-                session.refresh(event_model)
-                # First, delete all existent tags  
-                for tag in event_model.tags:
-                    session.delete(tag)
-                session.commit()
-                # Now, add new ones
-                tags_model: list[STEventTagModel] = []
-                for tag in event.tags:
-                    tags_model.append(STEventTagModel(
-                        user_id=user_id,
-                        tag=tag,
-                        event_id=event_model.id,
-                        event=event_model
-                    ))
-                for tag_model in tags_model:
-                    session.add(tag_model)
-                    session.commit()
+        with Session(engine) as session:
+            statement = select(STEventModel).where(
+                STEventModel.user_id == user_id,
+                STEventModel.id == event_id
+            )
+            event_model = session.exec(statement).first()
+
+            if not event_model:
+                raise NotFoundException(f"Event with id {event_id} not found for user {user_id}")
+            event_model.title = event.title
+            event_model.start_date = event.date.start_date
+            event_model.end_date = event.date.end_date
+            event_model.every_week = event.every_week
+            event_model.every_day = event.every_day
+            event_model.notes = event.notes
+            event_model.color = event.color
+            
+            new_tags = []
+            
+            if event.tags:
+                try:
+                    new_tag_ids = {int(tag_id) for tag_id in event.tags}
+                except (ValueError, TypeError):
+                    new_tag_ids = set()
+
+                if new_tag_ids:
+                    new_tags = session.exec(
+                        select(TagModel).where(TagModel.id.in_(new_tag_ids))
+                    ).all()
+
+            event_model.tags = new_tags
+            
+            session.commit()
 
     def delete_event(self, user_id: int, event_id: int):
         with Session(engine) as session:
@@ -835,3 +834,4 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session.delete(tag)
         session.commit()
         return True
+    

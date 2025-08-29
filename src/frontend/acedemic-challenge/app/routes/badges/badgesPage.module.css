@@ -143,10 +143,6 @@
     text-transform: uppercase;
 }
 
-.levelContent {
-    position: relative;
-}
-
 /* Estilo para quando um nível está 100% completo */
 .levelCompleted {
     border-color: #16a34a;
@@ -191,24 +187,94 @@
     opacity: 0.7;
 }
 
-.badgeTitle {
-    font-size: 1.25rem;
-    font-weight: bold;
+.levelHeaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.badgeStatusText {
-    margin-top: auto;
+.chip {
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    white-space: nowrap;
 }
 
-.badgeStatusEarned {
-    background-color: var(--badge-earned-primary-color);
+.chipInProgress {
+    background-color: #a21caf;
     color: white;
+    border-color: #d946ef;
 }
 
-.badgeStatusLocked {
+.chipCompleted {
+    background-color: var(--badge-earned-secondary-color); /* Verde escuro */
+    color: var(--badge-earned-text-color);
+    border-color: var(--badge-earned-primary-color);
+}
+
+.chipNextLevel {
     background-color: #4b5563;
     color: #d1d5db;
+    border-color: #6b7280;
+    opacity: 0.8;
+}
+
+.chipNotSelected {
+    background-color: transparent;
+    color: #9ca3af;
+    border-color: #6b7280;
+}
+
+.levelHeaderContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem; /* Adiciona espaço mesmo quando fechado */
+    cursor: pointer; /* Indica que é clicável */
+    user-select: none; /* Previne seleção de texto ao clicar */
+}
+
+.levelHeader {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.arrowIcon {
+    font-size: 1.2rem;
+    color: #a78bfa;
+    transition: transform 0.3s ease;
+}
+
+.arrowExpanded {
+    transform: rotate(180deg);
+}
+
+/* --- CONTEÚDO DO NÍVEL (EXISTENTE, COM ANIMAÇÃO) --- */
+.levelContent {
+    position: relative;
+    /* Animação de aparecimento suave */
+    animation: fadeInContent 0.5s ease;
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

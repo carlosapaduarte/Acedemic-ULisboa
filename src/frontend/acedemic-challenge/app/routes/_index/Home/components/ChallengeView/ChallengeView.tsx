@@ -4,9 +4,7 @@ import { Batch } from "~/service/service";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
 import { ChallengesContext } from "~/hooks/useChallenges";
-
-import RewardAnimation from "~/components/RewardAnimation";
-import type { Badge } from "~/types/Badge";
+import { Badge } from "~/types/Badge";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -34,12 +32,10 @@ export function ChallengeView({
 }: {
     onViewNotesButtonClick: () => void;
 }) {
-    const { userInfo, currentBatch, fetchUserInfo } =
+    const { userInfo, currentBatch, fetchUserInfo, showBadgeAnimation } =
         useContext(ChallengesContext);
     const { currentBatchDay } = useChallengeViewHook();
     const token = localStorage.getItem("jwt");
-
-    const [awardedBadge, setAwardedBadge] = useState<Badge | null>(null);
 
     async function onMarkCompleteClickHandler(
         challenge: Challenge,
@@ -67,20 +63,16 @@ export function ChallengeView({
             }
 
             const newlyAwardedBadges: Badge[] = await response.json();
+            fetchUserInfo();
 
             if (newlyAwardedBadges.length > 0) {
                 const firstBadge = newlyAwardedBadges[0];
-                setAwardedBadge(firstBadge);
+                showBadgeAnimation(firstBadge);
 
                 const isLevelUpBadge =
                     firstBadge.code.includes("iniciante_determinado") ||
                     firstBadge.code.includes("cavaleiro_persistencia") ||
                     firstBadge.code.includes("campeao_autoeficacia");
-
-                // Se for uma medalha de fim de nível, vai buscar os dados atualizados do utilizador
-                if (isLevelUpBadge) {
-                    fetchUserInfo();
-                }
             }
         } catch (error) {
             console.error("Erro ao completar desafio:", error);
@@ -90,12 +82,6 @@ export function ChallengeView({
     if (userInfo && currentBatchDay && currentBatch) {
         return (
             <>
-                {awardedBadge && (
-                    <RewardAnimation
-                        awardedBadge={awardedBadge}
-                        onClose={() => setAwardedBadge(null)}
-                    />
-                )}
                 <div className={styles.challengesContainerWrapper}>
                     <Challenges
                         currentBatchDay={currentBatchDay}
