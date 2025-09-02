@@ -1,9 +1,33 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import type { CombinedBadgeStatus, League } from "~/types/Badge";
 import classNames from "classnames";
 import styles from "./badgesPage.module.css";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
+import Confetti from "react-confetti";
+
+function useWindowSize() {
+    const [size, setSize] = useState({
+        width: typeof window !== "undefined" ? window.innerWidth : 0,
+        height: typeof window !== "undefined" ? window.innerHeight : 0,
+    });
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const handleResize = () => {
+            setSize({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    return size;
+}
 
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -15,12 +39,12 @@ interface GamificationProfile {
     completed_level_ranks: number[];
 }
 
-// Componente para o Chip de Status
+//chip de Status
 const LevelStatusChip = ({ status }: { status: string }) => {
     const chipStyles: { [key: string]: string } = {
         "EM CURSO": styles.chipInProgress,
         "NÍVEL COMPLETADO": styles.chipCompleted,
-        "PRÓXIMO NÍVEL": styles.chipNextLevel,
+        "EM PROGRESSO": styles.chipHasProgress,
         "NÃO SELECIONADO": styles.chipNotSelected,
     };
     return (
@@ -49,6 +73,15 @@ export default function BadgesPage() {
     const [expandedLevels, setExpandedLevels] = useState<Set<number>>(
         new Set(),
     );
+    // animação
+    const [animatingLevel, setAnimatingLevel] = useState<number | null>(null);
+    const { width, height } = useWindowSize(); //obter o tamanho da tela
+
+    const [confettiSource, setConfettiSource] = useState<{
+        x: number;
+        y: number;
+    } | null>(null);
+    const levelRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
     useEffect(() => {
         const fetchGamificationProfile = async () => {
@@ -92,10 +125,6 @@ export default function BadgesPage() {
                     setExpandedLevels(new Set([data.current_challenge_level]));
                 }
             } catch (err: any) {
-                console.error(
-                    "Erro ao carregar dados da página de medalhas:",
-                    err,
-                );
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -104,6 +133,35 @@ export default function BadgesPage() {
 
         fetchGamificationProfile();
     }, [navigate]);
+
+    useEffect(() => {
+        if (loading || badges.length === 0) {
+            return;
+        }
+
+        const completedLevel = sessionStorage.getItem("justCompletedLevel");
+        if (completedLevel) {
+            const levelRank = parseInt(completedLevel, 10);
+            const levelElement = levelRefs.current[levelRank];
+
+            if (levelElement) {
+                const rect = levelElement.getBoundingClientRect();
+                setConfettiSource({
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2,
+                });
+            }
+
+            setAnimatingLevel(levelRank);
+            sessionStorage.removeItem("justCompletedLevel");
+
+            const timer = setTimeout(() => {
+                setAnimatingLevel(null);
+                setConfettiSource(null);
+            }, 6000);
+            return () => clearTimeout(timer);
+        }
+    }, [loading, badges]);
 
     // Função para abrir/fechar um nível
     const toggleLevelExpansion = (rank: number) => {
@@ -143,36 +201,60 @@ export default function BadgesPage() {
     if (error) return <p className="p-4 text-red-400">Erro: {error}</p>;
 
     return (
-        <div className="p-4 min-h-screen bg-purple-900 text-gray-100">
+        <div className="p-4 min-h-screen bg-purple-900 text-gray-100 relative">
+            {animatingLevel !== null && confettiSource && (
+                <Confetti
+                    width={width}
+                    height={height}
+                    recycle={false}
+                    numberOfPieces={500}
+                    gravity={0.15}
+                    // Os confetis agora explodem a partir do centro do nível
+                    initialVelocityX={{ min: -10, max: 10 }}
+                    initialVelocityY={{ min: -15, max: 5 }}
+                    confettiSource={confettiSource}
+                />
+            )}
+
             {groupedAndSortedBadgesByLevel.map(
                 ({ league, badges: levelBadges }) => {
-                    const isCurrent = league.rank === currentUserChallengeLevel;
+                    const earnedCount = levelBadges.filter(
+                        (b) => b.has_earned,
+                    ).length;
+                    const totalCount = levelBadges.length;
                     const allBadgesInLevelEarned =
-                        levelBadges.length > 0 &&
-                        levelBadges.every((b) => b.has_earned);
-
-                    // Um nível está completo se o seu rank estiver na lista OU se for o nível 0 e todas as suas medalhas tiverem sido ganhas
+                        totalCount > 0 && earnedCount === totalCount;
+                    const isCompletedByRank = completedLevelRanks.includes(
+                        league.rank,
+                    );
                     const isCompleted =
-                        completedLevelRanks.includes(league.rank) ||
-                        (league.rank === 0 && allBadgesInLevelEarned);
-                    const isFuture =
-                        currentUserChallengeLevel !== null &&
-                        league.rank > currentUserChallengeLevel;
-                    const isLocked = isFuture && !isCompleted;
+                        isCompletedByRank || allBadgesInLevelEarned;
+
+                    const isCurrent = league.rank === currentUserChallengeLevel;
+                    const hasProgress = earnedCount > 0;
+                    const isAccessible =
+                        isCurrent || isCompleted || hasProgress;
 
                     let statusText = "";
-                    if (isCurrent) statusText = "EM CURSO";
-                    else if (isCompleted) statusText = "NÍVEL COMPLETADO";
-                    else if (isFuture) statusText = "PRÓXIMO NÍVEL";
-                    else statusText = "NÃO SELECIONADO";
+
+                    if (isCompleted) {
+                        statusText = "NÍVEL COMPLETADO";
+                    } else if (isCurrent) {
+                        statusText = "EM CURSO";
+                    } else if (hasProgress) {
+                        statusText = "EM PROGRESSO";
+                    } else {
+                        statusText = "NÃO SELECIONADO";
+                    }
 
                     const isExpanded = expandedLevels.has(league.rank);
 
                     return (
                         <div
                             key={league.id}
+                            ref={(el) => (levelRefs.current[league.rank] = el)}
                             className={classNames(styles.levelContainer, {
-                                [styles.levelLocked]: isLocked,
+                                [styles.levelLocked]: !isAccessible,
                             })}
                         >
                             <div
@@ -185,8 +267,33 @@ export default function BadgesPage() {
                                     {league.name}
                                 </h2>
                                 <div className={styles.headerRight}>
-                                    <LevelStatusChip status={statusText} />
-                                    {/* --- 3. ÍCONE DE SETA RETRÁTIL --- */}
+                                    <span
+                                        style={{
+                                            color: "yellow",
+                                            fontSize: "10px",
+                                            marginRight: "10px",
+                                        }}
+                                    >
+                                        (A:{animatingLevel}|R:{league.rank})
+                                    </span>
+
+                                    <span className={styles.badgeCounter}>
+                                        🏆{" "}
+                                        {
+                                            levelBadges.filter(
+                                                (b) => b.has_earned,
+                                            ).length
+                                        }{" "}
+                                        / {levelBadges.length}
+                                    </span>
+                                    <div
+                                        className={classNames({
+                                            [styles.chipAnimate]:
+                                                animatingLevel === league.rank,
+                                        })}
+                                    >
+                                        <LevelStatusChip status={statusText} />
+                                    </div>
                                     <span
                                         className={classNames(
                                             styles.arrowIcon,
@@ -201,10 +308,9 @@ export default function BadgesPage() {
                                 </div>
                             </div>
 
-                            {/* --- Renderização condicional do conteúdo do nível --- */}
                             {isExpanded && (
                                 <div className={styles.levelContent}>
-                                    {isLocked && (
+                                    {!isAccessible && (
                                         <div className={styles.lockedOverlay}>
                                             <div
                                                 className={

@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BatchDay, Challenge } from "~/challenges/types";
-import { Batch } from "~/service/service";
+import { Batch, Badge } from "~/service/service";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
 import { ChallengesContext } from "~/hooks/useChallenges";
-import { Badge } from "~/types/Badge";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -62,17 +61,27 @@ export function ChallengeView({
                 );
             }
 
-            const newlyAwardedBadges: Badge[] = await response.json();
+            const responseData = await response.json();
+            const newlyAwardedBadges: Badge[] =
+                responseData.newly_awarded_badges;
+            const completedLevelRank: number | null =
+                responseData.completed_level_rank;
+
             fetchUserInfo();
 
-            if (newlyAwardedBadges.length > 0) {
-                const firstBadge = newlyAwardedBadges[0];
-                showBadgeAnimation(firstBadge);
+            if (newlyAwardedBadges && newlyAwardedBadges.length > 0) {
+                showBadgeAnimation(newlyAwardedBadges[0]);
+            }
 
-                const isLevelUpBadge =
-                    firstBadge.code.includes("iniciante_determinado") ||
-                    firstBadge.code.includes("cavaleiro_persistencia") ||
-                    firstBadge.code.includes("campeao_autoeficacia");
+            if (
+                completedLevelRank !== null &&
+                completedLevelRank !== undefined
+            ) {
+                console.log(`Nível ${completedLevelRank} concluído!`);
+                sessionStorage.setItem(
+                    "justCompletedLevel",
+                    completedLevelRank.toString(),
+                );
             }
         } catch (error) {
             console.error("Erro ao completar desafio:", error);
@@ -81,21 +90,19 @@ export function ChallengeView({
 
     if (userInfo && currentBatchDay && currentBatch) {
         return (
-            <>
-                <div className={styles.challengesContainerWrapper}>
-                    <Challenges
-                        currentBatchDay={currentBatchDay}
-                        onMarkComplete={(challenge: Challenge) =>
-                            onMarkCompleteClickHandler(
-                                challenge,
-                                currentBatchDay,
-                                currentBatch,
-                            )
-                        }
-                        onViewNotesButtonClick={onViewNotesButtonClick}
-                    />
-                </div>
-            </>
+            <div className={styles.challengesContainerWrapper}>
+                <Challenges
+                    currentBatchDay={currentBatchDay}
+                    onMarkComplete={(challenge: Challenge) =>
+                        onMarkCompleteClickHandler(
+                            challenge,
+                            currentBatchDay,
+                            currentBatch,
+                        )
+                    }
+                    onViewNotesButtonClick={onViewNotesButtonClick}
+                />
+            </div>
         );
     }
 

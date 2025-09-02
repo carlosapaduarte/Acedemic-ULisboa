@@ -190,6 +190,14 @@ function Authenticate({
                             {renderPasswordErrorMessage()}
                         </FieldError>
                     </TextField>
+
+                    <div className={styles.passwordRuleParagraph}>
+                        <p>
+                            {t("login:password_rule_min_length", {
+                                count: MIN_PASSWORD_LENGTH,
+                            })}
+                        </p>
+                    </div>
                 </div>
                 <div className={styles.authenticationButtons}>
                     <Button

@@ -23,5 +23,9 @@
     "submit_selection_message": "Submit selection",
     "usage_objectives_title": "Usage objectives",
     "username_field_name": "Username",
-    "yes_answer_option": "Yes"
+    "yes_answer_option": "Yes",
+
+    "password_rules_title": "Password must contain:",
+    "rule_length": "At least 6 characters",
+    "password_rule_min_length": "Password must be at least {{count}} characters."
 }

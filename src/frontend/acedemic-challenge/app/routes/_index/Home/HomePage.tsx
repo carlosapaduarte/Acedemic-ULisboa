@@ -1,5 +1,5 @@
 import { Logger } from "tslog";
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import styles from "./homePage.module.css";
 import { ProgressBar } from "~/routes/_index/Home/components/ProgressBar/ProgressBar";
 import { ChallengeView } from "~/routes/_index/Home/components/ChallengeView/ChallengeView";
@@ -14,33 +14,23 @@ import RewardAnimation from "~/components/RewardAnimation";
 const logger = new Logger({ name: "HomePage" });
 
 function useHomePage() {
-    const {
-        userInfo,
-        batches,
-        batchDays,
-        currentDayIndex,
-        currentBatch,
-        fetchUserInfo,
-        badgeHistory,
-    } = useChallenges();
+    const contextData = useContext(ChallengesContext);
+    const { batchDays, currentBatch, currentDayIndex, fetchUserInfo } =
+        contextData;
 
-    const [isModalOpen, setIsModalOpen] = React.useState(false);
-
-    const [progress, setProgress] = React.useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
-        if (!batchDays || !currentBatch || currentDayIndex == undefined) return;
+        if (!batchDays || !currentBatch) return;
 
         const batchChallenges = batchDays.get(currentBatch.id);
-
         if (!batchChallenges) return;
 
         const allChallenges = batchChallenges.flatMap((b) => b.challenges);
-
         const completedCount = allChallenges.filter(
             (c) => c.completionDate,
         ).length;
-
         setProgress(
             allChallenges.length > 0
                 ? (completedCount / allChallenges.length) * 100
@@ -48,63 +38,66 @@ function useHomePage() {
         );
     }, [batchDays, currentBatch]);
 
+    useEffect(() => {
+        const pendingBadgeJSON = sessionStorage.getItem(
+            "pendingBadgeAnimation",
+        );
+        if (pendingBadgeJSON) {
+            try {
+                const badge = JSON.parse(pendingBadgeJSON);
+                contextData.showBadgeAnimation(badge);
+                sessionStorage.removeItem("pendingBadgeAnimation");
+            } catch (error) {
+                console.error(
+                    "Falha ao processar a animação de medalha pendente:",
+                    error,
+                );
+                sessionStorage.removeItem("pendingBadgeAnimation");
+            }
+        }
+    }, []);
     const currentBatchDays =
-        batchDays != undefined && currentBatch != undefined
-            ? batchDays.get(currentBatch.id)
-            : undefined;
+        batchDays && currentBatch ? batchDays.get(currentBatch.id) : undefined;
     const notesText =
-        currentBatchDays != undefined && currentDayIndex != undefined
+        currentBatchDays && currentDayIndex !== undefined
             ? currentBatchDays[currentDayIndex].notes
             : "";
 
     async function onNoteAddClick(notesText: string) {
-        if (currentDayIndex == undefined || !currentBatch) return;
-
+        if (currentDayIndex === undefined || !currentBatch) return;
         await service
             .editDayNote(currentBatch.id, currentDayIndex + 1, notesText)
-            .then(() => {
-                fetchUserInfo();
-            });
+            .then(() => fetchUserInfo());
     }
 
     return {
-        userInfo,
-        batches,
-        batchDays,
-        currentDayIndex,
-        currentBatch,
-        fetchUserInfo,
+        ...contextData,
         progress,
         isModalOpen,
         setIsModalOpen,
         notesText,
         onNoteAddClick,
-        badgeHistory,
     };
 }
 
 function HomePageContent() {
     useAppBar("home");
-
+    const { t } = useTranslation(["dashboard"]);
     const {
-        userInfo,
         batches,
-        batchDays,
-        currentDayIndex,
         currentBatch,
-        fetchUserInfo,
+        currentDayIndex,
         progress,
+        fetchUserInfo,
         isModalOpen,
         setIsModalOpen,
         notesText,
         onNoteAddClick,
     } = useHomePage();
 
-    const { t } = useTranslation(["dashboard"]);
-
     return (
         <div className={styles.homePage}>
-            {batches != undefined && currentBatch == undefined ? (
+            {batches !== undefined && currentBatch === undefined ? (
                 <>
                     <div className={styles.notOnBatchMessageContainer}>
                         <h1 className={styles.notOnBatchMessage}>
@@ -112,7 +105,7 @@ function HomePageContent() {
                         </h1>
                     </div>
                     <SelectLevelPage
-                        onLevelSelected={() => fetchUserInfo()}
+                        onLevelSelected={fetchUserInfo}
                         onStartQuizClick={() => {}}
                     />
                 </>
@@ -122,15 +115,18 @@ function HomePageContent() {
                     <ChallengeView
                         onViewNotesButtonClick={() => setIsModalOpen(true)}
                     />
-                    {currentDayIndex != undefined && (
-                        <NotesModal
-                            batchDayNumber={currentDayIndex + 1}
-                            isModalOpen={isModalOpen}
-                            setIsModalOpen={setIsModalOpen}
-                            savedNotesText={notesText}
-                            onNotesSave={onNoteAddClick}
-                        />
-                    )}
+
+                    {isModalOpen &&
+                        currentBatch &&
+                        typeof currentDayIndex === "number" && (
+                            <NotesModal
+                                batchDayNumber={currentDayIndex + 1}
+                                isModalOpen={isModalOpen}
+                                setIsModalOpen={setIsModalOpen}
+                                savedNotesText={notesText}
+                                onNotesSave={onNoteAddClick}
+                            />
+                        )}
                 </>
             )}
         </div>
@@ -140,35 +136,9 @@ function HomePageContent() {
 export default function HomePage() {
     const challengeData = useChallenges();
 
-    // --- AQUI ESTÁ A LÓGICA FINAL ---
-    useEffect(() => {
-        // Tenta ler o "bilhete" do sessionStorage
-        const pendingBadgeJSON = sessionStorage.getItem(
-            "pendingBadgeAnimation",
-        );
-
-        if (pendingBadgeJSON) {
-            try {
-                // Se o bilhete existe, converte-o de volta para um objeto
-                const badge = JSON.parse(pendingBadgeJSON);
-                // Chama a função de animação do nosso contexto
-                challengeData.showBadgeAnimation(badge);
-                // MUITO IMPORTANTE: Apaga o bilhete para não mostrar a animação outra vez se o utilizador recarregar a página
-                sessionStorage.removeItem("pendingBadgeAnimation");
-            } catch (error) {
-                console.error(
-                    "Falha ao processar a animação de medalha pendente:",
-                    error,
-                );
-                sessionStorage.removeItem("pendingBadgeAnimation"); // Limpa em caso de erro
-            }
-        }
-    }, []); // O array vazio `[]` garante que isto só executa UMA VEZ, quando a página carrega.
-
     return (
         <ChallengesContext.Provider value={challengeData}>
             <HomePageContent />
-
             {challengeData.badgeForAnimation && (
                 <RewardAnimation
                     awardedBadge={challengeData.badgeForAnimation}

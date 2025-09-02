@@ -91,3 +91,7 @@ class AwardedBadgeHistoryItem(BaseModel):
 
     awarded_at: datetime
     badge: BadgeResponse
+    
+class ChallengeCompletionResponse(BaseModel):
+    newly_awarded_badges: List[BadgeResponse]
+    completed_level_rank: Optional[int] = None

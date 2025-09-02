@@ -80,3 +80,12 @@
         opacity: 1;
     }
 }
+.passwordRuleParagraph {
+    margin-bottom: 8px;
+}
+
+.passwordRuleParagraph p {
+    font-size: 0.8rem;
+    color: #b0a8f2;
+    margin: 0;
+}
