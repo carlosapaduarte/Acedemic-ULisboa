@@ -3,6 +3,7 @@
 import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
+import type { Badge } from "~/types/Badge";
 
 // For now, all of these functions will return the expected response.
 // If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
@@ -11,8 +12,12 @@ import { NotAuthorizedError } from "~/service/error";
 export type LoginResult = {
     access_token: string;
     token_type: string;
+    newly_awarded_badges: Badge[];
 };
-
+export interface AwardedBadgeHistoryItem {
+    awarded_at: string;
+    badge: Badge;
+}
 export type AuthErrorType =
     | "USERNAME_ALREADY_EXISTS"
     | "INVALID_USERNAME_OR_PASSWORD"
@@ -72,6 +77,7 @@ async function login(username: string, password: string) {
     if (response.ok) {
         const responseObject: LoginResult = await response.json();
         localStorage["jwt"] = responseObject.access_token;
+        return responseObject;
     } else {
         if (response.status == 400)
             return Promise.reject(new AuthError("INVALID_FORMAT", "password"));
@@ -188,7 +194,24 @@ export type UserInfo = {
     shareProgress: boolean;
     avatarFilename: string; // TODO: this could be undefined
     batches: Batch[];
+    currentChallengeLevel: number | null; //1, 2, 3 or null if no level selected
 };
+
+async function fetchBadgeHistory(): Promise<AwardedBadgeHistoryItem[]> {
+    const request = {
+        path: `gamification/badges/me/history`,
+        method: "GET",
+    };
+    const response: Response = await doFetch(request);
+
+    if (response.ok) {
+        return await response.json();
+    } else {
+        return Promise.reject(
+            new Error("Badge history could not be obtained!"),
+        );
+    }
+}
 
 async function fetchUserInfoFromApi(): Promise<UserInfo> {
     const request = {
@@ -240,4 +263,5 @@ export const service = {
     fetchUserInfoFromApi,
     editDayNote,
     markChallengeAsCompleted: markChallengeAsCompleted,
+    fetchBadgeHistory,
 };

@@ -1,77 +1,110 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BatchDay, Challenge } from "~/challenges/types";
-import { Batch, service } from "~/service/service";
+import { Batch, Badge } from "~/service/service";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
-import { useTranslation } from "react-i18next";
 import { ChallengesContext } from "~/hooks/useChallenges";
 
-function useChallengeView() {
-    const { t } = useTranslation(["challenges"]);
+const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-    const {
-        userInfo, batches, currentBatch, currentDayIndex, batchDays,
-        fetchUserInfo
-    } = useContext(ChallengesContext);
-    const [newNoteText, setNewNoteText] = useState("");
-
-    const [currentBatchDay, setCurrentBatchDay] = useState<BatchDay | undefined>(undefined);
-
-    useEffect(() => {
-        if (userInfo != undefined) {
-            if (userInfo.batches.length == 0) {
-                return;
-            }
-        }
-    }, [userInfo]);
+function useChallengeViewHook() {
+    const { currentBatch, currentDayIndex, batchDays } =
+        useContext(ChallengesContext);
+    const [currentBatchDay, setCurrentBatchDay] = useState<
+        BatchDay | undefined
+    >(undefined);
 
     useEffect(() => {
-        if (!batchDays || !currentBatch || currentDayIndex == undefined)
+        if (!batchDays || !currentBatch || currentDayIndex === undefined)
             return;
-
         const currentBatchDays = batchDays.get(currentBatch.id);
-
-        if (!currentBatchDays)
-            return;
-
+        if (!currentBatchDays) return;
         setCurrentBatchDay(currentBatchDays[currentDayIndex]);
-    }, [batchDays]);
+    }, [batchDays, currentBatch, currentDayIndex]);
 
-    async function onMarkCompleteClickHandler(challenge: Challenge, batchDay: BatchDay, batch: Batch) {
-        await service.markChallengeAsCompleted(batch.id, batchDay.id, challenge.id)
-            .then(() => {
-                fetchUserInfo();
-            });
-    }
-
-    return {
-        userInfo,
-        currentBatchDay,
-        newNoteText,
-        currentBatch,
-        setNewNoteText,
-        onMarkCompleteClickHandler
-    };
+    return { currentBatchDay };
 }
 
-export function ChallengeView({ onViewNotesButtonClick }: { onViewNotesButtonClick: () => void }) {
-    const {
-        userInfo,
-        currentBatchDay,
-        currentBatch,
-        onMarkCompleteClickHandler
-    } = useChallengeView();
+export function ChallengeView({
+    onViewNotesButtonClick,
+}: {
+    onViewNotesButtonClick: () => void;
+}) {
+    const { userInfo, currentBatch, fetchUserInfo, showBadgeAnimation } =
+        useContext(ChallengesContext);
+    const { currentBatchDay } = useChallengeViewHook();
+    const token = localStorage.getItem("jwt");
 
-    if (userInfo && currentBatchDay != undefined && currentBatch) {
+    async function onMarkCompleteClickHandler(
+        challenge: Challenge,
+        batchDay: BatchDay,
+        batch: Batch,
+    ) {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/academic-challenge/users/me/batches/${batch.id}/${batchDay.id}/completed-challenges`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ challengeId: challenge.id }),
+                },
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                    errorData.detail || "Falha ao marcar desafio como completo",
+                );
+            }
+
+            const responseData = await response.json();
+            const newlyAwardedBadges: Badge[] =
+                responseData.newly_awarded_badges;
+            const completedLevelRank: number | null =
+                responseData.completed_level_rank;
+
+            fetchUserInfo();
+
+            if (newlyAwardedBadges && newlyAwardedBadges.length > 0) {
+                showBadgeAnimation(newlyAwardedBadges[0]);
+            }
+
+            if (
+                completedLevelRank !== null &&
+                completedLevelRank !== undefined
+            ) {
+                console.log(`Nível ${completedLevelRank} concluído!`);
+                sessionStorage.setItem(
+                    "justCompletedLevel",
+                    completedLevelRank.toString(),
+                );
+            }
+        } catch (error) {
+            console.error("Erro ao completar desafio:", error);
+        }
+    }
+
+    if (userInfo && currentBatchDay && currentBatch) {
         return (
             <div className={styles.challengesContainerWrapper}>
                 <Challenges
                     currentBatchDay={currentBatchDay}
                     onMarkComplete={(challenge: Challenge) =>
-                        onMarkCompleteClickHandler(challenge, currentBatchDay, currentBatch)}
-                    onViewNotesButtonClick={onViewNotesButtonClick} />
+                        onMarkCompleteClickHandler(
+                            challenge,
+                            currentBatchDay,
+                            currentBatch,
+                        )
+                    }
+                    onViewNotesButtonClick={onViewNotesButtonClick}
+                />
             </div>
         );
-    } else
-        return <></>;
+    }
+
+    return <></>;
 }

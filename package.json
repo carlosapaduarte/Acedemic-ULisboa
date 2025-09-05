@@ -3,6 +3,8 @@
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "i18next": "^25.3.2",
-    "react-i18next": "^15.6.0"
+    "react-confetti": "^6.4.0",
+    "react-i18next": "^15.6.0",
+    "react-use": "^17.6.0"
   }
 }

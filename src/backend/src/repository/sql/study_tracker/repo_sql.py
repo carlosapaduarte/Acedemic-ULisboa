@@ -834,3 +834,4 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session.delete(tag)
         session.commit()
         return True
+    

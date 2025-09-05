@@ -1,8 +1,11 @@
-from pydantic import BaseModel
-from typing import Optional, List
+from pydantic import BaseModel, model_validator, ConfigDict
+from typing import Any, Dict, Optional, List, Set
 from datetime import datetime
+from pydantic_core.core_schema import ValidationInfo
 
 class LeagueResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     code: str
     name: str
@@ -11,10 +14,9 @@ class LeagueResponse(BaseModel):
     badge_icon_url: Optional[str] = None
     rewards_json: Optional[dict] = None
 
-    class Config:
-        from_attributes = True
-
 class BadgeResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     code: str
     title: str
@@ -23,39 +25,73 @@ class BadgeResponse(BaseModel):
     app_scope: str
     is_active: bool
     league_id: Optional[int] = None
-    league: Optional[LeagueResponse] = None 
+    league: Optional[LeagueResponse] = None
     
-    class Config:
-        from_attributes = True
 
-# Este DTO UserBadgesStatusDto agora herdará league_id e league de BadgeResponse
 class UserBadgesStatusDto(BadgeResponse):
     has_earned: bool
-    metadata_json: Optional[dict] = None #É necessário?
-    
+
+    @model_validator(mode='before')
+    @classmethod
+    def calculate_has_earned(cls, data: Any, info: ValidationInfo) -> Any:
+        badge_object = data
+        badge_data = {}
+
+        if not isinstance(data, dict):
+            badge_data = {
+                'id': badge_object.id,
+                'code': badge_object.code,
+                'title': badge_object.title,
+                'description': badge_object.description,
+                'icon_url': badge_object.icon_url,
+                'app_scope': badge_object.app_scope,
+                'is_active': badge_object.is_active,
+                'league_id': badge_object.league_id,
+                'league': badge_object.league 
+            }
+        else:
+            badge_data = data
+        earned_badge_ids = set()
+        if info.context:
+            earned_badge_ids = info.context.get('earned_badge_ids', set())
+        
+        badge_data['has_earned'] = badge_data['id'] in earned_badge_ids
+        return badge_data
+
 class UserLeagueResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     user_id: int
     league_id: int
     joined_at: datetime
     league: LeagueResponse
     current_level_progress: Optional[int] = None
 
-    class Config:
-        from_attributes = True
-
 class UserMetricsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     user_id: int
     login_streak: int
     last_login_at: Optional[datetime] = None
     completed_challenges: List[str]
+    completed_challenges_count: int
+    challenge_completion_streak: int
+    current_challenge_level: Optional[int] = None
+    challenges_completed_in_current_level: int
     study_sessions_completed: int
-    total_pomodoro_cycles: int
-    total_tasks_completed: int
-    total_notepad_entries: int
-    total_forum_questions: int
-    total_forum_answers: int
-    simultaneous_tool_uses: int
     total_points: int
 
-    class Config:
-        from_attributes = True
+class GamificationProfileResponse(BaseModel):
+    badges_status: List[UserBadgesStatusDto]
+    current_challenge_level: Optional[int] = None
+    completed_level_ranks: List[int] = []
+    
+class AwardedBadgeHistoryItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    awarded_at: datetime
+    badge: BadgeResponse
+    
+class ChallengeCompletionResponse(BaseModel):
+    newly_awarded_badges: List[BadgeResponse]
+    completed_level_rank: Optional[int] = None

@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 # Configuração da bd
 DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
-print("url bd:",DATABASE_URL)
 if not DATABASE_URL:
     raise ValueError("SQLALCHEMY_DATABASE_URL não está definida no ambiente.")
 
@@ -25,10 +24,7 @@ def get_engine():
     return engine
 
 def get_session() -> Generator[Session, None, None]:
-    """
-    Dependency para fornecer uma sessão de banco de dados síncrona.
-    Usada com `FastAPI.Depends`.
-    """
+    """Dependency para fornecer uma sessão de banco de dados síncrona."""
     with Session(engine) as session:
         yield session
 
@@ -39,12 +35,6 @@ predefined_global_tag_names = [
     ("study", "#27AE60")
 ]
 
-def create_db_and_tables():
-    """Cria as tabelas na bd com base nos metadados do SQLModel."""
-    SQLModel.metadata.create_all(engine)
-    logger.info("Tabelas na bd criadas (ou já existentes).")
-
-
 def seed_global_tags(session: Session):
     """Seed das tags globais padrão."""
     logger.info("A semear tags globais...")
@@ -52,158 +42,93 @@ def seed_global_tags(session: Session):
         existing_tag = session.exec(
             select(TagModel).where(TagModel.name == tag_name)
         ).first()
-        if not existing_tag:
-            new_tag = TagModel(name=tag_name, color=tag_color, description=f"Tag para atividades de {tag_name}.")
-            session.add(new_tag)
-            logger.info(f"-> Adicionada Tag: '{tag_name}' com a cor {tag_color}")
+    if not existing_tag:
+        new_tag = TagModel(name=tag_name, color=tag_color, description=f"Tag para atividades de {tag_name}.")
+        session.add(new_tag)
+        logger.info(f"-> Adicionada Tag: '{tag_name}' com a cor {tag_color}")
     session.commit()
-
 
 def seed_gamification_data(session: Session):
-    """Seed de Badges e Leagues."""
-    logger.info("A semear dados de gamificação (Badges e Leagues)...")
+    """Seed dos Níveis e Troféus para o ACEdemic Challenge."""
+    logger.info("A semear dados de gamificação para o ACEdemic Challenge...")
 
-    initial_leagues = [
-        #TODO trocar as do challenge pelas do st - corrigir badges
-        {"code": "liga_bronze", "name": "Liga Bronze", "rank": 1, "description": "A liga inicial para novos utilizadores, focada em introdução às funcionalidades.", "badge_icon_url": "/icons/leagues/liga_bronze.png", "promotion_criteria_json": None},
-        {"code": "liga_prata", "name": "Liga Prata", "rank": 2, "description": "Para aqueles que demonstraram um bom uso das ferramentas da app.", "badge_icon_url": "/icons/leagues/liga_prata.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["ritmo_em_construcao", "planeador_frequente", "mestre_do_pomodoro", "maos_na_massa", "conselheiro_do_forum", "mestre_do_bloco", "malabarista"], "min_count": 5}},
-        {"code": "liga_ouro", "name": "Liga Ouro", "rank": 3, "description": "Para os utilizadores mais dedicados e organizados, mestres na gestão académica.", "badge_icon_url": "/icons/leagues/liga_ouro.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["forca_do_habito", "super_utilizador", "mestre_da_organizacao", "executor_de_elite", "colaborador_de_ouro", "mentor", "campeao_da_consistencia"], "min_count": 5}},
-        {"code": "novato", "name": "Liga Novato", "rank": 4, "description": "A liga inicial para novos utilizadores.", "badge_icon_url": "/icons/leagues/novato.png", "promotion_criteria_json": None},
-        {"code": "caloiro_autoeficacia", "name": "Liga Caloiro da Autoeficácia", "rank": 5, "description": "Para aqueles que completaram os primeiros desafios.", "badge_icon_url": "/icons/leagues/caloiro_autoeficacia.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["primeiro_passo", "primeira_marcacao", "primeiro_foco"], "min_count": 3}},
-        {"code": "explorador_desafios", "name": "Liga Explorador de Desafios", "rank": 6, "description": "Para os que se aventuram em mais desafios.", "badge_icon_url": "/icons/leagues/explorador_desafios.png", "promotion_criteria_json": {"type": "badge_completion_percentage", "target_league_code": "caloiro_autoeficacia", "percentage": 0.75}},
-        {"code": "mestre_autoeficacia", "name": "Liga Mestre da Autoeficácia", "rank": 7, "description": "Os verdadeiros mestres em concluir desafios.", "badge_icon_url": "/icons/leagues/mestre_autoeficacia.png", "promotion_criteria_json": {"type": "required_badges", "badges": ["forca_do_habito", "mestre_da_organizacao", "mestre_do_pomodoro", "executor_de_elite", "mestre_do_bloco", "colaborador_de_ouro"], "min_count": 5}},
-        {"code": "lenda_universitaria", "name": "Liga Lenda Universitária", "rank": 8, "description": "O topo da autoeficácia e realização académica.", "badge_icon_url": "/icons/leagues/lenda_universitaria.png", "promotion_criteria_json": {"type": "badge_completion_percentage", "target_league_code": "explorador_desafios", "percentage": 0.9}},
+    initial_levels = [
+        {"code": "level_0", "name": "Início", "rank": 0, "description": "Nível inicial para todos os novos aventureiros.", "badge_icon_url": "/assets/badges/levels/level_0.png", "promotion_criteria_json": None},
+        {"code": "level_1", "name": "Nível 1", "rank": 1, "description": "Complete os desafios iniciais para dominar a autoeficácia.", "badge_icon_url": "/assets/badges/levels/level_1.png", "promotion_criteria_json": None},
+        {"code": "level_2", "name": "Nível 2", "rank": 2, "description": "Aprofunde a sua determinação e torne-se um pioneiro.", "badge_icon_url": "/assets/badges/levels/level_2.png", "promotion_criteria_json": None},
+        {"code": "level_3", "name": "Nível 3", "rank": 3, "description": "Construa hábitos sólidos para se tornar um campeão.", "badge_icon_url": "/assets/badges/levels/level_3.png", "promotion_criteria_json": None},
     ]
-    
-    #guardar os IDs das ligas após as inserir
-    league_codes_to_ids = {}
 
-    for league_data in initial_leagues:
-        existing_league = session.exec(
-            select(League).where(League.code == league_data["code"])
-        ).first()
-        if not existing_league:
-            new_league = League(**league_data)
-            session.add(new_league)
+    level_codes_to_ids = {}
+    for level_data in initial_levels:
+        existing_level = session.exec(select(League).where(League.code == level_data["code"])).first()
+        if not existing_level:
+            new_level = League(**level_data)
+            session.add(new_level)
             session.flush()
-            league_codes_to_ids[new_league.code] = new_league.id
-            logger.info(f"    Adicionada Liga: '{league_data['code']}' (ID: {new_league.id})")
+            level_codes_to_ids[new_level.code] = new_level.id
         else:
-            league_codes_to_ids[existing_league.code] = existing_league.id
-            logger.info(f"    Liga existente: '{existing_league.code}' (ID: {existing_league.id})")
-    
+            level_codes_to_ids[existing_level.code] = existing_level.id
     session.commit()
 
-    # --- Definir e associar as Medalhas ---
-    # Mapeamento de código da medalha -> código da liga
-    badge_to_league_map = {
-        # Bronze
-        "primeiro_passo": "liga_bronze",
-        "primeira_marcacao": "liga_bronze",
-        "primeiro_foco": "liga_bronze",
-        "primeiro_sprint": "liga_bronze",
-        "escrita_em_curso": "liga_bronze",
-        "curioso_oficial": "liga_bronze",
-        "contributo_inicial": "liga_bronze",
-        "ritmo_em_construcao": "liga_bronze", 
-
-        # Prata
-        "planeador_frequente": "liga_prata",
-        "mestre_do_pomodoro": "liga_prata",
-        "maos_na_massa": "liga_prata",
-        "conselheiro_do_forum": "liga_prata",
-        "mestre_do_bloco": "liga_prata",
-        "malabarista": "liga_prata",
-        "forca_do_habito": "liga_prata",
-
-        # Ouro
-        "super_utilizador": "liga_ouro",
-        "mestre_da_organizacao": "liga_ouro",
-        "executor_de_elite": "liga_ouro",
-        "colaborador_de_ouro": "liga_ouro",
-        "mentor": "liga_ouro",
-        "campeao_da_consistencia": "liga_ouro",
-    }
-    
     initial_badges_data = [
-        {"code": "primeiro_passo", "title": "Primeiro Passo", "description": "Primeiro login na aplicação.", "icon_url": "/assets/badges/primeiro_passo.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "login_streak", "value": 1}},
-        {"code": "ritmo_em_construcao", "title": "Ritmo em Construção", "description": "5 dias de login consecutivos.", "icon_url": "/assets/badges/ritmo_em_construcao.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "login_streak", "value": 5}},
-        {"code": "forca_do_habito", "title": "Força do Hábito", "description": "30 dias de login consecutivos.", "icon_url": "/assets/badges/forca_do_habito.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "login_streak", "value": 30}},
-        {"code": "primeira_marcacao", "title": "Primeira Marcação", "description": "Adicionou o seu primeiro evento ao calendário.", "icon_url": "/assets/badges/primeira_marcacao.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "events_added", "value": 1}},
-        {"code": "planeador_frequente", "title": "Planeador Frequente", "description": "Adicionou 10 eventos ao calendário.", "icon_url": "/assets/badges/planeador_frequente.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "events_added", "value": 10}},
-        {"code": "mestre_da_organizacao", "title": "Mestre da Organização", "description": "Adicionou 50 eventos ao calendário.", "icon_url": "/assets/badges/mestre_da_organizacao.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "events_added", "value": 50}},
-        {"code": "primeiro_foco", "title": "Primeiro Foco", "description": "Completou o seu primeiro ciclo Pomodoro.", "icon_url": "/assets/badges/primeiro_foco.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "pomodoro_cycles", "value": 1}},
-        {"code": "mestre_do_pomodoro", "title": "Mestre do Pomodoro", "description": "Completou 25 ciclos Pomodoro.", "icon_url": "/assets/badges/mestre_do_pomodoro.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "pomodoro_cycles", "value": 25}},
-        {"code": "primeiro_sprint", "title": "Primeiro Sprint", "description": "Concluiu a sua primeira tarefa.", "icon_url": "/assets/badges/primeiro_sprint.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "tasks_completed", "value": 1}},
-        {"code": "maos_na_massa", "title": "Mãos na Massa", "description": "Concluiu 10 tarefas.", "icon_url": "/assets/badges/maos_na_massa.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "tasks_completed", "value": 10}},
-        {"code": "executor_de_elite", "title": "Executor de Elite", "description": "Concluiu 50 tarefas.", "icon_url": "/assets/badges/executor_de_elite.png", "app_scope": "study_tracker", "is_active": True, "criteria_json": {"type": "tasks_completed", "value": 50}},
-        {"code": "escrita_em_curso", "title": "Escrita em Curso", "description": "Adicionou a sua primeira entrada no Bloco de Notas.", "icon_url": "/assets/badges/escrita_em_curso.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "notepad_entries", "value": 1}},
-        {"code": "mestre_do_bloco", "title": "Mestre do Bloco", "description": "Adicionou 20 entradas no Bloco de Notas.", "icon_url": "/assets/badges/mestre_do_bloco.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "notepad_entries", "value": 20}},
-        {"code": "curioso_oficial", "title": "Curioso Oficial", "description": "Fez a sua primeira pergunta no Fórum.", "icon_url": "/assets/badges/curioso_oficial.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "forum_questions", "value": 1}},
-        {"code": "contributo_inicial", "title": "Contributo Inicial", "description": "Deu a sua primeira resposta no Fórum.", "icon_url": "/assets/badges/contributo_inicial.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "forum_answers", "value": 1}},
-        {"code": "conselheiro_do_forum", "title": "Conselheiro do Fórum", "description": "Fez 10 perguntas ou 10 respostas no Fórum.", "icon_url": "/assets/badges/conselheiro_do_forum.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "or", "criteria": [ {"type": "forum_questions", "value": 10}, {"type": "forum_answers", "value": 10} ]}},
-        {"code": "colaborador_de_ouro", "title": "Colaborador de Ouro", "description": "Fez 50 perguntas ou 50 respostas no Fórum.", "icon_url": "/assets/badges/colaborador_de_ouro.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "or", "criteria": [ {"type": "forum_questions", "value": 50}, {"type": "forum_answers", "value": 50} ]}},
-        {"code": "mentor", "title": "Mentor", "description": "Deu 100 respostas no Fórum.", "icon_url": "/assets/badges/mentor.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "forum_answers", "value": 100}},
-        {"code": "malabarista", "title": "Malabarista", "description": "Usou 2 ferramentas diferentes em simultâneo.", "icon_url": "/assets/badges/malabarista.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "simultaneous_tool_uses", "value": 2}},
-        {"code": "super_utilizador", "title": "Super Utilizador", "description": "Usou 3 ou mais ferramentas diferentes em simultâneo.", "icon_url": "/assets/badges/super_utilizador.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "simultaneous_tool_uses", "value": 3}},
-        {"code": "campeao_da_consistencia", "title": "Campeão da Consistência", "description": "Fazer login na app durante 3 meses.", "icon_url": "/assets/badges/campeao_da_consistencia.png", "app_scope": "common", "is_active": True, "criteria_json": {"type": "login_streak", "value": 90}},
+        # Início
+        {"code": "ac_novato", "title": "Novato", "description": "Após finalizar a autenticação na app.", "level_code": "level_0", "criteria_json": {"type": "login_streak", "value": 1}},
+        # Nível 1
+        {"code": "ac_caloiro_autoeficacia", "title": "Caloiro da Autoeficácia", "description": "Após completar o primeiro desafio.", "level_code": "level_1", "criteria_json": {"type": "challenges_in_level", "value": 1}},
+        {"code": "ac_prodigio_autoeficacia", "title": "Prodígio da Autoeficácia", "description": "Após completar os três primeiros desafios.", "level_code": "level_1", "criteria_json": {"type": "challenges_in_level", "value": 3}},
+        {"code": "ac_mestre_disciplina", "title": "Mestre da Disciplina", "description": "Se cumprir 1 semana de desafios na totalidade (7 desafios seguidos).", "level_code": "level_1", "criteria_json": {"type": "challenge_streak", "value": 7}},
+        {"code": "ac_campeao_consistencia", "title": "Campeão da Consistência", "description": "Se cumprir 2 semanas de desafios na totalidade (14 desafios seguidos).", "level_code": "level_1", "criteria_json": {"type": "challenge_streak", "value": 14}},
+        {"code": "ac_iniciante_determinado", "title": "Iniciante Determinado", "description": "Após finalizar o Nível 1 (21 desafios).", "level_code": "level_1", "criteria_json": {"type": "challenges_in_level", "value": 21}},
+        # Nível 2
+        {"code": "ac_pioneiro_determinacao", "title": "Pioneiro da Determinação", "description": "Após completar o primeiro desafio do Nível 2.", "level_code": "level_2", "criteria_json": {"type": "challenges_in_level", "value": 1}},
+        {"code": "ac_desbravador_autoeficacia", "title": "Desbravador da Autoeficácia", "description": "Após completar três desafios do Nível 2.", "level_code": "level_2", "criteria_json": {"type": "challenges_in_level", "value": 3}},
+        {"code": "ac_mestre_desafio", "title": "Mestre do Desafio", "description": "Se cumprir 1 semana de desafios no Nível 2", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 7}},
+        {"code": "ac_guerreiro_resiliente", "title": "Guerreiro Resiliente", "description": "Se cumprir 2 semanas de desafios no Nível 2", "level_code": "level_2", "criteria_json": {"type": "challenge_streak", "value": 14}},
+        {"code": "ac_cavaleiro_persistencia", "title": "Cavaleiro da Persistência", "description": "Após finalizar o Nível 2 (21 desafios).", "level_code": "level_2", "criteria_json": {"type": "challenges_in_level", "value": 21}},
+        # Nível 3
+        {"code": "ac_construtor_habitos", "title": "Construtor de Hábitos", "description": "Se cumprir 1 semana de desafios no Nível 3", "level_code": "level_3", "criteria_json": {"type": "challenge_streak", "value": 7}},
+        {"code": "ac_campeao_autoeficacia", "title": "Campeão da Autoeficácia", "description": "Após finalizar o Nível 3 (21 desafios)", "level_code": "level_3", "criteria_json": {"type": "challenges_in_level", "value": 21}},
     ]
 
-    logger.info("A semear e associar Medalhas às Ligas...")
-    for badge_data in initial_badges_data:
+
+    for i, badge_data in enumerate(initial_badges_data):
         badge_code = badge_data["code"]
-        league_code = badge_to_league_map.get(badge_code)
-        
-        league_id = None
-        if league_code:
-            league_id = league_codes_to_ids.get(league_code)
-            if not league_id:
-                logger.warning(f"  AVISO: ID da liga '{league_code}' não encontrado para a medalha '{badge_code}'.")
-        else:
-            logger.warning(f"  AVISO: Nenhuma liga mapeada para a medalha '{badge_code}'.")
+        level_code = badge_data.pop("level_code")
+        level_id = level_codes_to_ids.get(level_code)
+        existing_badge = session.exec(select(Badge).where(Badge.code == badge_code)).first()
 
-        existing_badge = session.exec(
-            select(Badge).where(Badge.code == badge_code)
-        ).first()
-
+        badge_fields = {
+            "title": badge_data["title"],
+            "description": badge_data["description"],
+            "icon_url": f"/assets/badges/{badge_code}.png",
+            "app_scope": "academic_challenge",
+            "is_active": True,
+            "criteria_json": badge_data["criteria_json"],
+            "league_id": level_id,
+            "display_order": i
+        }
         if existing_badge:
-            # Se a medalha já existe, atualiza o league_id e outros campos se for necessário
-            update_needed = False
-            if existing_badge.league_id != league_id:
-                existing_badge.league_id = league_id
-                update_needed = True
-
-            if update_needed:
-                session.add(existing_badge)
-                logger.info(f"    Atualizada Medalha '{badge_code}' (ID: {existing_badge.id}) com League ID: {league_id}.")
-            else:
-                logger.info(f"    Medalha '{badge_code}' já existe e está atualizada (League ID: {league_id}).")
+            for key, value in badge_fields.items():
+                setattr(existing_badge, key, value)
+            session.add(existing_badge)
         else:
-            # Se a medalha não existe, crie-a com o league_id
-            new_badge_data = {**badge_data, "league_id": league_id}
-            new_badge = Badge(**new_badge_data)
+            new_badge = Badge(code=badge_code, **badge_fields)
             session.add(new_badge)
-            logger.info(f"    Adicionada Nova Medalha '{badge_code}' com League ID: {league_id}.")
-
     session.commit()
-
-    logger.info("Seeding de dados de gamificação concluído.")
+    logger.info("Seeding de dados de gamificação para o ACEdemic Challenge concluído.")
 
 def seed_all_data():
     """Função principal para semear todos os dados."""
     session = None
     try:
         session = next(get_session())
-        seed_global_tags(session)
+        # seed_global_tags(session) # Descomentado por agora
         seed_gamification_data(session)
         session.commit()
-        logger.info("Dados de seed globais e de gamificação inseridos ou já existentes.")
     except Exception as e:
-        logger.error(f"Erro ao inserir dados de seed: {e}", exc_info=False)
-        if session:
-            session.rollback()
+        logger.error(f"Erro ao inserir dados de seed: {e}", exc_info=True)
+        if session: session.rollback()
         raise
     finally:
-        if session:
-            session.close()
-    logger.info("Seeding de dados concluído.")
+        if session: session.close()
