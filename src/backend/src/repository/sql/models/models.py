@@ -352,6 +352,7 @@ class Badge(SQLModel, table=True):
     app_scope: str = Field(default="common", nullable=False) # 'common', 'academic_challenge', 'study_tracker', 'all'
     is_active: bool = Field(default=True, nullable=False) # Para ativar/desativar medalhas
     criteria_json: Optional[dict] = Field(default=None, sa_column=SAColumn(JSON, nullable=True))
+    display_order: Optional[int] = Field(default=None, index=True) # Para ordenar a exibição
 
     user_badges: List["UserBadge"] = Relationship(back_populates="badge")
     league_id: Optional[int] = Field(default=None, foreign_key="leagues.id")
@@ -364,11 +365,20 @@ class UserMetric(SQLModel, table=True):
     login_streak: int = Field(default=0, nullable=False)
     last_login_at: Optional[datetime] = Field(default=None) 
     
+    # Para o Study Tracker
     completed_challenges: List[str] = Field(
         default_factory=list, # Default é uma lista vazia
         sa_column=SAColumn(pg_ARRAY(String), nullable=False)
     )
     
+    completed_challenges_count: int = Field(default=0, nullable=False)
+    current_challenge_level: Optional[int] = Field(default=None, nullable=True)
+
+    challenge_completion_streak: int = Field(default=0, nullable=False)
+    last_challenge_completion_date: Optional[date] = Field(default=None)
+    
+    challenges_completed_in_current_level: int = Field(default=0, nullable=False)
+
     study_sessions_completed: int = Field(default=0, nullable=False)
     total_points: int = Field(default=0, nullable=False)
 

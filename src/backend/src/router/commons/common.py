@@ -1,13 +1,15 @@
 # src/backend/src/router/commons/router_commons.py
 
 from datetime import timedelta
+from router.commons.dtos.gamification_dtos import BadgeResponse
 from sqlmodel import select, Session # Importar Session síncrona
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
+from service.gamification import core as gamification_service
 from repository.sql.models.models import TagModel, UserModel, UserTagLink
 from pydantic import BaseModel
-from service.common.badge_service import assign_for_event
+#from service.common.badge_service import 
 from repository.sql.models.database import get_session as get_db_session
 from typing import Annotated, Any, List
 
@@ -22,7 +24,7 @@ router = APIRouter(
     prefix="/commons",
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="commons/token")
 
 def get_current_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Annotated[Session, Depends(get_db_session)]) -> int:
     credentials_exception = HTTPException(
@@ -47,6 +49,7 @@ def get_current_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Annot
 class Token(BaseModel):
     access_token: str
     token_type: str
+    newly_awarded_badges: List[BadgeResponse] = []
 
 @router.post("/token")
 def login_for_access_token(
@@ -60,12 +63,15 @@ def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    newly_awarded_badges = []
+    if user.id:
+        newly_awarded_badges = gamification_service.update_login_streak(db, user.id)
+            
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    assign_for_event( user.id, "first_login")
-    return Token(access_token=access_token, token_type="bearer")
+    return Token(access_token=access_token, token_type="bearer", newly_awarded_badges=newly_awarded_badges)
 
 @router.get("/test-token")
 async def test_token_validity(

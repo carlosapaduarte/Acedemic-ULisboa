@@ -1,5 +1,5 @@
 import styles from "./homeAppBar.module.css";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@remix-run/react";
 import { service, UserInfo } from "~/service/service";
@@ -56,39 +56,57 @@ function NavBarButton({
 }
 
 export function GreetingsContainer() {
-    const [username, setUsername] = React.useState<string | undefined>(
-        undefined,
-    );
-    const [avatarFilename, setAvatarFilename] = React.useState<
-        string | undefined
-    >(undefined);
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+    const fetchAppBarData = () => {
+        service.fetchUserInfoFromApi().then((fetchedUserInfo: UserInfo) => {
+            setUserInfo(fetchedUserInfo);
+        });
+    };
 
     useEffect(() => {
-        service.fetchUserInfoFromApi().then((userInfo: UserInfo) => {
-            setAvatarFilename(userInfo.avatarFilename);
-            setUsername(userInfo.username);
-        });
+        fetchAppBarData();
+
+        window.addEventListener("updateAppBar", fetchAppBarData);
+        return () => {
+            window.removeEventListener("updateAppBar", fetchAppBarData);
+        };
     }, []);
 
-    let helloQuote = getHelloQuote();
+    const helloQuote = getHelloQuote();
 
     return (
         <div className={styles.greetingsContainer}>
-            <h4 className={styles.helloQuote}>
-                {username ? (
-                    <span>
-                        {helloQuote}, {username}
-                    </span>
-                ) : (
-                    <span>Loading...</span>
-                )}
-            </h4>
+            <div className={styles.greetingTextContainer}>
+                <h4 className={styles.helloQuote}>
+                    {userInfo ? (
+                        <>
+                            <span>
+                                {helloQuote}, {userInfo.username}
+                            </span>
+                            {typeof userInfo.currentChallengeLevel ===
+                                "number" && (
+                                <p className={styles.levelText}>
+                                    {userInfo.currentChallengeLevel === 1 &&
+                                        "Nível: Pouco Eficaz"}
+                                    {userInfo.currentChallengeLevel === 2 &&
+                                        "Nível: Eficaz"}
+                                    {userInfo.currentChallengeLevel === 3 &&
+                                        "Nível: Muito Eficaz"}
+                                </p>
+                            )}
+                        </>
+                    ) : (
+                        <span>Loading...</span>
+                    )}
+                </h4>
+            </div>
             <div className={`${styles.avatarAndDropdownContainer}`}>
                 <div className={`${styles.avatarContainer}`}>
                     <img
                         width={92}
                         height={92}
-                        src={`${avatarFilename}`}
+                        src={`${userInfo?.avatarFilename || ""}`}
                         alt={`User's Avatar`}
                     />
                 </div>

@@ -70,16 +70,40 @@ class EventsAddedEvaluator(BadgeCriteriaEvaluator):
         #FALTA métrica para o número total de eventos adicionados
         return user_metrics.get("total_events_added", 0) >= self.criteria_value
 
+class CompletedChallengesCountEvaluator(BadgeCriteriaEvaluator):
+    def __init__(self, criteria_value: int):
+        self.criteria_value = criteria_value
+
+    def evaluate(self, user_metrics: Dict[str, Any], context: Dict[str, Any] = None) -> bool:
+        return user_metrics.get("completed_challenges_count", 0) >= self.criteria_value
+
 class SimultaneousToolUsesEvaluator(BadgeCriteriaEvaluator):
     def __init__(self, criteria_value: int):
         self.criteria_value = criteria_value
 
     def evaluate(self, user_metrics: Dict[str, Any], context: Dict[str, Any] = None) -> bool:
-        # Pode ser o valor máximo registado, ou um flag
         return user_metrics.get("simultaneous_tool_uses", 0) >= self.criteria_value
 
+class TotalBadgesCountEvaluator(BadgeCriteriaEvaluator):
+    def __init__(self, criteria_value: int):
+        self.criteria_value = criteria_value
 
-# Factory para criar a instância de avaliador correta
+    def evaluate(self, user_metrics: Dict[str, Any], context: Dict[str, Any] = None) -> bool:
+        if not context or "earned_badge_codes" not in context:
+            return False
+        
+        # Conta o número de códigos de medalhas no contexto dado
+        num_earned_badges = len(context["earned_badge_codes"])
+        
+        return num_earned_badges >= self.criteria_value
+
+class ChallengesInLevelCountEvaluator(BadgeCriteriaEvaluator):
+    def __init__(self, criteria_value: int):
+        self.criteria_value = criteria_value
+
+    def evaluate(self, user_metrics: Dict[str, Any], context: Dict[str, Any] = None) -> bool:
+        return user_metrics.get("challenges_completed_in_current_level", 0) >= self.criteria_value
+
 def create_badge_criteria_evaluator(criteria_json: Dict[str, Any]) -> Optional[BadgeCriteriaEvaluator]:
     if not criteria_json:
         return None
@@ -103,5 +127,19 @@ def create_badge_criteria_evaluator(criteria_json: Dict[str, Any]) -> Optional[B
         return EventsAddedEvaluator(criteria_json["value"])
     elif criteria_type == "simultaneous_tool_uses":
         return SimultaneousToolUsesEvaluator(criteria_json["value"])
-    #TODO: Adicionar mais tipos de critérios aqui
+    elif criteria_type == "completed_challenges":
+        return CompletedChallengesCountEvaluator(criteria_json["value"])
+    elif criteria_type == "challenges_in_level":
+        return ChallengesInLevelCountEvaluator(criteria_json["value"])
+    elif criteria_type == "challenge_streak":
+        return ChallengeStreakEvaluator(criteria_json["value"])
+    elif criteria_type == "total_badges_count":
+        return TotalBadgesCountEvaluator(criteria_json["value"])
     return None
+
+class ChallengeStreakEvaluator(BadgeCriteriaEvaluator):
+    def __init__(self, criteria_value: int):
+        self.criteria_value = criteria_value
+
+    def evaluate(self, user_metrics: Dict[str, Any], context: Dict[str, Any] = None) -> bool:
+        return user_metrics.get("challenge_completion_streak", 0) >= self.criteria_value

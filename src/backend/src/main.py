@@ -7,9 +7,10 @@ from router import u_lisboa_auth
 from router.academic_challenge import academic_challenge
 from router.commons import common
 from router.gamification.badges import router as gamification_router
-
+from repository.sql.models import models
 from fastapi.middleware.cors import CORSMiddleware
 from router import tags
+from repository.sql.models.database import create_db_and_tables ,seed_all_data
 from router.study_tracker import study_tracker
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,6 +20,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+    seed_all_data()
+    
 # CORS
 dev_mode = True
 if dev_mode:

@@ -7,6 +7,7 @@ from repository.sql.commons.repo_sql import CommonsSqlRepo
 from router.commons.dtos.input_dtos import CreateUserInputDto
 from exception import UsernameAlreadyExistsException
 from domain.commons.user import User 
+from service.gamification import core as gamification_service
 
 def authenticate_user(db: Session, username: str, password: str) -> Optional[User]: 
     user = CommonsSqlRepo.get_user_by_username(db, username) 
@@ -24,11 +25,13 @@ def create_user(db: Session, user_data: CreateUserInputDto) -> User:
     hashed_password = get_password_hash(user_data.password)
     
     new_user_model = CommonsSqlRepo.create_user(db, user_data.username, hashed_password) 
+    gamification_service._get_or_create_user_metrics(db, new_user_model.id)
 
+    tag_names_to_query = [tag[0] for tag in predefined_global_tag_names]    
     predefined_tags_in_db = db.exec( 
-        select(TagModel).where(TagModel.name.in_(predefined_global_tag_names))
+        select(TagModel).where(TagModel.name.in_(tag_names_to_query))
     ).all()
-
+    
     for tag_model in predefined_tags_in_db:
         user_tag_association = UserTagLink(
             user_id=new_user_model.id,
@@ -38,11 +41,13 @@ def create_user(db: Session, user_data: CreateUserInputDto) -> User:
         db.add(user_tag_association)
 
     db.commit() 
-    db.refresh(new_user_model) 
 
-    new_user_domain = CommonsSqlRepo.from_user_model(new_user_model)
-    
-    return new_user_domain
+    new_user_domain_complete = CommonsSqlRepo.get_user_by_id(db, new_user_model.id)
+
+    if not new_user_domain_complete:
+        raise Exception("Falha ao recarregar o utilizador recém-criado")
+
+    return new_user_domain_complete
 
 def get_user_id_from_username(db: Session, username: str) -> Optional[int]: 
     user = CommonsSqlRepo.get_user_by_username(db, username) 

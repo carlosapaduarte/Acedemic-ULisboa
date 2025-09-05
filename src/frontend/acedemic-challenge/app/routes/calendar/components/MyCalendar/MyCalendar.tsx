@@ -1,41 +1,76 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { utils } from "~/utils";
 import { Button } from "~/components/Button/Button";
 import { useTranslation } from "react-i18next";
 import styles from "./myCalendar.module.css";
 import classNames from "classnames";
 import { BatchDay } from "~/challenges/types";
+import { AwardedBadgeHistoryItem } from "~/service/service";
 
-const weekdays = ["calendar:weekdays.sunday", "calendar:weekdays.monday", "calendar:weekdays.tuesday",
-    "calendar:weekdays.wednesday", "calendar:weekdays.thursday", "calendar:weekdays.friday", "calendar:weekdays.saturday"];
-const months = ["calendar:months.january", "calendar:months.february", "calendar:months.march", "calendar:months.april",
-    "calendar:months.may", "calendar:months.june", "calendar:months.july", "calendar:months.august",
-    "calendar:months.september", "calendar:months.october", "calendar:months.november", "calendar:months.december"];
+const APP_BASE_PATH = import.meta.env.BASE_URL || "/";
 
-enum MonthChangeAction { PREV_MONTH, NEXT_MONTH, TODAY }
+const weekdays = [
+    "calendar:weekdays.sunday",
+    "calendar:weekdays.monday",
+    "calendar:weekdays.tuesday",
+    "calendar:weekdays.wednesday",
+    "calendar:weekdays.thursday",
+    "calendar:weekdays.friday",
+    "calendar:weekdays.saturday",
+];
+const months = [
+    "calendar:months.january",
+    "calendar:months.february",
+    "calendar:months.march",
+    "calendar:months.april",
+    "calendar:months.may",
+    "calendar:months.june",
+    "calendar:months.july",
+    "calendar:months.august",
+    "calendar:months.september",
+    "calendar:months.october",
+    "calendar:months.november",
+    "calendar:months.december",
+];
+
+enum MonthChangeAction {
+    PREV_MONTH,
+    NEXT_MONTH,
+    TODAY,
+}
 
 function Title({ visibleMonth }: { visibleMonth: Date }) {
     const { t } = useTranslation(["calendar"]);
 
     return (
         <h2 className={`${styles.calendarTitle}`}>
-            {t(months[visibleMonth.getMonth()]) + " / " + visibleMonth.getFullYear()}
+            {t(months[visibleMonth.getMonth()]) +
+                " / " +
+                visibleMonth.getFullYear()}
         </h2>
     );
 }
 
-function ChangeViewButtons(
-    { visibleMonth, onButtonClick }: { visibleMonth: Date, onButtonClick: (action: MonthChangeAction) => void }
-) {
+function ChangeViewButtons({
+    visibleMonth,
+    onButtonClick,
+}: {
+    visibleMonth: Date;
+    onButtonClick: (action: MonthChangeAction) => void;
+}) {
     return (
         <div className={`${styles.changeViewButtonsContainer}`}>
-            <Button className={`${styles.changeMonthButton}`}
-                    onClick={() => onButtonClick(MonthChangeAction.PREV_MONTH)}>
+            <Button
+                className={`${styles.changeMonthButton}`}
+                onClick={() => onButtonClick(MonthChangeAction.PREV_MONTH)}
+            >
                 {"<"}
             </Button>
             <Title visibleMonth={visibleMonth} />
-            <Button className={`${styles.changeMonthButton}`}
-                    onClick={() => onButtonClick(MonthChangeAction.NEXT_MONTH)}>
+            <Button
+                className={`${styles.changeMonthButton}`}
+                onClick={() => onButtonClick(MonthChangeAction.NEXT_MONTH)}
+            >
                 {">"}
             </Button>
         </div>
@@ -51,13 +86,13 @@ function useVisibleMonth() {
         let newMonth = -1;
         const currentSelectedMonth = visibleMonth.getMonth();
         switch (action) {
-            case MonthChangeAction.PREV_MONTH :
+            case MonthChangeAction.PREV_MONTH:
                 newMonth = currentSelectedMonth - 1;
                 break;
-            case MonthChangeAction.NEXT_MONTH :
+            case MonthChangeAction.NEXT_MONTH:
                 newMonth = currentSelectedMonth + 1;
                 break;
-            case MonthChangeAction.TODAY :
+            case MonthChangeAction.TODAY:
                 newMonth = new Date().getMonth();
         }
         newDate.setMonth(newMonth);
@@ -69,16 +104,20 @@ function useVisibleMonth() {
 }
 
 export type CalendarDay = {
-    currentMonth: boolean,
-    date: Date,
-    month: number,
-    number: number,
-    selected: boolean,
-    year: number
-}
+    currentMonth: boolean;
+    date: Date;
+    month: number;
+    number: number;
+    selected: boolean;
+    year: number;
+};
 
 function useCalendarDays(visibleMonth: Date) {
-    let firstDayOfMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+    let firstDayOfMonth = new Date(
+        visibleMonth.getFullYear(),
+        visibleMonth.getMonth(),
+        1,
+    );
     let weekdayOfFirstDay = firstDayOfMonth.getDay();
     let currentDays: CalendarDay[] = [];
 
@@ -88,18 +127,21 @@ function useCalendarDays(visibleMonth: Date) {
         if (day === 0 && weekdayOfFirstDay === 0) {
             currentDate.setDate(currentDate.getDate() - 7);
         } else if (day === 0) {
-            currentDate.setDate(currentDate.getDate() + (day - weekdayOfFirstDay));
+            currentDate.setDate(
+                currentDate.getDate() + (day - weekdayOfFirstDay),
+            );
         } else {
             currentDate.setDate(currentDate.getDate() + 1);
         }
 
         let calendarDay: CalendarDay = {
-            currentMonth: (currentDate.getMonth() === visibleMonth.getMonth()),
+            currentMonth: currentDate.getMonth() === visibleMonth.getMonth(),
             date: new Date(currentDate),
             month: currentDate.getMonth(),
             number: currentDate.getDate(),
-            selected: (currentDate.toDateString() === visibleMonth.toDateString()),
-            year: currentDate.getFullYear()
+            selected:
+                currentDate.toDateString() === visibleMonth.toDateString(),
+            year: currentDate.getFullYear(),
         };
 
         currentDays.push(calendarDay);
@@ -113,30 +155,39 @@ function WeekHeader() {
 
     return (
         <>
-            {
-                weekdays.map((weekday) => {
-                    return (
-                        <div key={weekday} className={`${styles.weekHeaderDayContainer}`}>
-                            <h1 className={`${styles.weekHeaderDayText}`}>{t(weekday)}</h1>
-                        </div>
-                    );
-                })
-            }
+            {weekdays.map((weekday) => {
+                return (
+                    <div
+                        key={weekday}
+                        className={`${styles.weekHeaderDayContainer}`}
+                    >
+                        <h1 className={`${styles.weekHeaderDayText}`}>
+                            {t(weekday)}
+                        </h1>
+                    </div>
+                );
+            })}
         </>
     );
 }
 
-function Day(
-    {
-        day, onDayClick, hasChallenge, selected, reached, completed
-    }: {
-        day: CalendarDay, onDayClick: (day: CalendarDay) => void,
-        selected: boolean,
-        hasChallenge: boolean,
-        reached: boolean,
-        completed: boolean
-    }
-) {
+function Day({
+    day,
+    onDayClick,
+    hasChallenge,
+    selected,
+    reached,
+    completed,
+    hasAward,
+}: {
+    day: CalendarDay;
+    onDayClick: (day: CalendarDay) => void;
+    selected: boolean;
+    hasChallenge: boolean;
+    reached: boolean;
+    completed: boolean;
+    hasAward: boolean;
+}) {
     const isCurrentMonth = day.currentMonth;
 
     const isToday = utils.sameDay(day.date, new Date());
@@ -149,49 +200,68 @@ function Day(
                     { [styles.today]: isToday },
                     { [styles.notCurrentMonth]: !isCurrentMonth },
                     { [styles.hasChallenge]: hasChallenge },
-                    { [styles.selected]: selected }
+                    { [styles.selected]: selected },
                 )}
                 onClick={() => onDayClick(day)}
             >
-                <h1 className={classNames(
-                    styles.calendarDayText,
-                    { [styles.today]: isToday },
-                    { [styles.notCurrentMonth]: !isCurrentMonth },
-                    { [styles.hasChallenge]: hasChallenge },
-                    { [styles.selected]: selected }
-                )}>
+                <h1
+                    className={classNames(
+                        styles.calendarDayText,
+                        { [styles.today]: isToday },
+                        { [styles.notCurrentMonth]: !isCurrentMonth },
+                        { [styles.hasChallenge]: hasChallenge },
+                        { [styles.selected]: selected },
+                    )}
+                >
                     {day.number}
                 </h1>
+                {/* --- ÍCONE DE TROFÉU --- */}
+                {hasAward && (
+                    <img
+                        src={`${APP_BASE_PATH}icons/trophy.svg`} // Crie este ícone em /public/icons/
+                        className={styles.awardIcon}
+                        alt="Medalha ganha neste dia"
+                    />
+                )}
             </button>
-            {completed
-                ? <div className={classNames(
-                    styles.dayChallengeCompleteIndicator,
-                    { [styles.notCurrentMonth]: !isCurrentMonth }
-                )}>!</div>
-                : null
-            }
-            {!reached
-                ? <img
+            {completed ? (
+                <div
+                    className={classNames(
+                        styles.dayChallengeCompleteIndicator,
+                        { [styles.notCurrentMonth]: !isCurrentMonth },
+                    )}
+                >
+                    !
+                </div>
+            ) : null}
+            {!reached ? (
+                <img
                     src={"icons/lock_icon.svg"}
                     className={classNames(
                         styles.dayChallengeCompleteIndicator,
                         styles.locked,
-                        { [styles.notCurrentMonth]: !isCurrentMonth }
-                    )} alt={"Locked"}></img>
-                : null
-            }
+                        { [styles.notCurrentMonth]: !isCurrentMonth },
+                    )}
+                    alt={"Locked"}
+                ></img>
+            ) : null}
         </div>
     );
 }
 
-function CalendarDays(
-    {
-        reachedBatchDays, unreachedBatchDays, visibleMonth, onDayClick
-    }: {
-        reachedBatchDays: BatchDay[],
-        unreachedBatchDays: BatchDay[],
-        visibleMonth: Date, onDayClick: (day: CalendarDay) => void
-    }) {
+function CalendarDays({
+    reachedBatchDays,
+    unreachedBatchDays,
+    visibleMonth,
+    onDayClick,
+    awardedDates,
+}: {
+    reachedBatchDays: BatchDay[];
+    unreachedBatchDays: BatchDay[];
+    visibleMonth: Date;
+    onDayClick: (day: CalendarDay) => void;
+    awardedDates: Set<string>;
+}) {
     const { currentDays } = useCalendarDays(visibleMonth);
     const [selectedDay, setSelectedDay] = useState<CalendarDay>({
         currentMonth: true,
@@ -199,10 +269,11 @@ function CalendarDays(
         month: new Date().getMonth(),
         number: new Date().getDate(),
         selected: true,
-        year: new Date().getFullYear()
+        year: new Date().getFullYear(),
     });
 
-    const allBatchDays: BatchDay[] = reachedBatchDays.concat(unreachedBatchDays);
+    const allBatchDays: BatchDay[] =
+        reachedBatchDays.concat(unreachedBatchDays);
 
     const daysWithChallenges = allBatchDays.map((challenge) => {
         return challenge.date.toDateString();
@@ -210,65 +281,109 @@ function CalendarDays(
 
     return (
         <>
-            {
-                currentDays.map((day: CalendarDay, index: number) => {
-                    return (
-                        <Day key={index}
-                             day={day}
-                             hasChallenge={daysWithChallenges.includes(day.date.toDateString())}
-                             selected={selectedDay !== null && utils.sameDay(selectedDay.date, day.date)}
-                             onDayClick={(day) => {
-                                 setSelectedDay(day);
-                                 onDayClick(day);
-                             }}
-                             completed={reachedBatchDays.find((batchDay) =>
-                                 utils.sameDay(batchDay.date, day.date))?.challenges.every((challenge) =>
-                                 challenge.completionDate !== null) ?? false}
-                             reached={!unreachedBatchDays.some((batchDay) => utils.sameDay(batchDay.date, day.date))}
-                        />
-                    );
-                })
-            }
+            {currentDays.map((day: CalendarDay, index: number) => {
+                return (
+                    <Day
+                        key={index}
+                        day={day}
+                        hasChallenge={daysWithChallenges.includes(
+                            day.date.toDateString(),
+                        )}
+                        selected={
+                            selectedDay !== null &&
+                            utils.sameDay(selectedDay.date, day.date)
+                        }
+                        onDayClick={(day) => {
+                            setSelectedDay(day);
+                            onDayClick(day);
+                        }}
+                        completed={
+                            reachedBatchDays
+                                .find((batchDay) =>
+                                    utils.sameDay(batchDay.date, day.date),
+                                )
+                                ?.challenges.every(
+                                    (challenge) =>
+                                        challenge.completionDate !== null,
+                                ) ?? false
+                        }
+                        reached={
+                            !unreachedBatchDays.some((batchDay) =>
+                                utils.sameDay(batchDay.date, day.date),
+                            )
+                        }
+                        hasAward={awardedDates.has(day.date.toDateString())}
+                    />
+                );
+            })}
         </>
     );
 }
 
-function CalendarGrid(
-    {
-        reachedBatchDays, unreachedBatchDays, visibleMonth, onDayClick
-    }: {
-        reachedBatchDays: BatchDay[],
-        unreachedBatchDays: BatchDay[],
-        visibleMonth: Date, onDayClick: (day: CalendarDay) => void
-    }
-) {
+function CalendarGrid({
+    reachedBatchDays,
+    unreachedBatchDays,
+    visibleMonth,
+    onDayClick,
+    awardedDates,
+}: {
+    reachedBatchDays: BatchDay[];
+    unreachedBatchDays: BatchDay[];
+    visibleMonth: Date;
+    onDayClick: (day: CalendarDay) => void;
+    awardedDates: Set<string>;
+}) {
     return (
-        <div className={`${styles.calendarGridContainer}`}> {/*${styles.switched}*/}
+        <div className={`${styles.calendarGridContainer}`}>
+            {" "}
+            {/*${styles.switched}*/}
             <WeekHeader />
-            <CalendarDays reachedBatchDays={reachedBatchDays}
-                          unreachedBatchDays={unreachedBatchDays}
-                          visibleMonth={visibleMonth} onDayClick={onDayClick} />
+            <CalendarDays
+                reachedBatchDays={reachedBatchDays}
+                unreachedBatchDays={unreachedBatchDays}
+                visibleMonth={visibleMonth}
+                onDayClick={onDayClick}
+                awardedDates={awardedDates}
+            />
         </div>
     );
 }
 
-export function MyCalendar(
-    {
-        reachedBatchDays, unreachedBatchDays, onDayClickHandler
-    }: {
-        reachedBatchDays: BatchDay[],
-        unreachedBatchDays: BatchDay[],
-        onDayClickHandler: (day: CalendarDay) => void
-    }
-) {
+export function MyCalendar({
+    reachedBatchDays,
+    unreachedBatchDays,
+    onDayClickHandler,
+    badgeHistory,
+}: {
+    reachedBatchDays: BatchDay[];
+    unreachedBatchDays: BatchDay[];
+    onDayClickHandler: (day: CalendarDay) => void;
+    badgeHistory: AwardedBadgeHistoryItem[];
+}) {
     const { visibleMonth, monthChangeActionHandler } = useVisibleMonth();
 
+    const awardedDates = useMemo(
+        () =>
+            new Set(
+                badgeHistory.map((item) =>
+                    new Date(item.awarded_at).toDateString(),
+                ),
+            ),
+        [badgeHistory],
+    );
     return (
         <div className={`${styles.myCalendar}`}>
-            <ChangeViewButtons visibleMonth={visibleMonth} onButtonClick={monthChangeActionHandler} />
-            <CalendarGrid reachedBatchDays={reachedBatchDays}
-                          unreachedBatchDays={unreachedBatchDays}
-                          visibleMonth={visibleMonth} onDayClick={onDayClickHandler} />
+            <ChangeViewButtons
+                visibleMonth={visibleMonth}
+                onButtonClick={monthChangeActionHandler}
+            />
+            <CalendarGrid
+                reachedBatchDays={reachedBatchDays}
+                unreachedBatchDays={unreachedBatchDays}
+                visibleMonth={visibleMonth}
+                onDayClick={onDayClickHandler}
+                awardedDates={awardedDates}
+            />
         </div>
     );
 }

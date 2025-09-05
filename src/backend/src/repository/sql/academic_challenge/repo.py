@@ -8,8 +8,7 @@ class AcademicChallengeRepo(ABC):
         pass
 
     @abstractmethod
-    def complete_challenge(self, user_id: int, batch_id: int, batch_day_id: int, challenge_id: int,
-                           completion_date: datetime):
+    def complete_challenge(self, user_id: int, batch_id: int, batch_day_id: int, challenge_id: int,completion_date: datetime):
         pass
 
     @abstractmethod

@@ -18,7 +18,6 @@ export interface Badge {
     app_scope: string;
     is_active: boolean;
     criteria_json?: Record<string, any>;
-    //opcionais porque uma medalha pode não ter uma liga associada
     league_id?: number;
     league?: League;
 }

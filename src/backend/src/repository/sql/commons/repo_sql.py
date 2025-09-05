@@ -39,6 +39,7 @@ class CommonsSqlRepo(CommonsRepo):
     
     @staticmethod
     def from_user_model(user_model: UserModel) -> User:
+        
         batches_model: list[BatchModel] = user_model.user_batches if user_model.user_batches is not None else []
         batches: list[Batch] = []
         for batch_m in batches_model:
@@ -52,6 +53,7 @@ class CommonsSqlRepo(CommonsRepo):
                 challenges.sort(key=lambda c: c.id)
                 batch_days.append(BatchDay(id=batch_day_m.id, challenges=challenges, notes=batch_day_m.notes))
             batches.append(Batch(id=batch_m.id, start_date=batch_m.start_date, level=batch_m.level, batch_days=batch_days))
+        
         return User(
             id=user_model.id,
             username=user_model.username,
@@ -60,7 +62,8 @@ class CommonsSqlRepo(CommonsRepo):
             share_progress=user_model.share_progress,
             #receive_st_app_notifications=user_model.receive_st_app_notifications,
             #study_session_time=user_model.study_session_time,
-            batches=batches
+            batches=batches,
+            metrics=user_model.metrics
         )
 
     @staticmethod
@@ -97,7 +100,9 @@ class CommonsSqlRepo(CommonsRepo):
     
     @staticmethod
     def get_user_by_id(db: Session, id: int) -> User | None: 
+        db.expire_all()
         statement = select(UserModel).where(UserModel.id == id).options(
+            selectinload(UserModel.metrics),
             selectinload(UserModel.user_batches).selectinload(BatchModel.batch_days).selectinload(BatchDayModel.challenges)
         )
         result = db.exec(statement) 
@@ -105,7 +110,9 @@ class CommonsSqlRepo(CommonsRepo):
 
     @staticmethod
     def get_user_by_username(db: Session, username: str) -> User | None: 
+        db.expire_all()
         statement = select(UserModel).where(UserModel.username == username).options(
+            selectinload(UserModel.metrics),
             selectinload(UserModel.user_batches).selectinload(BatchModel.batch_days).selectinload(BatchDayModel.challenges)
         )
         result = db.exec(statement) 

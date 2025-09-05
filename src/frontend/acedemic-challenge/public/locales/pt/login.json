@@ -23,5 +23,9 @@
     "submit_selection_message": "Enviar seleção",
     "usage_objectives_title": "Objetivos de Uso",
     "username_field_name": "Nome de utilizador",
-    "yes_answer_option": "Sim"
+    "yes_answer_option": "Sim",
+
+    "password_rules_title": "A password deve conter:",
+    "rule_length": "Pelo menos 6 caracteres",
+    "password_rule_min_length": "A password deve ter no mínimo {{count}} caracteres."
 }
