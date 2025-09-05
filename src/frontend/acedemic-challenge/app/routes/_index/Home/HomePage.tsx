@@ -95,6 +95,11 @@ function HomePageContent() {
         onNoteAddClick,
     } = useHomePage();
 
+    const handleLevelSelected = async () => {
+        await fetchUserInfo();
+        window.dispatchEvent(new CustomEvent("updateAppBar"));
+    };
+
     return (
         <div className={styles.homePage}>
             {batches !== undefined && currentBatch === undefined ? (
@@ -105,7 +110,7 @@ function HomePageContent() {
                         </h1>
                     </div>
                     <SelectLevelPage
-                        onLevelSelected={fetchUserInfo}
+                        onLevelSelected={handleLevelSelected}
                         onStartQuizClick={() => {}}
                     />
                 </>

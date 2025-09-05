@@ -196,14 +196,14 @@ def _get_or_create_user_metrics(db: Session, user_id: int) -> UserMetric:
 def set_user_challenge_level(db: Session, user_id: int, level: int):
     """Define o nível de desafio ativo para um utilizador"""
     user_metrics = _get_or_create_user_metrics(db, user_id)
+
     user_metrics.current_challenge_level = level
     
     user_metrics.challenges_completed_in_current_level = 0
     
     db.add(user_metrics)
     db.commit()
-    logger.info(f"Nível de desafio do utilizador {user_id} definido para {level}.")
-    
+
 def get_user_badge_history(db: Session, user_id: int) -> List[UserBadge]:
     """Procura todas as medalhas que um utilizador ganhou, com as suas datas."""
     statement = (

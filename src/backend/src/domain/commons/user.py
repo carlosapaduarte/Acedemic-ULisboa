@@ -1,4 +1,7 @@
 from datetime import datetime
+from typing import Optional
+
+from repository.sql.models.models import UserMetric
 
 
 class UserNote:
@@ -36,7 +39,8 @@ class User:
             hashed_password: str,
             avatar_filename: str | None,
             share_progress: bool | None,
-            batches: list[Batch]
+            batches: list[Batch], 
+            metrics: Optional[UserMetric] = None
     ) -> None:
         self.id = id
         self.username = username
@@ -44,3 +48,4 @@ class User:
         self.avatar_filename = avatar_filename
         self.share_progress = share_progress
         self.batches = batches
+        self.metrics = metrics

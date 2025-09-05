@@ -194,6 +194,7 @@ export type UserInfo = {
     shareProgress: boolean;
     avatarFilename: string; // TODO: this could be undefined
     batches: Batch[];
+    currentChallengeLevel: number | null; //1, 2, 3 or null if no level selected
 };
 
 async function fetchBadgeHistory(): Promise<AwardedBadgeHistoryItem[]> {

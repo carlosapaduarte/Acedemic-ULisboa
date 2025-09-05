@@ -7,6 +7,7 @@ from domain.commons.user import User
 from router.academic_challenge.dtos.output_dtos import BatchDto
 
 
+
 class LoginOutputDto(BaseModel):
     id: int
 
@@ -17,6 +18,10 @@ class UserOutputDto(BaseModel):
     avatarFilename: str | None
     shareProgress: bool | None
     batches: list[BatchDto] | None
+    currentChallengeLevel: Optional[int] = None
+
+    class Config:
+        populate_by_name = True
 
     @staticmethod
     def fromUser(user: User) -> 'UserOutputDto':
@@ -25,7 +30,8 @@ class UserOutputDto(BaseModel):
             username=user.username,
             avatarFilename=user.avatar_filename,
             shareProgress=user.share_progress,
-            batches=BatchDto.fromBatches(user.batches)
+            batches=BatchDto.fromBatches(user.batches),
+            currentChallengeLevel=user.metrics.current_challenge_level if user.metrics else None
         )
 
 class TagOutputDto(BaseModel):
