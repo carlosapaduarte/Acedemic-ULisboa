@@ -19,7 +19,7 @@ function useHomePage() {
         batchDays,
         currentDayIndex,
         currentBatch,
-        fetchUserInfo
+        fetchUserInfo,
     } = useChallenges();
 
     const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -32,33 +32,38 @@ function useHomePage() {
 
         const batchChallenges = batchDays.get(currentBatch.id);
 
-        if (!batchChallenges)
-            return;
+        if (!batchChallenges) return;
 
-        const completedCount = batchChallenges.reduce(
-            (acc, batchDay) => {
-                const _acc = 0;
-                batchDay.challenges.forEach(challenge => {
-                    if (challenge.completionDate) {
-                        acc++;
-                    }
-                });
-                return acc + _acc; // TODO: Check if this is the correct way to check for completion
-            }, 0);
-        setProgress(completedCount / batchChallenges.flatMap(b => b.challenges).length * 100);
+        const completedCount = batchChallenges.reduce((acc, batchDay) => {
+            const _acc = 0;
+            batchDay.challenges.forEach((challenge) => {
+                if (challenge.completionDate) {
+                    acc++;
+                }
+            });
+            return acc + _acc; // TODO: Check if this is the correct way to check for completion
+        }, 0);
+        setProgress(
+            (completedCount /
+                batchChallenges.flatMap((b) => b.challenges).length) *
+                100,
+        );
     }, [batchDays]);
 
     const currentBatchDays =
         batchDays != undefined && currentBatch != undefined
             ? batchDays.get(currentBatch.id)
             : undefined;
-    const notesText = currentBatchDays != undefined && currentDayIndex != undefined ? currentBatchDays[currentDayIndex].notes : "";
+    const notesText =
+        currentBatchDays != undefined && currentDayIndex != undefined
+            ? currentBatchDays[currentDayIndex].notes
+            : "";
 
     async function onNoteAddClick(notesText: string) {
-        if (currentDayIndex == undefined || !currentBatch)
-            return;
+        if (currentDayIndex == undefined || !currentBatch) return;
 
-        await service.editDayNote(currentBatch.id, currentDayIndex + 1, notesText)
+        await service
+            .editDayNote(currentBatch.id, currentDayIndex + 1, notesText)
             .then(() => {
                 fetchUserInfo();
             });
@@ -75,7 +80,7 @@ function useHomePage() {
         isModalOpen,
         setIsModalOpen,
         notesText,
-        onNoteAddClick
+        onNoteAddClick,
     };
 }
 
@@ -93,45 +98,54 @@ export default function HomePage() {
         isModalOpen,
         setIsModalOpen,
         notesText,
-        onNoteAddClick
+        onNoteAddClick,
     } = useHomePage();
 
     const { t } = useTranslation(["dashboard"]);
 
     return (
         <ChallengesContext.Provider
-            value={{ userInfo, batches, batchDays, currentDayIndex, currentBatch, fetchUserInfo }}>
+            value={{
+                userInfo,
+                batches,
+                batchDays,
+                currentDayIndex,
+                currentBatch,
+                fetchUserInfo,
+            }}
+        >
             <div className={styles.homePage}>
-                {
-                    batches != undefined && currentBatch == undefined ?
-                        <>
-                            <div className={styles.notOnBatchMessageContainer}>
-                                <h1 className={styles.notOnBatchMessage}>
-                                    {t("dashboard:not_on_batch_message")}
-                                </h1>
-                            </div>
-                            <SelectLevelPage
-                                onLevelSelected={() => {
-                                    fetchUserInfo();
-                                }}
-                                onStartQuizClick={() => {
-                                }}
+                {batches != undefined && currentBatch == undefined ? (
+                    <>
+                        <div className={styles.notOnBatchMessageContainer}>
+                            <h1 className={styles.notOnBatchMessage}>
+                                {t("dashboard:not_on_batch_message")}
+                            </h1>
+                        </div>
+                        <SelectLevelPage
+                            onLevelSelected={() => {
+                                fetchUserInfo();
+                            }}
+                            onStartQuizClick={() => {}}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <ProgressBar progress={progress} />
+                        <ChallengeView
+                            onViewNotesButtonClick={() => setIsModalOpen(true)}
+                        />
+                        {currentDayIndex != undefined && (
+                            <NotesModal
+                                batchDayNumber={currentDayIndex + 1}
+                                isModalOpen={isModalOpen}
+                                setIsModalOpen={setIsModalOpen}
+                                savedNotesText={notesText}
+                                onNotesSave={onNoteAddClick}
                             />
-                        </>
-                        :
-                        <>
-                            <ProgressBar progress={progress} />
-                            <ChallengeView onViewNotesButtonClick={() => setIsModalOpen(true)} />
-                            {
-                                currentDayIndex != undefined &&
-                                <NotesModal batchDayNumber={currentDayIndex + 1}
-                                            isModalOpen={isModalOpen}
-                                            setIsModalOpen={setIsModalOpen}
-                                            savedNotesText={notesText}
-                                            onNotesSave={onNoteAddClick} />
-                            }
-                        </>
-                }
+                        )}
+                    </>
+                )}
             </div>
         </ChallengesContext.Provider>
     );
