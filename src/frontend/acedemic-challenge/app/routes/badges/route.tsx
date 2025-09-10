@@ -267,16 +267,6 @@ export default function BadgesPage() {
                                     {league.name}
                                 </h2>
                                 <div className={styles.headerRight}>
-                                    <span
-                                        style={{
-                                            color: "yellow",
-                                            fontSize: "10px",
-                                            marginRight: "10px",
-                                        }}
-                                    >
-                                        (A:{animatingLevel}|R:{league.rank})
-                                    </span>
-
                                     <span className={styles.badgeCounter}>
                                         🏆{" "}
                                         {

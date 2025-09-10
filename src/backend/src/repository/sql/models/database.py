@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Configuração da bd
 DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
+print("url bd:", DATABASE_URL)
 if not DATABASE_URL:
     raise ValueError("SQLALCHEMY_DATABASE_URL não está definida no ambiente.")
 
@@ -18,6 +19,10 @@ engine = create_engine(DATABASE_URL, echo=False)
 
 POSTGRES_MAX_INTEGER_VALUE = 2147483647
 
+def create_db_and_tables():
+    """Cria as tabelas na bd com base nos metadados do SQLModel."""
+    SQLModel.metadata.create_all(engine)
+    logger.info("Tabelas na bd criadas (ou já existentes).")
 
 def get_engine():
     """Retorna a instância do engine da bd."""
@@ -117,6 +122,7 @@ def seed_gamification_data(session: Session):
             session.add(new_badge)
     session.commit()
     logger.info("Seeding de dados de gamificação para o ACEdemic Challenge concluído.")
+
 
 def seed_all_data():
     """Função principal para semear todos os dados."""
