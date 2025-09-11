@@ -398,48 +398,45 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session: Session
     ) -> int:
         
-        # Generates a random ID, that is not yet taken
         if task_id is None:
             while True:
                 task_id = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE)
                 statement = select(STTaskModel).where(STTaskModel.id == task_id)
-                result = session.exec(statement)
-                if result.first() is None:
+                if session.exec(statement).first() is None:
                     break
         
         new_task_model = STTaskModel(
-            id=task_id, #automatic ID is not working
+            id=task_id,
             title=task.title,
             description=task.description,
             deadline=task.deadline,
             priority=task.priority,
             status=task.status,
             user_id=user_id,
-            user=user_model,
-            tags=[],
-            subtasks=[],
             parent_task_id=parent_task_id,
-            parent_user_id=user_id
+            parent_user_id=user_id if parent_task_id else None
         )
         session.add(new_task_model)
-        session.commit()
-        session.refresh(new_task_model)
-        
-        # Create associated tags
-        tags_model: list[STTaskTagModel] = []
-        for tag in task.tags:
-            tags_model.append(STTaskTagModel(
-                tag=tag,
-                task_id=new_task_model.id,
-                task=new_task_model,
-                user_id=user_id
-            ))
+        session.flush()
 
-        for tag_model in tags_model:
-            session.add(tag_model)
-            session.commit()
+        for tag_name in task.tags:
+            # 1. Procura a tag na base de dados pelo nome
+            tag_obj = session.exec(select(TagModel).where(TagModel.name == tag_name.lower())).first()
             
-        # Create associated sub-tags
+            # 2. Se não existir, cria-a
+            if not tag_obj:
+                # TODO: a cor e descrição podem precisar de valores padrão ou vir do frontend
+                tag_obj = TagModel(name=tag_name.lower(), color="#CCCCCC", description="") 
+                session.add(tag_obj)
+                session.flush() 
+            
+            association = STTaskTagModel(
+                tag_id=tag_obj.id,
+                task_id=new_task_model.id,
+                user_id=user_id
+            )
+            session.add(association)
+            
         for sub_task in task.sub_tasks:
             StudyTrackerSqlRepo.create_task_with_parent(
                 sub_task, 
@@ -449,7 +446,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 parent_task_id=new_task_model.id, 
                 session=session
             )
-            
+                
+        session.commit()
         return new_task_model.id
 
     def create_task(self, user_id: int, task: Task, task_id: int | None) -> int:
