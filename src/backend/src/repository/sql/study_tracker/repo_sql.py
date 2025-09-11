@@ -277,7 +277,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.commit()
 
     def get_not_available_schedule_blocks(self, user_id: int) -> list[UnavailableScheduleBlock]:
-         with Session(engine) as session:
+        with Session(engine) as session:
             statement = select(STScheduleBlockNotAvailableModel).where(STScheduleBlockNotAvailableModel.user_id == user_id)
             results = session.exec(statement)
         
@@ -703,7 +703,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
     @staticmethod
     def compute_elapsed_minutes(date1: datetime, date2: datetime) -> int:
-        return (int) ((get_datetime_utc(date1) - get_datetime_utc(date2)) / 60)
+        total_seconds = (get_datetime_utc(date1) - get_datetime_utc(date2)).total_seconds()
+        return int(total_seconds / 60)
             
     def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
         # TODO: events that repeat every week
@@ -826,12 +827,13 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 session.add(week_study_time_model)
                 session.commit()
                 
-
-    def delete_tag(session: Session, tag_id) -> bool:
-        tag = session.query(models.Tag).filter(models.Tag.id == tag_id).first()
+    
+    def delete_tag(self, session: Session, tag_id: int) -> bool:
+        tag = session.get(TagModel, tag_id)
+        
         if tag is None:
             return False
+            
         session.delete(tag)
         session.commit()
         return True
-    

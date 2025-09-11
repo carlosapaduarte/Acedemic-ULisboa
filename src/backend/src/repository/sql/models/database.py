@@ -46,12 +46,14 @@ def seed_global_tags(session: Session):
         existing_tag = session.exec(
             select(TagModel).where(TagModel.name == tag_name)
         ).first()
-    if not existing_tag:
-        new_tag = TagModel(name=tag_name, color=tag_color, description=f"Tag para atividades de {tag_name}.")
-        session.add(new_tag)
-        logger.info(f"-> Adicionada Tag: '{tag_name}' com a cor {tag_color}")
-    session.commit()
+        
+        if not existing_tag:
+            new_tag = TagModel(name=tag_name, color=tag_color)
+            session.add(new_tag)
+            logger.info(f"-> Adicionada Tag: '{tag_name}' com a cor {tag_color}")
 
+    session.commit()
+    
 def seed_gamification_data(session: Session):
     """Seed dos Níveis e Troféus para o ACEdemic Challenge."""
     logger.info("A semear dados de gamificação para o ACEdemic Challenge...")
@@ -128,7 +130,7 @@ def seed_all_data():
     session = None
     try:
         session = next(get_session())
-        # seed_global_tags(session) # Descomentado por agora
+        seed_global_tags(session)
         seed_gamification_data(session)
         session.commit()
     except Exception as e:

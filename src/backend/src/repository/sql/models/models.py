@@ -49,7 +49,8 @@ class TagModel(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True, index=True)
-
+    color: str = Field(nullable=False) 
+    
     user_links: List["UserTagLink"] = Relationship(
         back_populates="tag",
         sa_relationship_kwargs={"cascade": "all, delete-orphan"}

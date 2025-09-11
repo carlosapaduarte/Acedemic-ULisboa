@@ -520,7 +520,7 @@ export function CreateEventModal({
     setNewEventEndDate(new Date(new Date().getTime() + 60 * 1000)); // Adiciona 1 minuto
     setRecurrenceType("none");
     setNotes("");
-    setSelectedCustomColor("#FFFF");
+    setSelectedCustomColor("#3399FF");
   }
 
   const finishCreatingEventButtonDisabled = !newEventTitle;
