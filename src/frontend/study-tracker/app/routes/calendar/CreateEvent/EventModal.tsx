@@ -11,8 +11,8 @@ import {
 import classNames from "classnames";
 import { service } from "../../../service/service";
 import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
-import { EditTagModal } from "./EditTagModal";
-
+import { EditTagModal } from "../../../components/TagsModal/EditTagModal";
+import { CreateTagModal } from "../../../components/TagsModal/CreateTagModal";
 import styles from "./EventModal.module.css";
 
 interface Tag {
@@ -240,52 +240,7 @@ const TagSection = React.memo(function TagSection({
   setIsEditTagModalOpen: (isOpen: boolean) => void;
 }) {
   const { t } = useTranslation("calendar");
-  const [newTagNameInput, setNewTagNameInput] = useState<string>("");
-  const [isCreatingTag, setIsCreatingTag] = useState(false);
-  const [tagErrorMessage, setTagErrorMessage] = useState<string | null>(null);
-  const [newTagColor, setNewTagColor] = useState("#888888");
-
-  const handleCreateTag = async () => {
-    if (!newTagNameInput.trim()) {
-      setTagErrorMessage(t("tag_name_cannot_be_empty"));
-      return;
-    }
-    setIsCreatingTag(true);
-    setTagErrorMessage(null);
-    try {
-      const newTag = await service.createTag({
-        name: newTagNameInput,
-        color: newTagColor,
-      });
-      await refreshTags();
-      setSelectedTagIds((prev) => [...prev, newTag.id]);
-      setNewTagNameInput("");
-      setNewTagColor("#888888");
-    } catch (error: any) {
-      console.error("Erro ao criar tag:", error);
-      setTagErrorMessage(t("error_creating_tag_generic"));
-    } finally {
-      setIsCreatingTag(false);
-    }
-  };
-
-  const handleDeleteTag = async (tagToDelete: Tag) => {
-    if (
-      !window.confirm(
-        t("tag_delete_confirmation", { tagName: t(tagToDelete.name) })
-      )
-    ) {
-      return;
-    }
-    try {
-      await service.deleteTag(Number(tagToDelete.id));
-      await refreshTags();
-      setSelectedTagIds((prev) => prev.filter((id) => id !== tagToDelete.id));
-    } catch (error) {
-      console.error(`Erro ao apagar a tag ${tagToDelete.name}:`, error);
-      alert(t("error_deleting_tag", { tagName: t(tagToDelete.name) }));
-    }
-  };
+  const [isCreateTagModalOpen, setIsCreateTagModalOpen] = useState(false);
 
   const toggleTagSelection = (tagId: string) => {
     setSelectedTagIds((prev) =>
@@ -300,6 +255,13 @@ const TagSection = React.memo(function TagSection({
       <div className={styles.tagsHeader}>
         <h2 className={styles.formSectionTitle}>{t("tags_title")}</h2>
         <Button
+          onPress={() => setIsCreateTagModalOpen(true)}
+          className={styles.headerButton}
+          aria-label={t("add_new_tag")}
+        >
+          +
+        </Button>
+        <Button
           onPress={() => setIsEditTagModalOpen(true)}
           className={styles.manageTagsButton}
           aria-label={t("manage_tags")}
@@ -308,64 +270,27 @@ const TagSection = React.memo(function TagSection({
         </Button>
       </div>
       <div className={styles.tagsContent}>
-        <div className={styles.tagListAndCreateContainer}>
-          {availableTags.length > 0 && (
-            <div className={styles.tagListContainer}>
-              {availableTags.map((tag: Tag) => (
-                <div
-                  key={tag.id}
-                  className={classNames(styles.tagItem, {
-                    [styles.selectedTagItem]: selectedTagIds.includes(tag.id),
-                  })}
-                  onClick={() => toggleTagSelection(tag.id)}
-                  style={{ borderColor: tag.color }}
-                >
-                  <span className={styles.tagLabel}>{t(tag.name)}</span>
-                  <Button
-                    onPress={(e) => {
-                      handleDeleteTag(tag);
-                    }}
-                    className={styles.deleteTagButton}
-                    title={t("delete_tag_title", { tagName: t(tag.name) })}
-                  >
-                    &times;
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-          <div className={styles.createTagInputAndButtonContainer}>
-            <Input
-              className={styles.createTagInput}
-              value={newTagNameInput}
-              onChange={(e) => setNewTagNameInput(e.target.value)}
-              placeholder={t("new_tag_name_placeholder")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !isCreatingTag) {
-                  e.preventDefault();
-                  handleCreateTag();
-                }
-              }}
-              disabled={isCreatingTag}
-            />
-            <ColorPickerInput
-              color={newTagColor}
-              setColor={setNewTagColor}
-              clearColor={() => setNewTagColor("#888888")}
-            />
-            <Button
-              className={styles.addTagButtonRound}
-              onPress={handleCreateTag}
-              isDisabled={isCreatingTag || !newTagNameInput.trim()}
+        <div className={styles.tagListContainer}>
+          {availableTags.map((tag: Tag) => (
+            <div
+              key={tag.id}
+              className={classNames(styles.tagItem, {
+                [styles.selectedTagItem]: selectedTagIds.includes(tag.id),
+              })}
+              onClick={() => toggleTagSelection(tag.id)}
+              style={{ borderColor: tag.color }}
             >
-              +
-            </Button>
-          </div>
+              <span className={styles.tagLabel}>{t(tag.name)}</span>
+            </div>
+          ))}
         </div>
-        {tagErrorMessage && (
-          <p className={styles.tagErrorMessage}>{tagErrorMessage}</p>
-        )}
       </div>
+
+      <CreateTagModal
+        isOpen={isCreateTagModalOpen}
+        setIsOpen={setIsCreateTagModalOpen}
+        onTagCreated={refreshTags}
+      />
     </div>
   );
 });
@@ -385,18 +310,18 @@ const EventForm = (props: any) => {
         recurrenceType={props.recurrenceType}
         setRecurrenceType={props.setRecurrenceType}
       />
+      <ColorPickerInput
+        label={props.label}
+        color={props.color}
+        setColor={props.setColor}
+        clearColor={() => props.setColor("#3399FF")}
+      />
       <TagSection
         selectedTagIds={props.selectedTagIds}
         setSelectedTagIds={props.setSelectedTagIds}
         availableTags={props.availableTags}
         refreshTags={props.refreshTags}
         setIsEditTagModalOpen={props.setIsEditTagModalOpen}
-      />
-      <ColorPickerInput
-        label={props.label}
-        color={props.color}
-        setColor={props.setColor}
-        clearColor={() => props.setColor("#3399FF")}
       />
     </div>
   );
@@ -422,8 +347,14 @@ export function EventModal({
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [saving, setSaving] = useState(false);
+  const [tagToEdit, setTagToEdit] = useState<Tag | null>(null);
 
   const [isEditTagModalOpen, setIsEditTagModalOpen] = useState(false);
+
+  const handleOpenEditTagModal = (tag: Tag) => {
+    setTagToEdit(tag);
+    setIsEditTagModalOpen(true);
+  };
 
   const refreshTags = async () => {
     try {
@@ -579,6 +510,7 @@ export function EventModal({
                   label={t("custom_color_label")}
                   refreshTags={refreshTags}
                   setIsEditTagModalOpen={setIsEditTagModalOpen}
+                  openEditModalForTag={handleOpenEditTagModal}
                 />
               </div>
               <div className={styles.finishCreatingEventButtonContainer}>
@@ -610,6 +542,7 @@ export function EventModal({
         isOpen={isEditTagModalOpen}
         setIsOpen={setIsEditTagModalOpen}
         onTagsUpdate={refreshTags}
+        tagToEdit={tagToEdit}
       />
     </>
   );

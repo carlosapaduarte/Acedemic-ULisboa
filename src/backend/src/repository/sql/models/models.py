@@ -43,21 +43,6 @@ class UserModel(SQLModel, table=True):
     metrics: Optional["UserMetric"] = Relationship(back_populates="user", sa_relationship_kwargs={"uselist": False})
     league_memberships: List["UserLeague"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
-class TagModel(SQLModel, table=True):
-    __tablename__ = "tags"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(unique=True, index=True)
-    color: str = Field(nullable=False) 
-    
-    user_links: List["UserTagLink"] = Relationship(
-        back_populates="tag",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
-    )
-    event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
-    task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
-    daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
-
 class UserTagLink(SQLModel, table=True):
     __tablename__ = "user_tag_link"
 
@@ -95,7 +80,7 @@ class STTaskTagModel(SQLModel, table=True):
     user_id: int
 
     task: "STTaskModel" = Relationship(back_populates="tags_associations")
-    tag_ref: TagModel = Relationship(back_populates="task_links")
+    tag_ref: "TagModel" = Relationship(back_populates="task_links")
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -105,6 +90,21 @@ class STTaskTagModel(SQLModel, table=True):
         ),
         UniqueConstraint('task_id', 'tag_id', name='uq_st_task_tag'),
     )
+
+class TagModel(SQLModel, table=True):
+    __tablename__ = "tags"
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True, index=True)
+    color: str = Field(nullable=False)
+    
+    user_links: List["UserTagLink"] = Relationship(back_populates="tag")
+    event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
+    task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
+    daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
+
+    events: List["STEventModel"] = Relationship(back_populates="tags", link_model=STEventTagModel)
+    tasks: List["STTaskModel"] = Relationship(back_populates="tags", link_model=STTaskTagModel)
 
 class STEventModel(SQLModel, table=True):
     __tablename__ = "st_event"
@@ -140,6 +140,7 @@ class STTaskModel(SQLModel, table=True):
     user: "UserModel" = Relationship(back_populates="st_tasks")
 
     tags_associations: List["STTaskTagModel"] = Relationship(back_populates="task")
+    tags: List[TagModel] = Relationship(back_populates="tasks", link_model=STTaskTagModel)
 
     parent_task_id: Optional[int] = Field(default=None, nullable=True)
     parent_user_id: Optional[int] = Field(default=None, nullable=True)

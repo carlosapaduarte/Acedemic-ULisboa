@@ -10,7 +10,7 @@ import {
 } from "react-aria-components";
 import { service, Tag } from "~/service/service";
 import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
-import styles from "./EventModal.module.css";
+import styles from "./TagModals.module.css";
 import classNames from "classnames";
 
 interface EditTagModalProps {
@@ -159,13 +159,6 @@ export function EditTagModal({
               <TextField className={styles.formTextField} autoFocus>
                 <Label>{t("tag_name_label")}</Label>
                 <Input value={name} onChange={(e) => setName(e.target.value)} />
-              </TextField>
-              <TextField className={styles.formTextField}>
-                <Label>{t("tag_description_label")}</Label>
-                <Input
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
               </TextField>
               <ColorPickerInput
                 label={t("tag_color_label")}

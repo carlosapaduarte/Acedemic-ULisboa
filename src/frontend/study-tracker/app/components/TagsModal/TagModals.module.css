@@ -1,0 +1,44 @@
+.modal {
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #4a457b;
+  color: white;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 300px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.textField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.error {
+  color: #ff8a80;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.saveButton {
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #7c3aed;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.saveButton:hover {
+  background-color: #6d28d9;
+}
