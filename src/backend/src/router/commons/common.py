@@ -150,18 +150,19 @@ def get_user_tags(
 
         if not user_tag_data:
             return []
-
-        return [
-            TagOutputDto(
-                id=str(tag.id),
-                name=tag.name,
-                user_id=link.user_id,
-                is_custom=link.is_custom
+        
+        response_tags = []
+        for link, tag in user_tag_data:
+            response_tags.append(
+                TagOutputDto(
+                    id=str(tag.id),
+                    name=tag.name,
+                    user_id=link.user_id,
+                    is_custom=link.is_custom,
+                    color=tag.color
+                )
             )
-            for link, tag in user_tag_data
-        ]
-    except HTTPException:
-        raise
+        return response_tags
     except Exception as e:
         print(f"(: Error fetching user tags: {e}")
         raise HTTPException(
@@ -211,9 +212,9 @@ def create_user_tag(
     db: Annotated[Session, Depends(get_db_session)]
 ):
     try:
-        existing_tag = db.exec(
-            select(TagModel).where(TagModel.name == tag_input.name)
-        ).first()
+        existing_tag = (db.exec(
+            select(TagModel).where(TagModel.name.ilike(tag_input.name))
+        )).first()
 
         if existing_tag:
     
@@ -234,14 +235,9 @@ def create_user_tag(
                 db.add(new_user_tag_link)
                 db.commit()
                 db.refresh(new_user_tag_link)
-                return TagOutputDto(id=str(existing_tag.id), name=existing_tag.name, user_id=current_user_id,is_custom=new_user_tag_link.is_custom)
+                return TagOutputDto(id=str(existing_tag.id), name=existing_tag.name, user_id=current_user_id,is_custom=new_user_tag_link.is_custom,color=existing_tag.color)
         else:
-            # A tag não existe globalmente, cria uma nova
-            new_tag = TagModel(
-                name=tag_input.name, 
-                color=tag_input.color, 
-                description=tag_input.description
-            )
+            new_tag = TagModel(name=tag_input.name, color="#CCCCCC") #TODO: mudar para o colopicker depois
             db.add(new_tag)
             db.commit()
             db.refresh(new_tag)
@@ -250,7 +246,7 @@ def create_user_tag(
             db.add(new_user_tag_link)
             db.commit()
             
-            return TagOutputDto(id=str(new_tag.id), name=new_tag.name, user_id=current_user_id, is_custom=new_user_tag_link.is_custom)
+            return TagOutputDto(id=str(new_tag.id), name=new_tag.name, user_id=current_user_id, is_custom=new_user_tag_link.is_custom,color=new_tag.color)
 
     except HTTPException:
         raise

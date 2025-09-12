@@ -1,4 +1,4 @@
-// src/frontend/study-tracker/app/i18n.tsx
+/*// src/frontend/study-tracker/app/i18n.tsx
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import Backend from "i18next-http-backend";
@@ -38,4 +38,11 @@ export const i18nConfig = {
   supportedLngs: ["en", "pt"],
   fallbackLng: "en",
   defaultNS: "calendar",
+};
+*/
+
+export const i18nConfig = {
+  supportedLngs: ["en", "pt"],
+  fallbackLng: "en",
+  defaultNS: "common",
 };
