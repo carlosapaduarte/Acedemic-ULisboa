@@ -79,7 +79,6 @@ class TagModel(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True, index=True)
-    description: str = Field(default="", nullable=False)
     color: str = Field(nullable=False) 
 
     user_links: List["UserTagLink"] = Relationship(
