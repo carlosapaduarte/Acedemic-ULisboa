@@ -219,7 +219,7 @@ export type NewEventInfo = {
   everyWeek: boolean;
   everyDay: boolean;
   notes: string;
-  color: string;
+  color?: string;
 };
 
 async function createNewEvent(newEventInfo: NewEventInfo) {

@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 import {
   Button,
   Dialog,
+  DialogTrigger,
   Input,
   Label,
   Modal,
+  Popover,
   TextField,
 } from "react-aria-components";
 import classNames from "classnames";
@@ -14,13 +16,13 @@ import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput
 import { EditTagModal } from "../../../components/TagsModal/EditTagModal";
 import { CreateTagModal } from "../../../components/TagsModal/CreateTagModal";
 import styles from "./EventModal.module.css";
+import { RiSettings5Fill } from "react-icons/ri";
 
 interface Tag {
   id: string;
   name: string;
   user_id: number;
   color?: string;
-  description?: string;
 }
 
 export interface EventData {
@@ -107,38 +109,32 @@ const DateSection = React.memo(function DateSection({
   setEventEndDate: (endDate: Date) => void;
 }) {
   const { t } = useTranslation("calendar");
-
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
   const formatTime = (date: Date) => date.toTimeString().slice(0, 5);
-
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const [year, month, day] = e.target.value.split("-").map(Number);
     const newStartDate = new Date(eventStartDate);
     newStartDate.setFullYear(year, month - 1, day);
     setEventStartDate(newStartDate);
   };
-
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const [hours, minutes] = e.target.value.split(":").map(Number);
     const newStartDate = new Date(eventStartDate);
     newStartDate.setHours(hours, minutes);
     setEventStartDate(newStartDate);
   };
-
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const [year, month, day] = e.target.value.split("-").map(Number);
     const newEndDate = new Date(eventEndDate);
     newEndDate.setFullYear(year, month - 1, day);
     setEventEndDate(newEndDate);
   };
-
   const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const [hours, minutes] = e.target.value.split(":").map(Number);
     const newEndDate = new Date(eventEndDate);
     newEndDate.setHours(hours, minutes);
     setEventEndDate(newEndDate);
   };
-
   return (
     <div className={styles.dateSectionContainer}>
       <div className={styles.deadlineInputsContainer}>
@@ -204,7 +200,6 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection({
     { id: "daily", labelKey: "recurrence_daily_label" },
     { id: "weekly", labelKey: "recurrence_weekly_label" },
   ];
-
   return (
     <div className={styles.recurrentEventSectionContainer}>
       <h2 className={styles.formSectionTitle}>{t("recurrence_title")}</h2>
@@ -226,7 +221,8 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection({
   );
 });
 
-const TagSection = React.memo(function TagSection({
+// A Otimização React.memo foi REMOVIDA daqui
+const TagSection = ({
   selectedTagIds,
   setSelectedTagIds,
   availableTags,
@@ -234,15 +230,14 @@ const TagSection = React.memo(function TagSection({
   setIsEditTagModalOpen,
 }: {
   selectedTagIds: string[];
-  setSelectedTagIds: (ids: string[]) => void;
+  setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
   availableTags: Tag[];
-  refreshTags: () => Promise<void>;
+  refreshTags: () => void;
   setIsEditTagModalOpen: (isOpen: boolean) => void;
-}) {
+}) => {
   const { t } = useTranslation("calendar");
-  const [isCreateTagModalOpen, setIsCreateTagModalOpen] = useState(false);
 
-  const toggleTagSelection = (tagId: string) => {
+  const handleToggleTag = (tagId: string) => {
     setSelectedTagIds((prev) =>
       prev.includes(tagId)
         ? prev.filter((id) => id !== tagId)
@@ -254,46 +249,53 @@ const TagSection = React.memo(function TagSection({
     <div className={styles.tagsSectionContainer}>
       <div className={styles.tagsHeader}>
         <h2 className={styles.formSectionTitle}>{t("tags_title")}</h2>
-        <Button
-          onPress={() => setIsCreateTagModalOpen(true)}
-          className={styles.headerButton}
-          aria-label={t("add_new_tag")}
-        >
-          +
-        </Button>
-        <Button
-          onPress={() => setIsEditTagModalOpen(true)}
-          className={styles.manageTagsButton}
-          aria-label={t("manage_tags")}
-        >
-          ⚙️
-        </Button>
+        <div className={styles.tagButtonsContainer}>
+          <Button
+            onPress={() => setIsEditTagModalOpen(true)}
+            className={styles.headerButton}
+            aria-label={t("manage_tags", "Gerir etiquetas")}
+          >
+            <RiSettings5Fill size={18} />
+          </Button>
+        </div>
       </div>
       <div className={styles.tagsContent}>
         <div className={styles.tagListContainer}>
-          {availableTags.map((tag: Tag) => (
-            <div
-              key={tag.id}
-              className={classNames(styles.tagItem, {
-                [styles.selectedTagItem]: selectedTagIds.includes(tag.id),
-              })}
-              onClick={() => toggleTagSelection(tag.id)}
-              style={{ borderColor: tag.color }}
+          {availableTags.map((tag: Tag) => {
+            const isSelected = selectedTagIds.includes(tag.id);
+            return (
+              <div
+                key={tag.id}
+                className={classNames(styles.tagItem, {
+                  [styles.selectedTagItem]: isSelected,
+                })}
+                onClick={() => handleToggleTag(tag.id)}
+                style={{
+                  backgroundColor: isSelected
+                    ? tag.color || "#888888"
+                    : "var(--color-2)",
+                }}
+              >
+                <span className={styles.tagLabel}>{t(tag.name)}</span>
+              </div>
+            );
+          })}
+          <DialogTrigger>
+            <Button
+              className={styles.addTagButtonRound}
+              aria-label={t("add_new_tag", "Adicionar nova etiqueta")}
             >
-              <span className={styles.tagLabel}>{t(tag.name)}</span>
-            </div>
-          ))}
+              +
+            </Button>
+            <Popover placement="bottom">
+              <CreateTagModal onTagCreated={refreshTags} />
+            </Popover>
+          </DialogTrigger>
         </div>
       </div>
-
-      <CreateTagModal
-        isOpen={isCreateTagModalOpen}
-        setIsOpen={setIsCreateTagModalOpen}
-        onTagCreated={refreshTags}
-      />
     </div>
   );
-});
+};
 
 const EventForm = (props: any) => {
   return (
@@ -337,24 +339,18 @@ export function EventModal({
 }: EventModalProps) {
   const { t } = useTranslation("calendar");
   const isEditMode = !!eventToEdit;
+  const FALLBACK_COLOR = "#3399FF";
 
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [notes, setNotes] = useState("");
-  const [color, setColor] = useState("#3399FF");
+  const [color, setColor] = useState(FALLBACK_COLOR);
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [saving, setSaving] = useState(false);
-  const [tagToEdit, setTagToEdit] = useState<Tag | null>(null);
-
   const [isEditTagModalOpen, setIsEditTagModalOpen] = useState(false);
-
-  const handleOpenEditTagModal = (tag: Tag) => {
-    setTagToEdit(tag);
-    setIsEditTagModalOpen(true);
-  };
 
   const refreshTags = async () => {
     try {
@@ -366,10 +362,7 @@ export function EventModal({
   };
 
   useEffect(() => {
-    if (!isModalOpen) {
-      return;
-    }
-
+    if (!isModalOpen) return;
     const initializeForm = async () => {
       try {
         const fetchedTags = await service.fetchUserTags();
@@ -380,33 +373,34 @@ export function EventModal({
           setStartDate(new Date(eventToEdit.start));
           setEndDate(new Date(eventToEdit.end));
           setNotes(eventToEdit.notes || "");
-          setColor(eventToEdit.color || "#3399FF");
-
+          setColor(eventToEdit.color || FALLBACK_COLOR);
           if (eventToEdit.everyDay) setRecurrenceType("daily");
           else if (eventToEdit.everyWeek) setRecurrenceType("weekly");
           else setRecurrenceType("none");
 
-          const tagIdsToSelect = eventToEdit.tags
-            .map((tagName) => fetchedTags.find((t) => t.name === tagName)?.id)
+          const tagIdentifiers = eventToEdit.tags || [];
+          const tagIdsToSelect = tagIdentifiers
+            .map((identifier) => {
+              const foundTag = fetchedTags.find(
+                (t) => t.name === identifier || t.id === identifier
+              );
+              return foundTag ? foundTag.id : null;
+            })
             .filter((id): id is string => !!id);
-
           setSelectedTagIds(tagIdsToSelect);
         } else {
           setTitle("");
           setStartDate(initialStartDate);
           setEndDate(initialEndDate);
           setNotes("");
-          setColor("#3399FF");
+          setColor(FALLBACK_COLOR);
           setRecurrenceType("none");
           setSelectedTagIds([]);
         }
       } catch (err) {
         console.error("Erro ao inicializar o formulário do evento:", err);
-        setAvailableTags([]);
-        setSelectedTagIds([]);
       }
     };
-
     initializeForm();
   }, [isModalOpen, eventToEdit, initialStartDate, initialEndDate]);
 
@@ -419,19 +413,16 @@ export function EventModal({
       alert(t("title_is_required"));
       return;
     }
-
-    const tagIdsToSend = selectedTagIds.slice();
     const eventPayload = {
       title,
       startDate,
       endDate,
       notes,
-      color,
-      tags: tagIdsToSend,
+      color: color === FALLBACK_COLOR ? undefined : color,
+      tags: selectedTagIds,
       everyDay: recurrenceType === "daily",
       everyWeek: recurrenceType === "weekly",
     };
-
     setSaving(true);
     try {
       if (isEditMode && eventToEdit) {
@@ -454,12 +445,12 @@ export function EventModal({
     if (window.confirm(t("confirm_delete_event"))) {
       setSaving(true);
       try {
-        await service.deleteEvent(eventToEdit.id);
+        await service.deleteEvent(Number(eventToEdit.id));
         refreshUserEvents();
         clearFormAndClose();
       } catch (error) {
         console.error("Erro ao apagar evento:", error);
-        alert(t("error_deleting_event_generic"));
+        alert(t("error_deleting_event", { tagName: eventToEdit.title }));
       } finally {
         setSaving(false);
       }
@@ -510,7 +501,6 @@ export function EventModal({
                   label={t("custom_color_label")}
                   refreshTags={refreshTags}
                   setIsEditTagModalOpen={setIsEditTagModalOpen}
-                  openEditModalForTag={handleOpenEditTagModal}
                 />
               </div>
               <div className={styles.finishCreatingEventButtonContainer}>
@@ -537,12 +527,10 @@ export function EventModal({
           )}
         </Dialog>
       </Modal>
-
       <EditTagModal
         isOpen={isEditTagModalOpen}
         setIsOpen={setIsEditTagModalOpen}
         onTagsUpdate={refreshTags}
-        tagToEdit={tagToEdit}
       />
     </>
   );

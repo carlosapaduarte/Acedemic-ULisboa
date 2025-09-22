@@ -237,7 +237,7 @@ def create_user_tag(
                 db.refresh(new_user_tag_link)
                 return TagOutputDto(id=str(existing_tag.id), name=existing_tag.name, user_id=current_user_id,is_custom=new_user_tag_link.is_custom,color=existing_tag.color)
         else:
-            new_tag = TagModel(name=tag_input.name, color="#CCCCCC") #TODO: mudar para o colopicker depois
+            new_tag = TagModel(name=tag_input.name, color=tag_input.color)
             db.add(new_tag)
             db.commit()
             db.refresh(new_tag)
@@ -283,10 +283,15 @@ def update_user_tag(
     #atualiza os campos da tag com os dados recebidos.
     tag_to_update.name = tag_input.name
     tag_to_update.color = tag_input.color
-    tag_to_update.description = tag_input.description
 
     db.add(tag_to_update)
     db.commit()
     db.refresh(tag_to_update)
 
-    return tag_to_update
+    return TagOutputDto(
+        id=str(tag_to_update.id),     
+        name=tag_to_update.name,      
+        user_id=user_tag_link.user_id,  
+        is_custom=user_tag_link.is_custom,
+        color=tag_to_update.color 
+    )

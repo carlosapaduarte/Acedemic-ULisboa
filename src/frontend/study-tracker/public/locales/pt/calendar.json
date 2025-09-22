@@ -67,5 +67,15 @@
   "name_cannot_be_empty": "O nome da tag não pode estar vazio.",
   "tag_already_exists_for_user": "Esta tag já existe para o seu utilizador.",
   "created_successfully": "Tag criada com sucesso!",
-  "error_creating": "Erro ao criar a tag. Por favor, tente novamente."
+  "error_creating": "Erro ao criar a tag. Por favor, tente novamente.",
+
+  "edit_tags_title": "Editar Tags",
+  "loading_tags": "A carregar tags",
+  "select_a_tag_to_edit": "Seleciona uma tag para editar",
+  "tag_name_label": "Nome da Tag",
+  "tag_color_label": "Cor da Tag",
+  "saving_label": "A guardar...",
+  "tag_delete_confirmation": "Tens a certeza que queres apagar a tag \"{{tagName}}\"?",
+  "error_editing_tag": "Ocorreu um erro ao editar a tag.",
+  "error_deleting_tag": "Ocorreu um erro ao apagar a tag \"{{tagName}}\"."
 }

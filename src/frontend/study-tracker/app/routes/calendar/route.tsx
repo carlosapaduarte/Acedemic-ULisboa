@@ -7,7 +7,7 @@ import {
 } from "react-big-calendar";
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
-import { Event, service } from "~/service/service";
+import { Event, service, Tag } from "~/service/service";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar.css";
@@ -20,36 +20,6 @@ import { utils } from "~/utils";
 import "moment/locale/pt";
 import { getCalendarMessages } from "../../calendarUtils";
 
-type EventsView = "allEvents" | "recurringEvents";
-
-function inferColorFromTags(tags: string[] = []): string | undefined {
-  const normalize = (s: string) =>
-    s
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-
-  const tagColorMap: { [key: string]: string } = {
-    estudo: "#10B981",
-    study: "#10B981",
-    trabalho: "#0F02F6",
-    work: "#0F02F6",
-    pessoal: "#B39BEE",
-    personal: "#B39BEE",
-    lazer: "#EE6352",
-    fun: "#EE6352",
-  };
-
-  const matchedColors = Array.from(
-    new Set(tags.map((tag) => tagColorMap[normalize(tag)]).filter(Boolean))
-  );
-  if (matchedColors.length === 1) return matchedColors[0];
-  if (matchedColors.length > 1)
-    return `linear-gradient(135deg, ${matchedColors.join(", ")})`;
-  if (!tags || !tags.length) return "#A0A0A0";
-  return undefined;
-}
-
 interface CalendarEventResource {
   id: number;
   tags?: string[];
@@ -59,46 +29,79 @@ interface CalendarEventResource {
   originalStartDate?: Date;
   originalEndDate?: Date;
   notes?: string;
+  style?: React.CSSProperties;
 }
 
 const EventWithTags = ({
   event,
+  allUserTags,
+  style,
 }: {
-  event: CalendarEvent & {
-    resource: CalendarEventResource;
-  };
+  event: CalendarEvent & { resource: CalendarEventResource };
+  allUserTags: Tag[];
+  style?: React.CSSProperties;
 }) => {
   const isRecurring = event.resource.everyWeek || event.resource.everyDay;
+  const getTagNames = () => {
+    if (!event.resource.tags || allUserTags.length === 0) return [];
+    return event.resource.tags!.map((tagIdentifier: string | number) => {
+      const foundTag: Tag | undefined = allUserTags.find(
+        (tag: Tag) => tag.id === tagIdentifier || tag.name === tagIdentifier
+      );
+      return foundTag ? foundTag.name : tagIdentifier;
+    });
+  };
+  const tagNames = getTagNames();
+
+  const combinedStyle: React.CSSProperties = {
+    ...style,
+    width: "100%",
+    height: "100%",
+    borderRadius: "6px",
+    overflow: "hidden",
+    color: "white",
+    display: "flex",
+  };
+
+  const innerWrapperStyle: React.CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    padding: "4px",
+    height: "100%",
+    width: "100%",
+  };
+
+  const titleStyle: React.CSSProperties = {
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+  };
+
+  const tagsChipStyle: React.CSSProperties = {
+    fontSize: "0.7em",
+    background: "rgba(0,0,0,0.25)",
+    padding: "3px 8px",
+    borderRadius: "10px",
+    zIndex: 2,
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
+    marginTop: "4px",
+    alignSelf: "flex-start",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    maxWidth: "100%",
+  };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        borderRadius: "6px",
-        overflow: "hidden",
-        color: "white",
-      }}
-    >
-      <div style={{ position: "relative", padding: "4px", height: "100%" }}>
-        <div>{event.title}</div>
-        {(event.resource.tags?.length > 0 || isRecurring) && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 4,
-              right: 4,
-              fontSize: "0.7em",
-              background: "rgba(0,0,0,0.25)",
-              padding: "3px 8px",
-              borderRadius: "10px",
-              zIndex: 2,
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-            }}
-          >
+    <div style={combinedStyle}>
+      <div style={innerWrapperStyle}>
+        <div style={titleStyle}>{event.title}</div>
+
+        {(tagNames.length > 0 || isRecurring) && (
+          <div style={tagsChipStyle}>
             {isRecurring && (
               <span
                 title="Evento Recorrente"
@@ -106,18 +109,16 @@ const EventWithTags = ({
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  height="24px"
+                  height="16px"
                   viewBox="0 -960 960 960"
-                  width="24px"
+                  width="16px"
                   fill="#e3e3e3"
                 >
                   <path d="M280-80 120-240l160-160 56 58-62 62h406v-160h80v240H274l62 62-56 58Zm-80-440v-240h486l-62-62 56-58 160 160-160 160-56-58 62-62H280v160h-80Z" />
-                </svg>{" "}
+                </svg>
               </span>
             )}
-            {event.resource.tags?.length > 0 && (
-              <span>{event.resource.tags.join(", ")}</span>
-            )}
+            {tagNames.length > 0 && <span>{tagNames.join(", ")}</span>}
           </div>
         )}
       </div>
@@ -125,8 +126,50 @@ const EventWithTags = ({
   );
 };
 
+const getEventStyleProps = (
+  event: Event,
+  allUserTags: Tag[]
+): React.CSSProperties => {
+  const FALLBACK_COLOR = "#3399FF";
+
+  //1º prioridade: cor personalizada definida no evento.
+  if (event.color && event.color !== FALLBACK_COLOR) {
+    return { backgroundColor: event.color };
+  }
+
+  //2º Procurar cores nas tags associadas
+  const tagIdentifiers = event.tags || [];
+  if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
+    const associatedTags = allUserTags.filter(
+      (tag) =>
+        tagIdentifiers.includes(tag.id) || tagIdentifiers.includes(tag.name)
+    );
+
+    const colors = associatedTags
+      .map((tag) => tag.color)
+      .filter(Boolean) as string[];
+
+    //Se só houver uma cor, usa cor sólida
+    if (colors.length === 1) {
+      return { backgroundColor: colors[0] };
+    }
+
+    //Se houver várias cores, cria um gradiente
+    if (colors.length > 1) {
+      const gradient = `linear-gradient(45deg, ${colors.join(",")})`;
+      return { backgroundImage: gradient };
+    }
+  }
+
+  //fallback
+  return { backgroundColor: FALLBACK_COLOR };
+};
+
+type EventsView = "allEvents" | "recurringEvents";
+
 function useMyCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [userTags, setUserTags] = useState<Tag[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
   const [eventsView, setEventsView] = useState<EventsView>("allEvents");
   const [displayedDates, setDisplayedDates] = useState<Date[]>(() => {
@@ -140,10 +183,17 @@ function useMyCalendar() {
     return dates;
   });
 
-  const refreshUserEvents = useCallback(() => {
-    service.getAllUserEvents().then((eventsFromBackend: Event[]) => {
+  const refreshAllCalendarData = useCallback(async () => {
+    try {
+      const [eventsFromBackend, tagsFromBackend] = await Promise.all([
+        service.getAllUserEvents(),
+        service.fetchUserTags(),
+      ]);
+      setUserTags(tagsFromBackend);
       const allOccurrences: CalendarEvent[] = [];
       eventsFromBackend.forEach((event) => {
+        const styleProps = getEventStyleProps(event, tagsFromBackend);
+
         displayedDates.forEach((currentDisplayDate) => {
           let shouldAddEvent = false;
           let eventOccurrenceStartDate = new Date(currentDisplayDate);
@@ -152,7 +202,6 @@ function useMyCalendar() {
           eventStartDay.setHours(0, 0, 0, 0);
           const displayDay = new Date(currentDisplayDate);
           displayDay.setHours(0, 0, 0, 0);
-
           if (!event.everyDay && !event.everyWeek) {
             if (utils.sameDay(event.startDate, currentDisplayDate)) {
               shouldAddEvent = true;
@@ -187,7 +236,6 @@ function useMyCalendar() {
               );
             }
           }
-
           if (shouldAddEvent) {
             allOccurrences.push({
               title: event.title,
@@ -202,6 +250,7 @@ function useMyCalendar() {
                 originalEndDate: event.endDate,
                 color: event.color,
                 notes: event.notes,
+                style: styleProps,
               } as CalendarEventResource,
             });
           }
@@ -217,59 +266,17 @@ function useMyCalendar() {
         }
       });
       setEvents(Array.from(uniqueEventsMap.values()));
-    });
+    } catch (error) {
+      console.error("Falha ao carregar dados do calendário:", error);
+    }
   }, [displayedDates]);
 
-  function refreshUserRecurrentEvents(calendarDisplayedDates: Date[]) {
-    service.getUserEvents(false, true).then((events: Event[]) => {
-      const calendarEvents: CalendarEvent[] = [];
-
-      calendarDisplayedDates.forEach((displayedDate: Date) => {
-        events
-          .filter(
-            (event: Event) =>
-              event.startDate.getDay() === displayedDate.getDay() ||
-              event.everyDay
-          )
-          .forEach((event: Event) => {
-            const start = new Date(displayedDate);
-            start.setHours(event.startDate.getHours());
-            start.setMinutes(event.startDate.getMinutes());
-
-            const end = new Date(displayedDate);
-            end.setHours(event.endDate.getHours());
-            end.setMinutes(event.endDate.getMinutes());
-
-            const calendarEvent = {
-              title: event.title,
-              start: start,
-              end: end,
-              resource: {
-                id: event.id,
-                tags: event.tags,
-                everyWeek: event.everyWeek,
-                everyDay: event.everyDay,
-                color: event.color,
-                notes: event.notes,
-              } as CalendarEventResource,
-            };
-
-            calendarEvents.push(calendarEvent);
-          });
-      });
-      setEvents(calendarEvents);
-    });
-  }
-
   useEffect(() => {
-    if (eventsView === "allEvents") refreshUserEvents();
-    else refreshUserRecurrentEvents(displayedDates);
-  }, [eventsView, displayedDates, refreshUserEvents]);
-
+    refreshAllCalendarData();
+  }, [eventsView, displayedDates, refreshAllCalendarData]);
   useEffect(() => {
     if (calendarView === Views.MONTH) setEventsView("allEvents");
   }, [calendarView]);
-
   function toggleEventsView() {
     if (eventsView === "allEvents") setEventsView("recurringEvents");
     else setEventsView("allEvents");
@@ -277,19 +284,26 @@ function useMyCalendar() {
 
   return {
     events,
+    userTags,
     calendarView,
     setCalendarView,
     eventsView,
     setDisplayedDates,
-    refreshUserEvents,
+    refreshUserEvents: refreshAllCalendarData,
     toggleEventsView,
   };
 }
 
-const AgendaEvent = ({ event }) => {
-  // Obter a cor da tag
-  const tagColor =
-    event.resource?.color || event.resource?.tags?.[0]?.color || "#ccc";
+const AgendaEvent = ({
+  event,
+  allUserTags,
+}: {
+  event: any;
+  allUserTags: Tag[];
+}) => {
+  const eventStyle = event.resource?.style || {};
+
+  const dotColor = eventStyle.backgroundColor || "#3399FF";
 
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
@@ -298,7 +312,7 @@ const AgendaEvent = ({ event }) => {
           width: "10px",
           height: "10px",
           borderRadius: "50%",
-          backgroundColor: tagColor,
+          backgroundColor: dotColor,
           marginRight: "8px",
         }}
       />
@@ -310,6 +324,7 @@ const AgendaEvent = ({ event }) => {
 function MyCalendar() {
   const {
     events,
+    userTags,
     calendarView,
     setCalendarView,
     setDisplayedDates,
@@ -317,27 +332,22 @@ function MyCalendar() {
     toggleEventsView,
     eventsView,
   } = useMyCalendar();
-
   const { t, i18n } = useTranslation(["calendar"]);
   const localizer = momentLocalizer(moment);
-
-  // --- MUDANÇA ESSENCIAL: ESTADO UNIFICADO PARA O MODAL ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<EventData | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{
     start: Date;
     end: Date;
   } | null>(null);
-
   const handleSelectSlot = useCallback(
     ({ start, end }: { start: Date; end: Date }) => {
-      setEventToEdit(null); // Modo criação
+      setEventToEdit(null);
       setSelectedSlot({ start, end });
       setIsModalOpen(true);
     },
     []
   );
-
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
     setEventToEdit({
       id: event.resource.id,
@@ -353,28 +363,21 @@ function MyCalendar() {
     setSelectedSlot(null);
     setIsModalOpen(true);
   }, []);
-
   const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 400);
-
   useEffect(() => {
     const handleResize = () => {
       setIsWideScreen(window.innerWidth > 400);
     };
-
     window.addEventListener("resize", handleResize);
-
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
   const onRangeChange = useCallback(
     (range: Date[] | { start: Date; end: Date }) => {
       if (!(range instanceof Array)) {
         const dates: Date[] = [];
         let curDate = new Date(range.start);
-        while (true) {
-          if (utils.sameDay(curDate, range.end)) break;
-          dates.push(curDate);
-          curDate = new Date(curDate);
+        while (curDate <= range.end) {
+          dates.push(new Date(curDate));
           curDate.setDate(curDate.getDate() + 1);
         }
         setDisplayedDates(dates);
@@ -384,16 +387,13 @@ function MyCalendar() {
     },
     [setDisplayedDates]
   );
-
   const onView = useCallback(
     (newView: View) => {
       setCalendarView(newView);
     },
     [setCalendarView]
   );
-
   const calendarMessages = getCalendarMessages();
-
   const calendarFormats = {
     monthHeaderFormat: (date: Date, culture?: string) =>
       moment(date)
@@ -459,9 +459,13 @@ function MyCalendar() {
         <Calendar
           components={{
             agenda: {
-              event: AgendaEvent, // Usar o novo componente para a agenda
+              event: (props) => (
+                <AgendaEvent {...props} allUserTags={userTags} />
+              ),
             },
-            event: EventWithTags,
+            event: (props) => (
+              <EventWithTags {...props} allUserTags={userTags} />
+            ),
             week: {
               header: (props: any) => {
                 const days = [
@@ -478,7 +482,6 @@ function MyCalendar() {
                     isWideScreen ? "medium" : "short"
                   }`
                 );
-
                 return (
                   <div
                     style={{
@@ -509,54 +512,24 @@ function MyCalendar() {
           culture={i18n.language}
           formats={calendarFormats}
           eventPropGetter={(
-            event: CalendarEvent & { resource?: CalendarEventResource },
-            start,
-            end,
-            isSelected
+            event: CalendarEvent & { resource?: CalendarEventResource }
           ) => {
-            // Sua lógica de cores existente
-            const colorFromPickerOrBackend = event.resource?.color;
-            const inferredTagColor = inferColorFromTags(event.resource?.tags);
-
-            let effectiveColor: string;
-            if (
-              colorFromPickerOrBackend &&
-              colorFromPickerOrBackend !== "#3399FF"
-            ) {
-              effectiveColor = colorFromPickerOrBackend;
-            } else if (inferredTagColor) {
-              effectiveColor = inferredTagColor;
-            } else if (colorFromPickerOrBackend) {
-              effectiveColor = colorFromPickerOrBackend;
-            } else {
-              effectiveColor = "#A0A0A0";
-            }
-
-            const style: React.CSSProperties = {
+            const baseStyle: React.CSSProperties = {
               borderRadius: "5px",
               color: "white",
               border: "none",
             };
+            const finalStyle = {
+              ...baseStyle,
+              ...event.resource?.style,
+            };
 
-            // Condicional para a vista de agenda
             if (calendarView === Views.AGENDA) {
-              style.backgroundColor = "transparent"; // Remove a cor de fundo
-              style.color = "black"; // Ou outra cor para o texto
-              // Note: O chip colorido será adicionado no componente de evento da agenda
-            } else {
-              // Lógica de cores para outras vistas (month, week, day)
-              if (
-                typeof effectiveColor === "string" &&
-                (effectiveColor.startsWith("linear-gradient") ||
-                  effectiveColor.includes("gradient"))
-              ) {
-                style.backgroundImage = effectiveColor;
-              } else {
-                style.backgroundColor = effectiveColor;
-              }
+              finalStyle.backgroundColor = "transparent";
+              finalStyle.backgroundImage = "none";
+              finalStyle.color = "inherit";
             }
-
-            return { style };
+            return { style: finalStyle };
           }}
         />
       </div>

@@ -108,7 +108,11 @@ export function EditTagModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      className={styles.modalOverlay}
+    >
       <Dialog
         aria-label={t("edit_tags_title")}
         className={styles.editTagModalContainer}
@@ -120,73 +124,79 @@ export function EditTagModal({
         >
           {t("close_button")}
         </Button>
-        <h1 className={styles.newEventTitleText}>{t("edit_tags_title")}</h1>
+        <h1 className={styles.mainFormModalTitleText}>
+          {t("edit_tags_title")}
+        </h1>
 
-        <div className={styles.newEventFormContainer}>
-          <p className={styles.modalSubtitle}>{t("edit_tags_subtitle")}</p>
+        <div className={styles.mainContentContainer}>
+          <div className={styles.tagListColumn}>
+            <div className={styles.tagList}>
+              {isLoading ? (
+                <p>{t("loading_tags")}...</p>
+              ) : (
+                allUserTags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className={classNames(styles.tagItem, {
+                      [styles.currentlyEditingTag]: tagToEdit?.id === tag.id,
+                    })}
+                    style={{ borderColor: tag.color || "#888" }}
+                    onClick={() => handleTagSelect(tag)}
+                  >
+                    <div
+                      className={styles.tagColorDot}
+                      style={{ backgroundColor: tag.color || "#888" }}
+                    />
+                    {tag.name}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
 
-          <div
-            className={styles.tagListContainer}
-            style={{ marginBottom: "20px" }}
-          >
-            {isLoading ? (
-              <p>{t("loading_tags")}...</p>
-            ) : (
-              allUserTags.map((tag) => (
-                <div
-                  key={tag.id}
-                  className={classNames(styles.tagItem, styles.selectableTag, {
-                    [styles.currentlyEditingTag]: tagToEdit?.id === tag.id,
-                  })}
-                  style={{
-                    borderColor: tag.color,
-                    backgroundColor:
-                      tagToEdit?.id === tag.id
-                        ? `${tag.color}33`
-                        : "transparent",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleTagSelect(tag)}
-                >
-                  {tag.name}
+          <div className={styles.editFormColumn}>
+            {tagToEdit ? (
+              <>
+                <div className={styles.editFormContainer}>
+                  <TextField className={styles.textField} autoFocus>
+                    <Label>{t("tag_name_label")}</Label>
+                    <Input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </TextField>
+                  <ColorPickerInput
+                    label={t("tag_color_label")}
+                    color={color}
+                    setColor={setColor}
+                    clearColor={() => setColor("#CCCCCC")}
+                  />
                 </div>
-              ))
+
+                <div className={styles.actionButtonsContainer}>
+                  <Button
+                    onPress={handleDelete}
+                    className={styles.deleteButton}
+                    isDisabled={isSaving}
+                  >
+                    {t("delete_button")}
+                  </Button>
+                  <Button
+                    onPress={handleSave}
+                    className={styles.saveButton}
+                    isDisabled={isSaving}
+                  >
+                    {isSaving ? t("saving_label") : t("save_button")}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className={styles.noTagSelectedMessage}>
+                <p>{t("select_a_tag_to_edit")}</p>
+              </div>
             )}
           </div>
-
-          {tagToEdit && (
-            <div className={styles.editFormContainer}>
-              <TextField className={styles.formTextField} autoFocus>
-                <Label>{t("tag_name_label")}</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} />
-              </TextField>
-              <ColorPickerInput
-                label={t("tag_color_label")}
-                color={color}
-                setColor={setColor}
-              />
-            </div>
-          )}
         </div>
-
-        {tagToEdit && (
-          <div className={styles.finishCreatingEventButtonContainer}>
-            <Button
-              onPress={handleDelete}
-              className={styles.deleteEventButton}
-              isDisabled={isSaving}
-            >
-              {t("delete_button")}
-            </Button>
-            <Button
-              onPress={handleSave}
-              className={styles.finishCreatingEventButton}
-              isDisabled={isSaving}
-            >
-              {isSaving ? t("saving_label") : t("save_button")}
-            </Button>
-          </div>
-        )}
       </Dialog>
     </Modal>
   );
