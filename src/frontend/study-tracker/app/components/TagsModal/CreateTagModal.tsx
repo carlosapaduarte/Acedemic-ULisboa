@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Dialog,
@@ -42,10 +42,18 @@ export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
   const [tagName, setTagName] = useState("");
   const [tagColor, setTagColor] = useState("#888888");
   const [isSaving, setIsSaving] = useState(false);
-  const [nameError, setNameError] = useState<string | null>(null);
+  //const [nameError, setNameError] = useState<string | null>(null);
   const [colorError, setColorError] = useState<string | null>(null);
   const [deselectedTagColor, setDeselectedTagColor] = useState<string>("");
   const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
+
+  //vai buscar a lista de todas as tags do utilizador e guarda-a no estado allUserTags
+  useEffect(() => {
+    service
+      .fetchUserTags()
+      .then(setAllUserTags)
+      .catch((err) => console.error("Falha ao carregar tags existentes:", err));
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -71,25 +79,44 @@ export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
     }
   }, [tagColor, deselectedTagColor, t]);
 
+  const nameError = useMemo(() => {
+    if (!tagName) return null;
+    const normalizedInput = tagName.trim().toLowerCase();
+    if (normalizedInput.length === 0) return null;
+
+    //ve se a entrada do utilizador corresponde a uma tradução de uma tag existente
+    const isDuplicate = allUserTags.some((tag) => {
+      const originalName = tag.name.toLowerCase();
+      const translatedName = t(originalName).toLowerCase();
+      return (
+        normalizedInput === originalName || normalizedInput === translatedName
+      );
+    });
+
+    if (isDuplicate) {
+      return t(
+        "tag_already_exists_error",
+        "Esta tag (ou a sua tradução) já existe."
+      );
+    }
+
+    return null;
+  }, [tagName, allUserTags, t]);
+
   const handleSave = async (close: () => void) => {
     if (!tagName.trim()) {
-      setNameError(
-        t("tag_name_required_error", "O nome da tag não pode estar vazio.")
-      );
       return;
     }
-    setNameError(null);
-
-    if (colorError) return;
+    if (nameError || colorError) return;
 
     setIsSaving(true);
     try {
-      await service.createTag({ name: tagName, color: tagColor });
+      await service.createTag({ name: tagName.trim(), color: tagColor });
       onTagCreated();
       close();
     } catch (err: any) {
       console.error("Erro ao criar tag:", err);
-      setNameError(err?.message || "Ocorreu um erro.");
+      alert(t("error_creating_tag", "Ocorreu um erro ao criar a tag"));
     } finally {
       setIsSaving(false);
     }

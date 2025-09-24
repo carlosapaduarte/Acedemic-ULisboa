@@ -1,17 +1,81 @@
 /*@import 'react-big-calendar/lib/sass/styles.scss';*/
 
-
 .rbc-btn-group > button {
-
 }
 
 .rbc-toolbar button {
 }
 
 .rbc-time-view .rbc-row {
-    min-height: unset;
+  min-height: unset;
 }
 
 .rbc-allday-cell .rbc-row-content {
-    padding-bottom: 20px;
+  padding-bottom: 20px;
+}
+
+.rbc-agenda-view
+  .rbc-agenda-table
+  tbody
+  tr:nth-child(odd)
+  td:not(.rbc-agenda-date-cell) {
+  background-color: #d4cd9b;
+}
+.rbc-agenda-view
+  .rbc-agenda-table
+  tbody
+  tr:nth-child(even)
+  td:not(.rbc-agenda-date-cell) {
+  background-color: var(--color-1);
+}
+
+.rbc-agenda-view .rbc-agenda-date-cell {
+  background: #d4cd9b;
+  font-weight: 600;
+  vertical-align: top;
+  padding: 14px 12px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.rbc-agenda-view .rbc-agenda-date-cell,
+.rbc-agenda-view .rbc-agenda-date-cell ~ td {
+  border-top: 1px solid var(--color-2);
+}
+.rbc-agenda-view .rbc-agenda-table > tbody > tr:first-child > td {
+  border-top: none;
+}
+
+.rbc-agenda-view .rbc-agenda-time-cell,
+.rbc-agenda-view .rbc-agenda-event-cell {
+  padding: 12px 14px;
+  font-size: 0.95rem;
+}
+
+.rbc-agenda-event-cell .rbc-event {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rbc-agenda-event-cell .rbc-event:before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: currentColor;
+}
+
+/* Cabeçalho */
+.rbc-agenda-view .rbc-header {
+  padding: 14px 12px;
+  background: var(--color-3);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+.rbc-agenda-view .rbc-agenda-table td {
+  border-bottom: none;
 }
