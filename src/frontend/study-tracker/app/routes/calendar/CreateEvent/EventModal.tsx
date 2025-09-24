@@ -402,7 +402,7 @@ export function EventModal({
       }
     };
     initializeForm();
-  }, [isModalOpen, eventToEdit, initialStartDate, initialEndDate]);
+  }, [isModalOpen, eventToEdit?.id]);
 
   const clearFormAndClose = () => {
     setIsModalOpen(false);

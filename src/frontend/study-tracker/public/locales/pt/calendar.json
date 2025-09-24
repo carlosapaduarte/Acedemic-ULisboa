@@ -75,7 +75,7 @@
   "tag_name_label": "Nome da etiqueta",
   "tag_color_label": "Cor da etiqueta",
   "saving_label": "A guardar...",
-  "tag_delete_confirmation": "Tens a certeza que queres apagar a ta \"{{tagName}}\"?",
+  "tag_delete_confirmation": "Tens a certeza que queres apagar a etiqueta \"{{tagName}}\"?",
   "error_editing_tag": "Ocorreu um erro ao editar a etiqueta",
   "error_deleting_tag": "Ocorreu um erro ao apagar a etiqueta \"{{tagName}}\"."
 }
