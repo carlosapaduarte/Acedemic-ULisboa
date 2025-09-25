@@ -67,5 +67,15 @@
   "name_cannot_be_empty": "Tag name cannot be empty.",
   "tag_already_exists_for_user": "This tag already exists for your user.",
   "created_successfully": "Tag created successfully!",
-  "error_creating": "Error creating tag. Please try again."
+  "error_creating": "Error creating tag. Please try again.",
+
+  "edit_tags_title": "Edit Tags",
+  "loading_tags": "Loading tags",
+  "select_a_tag_to_edit": "Select a tag to edit",
+  "tag_name_label": "Tag Name",
+  "tag_color_label": "Tag Color",
+  "saving_label": "Saving...",
+  "tag_delete_confirmation": "Are you sure you want to delete the tag \"{{tagName}}\"?",
+  "error_editing_tag": "An error occurred while editing the tag.",
+  "error_deleting_tag": "An error occurred while deleting the tag \"{{tagName}}\"."
 }

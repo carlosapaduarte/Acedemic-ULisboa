@@ -1,0 +1,230 @@
+/* -------- ESTILOS PARA O MODAL DE EDITAR TAGS -------- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.mainFormModalTitleText {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color-2);
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--color-2);
+  color: var(--text-color-2);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.closeButton:hover {
+  background-color: var(--color-2-hover);
+}
+
+/* centralizar e limitar o tamanho do modal */
+.editTagModalContainer {
+  background-color: var(--color-3);
+  color: var(--text-color-2);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  max-width: 650px;
+  width: 90%;
+  max-height: 80vh;
+  /*overflow: hidden;*/
+  border: 1px solid var(--color-2);
+  position: relative;
+}
+
+/* Estrutura de Duas Colunas */
+.mainContentContainer {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.tagListColumn {
+  flex: 1;
+}
+
+.editFormColumn {
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Lista de Tags à Esquerda */
+.tagList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.tagItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 2px solid;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--text-color-2);
+}
+.tagItem:hover {
+  background-color: var(--color-2);
+}
+.tagColorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.currentlyEditingTag {
+  background-color: var(--color-2);
+  font-weight: bold;
+}
+
+/* Formulário direita */
+.editFormContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.noTagSelectedMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  color: var(--color-2);
+  border: 2px dashed var(--color-2);
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.textField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.textField Input {
+  background-color: var(--color-1);
+  color: var(--text-color-1);
+  border: 1px solid var(--color-2);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.textField Input:focus {
+  outline: none;
+}
+
+/* --- ESTILOS PARA O POPOVER DE CRIAR TAG --- */
+.tagModal {
+  background-color: var(--color-3);
+  color: var(--text-color-2);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid var(--color-2);
+}
+.deleteButton {
+  background-color: var(--color-text-danger);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.deleteButton:hover {
+  background-color: #9c140d;
+}
+.actionButtonsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.saveButton {
+  background-color: var(--color-4);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+.saveButton:hover {
+  background-color: var(--color-4-hover);
+}
+.saveButton:disabled {
+  background-color: #5877504a;
+  cursor: not-allowed;
+}
+
+.arrow {
+  position: absolute;
+  fill: var(--color-3);
+  stroke: var(--color-2);
+  stroke-width: 1px;
+}
+
+[data-placement="bottom"] .arrow {
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+[data-placement="top"] .arrow {
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.colorPickerWrapper {
+  display: block;
+}
+
+.error {
+  color: #ff8a80;
+  font-size: 0.8rem;
+  margin: 5px;
+  text-align: center;
+}

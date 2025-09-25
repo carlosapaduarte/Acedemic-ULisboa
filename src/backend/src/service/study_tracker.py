@@ -5,8 +5,9 @@ from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
 from datetime import date
 
-
 study_tracker_repo = StudyTrackerSqlRepo()
+
+FALLBACK_COLOR = "#3399FF"
 
 def update_user_study_tracker_use_goals(user_id: int, use_goals: set[int]):
     study_tracker_repo.update_user_study_tracker_use_goals(user_id, use_goals)
@@ -29,18 +30,19 @@ def verify_start_end_date_validity(date: DateInterval):
         raise InvalidDate()
 
 def create_event(user_id: int, event: Event) -> Event:
-
-    print(f"\n[SERVICE] create_event: Recebido Evento de domínio no serviço (ANTES de chamar o repo):")
-    print(f"Cor: {event.color}")
-    print(f"Notas: {event.notes}")
+    
+    if event.color is None:
+        event.color = FALLBACK_COLOR
     
     does_not_collide_with_unavailable_block(user_id, event.date)
     verify_start_end_date_validity(event.date)
-    #study_tracker_repo.create_event(user_id, event)
     created_event = study_tracker_repo.create_event(user_id, event)
     return created_event
     
 def update_event(user_id: int, event_id: int, event: Event):
+    if event.color is None:
+        event.color = FALLBACK_COLOR
+    
     does_not_collide_with_unavailable_block(user_id, event.date)
     study_tracker_repo.update_event(user_id, event_id, event)
 

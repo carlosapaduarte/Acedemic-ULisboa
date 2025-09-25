@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Configuração da bd
 DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
+print("url bd:", DATABASE_URL)
 if not DATABASE_URL:
     raise ValueError("SQLALCHEMY_DATABASE_URL não está definida no ambiente.")
 

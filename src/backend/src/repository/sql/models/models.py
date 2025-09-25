@@ -2,12 +2,11 @@ from datetime import date, timezone, datetime
 from typing import Optional, List # Importar List
 from uuid import UUID
 
-from sqlalchemy import ForeignKeyConstraint, UniqueConstraint
+from sqlalchemy import ForeignKeyConstraint, UniqueConstraint, String
 from sqlmodel import Field, Relationship, SQLModel
 
 from sqlalchemy import Column as SAColumn
 from sqlalchemy.dialects.postgresql import JSON, ARRAY as pg_ARRAY 
-from sqlalchemy import String
 
 class UserModel(SQLModel, table=True):
     __tablename__ = "user"
@@ -44,21 +43,6 @@ class UserModel(SQLModel, table=True):
     metrics: Optional["UserMetric"] = Relationship(back_populates="user", sa_relationship_kwargs={"uselist": False})
     league_memberships: List["UserLeague"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
-class TagModel(SQLModel, table=True):
-    __tablename__ = "tags"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(unique=True, index=True)
-    color: str = Field(nullable=False) 
-    
-    user_links: List["UserTagLink"] = Relationship(
-        back_populates="tag",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
-    )
-    event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
-    task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
-    daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
-
 class UserTagLink(SQLModel, table=True):
     __tablename__ = "user_tag_link"
 
@@ -67,7 +51,7 @@ class UserTagLink(SQLModel, table=True):
     is_custom: bool = Field(default=False, nullable=False)
     
     user: UserModel = Relationship(back_populates="user_tags")
-    tag: TagModel = Relationship(back_populates="user_links")
+    tag: "TagModel" = Relationship(back_populates="user_links")
 
 class STEventTagModel(SQLModel, table=True):
     __tablename__ = "st_event_tag"
@@ -77,7 +61,7 @@ class STEventTagModel(SQLModel, table=True):
     user_id: int
 
     event: "STEventModel" = Relationship(back_populates="tags_associations")
-    tag_ref: TagModel = Relationship(back_populates="event_links")
+    tag_ref: "TagModel" = Relationship(back_populates="event_links")
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -96,7 +80,7 @@ class STTaskTagModel(SQLModel, table=True):
     user_id: int
 
     task: "STTaskModel" = Relationship(back_populates="tags_associations")
-    tag_ref: TagModel = Relationship(back_populates="task_links")
+    tag_ref: "TagModel" = Relationship(back_populates="task_links")
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -106,6 +90,21 @@ class STTaskTagModel(SQLModel, table=True):
         ),
         UniqueConstraint('task_id', 'tag_id', name='uq_st_task_tag'),
     )
+
+class TagModel(SQLModel, table=True):
+    __tablename__ = "tags"
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True, index=True)
+    color: str = Field(nullable=False)
+    
+    user_links: List["UserTagLink"] = Relationship(back_populates="tag")
+    event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
+    task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
+    daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
+
+    events: List["STEventModel"] = Relationship(back_populates="tags", link_model=STEventTagModel)
+    tasks: List["STTaskModel"] = Relationship(back_populates="tags", link_model=STTaskTagModel)
 
 class STEventModel(SQLModel, table=True):
     __tablename__ = "st_event"
@@ -118,19 +117,13 @@ class STEventModel(SQLModel, table=True):
     every_day: bool = Field(default=False)
     notes: str = Field(default="", nullable=False)
     color: str = Field(nullable=False)
-    
-    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event",sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
     
-    @property
-    def tags(self) -> List[str]:
-        """Retorna uma lista de nomes de tags associadas a este evento."""
-        if not self.tags_associations:
-            return []
-        return [association.tag_ref.name for association in self.tags_associations if association.tag_ref]
-
+    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    tags: List[TagModel] = Relationship(back_populates="events", link_model=STEventTagModel)
+    
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"
 
@@ -147,6 +140,7 @@ class STTaskModel(SQLModel, table=True):
     user: "UserModel" = Relationship(back_populates="st_tasks")
 
     tags_associations: List["STTaskTagModel"] = Relationship(back_populates="task")
+    tags: List[TagModel] = Relationship(back_populates="tasks", link_model=STTaskTagModel)
 
     parent_task_id: Optional[int] = Field(default=None, nullable=True)
     parent_user_id: Optional[int] = Field(default=None, nullable=True)

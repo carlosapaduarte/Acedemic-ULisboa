@@ -64,8 +64,18 @@
   "recurrence_daily_label": "Diária",
   "recurrence_weekly_label": "Semanal",
 
-  "name_cannot_be_empty": "O nome da tag não pode estar vazio.",
-  "tag_already_exists_for_user": "Esta tag já existe para o seu utilizador.",
-  "created_successfully": "Tag criada com sucesso!",
-  "error_creating": "Erro ao criar a tag. Por favor, tente novamente."
+  "name_cannot_be_empty": "O nome da etiqueta não pode estar vazio.",
+  "tag_already_exists_for_user": "Esta etiqueta já existe para o seu utilizador.",
+  "created_successfully": "Etiqueta criada com sucesso!",
+  "error_creating": "Erro ao criar a etiqueta. Por favor, tente novamente.",
+
+  "edit_tags_title": "Editar etiquetas",
+  "loading_tags": "A carregar etiquetas",
+  "select_a_tag_to_edit": "Seleciona uma etiqueta para editar",
+  "tag_name_label": "Nome da etiqueta",
+  "tag_color_label": "Cor da etiqueta",
+  "saving_label": "A guardar...",
+  "tag_delete_confirmation": "Tens a certeza que queres apagar a etiqueta \"{{tagName}}\"?",
+  "error_editing_tag": "Ocorreu um erro ao editar a etiqueta",
+  "error_deleting_tag": "Ocorreu um erro ao apagar a etiqueta \"{{tagName}}\"."
 }

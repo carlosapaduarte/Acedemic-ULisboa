@@ -66,7 +66,8 @@ class EventOutputDto(BaseModel):
     tags: list[str]
     everyWeek: bool
     everyDay: bool
-    color: str = None
+    color: str | None = None
+    notes: str | None = None
 
 
     @staticmethod
@@ -86,7 +87,8 @@ class EventOutputDto(BaseModel):
                     tags=event.tags,
                     everyWeek=event.every_week,
                     everyDay=event.every_day,
-                    color=event.color
+                    color=event.color,
+                    notes=event.notes
                 )
             )
 
@@ -195,3 +197,10 @@ class WeekTimeStudyOutputDto(BaseModel):
                 )
             )
         return dtos
+    
+class TagOutputDto(BaseModel):
+    id: int
+    name: str
+    color: str
+    description: str
+    user_id: int

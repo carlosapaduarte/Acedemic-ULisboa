@@ -1,25 +1,24 @@
-
 .calendarPageContainer {
-    height: 100%;
+  height: 100%;
 
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    animation: fade 300ms ease;
+  animation: fade 300ms ease;
 }
 
 .calendarContainer {
-    height: 100%;
+  height: 100%;
 
-    overflow: auto;
-    height: 100%;
+  overflow: auto;
+  height: 100%;
 }
 
 @keyframes fade {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

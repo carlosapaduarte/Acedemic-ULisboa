@@ -15,6 +15,13 @@ from router.study_tracker import study_tracker
 from dotenv import load_dotenv
 load_dotenv()
 
+app = FastAPI()
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+    seed_all_data()
+    
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
