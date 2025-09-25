@@ -5,6 +5,7 @@ import styles from "./badgesPage.module.css";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import Confetti from "react-confetti";
+import { service } from "~/service/service";
 
 function useWindowSize() {
     const [size, setSize] = useState({
@@ -28,10 +29,6 @@ function useWindowSize() {
 
     return size;
 }
-
-const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-const APP_BASE_PATH = import.meta.env.BASE_URL || "/";
 
 interface GamificationProfile {
     badges_status: CombinedBadgeStatus[];
@@ -83,40 +80,12 @@ export default function BadgesPage() {
     } | null>(null);
     const levelRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-    useEffect(() => {
-        const fetchGamificationProfile = async () => {
-            const token = localStorage.getItem("jwt");
-            if (!token) {
-                setError(
-                    "Utilizador não autenticado. Faça login para ver as medalhas.",
-                );
-                navigate("/log-in");
-                return;
-            }
-
+        useEffect(() => {
+        const fetchProfile = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(
-                    `${API_BASE_URL}/gamification/profile/me?app_scope=academic_challenge`,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    },
-                );
+                const data: GamificationProfile = await service.fetchGamificationProfile();
 
-                if (!response.ok) {
-                    // Se o erro for de não autorizado, redireciona para o login
-                    if (response.status === 401) {
-                        navigate("/log-in");
-                        return;
-                    }
-                    const errorJson = await response.json();
-                    throw new Error(
-                        errorJson.detail ||
-                            "Falha ao carregar o perfil de gamificação.",
-                    );
-                }
-
-                const data: GamificationProfile = await response.json();
                 setBadges(data.badges_status);
                 setCurrentUserChallengeLevel(data.current_challenge_level);
                 setCompletedLevelRanks(data.completed_level_ranks);
@@ -125,13 +94,17 @@ export default function BadgesPage() {
                     setExpandedLevels(new Set([data.current_challenge_level]));
                 }
             } catch (err: any) {
-                setError(err.message);
+                if (err.name === 'NotAuthorizedError') {
+                    navigate("/log-in");
+                    return;
+                }
+                setError(err.message || "Falha ao carregar o perfil de gamificação.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchGamificationProfile();
+        fetchProfile();
     }, [navigate]);
 
     useEffect(() => {
@@ -308,7 +281,7 @@ export default function BadgesPage() {
                                                 }
                                             >
                                                 <img
-                                                    src={`${APP_BASE_PATH}icons/padlock.svg`}
+                                                    src={`/icons/padlock.svg`}
                                                     alt="Nível Bloqueado"
                                                     className={
                                                         styles.lockIconSvg
@@ -335,7 +308,7 @@ export default function BadgesPage() {
                                                     <img
                                                         src={
                                                             badge.icon_url
-                                                                ? `${APP_BASE_PATH}${badge.icon_url.substring(1)}`
+                                                                ? `/${badge.icon_url.substring(1)}`
                                                                 : ""
                                                         }
                                                         alt={badge.title}

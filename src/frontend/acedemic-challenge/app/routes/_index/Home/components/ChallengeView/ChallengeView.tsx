@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BatchDay, Challenge } from "~/challenges/types";
-import { Batch, Badge } from "~/service/service";
+import { Batch, Badge, service } from "~/service/service";
 import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
 import { ChallengesContext } from "~/hooks/useChallenges";
 
-const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 function useChallengeViewHook() {
     const { currentBatch, currentDayIndex, batchDays } =
@@ -34,7 +32,6 @@ export function ChallengeView({
     const { userInfo, currentBatch, fetchUserInfo, showBadgeAnimation } =
         useContext(ChallengesContext);
     const { currentBatchDay } = useChallengeViewHook();
-    const token = localStorage.getItem("jwt");
 
     async function onMarkCompleteClickHandler(
         challenge: Challenge,
@@ -42,46 +39,32 @@ export function ChallengeView({
         batch: Batch,
     ) {
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/academic-challenge/users/me/batches/${batch.id}/${batchDay.id}/completed-challenges`,
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ challengeId: challenge.id }),
-                },
+            const responseData = await service.markChallengeAsCompleted(
+                batch.id,
+                batchDay.id,
+                challenge.id
             );
+            
+            if (responseData) {
+                const newlyAwardedBadges: Badge[] = responseData.newly_awarded_badges;
+                const completedLevelRank: number | null = responseData.completed_level_rank;
+                
+                fetchUserInfo();
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.detail || "Falha ao marcar desafio como completo",
-                );
-            }
-
-            const responseData = await response.json();
-            const newlyAwardedBadges: Badge[] =
-                responseData.newly_awarded_badges;
-            const completedLevelRank: number | null =
-                responseData.completed_level_rank;
-
-            fetchUserInfo();
-
-            if (newlyAwardedBadges && newlyAwardedBadges.length > 0) {
-                showBadgeAnimation(newlyAwardedBadges[0]);
-            }
-
-            if (
-                completedLevelRank !== null &&
-                completedLevelRank !== undefined
-            ) {
-                console.log(`Nível ${completedLevelRank} concluído!`);
-                sessionStorage.setItem(
-                    "justCompletedLevel",
-                    completedLevelRank.toString(),
-                );
+                if (newlyAwardedBadges && newlyAwardedBadges.length > 0) {
+                    showBadgeAnimation(newlyAwardedBadges[0]);
+                }
+                
+                if (
+                    completedLevelRank !== null &&
+                    completedLevelRank !== undefined
+                ) {
+                    console.log(`Nível ${completedLevelRank} concluído!`);
+                    sessionStorage.setItem(
+                        "justCompletedLevel",
+                        completedLevelRank.toString(),
+                    );
+                }
             }
         } catch (error) {
             console.error("Erro ao completar desafio:", error);
@@ -108,3 +91,4 @@ export function ChallengeView({
 
     return <></>;
 }
+

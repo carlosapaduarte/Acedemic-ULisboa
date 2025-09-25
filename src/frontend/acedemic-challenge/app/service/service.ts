@@ -251,6 +251,19 @@ async function markChallengeAsCompleted(
         return Promise.reject(
             new Error("Failed to mark challenge as completed!"),
         );
+    return response.json();
+}
+
+async function fetchGamificationProfile() {
+  const request = {
+    path: `gamification/profile/me?app_scope=academic_challenge`,
+    method: "GET",
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    return Promise.reject(new Error("Failed to fetch gamification profile!"));
+  }
+  return response.json();
 }
 
 export const service = {
@@ -264,4 +277,5 @@ export const service = {
     editDayNote,
     markChallengeAsCompleted: markChallengeAsCompleted,
     fetchBadgeHistory,
+    fetchGamificationProfile,
 };
