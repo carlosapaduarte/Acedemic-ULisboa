@@ -4,10 +4,7 @@ import { BASE_API_URL } from "./config";
 const CONTENT_TYPE_JSON = "application/json";
 
 function toFullUrl(request: Request): string {
-  //return BASE_API_URL + request.path;
-  const base = BASE_API_URL.replace(/\/+$/, ""); // remove barras finais
-  const path = request.path.replace(/^\/+/, ""); // remove barras iniciais
-  return `${base}/${path}`;
+  return BASE_API_URL + request.path;
 }
 
 export type KeyValuePair = {

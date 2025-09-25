@@ -1,0 +1,365 @@
+[33m3b6174c[m feat: Delete tags
+[33m8b7d6ea[m feat: add tags visualy to the calendar
+[33m566526d[m feat: colors added to tags
+[33m2eca603[m Clean up CreateEvent component code
+[33mc52e4fa[m Add daily recurrence option for calendar events
+[33mdafb38d[m fix: translations on calendar
+[33m1ab942c[m Add badge system to backend and frontend + Bug fix calendar in study tracker
+[33m4458a19[m Add LICENSE
+[33m31f3d34[m fix: correct ulisboa auth's settings.json
+[33m3c4596e[m feat: adds u-lisbon-auth private key and certificate
+[33m248722f[m feat: implementing u-lisbon-auth
+[33m26fdc9d[m feat: improve energy question in Tracker home page.
+[33md53cb5d[m feat: remove cache from i18n translation files
+[33mc3b410a[m feat: add i18n and a11y for challenge app navbar
+[33m8c0daad[m fix: minor meta description fix
+[33m76284ff[m feat: add design to Challenge authentication (login) page
+[33meab7cf2[m fix: improve home app responsiveness
+[33m57a51cd[m fix: home app cards horizontal scroll
+[33m5b10cd1[m fix: footer max-height
+[33m28c981b[m feat: add Not Found page callback for Home App.
+[33ma3ae4e8[m fix: wrap calendar and challenges routes with RequireAuthn
+[33m44c5b93[m fix: some font-sizing, styling and scroll on challenge.
+[33me3a6bf0[m feat: add challenge locked information on calendar for levels 1 and 2
+[33m086b121[m feat: add correct text to welcome page
+[33me0f898f[m feat: added way to create new batch after finishing the previous
+[33m9453c26[m fix: remove badges from nav bar
+[33m77daa6b[m feat: improved day challenges view and functionality for calendar and home page. now it is possible to mark complete for each challenge in home page in level 3. feat: add lock icon to calendar day info container for locked day.
+[33me7fdb99[m feat: change colors in level 3 challenges list feat: add lock icon to calendar for unreached days
+[33mcbb4844[m fix: statistics page icons src path
+[33m0bef7df[m fix: energy slider value correspondent emoji
+[33m9b020f7[m[33m ([m[1;31morigin/slots-to-work[m[33m)[m feat: add dropdown menu on gear icon click fix: energy slider values
+[33m61e41d7[m refactor: full frontend reformat
+[33m69d0997[m fix: edit task form start with the current values from the task
+[33mcd89ae4[m fix: rendering of slot to work modal content fix: slot to work locale of date and time string
+[33m6098ec6[m fix: fixes bugs in update-task, in ST app
+[33m694a778[m fix: fixes bugs in update-task, in ST app
+[33m7b08433[m Implementing slots to work
+[33m55bfaf4[m feat: improve home app accessibility fix: remove redundant title tag in html fix: improve home app responsiveness fix: avatar stretch on challenge app
+[33m81522e6[m fix: home app responsiveness. fix: remove min-height on body
+[33mb8222bb[m fix: remove DEBUG_TIME_OFFSET from challenges app fix: level images src path
+[33m746ad4d[m fix: discrepancy with base and basename in vite.config.ts
+[33m6e08f17[m feat: update nginx.conf to have home and challenge apps fix: add tracker and challenge base path to each respective apps vite.config.ts and i18n fix: remove "/" from path in img src elements
+[33m4511751[m feat: add Dockerfiles for home and challenge apps. feat: update docker-compose.yml feat: update PORTs for the apps
+[33m00b591c[m fix: home app page href's to apps.
+[33m9288ee2[m feat: add title to home app page. feat: add footer to home app.
+[33m6970a17[m feat: add i18n to home app fix: changed versions of home app modules in package.json
+[33m39071ef[m feat: add i18n fix: changed versions of home app modules in package.json
+[33m5862e69[m feat: change some colors in home app page.
+[33m853a770[m feat: add styles to home app page.
+[33mcbf7b06[m feat: add icons to challenge app logo.
+[33md0dd04b[m feat: add frontend 'home' project
+[33me5eb3df[m feat: add meta description for challenge and tracker
+[33mbeba57c[m Documentation (#40)
+[33m691b7a8[m Edit tasks (#39)
+[33m19c434b[m Merge pull request #38 from MiguelRocha2001/finishing-challenge
+[33m394b6ae[m Merge remote-tracking branch 'refs/remotes/origin/main' into finishing-challenge
+[33mba87a39[m feat: level 3 challenges list view implemented
+[33m39f3079[m feat: create separate challenges list components for "levels 1 and 2", and level 3.
+[33m8a7f213[m fix: minor callback handling optimization
+[33me9c1d92[m fix: animated loading on challenges page
+[33mc70c080[m feat: extract components from ChallengeListItem.
+[33m72b12f9[m feat: improve cut button's visual feedback on hover and click
+[33m19ab231[m refactor: renamed all colors from "primary", "secondary", etc to "color-1", "color-2", etc.
+[33md11f6ac[m feat: add day notes to the home page.
+[33ma7b2449[m feat: add lock icon to locked challenge in challenges page.
+[33m2d59214[m fix: challenges page keyboard navigation feat: add better outline on focus-visible on challenge item.
+[33mf28f34f[m feat: add complete indicator to the calendar days
+[33me912653[m fix: day index calculations
+[33m4f82fc0[m feat: add "edit notes" functionality and modal to home page. fix: buttons now always visible in expanded challenge.
+[33m83a1fcc[m feat: add incomplete and locked tags to challenges page. feat: add shake animation when clicking locked challenge.
+[33mb972ae0[m feat: add notes modal for challenges page. it is now possible to edit the notes of a day.
+[33md06edf7[m feat: add BatchDay entity that holds the actual challenges and the notes.
+[33mf7c8835[m fix: small fix in study tracker statistcs page
+[33m5719774[m fix: fixes bugs in Statistics page, in ST app
+[33m29e25a6[m feat: completes last commit, and changes daily tags mock to real implementation
+[33m5382521[m feat: adds page to submite daily tags, plus backend implementation to support that (not yet fully finished)
+[33m560f9ea[m feat: rebase statistics onto main
+[33m291e61c[m feat: adds translations to Statistics page, in ST app
+[33meb2144f[m feat: adds progress icons to ST statistics
+[33m8d61f0e[m fix: improved ID generation in DB (backend)
+[33mcc61752[m feat: fixes Task-Distribution container, and implementation of Daily-Task-Progress stats
+[33m21bc100[m feat: fixes Task-Distribution container, and impelments half of Week/Daily-Progress container, in ST app
+[33m7dfd201[m fix: Task Distribution contaiiner, in ST statistic page, fixed
+[33m11ac2dc[m feat: improves task distribution chart, in ST app
+[33m795628a[m feat: implementing task distribution statistics in ST app
+[33mdf8088e[m feat: add autoscroll to latest challenge when entering challenges page without a selected day.
+[33m3825886[m feat: add search param for /challenges route to specify the selected day. feat: add ChallengesContext. feat: add autoscroll when entering challenges page with a selected day.
+[33mb73ad52[m feat: add "add note" and "complete challenge" buttons to challenge list page.
+[33m2034b68[m feat: add temporary level 3 content in homepage.
+[33meb5e197[m feat: add completed status to the challenge in all pages.
+[33m38b909d[m fix: home page challenge's scrollable portion
+[33m2b03355[m feat: show progress bar based on challenge data fix: window event listener cleanup
+[33m4c0dcc0[m fix: reduce size of back and home buttons
+[33mc806b05[m feat: implement visuals in calendar for selected day and days with challenge.
+[33m33e2a34[m feat: implement useChallenges hook
+[33m697dd78[m feat: add English translation for challenges. feat: challenges now stored in the database based on their id straight from the batch creation, completion status is always present.
+[33mbbf90a9[m feat: add a href to challenge's nav bar.
+[33me34c01b[m feat: add "in construction" page
+[33m43a18e5[m feat: add i18n to footer logos
+[33md9306ae[m feat: reduce language button opacity when it is not the selected language
+[33m2fa5312[m fix: add explicit flex column layout for form sections
+[33mda137a4[m feat: improve appbar and sidebar accessibility and i18n.
+[33mb849d14[m fix: language button select colors.
+[33me6e3260[m[33m ([m[1;31morigin/hotfix[m[33m, [m[1;32mhotfix[m[33m)[m fix: text field autofocus fix: language button select on clean app bar variant
+[33m9ca5d0e[m feat: change main app elements to be semantic elements such as header (role="banner"), main and footer.
+[33mb97dde3[m feat: language button shows which language is selected
+[33mfa0c135[m hotfix try: primary key issue on energy
+[33md48d9d2[m hotfix try: avatar stretch on ios
+[33m4d9cd1d[m hotfix try: avatar stretch on ios
+[33mec0ca77[m Merge pull request #36 from MiguelRocha2001/beta-preparation
+[33m4f67fd0[m fix: API_URL to /api/
+[33m94a07e7[m Some temporary tweaks for beta deployment.
+[33m401829d[m fix: fixes energy question feature in both frontend and backend
+[33m24c3321[m fix: calendar displayed events and color in energy stats page, in ST app
+[33m589b826[m feat: comment out SlotsToWorkSection in create task, as it is incomplete for the beta version.
+[33m3cee0de[m feat: implement delete event button
+[33ma89b74d[m feat: add description section to create task
+[33m161485a[m feat: add translation for week days in calendar
+[33m164218b[m feat: fix calendar week view in small screens
+[33ma9bf5fa[m feat: implement edit calendar event
+[33m0be57e4[m fix: home app bar avatar dimensions
+[33m4a6dcdb[m feat: improved task creation fix: task list refresh bug with state
+[33me532c3e[m Merge pull request #35 from MiguelRocha2001/st-statistics
+[33m12951c9[m fix: changes timer behavior on ST app
+[33m9b8378c[m fix: improves visuals of Energy Question, in ST app
+[33m9860b12[m fix: improves daily-energy-question screen
+[33m972535b[m feat: adds energy tags and icons, to ST app
+[33m1f0fbd2[m feat: adds energy container title icon and today energy status icon, to ST app
+[33m7b5e189[m fix: small fixes in Focus Statistics container, in ST app
+[33m1967a1a[m fix: small fix from last commit (backend)
+[33m55145c2[m fix: small fix in Focus stats chart, in ST app
+[33mec995e2[m feat: backend week-study-time endpoint will now also send target study time
+[33m3c5e184[m feat: fixes Statistics Focus plot display
+[33m0602cd9[m feat: fixes appearance of Focus statistics in ST app
+[33mee61c96[m fix: add key to items of focus section in statistics.
+[33m8f7dd28[m refactor: reformat code.
+[33md5fa009[m feat: progress bar for Focus section in statistics.
+[33mb6283e5[m fix: margins and paddings in statistics.
+[33meefcbe7[m fix: fixes timer issues in ST app
+[33m44d60c4[m feat: fixes total study time in ST app
+[33m73fa2e0[m feat: fixes appearance of statistics container in ST app
+[33mb75774f[m feat: adds endpoints to increment and get study time per week. Starts addapting frontend for that.
+[33maf11fed[m feat: improves visuals of daily energy statistics page
+[33mfb6f929[m Adds basic statistics page to ST app
+[33mdcd6c31[m feat: adds backend endpoint to get daily tasks progress
+[33mef92329[m feat: adds missing files from last commit, and small optimizations in ST app
+[33ma6d7e27[m feat: adds tag statistics page and daily energy question in ST app
+[33macd6f75[m Merge pull request #34 from MiguelRocha2001/finishing-challenge
+[33mf24a42a[m feat: add form validation to authentication page in ST
+[33m420f3e6[m refactor: renamed all 'setError' to 'setGlobalError' refactor: fixed GlobalErrorContext name
+[33ma58c46c[m feat: add DGES logos
+[33me6c79e4[m feat: add dynamic line clamp ellipsis on calendar page. feat: improve media and container queries in calendar page.
+[33m0677824[m fix: authentication page after clicking register or login button
+[33m4bc7da1[m refactor: add AppBarProvider.tsx to challenge
+[33m1cd97bf[m feat: add new high-res avatars. fix: image related sizings in home app bar.
+[33m7fa0134[m feat: add progress bar with trophy icon to home page.
+[33m83c7fb8[m refactor: renamed "goal" to "challenge" across the entirety of the application.
+[33m840f8bb[m feat: add icons to navbar in home page.
+[33mecb6e78[m feat: add loading gradient and animation for challenges list
+[33mc25d540[m feat: add home icon.
+[33m03170c9[m fix: styles in challenges page.
+[33m24bb90d[m fix: language button cut version border.
+[33m7c789f6[m feat: update acedemic-challenge, synchronizing with tracker features, such as i18n working in SSR, loading screen and error handling.
+[33meae8543[m refactor: remove useless/redundant 'acedemic-challenge/src' folder.
+[33m021f5f4[m fix: input time element now allows 0 to be typed in
+[33m3adb411[m fix: in task creation current date is passed as deadline if no deadline is set
+[33mc449802[m fix: /api location in nginx configuration
+[33mc44ff2d[m fix: change setup_nginx.sh run ./configure_nginx.sh as sudo
+[33m81bfef3[m fix: remove /api prefix upon accessing location /api in nginx configuration feat: change exposed backend port in docker-compose.yml
+[33mfb35912[m feat: add specific development port for challenge app. feat: add specific CORS origins in fastapi
+[33mfa1f516[m feat: change nginx scripts
+[33m523b8d9[m fix: nginx scripts "academic" to "acedemic"
+[33m6bc7d1a[m feat: add scripts for deployment
+[33md450f0c[m Some styling in /tasks (#33)
+[33m5ad20aa[m refactor: rename task-list to tasks
+[33m9c9393d[m fix: create task endpoint slots to work field is optional
+[33mc85bf81[m feat: adds update and delete endpoints to backend
+[33m7c16bdf[m feat: add edit event modal for calendar.
+[33mbca6d80[m feat: possibility to edit event time in calendar's modal
+[33md607c00[m fix: z-index of avatar click dropdown to be bigger than appbar's
+[33m8d2406b[m fix: overflow in calendar page. add calendarPageContainer div.
+[33m83ec6a3[m feat: initialize login view to "initial" and update navigation logic. feat: skip some login views, like "share progress?"
+[33mb8f70c3[m refactor: rename UserInfoPage to AuthenticationPage, updated related imports, file names, and CSS modules. feat: going to '/log-in' while already logged in redirects to home ('/').
+[33m621b55f[m feat: improve auth transition with a loading state.
+[33m46fb90d[m Styling tracker (#32)
+[33m41ab3e8[m feat: adds DB migration support
+[33m46640f2[m Authentication (#31)
+[33mc0f3acc[m Deployment (#30)
+[33m37b8be2[m fix: remove buggy global 'background-color transition' css rule applied to all elements.
+[33m4f09987[m feat: add loading overlay with a fade out animation, instead of just a loading screen.
+[33mfd381a1[m fix: remove Button.tsx and usages of that reusable component. Now roundButton and cutButton should be imported using the css module.
+[33m7612ba6[m feat: Add i18n to production mode - i18n remix.
+[33mf2929f3[m fix: remove isHydrated from Tracker's Root. Now using a loaded state in App.
+[33m50eaf1d[m feat: adds authorization control to ST app (#29)
+[33m53046be[m feat: implement loading screen for Tracker.
+[33m740fde3[m fix: language button outline, before it was using border and therefore cramming the image in a weird way.
+[33mdf72275[m feat: add animated page slider to Challenge's welcome page.
+[33m59cc41a[m feat: Added React ErrorBoundary to App component, wrapping the main content (Outlet). feat: Changed Remix Root ErrorBoundary to simply say "An error occurred" instead of showing stack trace.
+[33m51d0777[m fix: Renamed ErrorContainer, ErrorController to GlobalErrorContainer and GlobalErrorController.
+[33m8f5c740[m feat: Error and Authentication providers/wrappers readded.
+[33mdebc734[m Styling tracker (#28)
+[33ma1e3f84[m fix: fixes select associated tasks before start study session, in ST app
+[33m82e48af[m fix: fixes Task List in ST app
+[33mc6ec6c8[m feat: allows to associate tasks to study timer, and configures timer automaticaly if there is a current study block happening
+[33md0e4a2e[m feat: adds basic funcional Timer, supporting study and pause times
+[33m9a176e0[m feat: Added /timer with a countdown timer.
+[33mda248ca[m feat: started setting up tracker routes/pages. Starting with home page and welcome page.
+[33m03582df[m fix: colors and appearance for tracker appbar
+[33m959ad53[m feat: fixed some colors in tracker and challenge. feat: Added language locales to tracker.
+[33m9fabd4f[m feat: Copied several components from challenge to tracker. feat: added positive variation of sucesso logo to both apps.
+[33m8f1c169[m fix: avatar and settings button are now buttons (keyboard navigation). refactor: moved footer styles to dedicated css module.
+[33m9f5849a[m fix: Challenge App - wrongly assuming user always has at least one batch.
+[33ma1cbcb8[m fix: Challenge App - correctly displaying user's selected avatar and their username.
+[33mcf835e2[m Merge pull request #26 from MiguelRocha2001/styling-challenge
+[33m2bb6571[m Merge branch 'main' into styling-challenge
+[33m17d1ebf[m fix: Some Challenges list accessibility for the accordion. fix: Challenges list not using lorem ipsum as challenge description anymore.
+[33m7e38ecc[m feat: Changed name of color-theme CSS variables. feat: Added "blue" color theme.
+[33m84f3f44[m feat: Added settings page. feat: Added theme selection in settings page.
+[33m5c2ae03[m fix: App viewport height. fix: WelcomePage image sizing.
+[33m203a8db[m fix: removes Tailwind artifacts from ST frontend
+[33md0dd431[m feat: adds option to crate individual grades for each CU
+[33m809c796[m feat: adds page to create Curricular Units in ST app
+[33m0bbf4bd[m fix: updates automaticaly after creating archive or file
+[33m5f7986e[m feat: integrates a rich text editor to allow editing files inside archives, and persist them on the backend
+[33me0dd8be[m feat: allows to open files inside each archive, in ST app
+[33m8119759[m feat: allows to create archives, and get them
+[33m0436236[m feat: Added themes, powered by a ThemeContext Provider at the root. fix: Initial view, fixed hydration by checking if page is hydrated (Root).
+[33m57dea91[m feat: added several avatars feat: removed test.webp image
+[33m7b73f6e[m fix: Suspend bug on logout click.
+[33mfae679a[m feat: Added implementation of "clean" variant of AppBar. feat: Improved welcome page. feat: Created useAppBar hook.
+[33m29534d7[m fix: padding, overflows and flex in LevelSelect
+[33mf9b5d65[m feat: Appbar animates as it transitions its height from one page to another (i.e. Home to Challenges).
+[33m63900d0[m feat: added dvh to dynamically adjust app height according to the changing viewport in mobile, since this is a web app.
+[33m647a956[m feat: feature to alow to display only recurrent events in the ST app Calendar
+[33ma98ad75[m feat: alows to vizualize event tags in Study Tracker app Calendar
+[33md28d0e7[m feat: alows to select tags when creating an event in Study Tracker app
+[33me0ae92c[m fix: fixes create event in Study Tracker App
+[33mf7e2bb8[m feat: adds base code to display react-big-calendar in /react-big-calendar endpoint, fetch and create events
+[33me968b39[m fix: fixed responsiveness for SelectLevelPage.
+[33ma3267cd[m feat: Added dropdown menu upon clicking user avatar in home page.
+[33m3577bfa[m fix: created separate useUserIdEvent to not trigger the useEffect even when not needed.
+[33m753314e[m feat: joined both AppBar variants in the same html structure.
+[33m0feeebf[m feat: created AppBarContext and its provider to allow the outlet pages to select their AppBar variant.
+[33mf53067a[m feat: added HomeAppBar as a variant to the single AppBar component.
+[33m09b34c9[m feat: added AppBar to all pages.
+[33md63f5fe[m feat: added settings button to AppBar.
+[33m03e9d0e[m feat: improved useUserId hook to now allow a callback that triggers whenever userId changes (useEffect).
+[33m661374b[m Implemented fully responsive challenges list in Challenges Page
+[33m0f9210b[m feat: implements feature to update task status in Study Tracker frontend
+[33mec9e510[m fix: fixes Study Tracker app Get-Tasks sorted endpoint fix: minor fixes
+[33m8827ed9[m feat: Study Tracker app is now showing Sub Tasks correctly
+[33m389126a[m feat: Sub Task is now of parent task type, in Backend
+[33m853d9d6[m fix: improves overall code quality in Backend
+[33m9e38f94[m feat: design of calendar's goal info section implemented
+[33m471d956[m fix: sorted translation strings alphabetically (used Easy I18n plugin)
+[33m51a9c59[m feat: added goal info component to calendar page
+[33m9d7f0f9[m fix: bug in Calendar wrongfully not setting visible month's days as being part of the current month. refactor: renamed stuff in MyCalendar
+[33m233fc57[m fix: button element default text color changed to black
+[33md0cb900[m Study tracker tasks feature (#22)
+[33m089abc1[m feat: Added back and home navigation to AppBars.
+[33mbb9cbc3[m feat: Changed MyCalendar to display calendar as a grid. feat: Added translations to calendar.
+[33m944121a[m feat: added default variant "none" to Button component
+[33m3e5716a[m refactor: Changed location of MyCalendar.tsx
+[33m25b011b[m feat: implemented common AppBar. Added AppBar to calendar page
+[33m00c3aa6[m fix: removed some redundancy between homeAppBar media queries
+[33m921473e[m feat: added home app bar responsiveness to smaller than web screens but bigger than laptop
+[33m05eb8ef[m feat: better responsiveness in web version of home app bar
+[33m6595d4f[m feat: added multi-device responsiveness to the Home Page
+[33m42b8def[m refactor: changes translations from inside the Translations.tsx to a dedicated .json file
+[33m774d659[m feat: design for challenges content of Home Page nearly completed. fix: minor fixes regarding overflows
+[33me2fc60b[m feat: language buttons change language
+[33m31fead4[m feat: added app bar language buttons to home page. Added several components for HomeAppBar, transferring inline styles to proper css modules.
+[33m44f4c54[m feat: created HomeAppBar component. added footer images
+[33md999e0d[m feat: added Footer to app
+[33m9991e3e[m fix: some i18next t function usages to use useTranslation hook
+[33mfe6e663[m feat: created specific i18next files in public/locales
+[33m17f11f0[m Fix unavailable schedule block feature (#21)
+[33mbd5bc5a[m feat: added to backend's requirements.txt
+[33m8a7a05e[m feat: create not-available schedule blocks in study tracker (#20)
+[33m434d8e0[m feat: new task operation on Study Tracker app allows choosing multiple tags (#19)
+[33mfa40a27[m feat: removes old backend, renames new one, and changes some filenames (#18)
+[33m7bf0a0d[m New-Backend reorganization, and display today's tasks in Study Tracker Dashboard page feature (#17)
+[33m23352f7[m fix: frontend correctly shows completed goal
+[33m04c1687[m fix: fixed previous commit
+[33m870f5aa[m fix: fixed bug
+[33mf53f3b1[m fix: minor backend fix
+[33me74f9f7[m Merge pull request #16 from MiguelRocha2001/front-end-refactor
+[33md079ff8[m merge: joined with changes to new backend
+[33m345e761[m deleted frontend/old
+[33md298b92[m Merge branch 'main' into front-end-refactor
+[33mc55d4ec[m fix: fixes study tracker calendar feature (#15)
+[33m76fc003[m Study tracker (#14)
+[33m62b7330[m refactor: added Home, Challenges and Calendar pages.
+[33md89c57f[m feat: hovering on buttons is visually represented
+[33me282090[m feat: avatars are now circular.
+[33m8abc492[m fix: minor flickering on navigate. removed lazy loading on images.
+[33m597da6b[m fix: changed location of some styles. improved Button component with a variant to class map
+[33m1e5f341[m fix: fixed directory for getting level selection images from public folder
+[33mf821bca[m fix: fixed bug where I had different component trees depending on a isLoggedIn conditional. fix: created logIn and logOut functions for AuthnContainer, instead of setLoggedIn.
+[33m8fe9e55[m fix: minor layout fixes
+[33mdee9a75[m fix: Added key properties to items rendered in list in some LoginPages (SelectLevel and AvatarSelection).
+[33m5742b2e[m refactor: Completely removed tailwind. Started using CSS Modules.
+[33m5501a00[m feat: added our style to login page, using images feat: implemented level select and avatar select with confirm button fix: avatar list now uses layout: grid intelligently
+[33mb63f93c[m feat: added how to run backend api to new-backed\src\README.md
+[33mee33eb3[m feat: adds readme files with relevant links (#13)
+[33m42b5d1b[m feat: adds readme files with relevant links
+[33m53e6df1[m feat: created React Remix project for Study Tracker app (#11)
+[33mcd61a10[m Backend fix (#10)
+[33m12c9d23[m Integrate sql model (#9)
+[33me33e5b9[m Backend python migration (#8)
+[33m11a6208[m refactor: frontend - created and moved to acedemic-challenge folder
+[33mf39566e[m refactor: Added all login views for /log-in (registering/entering for the first time).
+[33m55f912f[m refactor: Added AppDashboard, applying in pages if the user is logged in. Added NotFoundPage for 404.
+[33m0368561[m refactor: started creating pages and design from the ground up with TailwindCSS. added Prettier and PrettierTailwindCSS dependencies.
+[33mb60bcf9[m refactor: added previous files to new project. MUI dependencies removed, goal is to use TailwindCSS with other component libraries like DaisyUI or RadixUI.
+[33mae08d7c[m refactor: created new Remix project to which we will migrate to. old project named old
+[33mdf25ddd[m fix: added mobile/multiple screen size responsiveness to some elements using sx prop and size modifiers (xs, md, etc.).
+[33m9e1e261[m feat: SQL DB scripts added (#7)
+[33mbeeef4c[m Implementig goal overview (#6)
+[33m0c2f44d[m Integrate new calendar (#5)
+[33m0815fdb[m Merge pull request #4 from MiguelRocha2001/avatar-page
+[33m26dfc6d[m fix: Changed Calendar page to instead use useState hooks instead of a useReducer for the whole state.
+[33m48e1467[m feat: implementing avatar in Frontend
+[33m8e87bbd[m feat: starts Select-Avatar page
+[33mc7f3781[m feat: improves Select Level view in Frontend
+[33m423ad38[m feat: improving Level Selector page
+[33meeca7e4[m feat: re-implementing Dashboard.tsx
+[33me5afdf1[m feat: building a new Calendar from scratch, in Frontend
+[33m35edd03[m feat: new Pt-pt translations for dashboard (hello quotes)
+[33mff16e0a[m fix: Dashboard correctly fetches today's goals
+[33mb06b020[m feat: improves Dashboard.tsx layout
+[33mffaeaae[m feat: Calendar shows the challenge for the selected day. Clicking on a day on the calendar selects it to be shown.
+[33mbdd230f[m feat: builds components to handle service errors
+[33mc17141f[m feat: Dashboard page supports marking goals as completed
+[33m5e6d976[m Merge branch 'main' into dashboard
+[33m655724d[m feat: Calendar.tsx page fixed
+[33m14c6ce7[m fix: fixing Dashboard.tsx; Moves Calendar component to another page
+[33m41c7625[m fix: Calendar position.
+[33m2d56dce[m fix: positions of Appbar, Drawer, and main content with respect to each other.
+[33ma1ceed7[m feat: Added localization with i18next. Translations/strings currently stored in Translations.tsx, and used with useTranslation hook from "react-i18next".
+[33mebfcaa8[m feat: Added MaterialUI elements and layout, such as AppBar and Menu Drawer.
+[33m90dceae[m refactor: moved frontend/bolsa to frontend
+[33md0e301e[m feat: frontend is able to create tasks by clicking on Calendar (#3)
+[33mc1917e1[m Auto login in frontend (#2)
+[33mab076c3[m Merge pull request #1 from MiguelRocha2001/miguel-21-days
+[33mb4c25c8[m feat: changes Current Day User property in Backend to Start Date
+[33m2189ef5[m feat: improves data Frontend data structures that hold Goal data
+[33m4ee04af[m feat: first Calendar version on Frontend
+[33ma4abf56[m feat: User can create new Goal in Frontend
+[33mcff0508[m feat: improves state management of Calendar component
+[33m2c89a8a[m feat: adds level-3 challenges to Frontend
+[33m019adde[m feat: displays list of challenges in Frontend
+[33m03e2b77[m feat: now, it displays current User challenge in Frontend
+[33ma921d1b[m fix: adds missing changes from last commit. Improves login controll on Frontend
+[33me6d966b[m fix: improves LogIn.tsx
+[33m1a34554[m feat: Frontend requests Backend to create new User
+[33m4570d9d[m feat: Started backend, users can now be stored alongside their level and current day.
+[33me3c38ad[m fix: all the quiz questions appear. Array is iterable.
+[33m357edc2[m fix: login page
+[33md6210d3[m feat: replaces ChooseLevel.tsx with LogIn.tsx component
+[33m459a39a[m feat: adds notes.md -> developer notes for frontend
+[33m1b5c3e2[m feat: adds Welcome, Choose-Level and Calendar pages
+[33mccce76d[m feat: setup project backend
+[33mad938ad[m Created frontend folder and project.
+[33mc5b0ff7[m Initial commit
