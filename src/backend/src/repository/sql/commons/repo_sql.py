@@ -49,7 +49,7 @@ class CommonsSqlRepo(CommonsRepo):
                 challenges: list[Challenge] = []
                 challenges_m: list[ChallengeModel] = batch_day_m.challenges if batch_day_m.challenges is not None else []
                 for challenge_m in challenges_m:
-                    challenges.append(Challenge(id=challenge_m.id, completion_date=challenge_m.completion_date))
+                    challenges.append(Challenge(id=challenge_m.id, completion_date=challenge_m.completion_date, user_answer=challenge_m.user_answer))
                 challenges.sort(key=lambda c: c.id)
                 batch_days.append(BatchDay(id=batch_day_m.id, challenges=challenges, notes=batch_day_m.notes))
             batches.append(Batch(id=batch_m.id, start_date=batch_m.start_date, level=batch_m.level, batch_days=batch_days))

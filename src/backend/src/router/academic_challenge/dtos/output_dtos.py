@@ -7,7 +7,8 @@ from utils import get_datetime_utc
 class ChallengeDto(BaseModel):
     id: int
     completionDate: int | None
-
+    user_answer: str | None
+    
     @staticmethod
     def fromChallenges(challenges: list[Challenge]) -> list['ChallengeDto']:
         challenges_dtos: list['ChallengeDto'] = []
@@ -15,7 +16,9 @@ class ChallengeDto(BaseModel):
         for challenge in challenges:
             challenges_dtos.append(ChallengeDto(
                 id=challenge.id,
-                completionDate=get_datetime_utc(challenge.completion_date) if challenge.completion_date else None
+                completionDate=get_datetime_utc(challenge.completion_date) if challenge.completion_date else None,
+                user_answer=challenge.user_answer
+                
             ))
 
         return challenges_dtos

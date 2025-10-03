@@ -1,0 +1,108 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(1px);
+    font-family: var(--font-family1);
+}
+
+.modalContent {
+    padding: 2rem;
+    max-width: 550px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    composes: cutButton from "@/components/Button/button.module.css";
+    --cut-button-background-color: var(--color-3);
+    --cut-button-background-color-hover: var(--color-3);
+    color: white;
+}
+
+.modalContent h2 {
+    font-family: var(--font-family2);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: var(--color-2);
+}
+
+.reflectionPrompt {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.reflectionTextarea {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-2);
+    color: var(--text-color-2);
+    font-family: var(--font-family1);
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.reflectionTextarea:focus {
+    outline: none;
+    border-color: var(--color-4);
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+.modalActions .button {
+    flex-grow: 1;
+}
+
+.button {
+    composes: cutButton from "@/components/Button/button.module.css";
+    padding: 0.75rem 1.5rem;
+    border: none;
+    font-family: var(--font-family2);
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+}
+
+.buttonSecondary {
+    composes: button;
+    color: var(--text-color-1);
+    --cut-button-background-color: var(--color-2);
+    --cut-button-background-color-hover: var(--color-2-hover);
+}
+
+.buttonSecondary:hover {
+    background-color: var(--color-2-hover);
+}
+
+.buttonPrimary {
+    composes: button;
+    color: var(--text-color-2);
+    --cut-button-background-color: black;
+}
+
+.buttonPrimary:hover {
+    --cut-button-background-color-hover: rgba(0, 0, 0, 0.3);
+}
+
+.charCounter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #a0a0a0;
+    margin-top: -1rem;
+}

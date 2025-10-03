@@ -1,5 +1,6 @@
 import random
 from datetime import datetime
+from typing import Optional
 
 from sqlmodel import Session, select
 
@@ -87,8 +88,7 @@ class AcademicChallengeSqlRepo(AcademicChallengeRepo):
 
             return new_batch.id
 
-    def complete_challenge(self, user_id: int, batch_id: int, batch_day_id: int, challenge_id: int,
-                           completion_date: datetime):
+    def complete_challenge(self, user_id: int, batch_id: int, batch_day_id: int, challenge_id: int, completion_date: datetime, user_answer: Optional[str] = None):
         with Session(engine) as session:
             statement = select(ChallengeModel).where(
                 ChallengeModel.user_id == user_id,
@@ -102,10 +102,11 @@ class AcademicChallengeSqlRepo(AcademicChallengeRepo):
                 raise ValueError("Challenge not found")
 
             existing_challenge.completion_date = completion_date
+            existing_challenge.user_answer = user_answer
             session.add(existing_challenge)  # This is optional; changes are tracked automatically
             session.commit()
 
-    def edit_day_notes(self, user_id: int, batch_id: int, batch_day_id: int, notes: str, date: datetime):
+    def edit_day_notes(self, user_id: int, batch_id: int, batch_day_id: int, notes: str, date: datetime, user_answer: Optional[str] = None):
         with Session(engine) as session:
             statement = select(BatchDayModel).where(
                 BatchDayModel.user_id == user_id,

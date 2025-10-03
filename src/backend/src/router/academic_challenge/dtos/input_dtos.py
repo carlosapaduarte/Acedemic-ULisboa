@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class CreateBatchInputDto(BaseModel):
@@ -22,3 +23,4 @@ class NewUserNoteDto(BaseModel):
 
 class ChallengeCompletedDto(BaseModel):
     challengeId: int
+    user_answer: Optional[str] = None

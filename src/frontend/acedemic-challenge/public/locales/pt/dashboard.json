@@ -12,5 +12,67 @@
     "my_notes": "As Minhas Notas",
     "no_notes": "Não há notas ainda...",
     "notes": "Notas",
-    "not_on_batch_message": "Ainda não está num conjunto de 21 desafios, selecione um nível para começar um novo!"
+    "not_on_batch_message": "Ainda não está num conjunto de 21 desafios, selecione um nível para começar um novo!",
+    "reflection_placeholder": "Escreva aqui a sua reflexão...",
+    "skip_button": "Saltar",
+    "save_and_complete_button": "Guardar e Completar",
+    "level1": {
+        "challenge0": {
+            "title": "Despertar",
+            "description": "Adicione aqui a descrição do desafio 'Despertar'.",
+            "reflection_prompt": "Qual foi a frase/palavra que escolheste?"
+        },
+        "challenge1": {
+            "title": "Caminhar em Consciência",
+            "description": "Adicione aqui a descrição do desafio 'Caminhar em Consciência'.",
+            "reflection_prompt": "Qual foi o objetivo académico que definiste para esta semana? E em que local o colocaste?"
+        },
+        "challenge2": {
+            "title": "Título do Desafio - Dia 3",
+            "description": "Descrição do desafio do dia 3."
+        },
+        "challenge3": {
+            "title": "Saber Saber",
+            "description": "Adicione aqui a descrição do desafio 'Saber Saber'.",
+            "reflection_prompt": "Qual foi o conceito mais importante que reviste?"
+        },
+        "challenge4": {
+            "title": "Título do Desafio - Dia 5",
+            "description": "Descrição do desafio do dia 5."
+        },
+        "challenge5": {
+            "title": "Página Diária",
+            "description": "Adicione aqui a descrição do desafio 'Página Diária'.",
+            "reflection_prompt": "Qual foi a principal dúvida ou reflexão que anotaste?"
+        },
+        "challenge6": {
+            "title": "Dia da Compaixão",
+            "description": "Adicione aqui a descrição do desafio 'Dia da Compaixão'.",
+            "reflection_prompt": "Que atitude de compaixão aplicaste a ti mesmo hoje?"
+        },
+        "challenge7": {
+            "title": "Bússola da Semana",
+            "description": "Adicione aqui a descrição do desafio 'Bússola da Semana'.",
+            "reflection_prompt": "Qual é a tarefa mais importante que identificaste para a próxima semana?"
+        },
+        "challenge8": {
+            "title": "Pergunta",
+            "description": "Adicione aqui a descrição do desafio 'Pergunta'.",
+            "reflection_prompt": "Que dúvida esclareceste hoje com um professor ou colega?"
+        },
+        "challenge9": {
+            "title": "Atualiza-te",
+            "description": "Adicione aqui a descrição do desafio 'Atualiza-te'.",
+            "reflection_prompt": "Que app de estudo exploraste ou que dica recebeste de um colega?"
+        },
+        "challenge10": {
+            "title": "Título do Desafio - Dia 11",
+            "description": "Descrição do desafio do dia 11."
+        },
+        "challenge11": {
+            "title": "Dia de Ser",
+            "description": "Adicione aqui a descrição do desafio 'Dia de Ser'.",
+            "reflection_prompt": "Que atividade de lazer escolheste para ti hoje?"
+        }
+    }
 }

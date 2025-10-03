@@ -64,6 +64,7 @@ def complete_challenge(
         batch_day_id=batch_day_id,
         challenge_id=input_dto.challengeId,
         completion_date=datetime.now(),
-        db=db
+        db=db,
+        user_answer=input_dto.user_answer
     )
     return newly_awarded_badges
