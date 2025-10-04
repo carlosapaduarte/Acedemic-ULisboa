@@ -17,7 +17,6 @@ import { EditTagModal } from "../../../components/TagsModal/EditTagModal";
 import { CreateTagModal } from "../../../components/TagsModal/CreateTagModal";
 import styles from "./EventModal.module.css";
 import { RiSettings5Fill } from "react-icons/ri";
-
 interface Tag {
   id: string;
   name: string;
@@ -341,6 +340,8 @@ export function EventModal({
   const isEditMode = !!eventToEdit;
   const FALLBACK_COLOR = "#3399FF";
 
+  const [error, setError] = useState<string | null>(null);
+
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -409,10 +410,18 @@ export function EventModal({
   };
 
   const handleSave = async () => {
+    setError(null);
+
     if (!title) {
-      alert(t("title_is_required"));
+      setError(t("title_is_required"));
       return;
     }
+
+    if (endDate < startDate) {
+      setError(t("end_date_before_start_date_error"));
+      return;
+    }
+
     const eventPayload = {
       title,
       startDate,
@@ -503,6 +512,13 @@ export function EventModal({
                   setIsEditTagModalOpen={setIsEditTagModalOpen}
                 />
               </div>
+
+              {error && (
+                <div className={styles.errorMessageContainer}>
+                  <p>{error}</p>
+                </div>
+              )}
+
               <div className={styles.finishCreatingEventButtonContainer}>
                 {isEditMode && (
                   <Button

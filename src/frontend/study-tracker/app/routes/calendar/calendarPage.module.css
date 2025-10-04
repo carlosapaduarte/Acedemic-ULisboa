@@ -22,3 +22,47 @@
     opacity: 1;
   }
 }
+
+.calendarHeaderActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-3);
+  border-bottom: 1px solid var(--color-2, #7df4be);
+}
+
+.button {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-family: var(--font-family2);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.createEventButton {
+  composes: button;
+  background-color: var(--color-2);
+  color: var(--text-color-1);
+  border-color: var(--color-2);
+}
+
+.createEventButton:hover {
+  background-color: var(--color-2-hover);
+  border-color: var(--color-2-hover);
+}
+
+.toggleButton {
+  composes: button;
+  background-color: transparent;
+  color: var(--color-2);
+  border-color: var(--color-2);
+}
+
+.toggleButton:hover {
+  background-color: rgba(125, 244, 190, 0.15);
+  color: var(--text-color-2);
+}

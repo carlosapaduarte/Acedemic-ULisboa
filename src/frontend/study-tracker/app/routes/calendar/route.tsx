@@ -37,7 +37,7 @@ const EventWithTags = ({
   allUserTags,
   style,
 }: {
-  event: CalendarEvent & { resource: CalendarEventResource };
+  event: CalendarEvent & { resource?: CalendarEventResource };
   allUserTags: Tag[];
   style?: React.CSSProperties;
 }) => {
@@ -190,7 +190,8 @@ function useMyCalendar() {
         service.fetchUserTags(),
       ]);
       setUserTags(tagsFromBackend);
-      const allOccurrences: CalendarEvent[] = [];
+
+      let allOccurrences: CalendarEvent[] = [];
       eventsFromBackend.forEach((event) => {
         const styleProps = getEventStyleProps(event, tagsFromBackend);
 
@@ -256,8 +257,17 @@ function useMyCalendar() {
           }
         });
       });
+
+      const filteredOccurrences = allOccurrences.filter((event) => {
+        if (eventsView === "recurringEvents") {
+          const resource = event.resource as CalendarEventResource;
+          return resource.everyDay || resource.everyWeek;
+        }
+        return true; // Se for 'allEvents', mantém todos
+      });
+
       const uniqueEventsMap = new Map<string, CalendarEvent>();
-      allOccurrences.forEach((ev) => {
+      filteredOccurrences.forEach((ev) => {
         const key = `${(ev.resource as CalendarEventResource).id}-${ev
           .start!.toISOString()
           .slice(0, 10)}`;
@@ -269,7 +279,7 @@ function useMyCalendar() {
     } catch (error) {
       console.error("Falha ao carregar dados do calendário:", error);
     }
-  }, [displayedDates]);
+  }, [displayedDates, eventsView]);
 
   useEffect(() => {
     refreshAllCalendarData();
@@ -363,6 +373,13 @@ function MyCalendar() {
     setSelectedSlot(null);
     setIsModalOpen(true);
   }, []);
+
+  const handleCreateEventClick = () => {
+    setEventToEdit(null);
+    setSelectedSlot(null);
+    setIsModalOpen(true);
+  };
+
   const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 400);
   useEffect(() => {
     const handleResize = () => {
@@ -444,17 +461,28 @@ function MyCalendar() {
         initialStartDate={selectedSlot?.start}
         initialEndDate={selectedSlot?.end}
       />
-      {calendarView !== Views.MONTH ? (
-        <button onClick={toggleEventsView}>
-          {eventsView === "allEvents" ? (
-            <span>{t("display_only_recurring_events_button")}</span>
-          ) : (
-            <span>{t("display_all_events_button")}</span>
-          )}
+
+      <div className={styles.calendarHeaderActions}>
+        {calendarView !== Views.MONTH ? (
+          <button onClick={toggleEventsView}>
+            {eventsView === "allEvents" ? (
+              <span>{t("display_only_recurring_events_button")}</span>
+            ) : (
+              <span>{t("display_all_events_button")}</span>
+            )}
+          </button>
+        ) : (
+          <div></div>
+        )}
+
+        <button
+          className={styles.createEventButton}
+          onClick={handleCreateEventClick}
+        >
+          {t("create_event_button")}
         </button>
-      ) : (
-        <></>
-      )}
+      </div>
+
       <div className={styles.calendarContainer}>
         <Calendar
           components={{
@@ -498,6 +526,7 @@ function MyCalendar() {
             },
           }}
           localizer={localizer}
+          scrollToTime={new Date(2000, 1, 1, 7)}
           events={events}
           startAccessor="start"
           endAccessor="end"

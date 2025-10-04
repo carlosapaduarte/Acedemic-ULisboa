@@ -79,3 +79,12 @@
 .rbc-agenda-view .rbc-agenda-table td {
   border-bottom: none;
 }
+
+.rbc-time-content .rbc-timeslot-group {
+  border-top: 1px solid #171006;
+}
+
+/* Linha dos 30 minutos */
+.rbc-time-content .rbc-timeslot-group .rbc-time-slot:nth-child(2) {
+  border-top: 0.5px solid #ce932f;
+}
