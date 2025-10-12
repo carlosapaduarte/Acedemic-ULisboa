@@ -121,7 +121,7 @@ export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
       setIsSaving(false);
     }
   };
-
+  const MAX_CHARS = 30;
   return (
     <Dialog className={styles.tagModal}>
       {({ close }) => (
@@ -136,11 +136,12 @@ export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
             <Input
               value={tagName}
               onChange={(e) => setTagName(e.target.value)}
-              placeholder={t(
-                "new_tag_name_placeholder",
-                "Nome da nova etiqueta"
-              )}
+              maxLength={MAX_CHARS}
+              placeholder={t("new_tag_name_placeholder")}
             />
+            <div className={styles.charCounter}>
+              {tagName.length} / {MAX_CHARS}
+            </div>
           </TextField>
 
           <ColorPickerInput

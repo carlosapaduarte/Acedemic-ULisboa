@@ -228,3 +228,11 @@
   margin: 5px;
   text-align: center;
 }
+
+.charCounter {
+  font-size: 0.8rem;
+  color: grey;
+  text-align: right;
+  margin-top: 4px;
+  padding-right: 2px;
+}

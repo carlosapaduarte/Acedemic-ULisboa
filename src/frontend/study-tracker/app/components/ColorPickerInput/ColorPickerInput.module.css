@@ -64,7 +64,6 @@
 }
 
 .hexValue {
-  font-family: var(--font-family2);
   font-size: 0.875rem;
   color: var(--text-color-2);
   flex-grow: 1;

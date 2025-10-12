@@ -343,7 +343,69 @@ function MyCalendar() {
     eventsView,
   } = useMyCalendar();
   const { t, i18n } = useTranslation(["calendar"]);
-  const localizer = momentLocalizer(moment);
+
+  useEffect(() => {
+    const lang = i18n.language.toLowerCase();
+    const localeToSet = lang.startsWith("pt") ? "pt" : "en";
+
+    //tradução dos meses e dias em PT manualmente
+    if (localeToSet === "pt") {
+      moment.updateLocale("pt", {
+        months: [
+          "janeiro",
+          "fevereiro",
+          "março",
+          "abril",
+          "maio",
+          "junho",
+          "julho",
+          "agosto",
+          "setembro",
+          "outubro",
+          "novembro",
+          "dezembro",
+        ],
+        monthsShort: [
+          "jan",
+          "fev",
+          "mar",
+          "abr",
+          "mai",
+          "jun",
+          "jul",
+          "ago",
+          "set",
+          "out",
+          "nov",
+          "dez",
+        ],
+        weekdays: [
+          "domingo",
+          "segunda-feira",
+          "terça-feira",
+          "quarta-feira",
+          "quinta-feira",
+          "sexta-feira",
+          "sábado",
+        ],
+        weekdaysShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+        weekdaysMin: ["D", "S", "T", "Q", "Q", "S", "S"],
+        week: { dow: 1 }, // começa segunda
+      });
+    } else {
+      moment.updateLocale("en", {
+        week: { dow: 1 }, // começa segunda tmb
+      });
+    }
+
+    moment.locale(localeToSet);
+  }, [i18n.language]);
+
+  const localizer = React.useMemo(
+    () => momentLocalizer(moment),
+    [i18n.language]
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<EventData | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{
@@ -411,6 +473,7 @@ function MyCalendar() {
     [setCalendarView]
   );
   const calendarMessages = getCalendarMessages();
+
   const calendarFormats = {
     monthHeaderFormat: (date: Date, culture?: string) =>
       moment(date)

@@ -220,7 +220,6 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection({
   );
 });
 
-// A Otimização React.memo foi REMOVIDA daqui
 const TagSection = ({
   selectedTagIds,
   setSelectedTagIds,
@@ -315,7 +314,7 @@ const EventForm = (props: any) => {
         label={props.label}
         color={props.color}
         setColor={props.setColor}
-        clearColor={() => props.setColor("#3399FF")}
+        clearColor={() => props.setColor(null)}
       />
       <TagSection
         selectedTagIds={props.selectedTagIds}
@@ -346,7 +345,8 @@ export function EventModal({
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [notes, setNotes] = useState("");
-  const [color, setColor] = useState(FALLBACK_COLOR);
+  //const [color, setColor] = useState(FALLBACK_COLOR);
+  const [color, setColor] = useState<string | null>(null);
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
@@ -394,7 +394,7 @@ export function EventModal({
           setStartDate(initialStartDate);
           setEndDate(initialEndDate);
           setNotes("");
-          setColor(FALLBACK_COLOR);
+          setColor(null);
           setRecurrenceType("none");
           setSelectedTagIds([]);
         }
@@ -427,7 +427,7 @@ export function EventModal({
       startDate,
       endDate,
       notes,
-      color: color === FALLBACK_COLOR ? undefined : color,
+      color: color || undefined,
       tags: selectedTagIds,
       everyDay: recurrenceType === "daily",
       everyWeek: recurrenceType === "weekly",

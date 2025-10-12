@@ -5,7 +5,7 @@ import styles from "./ColorPickerInput.module.css";
 
 interface ColorPickerInputProps {
   label?: string;
-  color?: string;
+  color?: string | null;
   setColor: (color: string) => void;
   clearColor: () => void;
 }
@@ -24,20 +24,25 @@ export function ColorPickerInput({
       <div className={styles.inputWrapper}>
         <Input
           type="color"
-          value={color}
+          // como o input de cor não pode ter valor nulo fica branco como fallback
+          value={color || "#ffffff"}
           onChange={(e) => {
-            console.log("ColorPickerInput: Cor selecionada:", e.target.value);
             setColor(e.target.value);
           }}
           className={styles.colorInput}
         />
+        {color ? (
+          <span className={styles.hexValue}>{color.toUpperCase()}</span>
+        ) : (
+          <span className={styles.hexValue}>
+            {t("choose_a_color", "Escolha uma cor")}
+          </span>
+        )}
 
-        <span className={styles.hexValue}>{color.toUpperCase()}</span>
         {color && (
           <Button
             className={styles.clearButton}
             onPress={() => {
-              console.log("ColorPickerInput:  A limpar a cor");
               clearColor();
             }}
             aria-label={t("clear_custom_color")}

@@ -188,6 +188,7 @@
   font-size: 1rem;
   font-weight: 500;
   border: 2px solid transparent;
+  word-break: break-word; /* parte palavras muito longas para não saírem do contentor */
 }
 
 .tagItem:hover {
