@@ -61,8 +61,8 @@ def seed_gamification_data(session: Session):
 
     initial_levels = [
         {"code": "level_0", "name": "Início", "rank": 0, "description": "Nível inicial para todos os novos aventureiros.", "badge_icon_url": "/assets/badges/levels/level_0.png", "promotion_criteria_json": None},
-        {"code": "level_1", "name": "Iniciante", "rank": 1, "description": "Complete os desafios iniciais para dominar a autoeficácia.", "badge_icon_url": "/assets/badges/levels/level_1.png", "promotion_criteria_json": None},
-        {"code": "level_2", "name": "Intermediário", "rank": 2, "description": "Aprofunde a sua determinação e torne-se um pioneiro.", "badge_icon_url": "/assets/badges/levels/level_2.png", "promotion_criteria_json": None},
+        {"code": "level_1", "name": "Iniciado", "rank": 1, "description": "Complete os desafios iniciais para dominar a autoeficácia.", "badge_icon_url": "/assets/badges/levels/level_1.png", "promotion_criteria_json": None},
+        {"code": "level_2", "name": "Intermédio", "rank": 2, "description": "Aprofunde a sua determinação e torne-se um pioneiro.", "badge_icon_url": "/assets/badges/levels/level_2.png", "promotion_criteria_json": None},
         {"code": "level_3", "name": "Avançado", "rank": 3, "description": "Construa hábitos sólidos para se tornar um campeão.", "badge_icon_url": "/assets/badges/levels/level_3.png", "promotion_criteria_json": None},
     ]
 

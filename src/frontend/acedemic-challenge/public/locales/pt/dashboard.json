@@ -15,7 +15,7 @@
     "not_on_batch_message": "Ainda não está num conjunto de 21 desafios, selecione um nível para começar um novo!",
     "reflection_placeholder": "Escreva aqui a sua reflexão...",
     "skip_button": "Saltar",
-    "save_and_complete_button": "Guardar e Completar",
+    "save_and_complete_button": "Guardar",
     "level1": {
         "challenge0": {
             "title": "Despertar",

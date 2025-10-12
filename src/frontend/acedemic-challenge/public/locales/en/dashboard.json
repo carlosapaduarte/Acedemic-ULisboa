@@ -15,7 +15,7 @@
     "not_on_batch_message": "You are not in a set of 21 challenges yet, select a level to start a new one!",
     "reflection_placeholder": "Write here your reflection...",
     "skip_button": "Skip",
-    "save_and_complete_button": "Save and Complete",
+    "save_and_complete_button": "Save",
     "level1": {
         "challenge0": {
             "title": "Awakening",

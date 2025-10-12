@@ -88,9 +88,9 @@ export function GreetingsContainer() {
                                 "number" && (
                                 <p className={styles.levelText}>
                                     {userInfo.currentChallengeLevel === 1 &&
-                                        "Iniciante"}
+                                        "Iniciado"}
                                     {userInfo.currentChallengeLevel === 2 &&
-                                        "Intermediário"}
+                                        "Intermédio"}
                                     {userInfo.currentChallengeLevel === 3 &&
                                         "Avançado"}
                                 </p>
