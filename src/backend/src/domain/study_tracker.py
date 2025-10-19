@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from enum import Enum
-
+from typing import Optional
 from repository.sql.models.models import STArchiveModel, STCurricularUnitModel, STEventModel, STFileModel, STGradeModel, WeekStudyTimeModel
 from router.study_tracker.dtos.input_dtos import CreateTaskInputDto, SlotToWorkInputDto
 
@@ -121,7 +121,7 @@ class ScheduleBlock():
 """
 
 class Event():
-    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool, every_day: bool, color: str,notes: str = ""):
+    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool, every_day: bool, color: Optional[str] = None,notes: str = ""):
         self.id=id
         self.title=title
         self.date=date

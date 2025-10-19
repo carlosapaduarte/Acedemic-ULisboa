@@ -299,7 +299,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
         tags: list[str] = []
         for tag_model in task_model.tags:
-            tags.append(tag_model.tag)
+            display_name = tag_model.name_pt or tag_model.name_en
+            if display_name:
+                tags.append(display_name)
             
         return Task(
             id=task_model.id,
@@ -420,9 +422,16 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session.flush()
 
         for tag_name in task.tags:
-            # 1. Procura a tag na base de dados pelo nome
-            tag_obj = session.exec(select(TagModel).where(TagModel.name == tag_name.lower())).first()
-            
+            # 1. Procura a tag na base de dados pelo nome (pt ou en)
+            tag_obj = session.exec(
+                select(TagModel).where(
+                    or_(
+                        TagModel.name_pt.ilike(tag_name),
+                        TagModel.name_en.ilike(tag_name)
+                    )
+                )
+            ).first()
+
             # 2. Se não existir, cria-a
             if not tag_obj:
                 # TODO: a cor e descrição podem precisar de valores padrão ou vir do frontend
