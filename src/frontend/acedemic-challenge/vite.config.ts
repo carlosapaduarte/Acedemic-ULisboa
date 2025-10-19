@@ -6,7 +6,14 @@ import * as path from "node:path";
 export default defineConfig({
     base: "/challenge/",
     server: {
-        port: 5173
+        port: 5173,
+        proxy: {
+            "/api": {
+                target: "http://localhost:8000",
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, ""),
+            },
+        },
     },
     plugins: [
         remix({
@@ -14,21 +21,21 @@ export default defineConfig({
             future: {
                 v3_fetcherPersist: true,
                 v3_relativeSplatPath: true,
-                v3_throwAbortReason: true
-            }
+                v3_throwAbortReason: true,
+            },
         }),
-        tsconfigPaths()
+        tsconfigPaths(),
     ],
     css: {
         preprocessorOptions: {
             scss: {
-                api: "modern-compiler" // or "modern"
-            }
-        }
+                api: "modern-compiler", // or "modern"
+            },
+        },
     },
     resolve: {
         alias: {
-            "@": path.resolve(__dirname, "./app")
-        }
-    }
+            "@": path.resolve(__dirname, "./app"),
+        },
+    },
 });

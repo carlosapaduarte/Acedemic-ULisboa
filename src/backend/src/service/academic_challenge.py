@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from sqlmodel import Session 
 from repository.sql.models.database import get_session
 from fastapi import Depends 
@@ -26,13 +26,15 @@ def complete_challenge(
     batch_day_id: int, 
     challenge_id: int, 
     completion_date: datetime,
-    db: Session
+    db: Session,
+    user_answer: Optional[str] = None
 ) -> Dict[str, Any]:
     # marca o desafio como completo
     ranks_before = gamification_service.get_completed_level_ranks(db, user_id, app_scope="academic_challenge")
     academic_challenge_repo.complete_challenge(
         user_id=user_id, batch_id=batch_id, batch_day_id=batch_day_id, 
-        challenge_id=challenge_id, completion_date=completion_date
+        challenge_id=challenge_id, completion_date=completion_date,
+        user_answer=user_answer
     )
     
     newly_awarded_badges = gamification_service.update_challenge_completion_metrics(db, user_id)

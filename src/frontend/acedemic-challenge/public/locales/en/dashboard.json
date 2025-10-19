@@ -12,5 +12,67 @@
     "my_notes": "My Notes",
     "no_notes": "No notes yet...",
     "notes": "Notes",
-    "not_on_batch_message": "You are not in a set of 21 challenges yet, select a level to start a new one!"
+    "not_on_batch_message": "You are not in a set of 21 challenges yet, select a level to start a new one!",
+    "reflection_placeholder": "Write here your reflection...",
+    "skip_button": "Skip",
+    "save_and_complete_button": "Save",
+    "level1": {
+        "challenge0": {
+            "title": "Awakening",
+            "description": "Add the description for the 'Awakening' challenge here.",
+            "reflection_prompt": "What was the phrase/word you chose?"
+        },
+        "challenge1": {
+            "title": "Mindful Walking",
+            "description": "Add the description for the 'Mindful Walking' challenge here.",
+            "reflection_prompt": "What academic goal did you set for this week? And where did you place it?"
+        },
+        "challenge2": {
+            "title": "Challenge Title - Day 3",
+            "description": "Description for the day 3 challenge."
+        },
+        "challenge3": {
+            "title": "Learning to Learn",
+            "description": "Add the description for the 'Learning to Learn' challenge here.",
+            "reflection_prompt": "What was the most important concept you reviewed?"
+        },
+        "challenge4": {
+            "title": "Challenge Title - Day 5",
+            "description": "Description for the day 5 challenge."
+        },
+        "challenge5": {
+            "title": "Daily Page",
+            "description": "Add the description for the 'Daily Page' challenge here.",
+            "reflection_prompt": "What was the main question or reflection you noted down?"
+        },
+        "challenge6": {
+            "title": "Day of Compassion",
+            "description": "Add the description for the 'Day of Compassion' challenge here.",
+            "reflection_prompt": "What act of compassion did you apply to yourself today?"
+        },
+        "challenge7": {
+            "title": "Weekly Compass",
+            "description": "Add the description for the 'Weekly Compass' challenge here.",
+            "reflection_prompt": "What is the most important task you identified for next week?"
+        },
+        "challenge8": {
+            "title": "Question",
+            "description": "Add the description for the 'Question' challenge here.",
+            "reflection_prompt": "What question did you clarify with a teacher or colleague today?"
+        },
+        "challenge9": {
+            "title": "Get Updated",
+            "description": "Add the description for the 'Get Updated' challenge here.",
+            "reflection_prompt": "What study app did you explore or what tip did you receive from a colleague?"
+        },
+        "challenge10": {
+            "title": "Challenge Title - Day 11",
+            "description": "Description for the day 11 challenge."
+        },
+        "challenge11": {
+            "title": "Day of Being",
+            "description": "Add the description for the 'Day of Being' challenge here.",
+            "reflection_prompt": "What leisure activity did you choose for yourself today?"
+        }
+    }
 }

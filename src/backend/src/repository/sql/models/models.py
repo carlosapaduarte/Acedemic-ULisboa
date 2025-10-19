@@ -203,6 +203,8 @@ class ChallengeModel(SQLModel, table=True):
     batch_id: int = Field(primary_key=True)
     user_id: int = Field(primary_key=True)
     completion_date: datetime | None
+    user_answer: Optional[str] = Field(default=None, nullable=True)
+    
     batch_day: BatchDayModel = Relationship(back_populates="challenges")
     __table_args__ = (
         ForeignKeyConstraint(
@@ -394,3 +396,4 @@ class UserLeague(SQLModel, table=True):
     __table_args__ = (
         UniqueConstraint('user_id', 'league_id', name='_user_league_uc'),
     )
+

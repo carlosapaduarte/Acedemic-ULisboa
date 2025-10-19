@@ -88,11 +88,11 @@ export function GreetingsContainer() {
                                 "number" && (
                                 <p className={styles.levelText}>
                                     {userInfo.currentChallengeLevel === 1 &&
-                                        "Nível: Pouco Eficaz"}
+                                        "Iniciado"}
                                     {userInfo.currentChallengeLevel === 2 &&
-                                        "Nível: Eficaz"}
+                                        "Intermédio"}
                                     {userInfo.currentChallengeLevel === 3 &&
-                                        "Nível: Muito Eficaz"}
+                                        "Avançado"}
                                 </p>
                             )}
                         </>

@@ -1,7 +1,6 @@
 import { Challenge } from "./types";
 import { StoredChallenge } from "~/service/service";
 
-
 /**
  * Returns the full challenge from the one stored in the database.
  *
@@ -13,12 +12,32 @@ import { StoredChallenge } from "~/service/service";
  * @param storedChallenge The challenge stored in the database
  * @param t The translation function
  */
-export function getFullChallenge(level: number, storedChallenge: StoredChallenge, t: (key: string) => string): Challenge {
+export function getFullChallenge(
+    level: number,
+    storedChallenge: StoredChallenge,
+    t: (key: string) => string,
+): Challenge {
+    const keyWithNamespace = `dashboard:level${level}.challenge${storedChallenge.id}.reflection_prompt`;
+    const keyWithoutNamespace = `level${level}.challenge${storedChallenge.id}.reflection_prompt`;
+    const promptText = t(keyWithNamespace);
+
     return {
         id: storedChallenge.id,
         title: t(`level${level}.challenge${storedChallenge.id}.title`),
-        description: t(`level${level}.challenge${storedChallenge.id}.description`),
-        completionDate: storedChallenge.completionDate ? new Date(storedChallenge.completionDate * 1000) : null
+        description: t(
+            `level${level}.challenge${storedChallenge.id}.description`,
+        ),
+        completionDate: storedChallenge.completionDate
+            ? new Date(storedChallenge.completionDate * 1000)
+            : null,
+        user_answer: storedChallenge.user_answer ?? null,
+
+        reflection_prompt:
+            promptText &&
+            promptText !== keyWithNamespace &&
+            promptText !== keyWithoutNamespace
+                ? promptText
+                : null,
     };
 }
 
@@ -50,7 +69,10 @@ export function getChallengeIdList(level: number): number[] | number[][] {
  * database for historical purposes.
  */
 function getLevel1ChallengeIdList(): number[] {
-    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    return [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        20,
+    ];
 }
 
 /**
@@ -63,7 +85,10 @@ function getLevel1ChallengeIdList(): number[] {
  * database for historical purposes.
  */
 function getLevel2ChallengeIdList(): number[] {
-    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    return [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        20,
+    ];
 }
 
 /**
@@ -97,6 +122,6 @@ function getLevel3ChallengeIdList(): number[][] {
         [0, 1, 2, 3, 4],
         [0, 1, 2, 3, 4],
         [0, 1, 2, 3, 4],
-        [0, 1, 2, 3, 4]
+        [0, 1, 2, 3, 4],
     ];
 }

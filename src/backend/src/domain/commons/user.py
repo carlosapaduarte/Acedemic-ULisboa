@@ -11,9 +11,10 @@ class UserNote:
 
 
 class Challenge:
-    def __init__(self, id: int, completion_date: datetime | None) -> None:
+    def __init__(self, id: int, completion_date: datetime | None, user_answer: str | None = None) -> None:
         self.id = id
         self.completion_date = completion_date
+        self.user_answer = user_answer
 
 
 class BatchDay:

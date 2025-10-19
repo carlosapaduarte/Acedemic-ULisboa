@@ -172,12 +172,14 @@ export type UserNote = {
 export type StoredChallenge = {
     id: number;
     completionDate: number | null;
+    user_answer?: string | null;
 };
 
 export type StoredBatchDay = {
     id: number;
     challenges: StoredChallenge[];
     notes: string;
+    user_answer?: string | null;
 };
 
 export type Batch = {
@@ -240,11 +242,12 @@ async function markChallengeAsCompleted(
     batchId: number,
     batchDayId: number,
     challengeId: number,
+    userAnswer: string | null,
 ) {
     const request = {
         path: `academic-challenge/users/me/batches/${batchId}/${batchDayId}/completed-challenges`,
         method: "POST",
-        body: toJsonBody({ challengeId }),
+        body: toJsonBody({ challengeId, user_answer: userAnswer }),
     };
     const response: Response = await doFetch(request);
     if (!response.ok)
@@ -255,15 +258,17 @@ async function markChallengeAsCompleted(
 }
 
 async function fetchGamificationProfile() {
-  const request = {
-    path: `gamification/profile/me?app_scope=academic_challenge`,
-    method: "GET",
-  };
-  const response: Response = await doFetch(request);
-  if (!response.ok) {
-    return Promise.reject(new Error("Failed to fetch gamification profile!"));
-  }
-  return response.json();
+    const request = {
+        path: `gamification/profile/me?app_scope=academic_challenge`,
+        method: "GET",
+    };
+    const response: Response = await doFetch(request);
+    if (!response.ok) {
+        return Promise.reject(
+            new Error("Failed to fetch gamification profile!"),
+        );
+    }
+    return response.json();
 }
 
 export const service = {

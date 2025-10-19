@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from router import tags
 from repository.sql.models.database import create_db_and_tables ,seed_all_data
 from router.study_tracker import study_tracker
+import uvicorn
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -25,13 +26,7 @@ def on_startup():
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
 
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
-    seed_all_data()
-    
 # CORS
 dev_mode = True
 if dev_mode:
@@ -95,3 +90,6 @@ async def invalid_date_exception_handler(request: Request, exc: InvalidDate):
         status_code=400, # Conflict
         content={"error": "Date is invalid"},
     )
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

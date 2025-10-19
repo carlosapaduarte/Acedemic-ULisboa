@@ -5,7 +5,6 @@ import Challenges from "~/routes/_index/Home/components/Challenges/Challenges";
 import styles from "./challengeView.module.css";
 import { ChallengesContext } from "~/hooks/useChallenges";
 
-
 function useChallengeViewHook() {
     const { currentBatch, currentDayIndex, batchDays } =
         useContext(ChallengesContext);
@@ -37,24 +36,28 @@ export function ChallengeView({
         challenge: Challenge,
         batchDay: BatchDay,
         batch: Batch,
+        userAnswer: string | null,
     ) {
         try {
             const responseData = await service.markChallengeAsCompleted(
                 batch.id,
                 batchDay.id,
-                challenge.id
+                challenge.id,
+                userAnswer,
             );
-            
+
             if (responseData) {
-                const newlyAwardedBadges: Badge[] = responseData.newly_awarded_badges;
-                const completedLevelRank: number | null = responseData.completed_level_rank;
-                
+                const newlyAwardedBadges: Badge[] =
+                    responseData.newly_awarded_badges;
+                const completedLevelRank: number | null =
+                    responseData.completed_level_rank;
+
                 fetchUserInfo();
 
                 if (newlyAwardedBadges && newlyAwardedBadges.length > 0) {
                     showBadgeAnimation(newlyAwardedBadges[0]);
                 }
-                
+
                 if (
                     completedLevelRank !== null &&
                     completedLevelRank !== undefined
@@ -76,11 +79,15 @@ export function ChallengeView({
             <div className={styles.challengesContainerWrapper}>
                 <Challenges
                     currentBatchDay={currentBatchDay}
-                    onMarkComplete={(challenge: Challenge) =>
+                    onMarkComplete={(
+                        challenge: Challenge,
+                        userAnswer: string | null,
+                    ) =>
                         onMarkCompleteClickHandler(
                             challenge,
                             currentBatchDay,
                             currentBatch,
+                            userAnswer,
                         )
                     }
                     onViewNotesButtonClick={onViewNotesButtonClick}
@@ -91,4 +98,3 @@ export function ChallengeView({
 
     return <></>;
 }
-
