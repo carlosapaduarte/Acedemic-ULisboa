@@ -18,14 +18,18 @@ export function ColorPickerInput({
 }: ColorPickerInputProps) {
   const { t } = useTranslation("calendar");
 
+  const fallbackHexValue = "#703f3a";
+
   return (
     <div className={styles.colorPickerContainer}>
       <Label className={styles.label}>{label}</Label>
       <div className={styles.inputWrapper}>
         <Input
           type="color"
-          // como o input de cor não pode ter valor nulo fica branco como fallback
-          value={color || "#ffffff"}
+          value={color || fallbackHexValue}
+          style={{
+            backgroundColor: color ? color : "var(--color-event-fallback)",
+          }}
           onChange={(e) => {
             setColor(e.target.value);
           }}

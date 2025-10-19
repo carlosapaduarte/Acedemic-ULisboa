@@ -198,16 +198,26 @@ function useMyCalendar() {
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
   const [eventsView, setEventsView] = useState<EventsView>("allEvents");
   const { i18n } = useTranslation();
-  const [displayedDates, setDisplayedDates] = useState<Date[]>(() => {
-    const today = new Date();
+  const [displayedDates, setDisplayedDates] = useState<Date[]>([]);
+
+  useEffect(() => {
+    const lang = i18n.language.toLowerCase();
+    const localeToSet = lang.startsWith("pt") ? "pt" : "en";
+
+    if (localeToSet === "pt") {
+      moment.updateLocale("pt", { week: { dow: 1 } });
+    } else {
+      moment.updateLocale("en", { week: { dow: 1 } });
+    }
+    moment.locale(localeToSet);
+
+    const startOfWeek = moment().startOf("week").toDate();
     const dates = [];
     for (let i = 0; i < 7; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - today.getDay() + i);
-      dates.push(d);
+      dates.push(moment(startOfWeek).add(i, "days").toDate());
     }
-    return dates;
-  });
+    setDisplayedDates(dates);
+  }, [i18n.language]);
 
   const refreshAllCalendarData = useCallback(async () => {
     try {
@@ -375,63 +385,6 @@ function MyCalendar() {
   useEffect(() => {
     refreshUserEvents();
   }, [i18n.language, refreshUserEvents]);
-
-  useEffect(() => {
-    const lang = i18n.language.toLowerCase();
-    const localeToSet = lang.startsWith("pt") ? "pt" : "en";
-
-    //tradução dos meses e dias em PT manualmente
-    if (localeToSet === "pt") {
-      moment.updateLocale("pt", {
-        months: [
-          "janeiro",
-          "fevereiro",
-          "março",
-          "abril",
-          "maio",
-          "junho",
-          "julho",
-          "agosto",
-          "setembro",
-          "outubro",
-          "novembro",
-          "dezembro",
-        ],
-        monthsShort: [
-          "jan",
-          "fev",
-          "mar",
-          "abr",
-          "mai",
-          "jun",
-          "jul",
-          "ago",
-          "set",
-          "out",
-          "nov",
-          "dez",
-        ],
-        weekdays: [
-          "domingo",
-          "segunda-feira",
-          "terça-feira",
-          "quarta-feira",
-          "quinta-feira",
-          "sexta-feira",
-          "sábado",
-        ],
-        weekdaysShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
-        weekdaysMin: ["D", "S", "T", "Q", "Q", "S", "S"],
-        week: { dow: 1 }, // começa segunda
-      });
-    } else {
-      moment.updateLocale("en", {
-        week: { dow: 1 }, // começa segunda tmb
-      });
-    }
-
-    moment.locale(localeToSet);
-  }, [i18n.language]);
 
   const localizer = React.useMemo(
     () => momentLocalizer(moment),

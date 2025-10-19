@@ -13,12 +13,18 @@
   --color-2-hover: rgba(89, 46, 37, 0.6);
   --color-4-hover: rgba(88, 119, 80, 0.6);
 
+  --color-event-fallback: var(--color-3);
+
   --text-color-1: #000000;
   --text-color-2: #ffffff;
   --color-text-danger: #b01b10;
 
   --font-family1: "DM Sans";
   --font-family2: "Chakra Petch";
+}
+
+body.dark-theme {
+  --color-event-fallback: #2a2a2a;
 }
 
 html,
