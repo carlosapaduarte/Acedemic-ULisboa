@@ -1,7 +1,6 @@
 from dataclasses import Field
 from typing import List, Optional
-from pydantic import BaseModel
-
+from pydantic import BaseModel, model_validator
 
 class SetStudyTrackerAppUseGoalsInputDto(BaseModel):
     uses: set[int]
@@ -95,9 +94,27 @@ class UpdateWeekStudyTime(BaseModel):
     time: int
     
 class CreateTagInputDto(BaseModel):
-    name: str
-    color: str
+    name_pt: Optional[str] = None
+    name_en: Optional[str] = None
+    color: Optional[str] = None
+
+    @model_validator(mode='before')
+    @classmethod
+    def check_at_least_one_name(cls, data: dict):
+        # Valida se pelo menos um dos nomes foi fornecido
+        if not data.get('name_pt') and not data.get('name_en'):
+            raise ValueError('É necessário fornecer pelo menos um nome para a etiqueta (name_pt ou name_en).')
+        return data
 
 class UpdateTagInputDto(BaseModel):
-    name: str
-    color: str
+    name_pt: Optional[str] = None
+    name_en: Optional[str] = None
+    color: Optional[str] = None
+
+    @model_validator(mode='before')
+    @classmethod
+    def check_at_least_one_name(cls, data: dict):
+        # Valida se pelo menos um dos nomes foi fornecido
+        if not data.get('name_pt') and not data.get('name_en'):
+            raise ValueError('É necessário fornecer pelo menos um nome para a etiqueta (name_pt ou name_en).')
+        return data

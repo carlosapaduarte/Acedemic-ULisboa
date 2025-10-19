@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task, WeekTimeStudy
@@ -200,7 +201,6 @@ class WeekTimeStudyOutputDto(BaseModel):
     
 class TagOutputDto(BaseModel):
     id: int
-    name: str
+    name_pt: Optional[str] = None
+    name_en: Optional[str] = None
     color: str
-    description: str
-    user_id: int

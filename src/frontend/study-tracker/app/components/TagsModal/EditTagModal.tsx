@@ -19,19 +19,22 @@ interface EditTagModalProps {
   onTagsUpdate: () => void;
 }
 
+const PREDEFINED_TAG_NAMES = ["fun", "work", "personal", "study"];
+
 export function EditTagModal({
   isOpen,
   setIsOpen,
   onTagsUpdate,
 }: EditTagModalProps) {
-  const { t } = useTranslation("calendar");
+  const { t, i18n } = useTranslation("calendar");
 
   const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
   const [tagToEdit, setTagToEdit] = useState<Tag | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [name, setName] = useState("");
+  const [namePt, setNamePt] = useState("");
+  const [nameEn, setNameEn] = useState("");
   const [color, setColor] = useState("#CCCCCC");
   const [description, setDescription] = useState("");
 
@@ -50,20 +53,18 @@ export function EditTagModal({
   useEffect(() => {
     if (isOpen) {
       fetchAllTags();
-    } else {
-      setTagToEdit(null);
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (tagToEdit) {
-      setName(tagToEdit.name);
+      setNamePt(tagToEdit.name_pt || "");
+      setNameEn(tagToEdit.name_en || "");
       setColor(tagToEdit.color || "#CCCCCC");
-      setDescription(tagToEdit.description || "");
     } else {
-      setName("");
+      setNamePt("");
+      setNameEn("");
       setColor("#CCCCCC");
-      setDescription("");
     }
   }, [tagToEdit]);
 
@@ -72,10 +73,14 @@ export function EditTagModal({
   };
 
   const handleSave = async () => {
-    if (!name.trim() || !tagToEdit) return;
+    if ((!namePt.trim() && !nameEn.trim()) || !tagToEdit) return;
     setIsSaving(true);
     try {
-      await service.updateTag(tagToEdit.id, { name, color, description });
+      await service.updateTag(tagToEdit.id, {
+        name_pt: namePt,
+        name_en: nameEn,
+        color: color,
+      });
       onTagsUpdate();
       await fetchAllTags();
       setTagToEdit(null);
@@ -88,9 +93,15 @@ export function EditTagModal({
   };
 
   const handleDelete = async () => {
+    const lang = i18n.language.toLowerCase();
+    const displayName =
+      lang.startsWith("en") && tagToEdit?.name_en
+        ? tagToEdit.name_en
+        : tagToEdit?.name_pt;
+
     if (
       !tagToEdit ||
-      !window.confirm(t("tag_delete_confirmation", { tagName: name }))
+      !window.confirm(t("tag_delete_confirmation", { tagName: displayName }))
     )
       return;
     setIsSaving(true);
@@ -101,7 +112,7 @@ export function EditTagModal({
       setTagToEdit(null);
     } catch (error) {
       console.error("Erro ao apagar a tag:", error);
-      alert(t("error_deleting_tag", { tagName: name }));
+      alert(t("error_deleting_tag", { tagName: displayName }));
     } finally {
       setIsSaving(false);
     }
@@ -134,22 +145,36 @@ export function EditTagModal({
               {isLoading ? (
                 <p>{t("loading_tags")}...</p>
               ) : (
-                allUserTags.map((tag) => (
-                  <div
-                    key={tag.id}
-                    className={classNames(styles.tagItem, {
-                      [styles.currentlyEditingTag]: tagToEdit?.id === tag.id,
-                    })}
-                    style={{ borderColor: tag.color || "#888" }}
-                    onClick={() => handleTagSelect(tag)}
-                  >
+                allUserTags.map((tag) => {
+                  let displayName: string | undefined | null;
+
+                  if (tag.name && PREDEFINED_TAG_NAMES.includes(tag.name)) {
+                    displayName = t(`tags:${tag.name}`);
+                  } else {
+                    const lang = i18n.language.toLowerCase();
+                    displayName =
+                      lang.startsWith("en") && tag.name_en
+                        ? tag.name_en
+                        : tag.name_pt;
+                  }
+
+                  return (
                     <div
-                      className={styles.tagColorDot}
-                      style={{ backgroundColor: tag.color || "#888" }}
-                    />
-                    {tag.name}
-                  </div>
-                ))
+                      key={tag.id}
+                      className={classNames(styles.tagItem, {
+                        [styles.currentlyEditingTag]: tagToEdit?.id === tag.id,
+                      })}
+                      style={{ borderColor: tag.color || "#888" }}
+                      onClick={() => handleTagSelect(tag)}
+                    >
+                      <div
+                        className={styles.tagColorDot}
+                        style={{ backgroundColor: tag.color || "#888" }}
+                      />
+                      {displayName}
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
@@ -159,12 +184,23 @@ export function EditTagModal({
               <>
                 <div className={styles.editFormContainer}>
                   <TextField className={styles.textField} autoFocus>
-                    <Label>{t("tag_name_label")}</Label>
+                    <Label>
+                      {t("tag_name_pt_label", "Nome da Etiqueta (PT)")}
+                    </Label>
                     <Input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      value={namePt}
+                      onChange={(e) => setNamePt(e.target.value)}
                     />
                   </TextField>
+
+                  <TextField className={styles.textField}>
+                    <Label>{t("tag_name_en_label", "Tag Name (EN)")}</Label>
+                    <Input
+                      value={nameEn}
+                      onChange={(e) => setNameEn(e.target.value)}
+                    />
+                  </TextField>
+
                   <ColorPickerInput
                     label={t("tag_color_label")}
                     color={color}
@@ -184,7 +220,7 @@ export function EditTagModal({
                   <Button
                     onPress={handleSave}
                     className={styles.saveButton}
-                    isDisabled={isSaving}
+                    isDisabled={isSaving || (!namePt.trim() && !nameEn.trim())}
                   >
                     {isSaving ? t("saving_label") : t("save_button")}
                   </Button>

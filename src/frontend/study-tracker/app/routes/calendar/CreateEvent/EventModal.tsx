@@ -19,7 +19,8 @@ import styles from "./EventModal.module.css";
 import { RiSettings5Fill } from "react-icons/ri";
 interface Tag {
   id: string;
-  name: string;
+  name_pt: string;
+  name_en?: string;
   user_id: number;
   color?: string;
 }
@@ -233,7 +234,7 @@ const TagSection = ({
   refreshTags: () => void;
   setIsEditTagModalOpen: (isOpen: boolean) => void;
 }) => {
-  const { t } = useTranslation("calendar");
+  const { t, i18n } = useTranslation("calendar");
 
   const handleToggleTag = (tagId: string) => {
     setSelectedTagIds((prev) =>
@@ -261,6 +262,10 @@ const TagSection = ({
         <div className={styles.tagListContainer}>
           {availableTags.map((tag: Tag) => {
             const isSelected = selectedTagIds.includes(tag.id);
+            const lang = i18n.language.toLowerCase();
+            const displayName =
+              lang.startsWith("en") && tag.name_en ? tag.name_en : tag.name_pt;
+
             return (
               <div
                 key={tag.id}
@@ -274,7 +279,7 @@ const TagSection = ({
                     : "var(--color-2)",
                 }}
               >
-                <span className={styles.tagLabel}>{t(tag.name)}</span>
+                <span className={styles.tagLabel}>{displayName}</span>
               </div>
             );
           })}
@@ -374,7 +379,8 @@ export function EventModal({
           setStartDate(new Date(eventToEdit.start));
           setEndDate(new Date(eventToEdit.end));
           setNotes(eventToEdit.notes || "");
-          setColor(eventToEdit.color || FALLBACK_COLOR);
+          setColor(eventToEdit.color || null);
+
           if (eventToEdit.everyDay) setRecurrenceType("daily");
           else if (eventToEdit.everyWeek) setRecurrenceType("weekly");
           else setRecurrenceType("none");
@@ -383,7 +389,10 @@ export function EventModal({
           const tagIdsToSelect = tagIdentifiers
             .map((identifier) => {
               const foundTag = fetchedTags.find(
-                (t) => t.name === identifier || t.id === identifier
+                (t) =>
+                  t.name_pt === identifier ||
+                  t.name_en === identifier ||
+                  t.id === identifier
               );
               return foundTag ? foundTag.id : null;
             })

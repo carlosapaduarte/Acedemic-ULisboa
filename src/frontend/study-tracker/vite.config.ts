@@ -4,31 +4,38 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import * as path from "node:path";
 
 export default defineConfig({
-    base: "/tracker/",
-    server: {
-        port: 5273
+  base: "/tracker/",
+  server: {
+    port: 5273,
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:8000", // Backend server URL
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
     },
-    plugins: [
-        remix({
-            basename: "/tracker/",
-            future: {
-                v3_fetcherPersist: true,
-                v3_relativeSplatPath: true,
-                v3_throwAbortReason: true
-            }
-        }),
-        tsconfigPaths()
-    ],
-    css: {
-        preprocessorOptions: {
-            scss: {
-                api: "modern-compiler" // or "modern"
-            }
-        }
+  },
+  plugins: [
+    remix({
+      basename: "/tracker/",
+      future: {
+        v3_fetcherPersist: true,
+        v3_relativeSplatPath: true,
+        v3_throwAbortReason: true,
+      },
+    }),
+    tsconfigPaths(),
+  ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern-compiler", // or "modern"
+      },
     },
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./app")
-        }
-    }
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./app"),
+    },
+  },
 });

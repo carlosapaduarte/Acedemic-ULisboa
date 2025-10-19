@@ -6,6 +6,7 @@ from sqlmodel import select, Session # Importar Session síncrona
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
+from sqlalchemy import or_
 from service.gamification import core as gamification_service
 from repository.sql.models.models import TagModel, UserModel, UserTagLink
 from pydantic import BaseModel
@@ -103,7 +104,6 @@ def create_user_route(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Erro ao criar utilizador com tags: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"type": "USER_CREATION_FAILED", "field": "general"}
@@ -156,7 +156,8 @@ def get_user_tags(
             response_tags.append(
                 TagOutputDto(
                     id=str(tag.id),
-                    name=tag.name,
+                    name_pt=tag.name_pt,
+                    name_en=tag.name_en,
                     user_id=link.user_id,
                     is_custom=link.is_custom,
                     color=tag.color
@@ -204,54 +205,69 @@ def delete_user_tag(
         )
 
 
-
 @router.post("/users/me/tags", response_model=TagOutputDto, status_code=status.HTTP_201_CREATED)
 def create_user_tag(
     tag_input: CreateTagInputDto,
     current_user_id: Annotated[int, Depends(get_current_user_id)],
     db: Annotated[Session, Depends(get_db_session)]
 ):
+    name_pt = tag_input.name_pt.strip() if tag_input.name_pt else None
+    name_en = tag_input.name_en.strip() if tag_input.name_en else None
+
+    # se um nome não for fornecido, usa o outro.
+    final_pt = name_pt if name_pt else name_en
+    final_en = name_en if name_en else name_pt
+
     try:
         existing_tag = (db.exec(
-            select(TagModel).where(TagModel.name.ilike(tag_input.name))
+            select(TagModel).where(or_(TagModel.name_pt.ilike(final_pt), TagModel.name_en.ilike(final_en)))
         )).first()
 
-        if existing_tag:
-    
-            user_tag_link = (db.exec(
-                select(UserTagLink).where(
-                    UserTagLink.user_id == current_user_id,
-                    UserTagLink.tag_id == existing_tag.id
-                )
-            )).first()
+        tag_to_associate: TagModel
 
-            if user_tag_link:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={"type": "TAG_ALREADY_EXISTS_FOR_USER", "field": "tag_name"}
-                )
-            else:
-                new_user_tag_link = UserTagLink(user_id=current_user_id, tag_id=existing_tag.id,is_custom=True)
-                db.add(new_user_tag_link)
-                db.commit()
-                db.refresh(new_user_tag_link)
-                return TagOutputDto(id=str(existing_tag.id), name=existing_tag.name, user_id=current_user_id,is_custom=new_user_tag_link.is_custom,color=existing_tag.color)
-        else:
-            new_tag = TagModel(name=tag_input.name, color=tag_input.color)
+        if not existing_tag:
+            new_tag = TagModel(name_pt=final_pt, name_en=final_en, color=tag_input.color, is_global=True)
             db.add(new_tag)
-            db.commit()
-            db.refresh(new_tag)
+            db.flush()
+            tag_to_associate = new_tag
+        else:
+            tag_to_associate = existing_tag
 
-            new_user_tag_link = UserTagLink(user_id=current_user_id, tag_id=new_tag.id,is_custom=True)
-            db.add(new_user_tag_link)
-            db.commit()
-            
-            return TagOutputDto(id=str(new_tag.id), name=new_tag.name, user_id=current_user_id, is_custom=new_user_tag_link.is_custom,color=new_tag.color)
+        # Verifica se esta tag já está associada ao utilizador
+        user_tag_link = (db.exec(
+            select(UserTagLink).where(
+                UserTagLink.user_id == current_user_id,
+                UserTagLink.tag_id == tag_to_associate.id
+            )
+        )).first()
 
+        if user_tag_link:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={"type": "TAG_ALREADY_EXISTS_FOR_USER", "field": "tag_name"}
+            )
+        
+        new_user_tag_link = UserTagLink(user_id=current_user_id, tag_id=tag_to_associate.id, is_custom=True)
+        db.add(new_user_tag_link)
+        db.commit()
+        db.refresh(tag_to_associate)
+        db.refresh(new_user_tag_link)
+
+        # Devolve um TagOutputDto com os novos campos
+        return TagOutputDto(
+            id=str(tag_to_associate.id),
+            name_pt=tag_to_associate.name_pt,
+            name_en=tag_to_associate.name_en,
+            user_id=current_user_id,
+            is_custom=new_user_tag_link.is_custom,
+            color=tag_to_associate.color
+        )
+    
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Erro ao criar tag '{tag_input.name}' para o utilizador {current_user_id}: {e}")
+        db.rollback()
+        print(f"Erro ao criar tag '{final_pt}' para o utilizador {current_user_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Falha ao criar tag."
@@ -281,7 +297,8 @@ def update_user_tag(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag não encontrada.")
 
     #atualiza os campos da tag com os dados recebidos.
-    tag_to_update.name = tag_input.name
+    tag_to_update.name_pt = tag_input.name_pt
+    tag_to_update.name_en = tag_input.name_en
     tag_to_update.color = tag_input.color
 
     db.add(tag_to_update)
@@ -290,7 +307,8 @@ def update_user_tag(
 
     return TagOutputDto(
         id=str(tag_to_update.id),     
-        name=tag_to_update.name,      
+        name_pt=tag_to_update.name_pt,
+        name_en=tag_to_update.name_en, 
         user_id=user_tag_link.user_id,  
         is_custom=user_tag_link.is_custom,
         color=tag_to_update.color 

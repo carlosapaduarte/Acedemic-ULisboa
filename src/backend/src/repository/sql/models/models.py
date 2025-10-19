@@ -95,7 +95,8 @@ class TagModel(SQLModel, table=True):
     __tablename__ = "tags"
     
     id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(unique=True, index=True)
+    name_pt: Optional[str] = Field(default=None, index=True, nullable=True)
+    name_en: Optional[str] = Field(default=None, index=True, nullable=True)
     color: str = Field(nullable=False)
     
     user_links: List["UserTagLink"] = Relationship(back_populates="tag")

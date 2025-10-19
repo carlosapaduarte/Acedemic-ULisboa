@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Dialog,
+  Label,
   Input,
   TextField,
   OverlayArrow,
@@ -39,10 +40,10 @@ function getColorDistance(color1: string, color2: string): number {
 
 export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
   const { t } = useTranslation("calendar");
-  const [tagName, setTagName] = useState("");
+  const [namePt, setNamePt] = useState("");
+  const [nameEn, setNameEn] = useState("");
   const [tagColor, setTagColor] = useState("#888888");
   const [isSaving, setIsSaving] = useState(false);
-  //const [nameError, setNameError] = useState<string | null>(null);
   const [colorError, setColorError] = useState<string | null>(null);
   const [deselectedTagColor, setDeselectedTagColor] = useState<string>("");
   const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
@@ -80,38 +81,42 @@ export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
   }, [tagColor, deselectedTagColor, t]);
 
   const nameError = useMemo(() => {
-    if (!tagName) return null;
-    const normalizedInput = tagName.trim().toLowerCase();
-    if (normalizedInput.length === 0) return null;
+    const normalizedInputPt = namePt.trim().toLowerCase();
+    const normalizedInputEn = nameEn.trim().toLowerCase();
 
-    //ve se a entrada do utilizador corresponde a uma tradução de uma tag existente
-    const isDuplicate = allUserTags.some((tag) => {
-      const originalName = tag.name.toLowerCase();
-      const translatedName = t(originalName).toLowerCase();
-      return (
-        normalizedInput === originalName || normalizedInput === translatedName
-      );
-    });
+    if (normalizedInputPt.length === 0 && normalizedInputEn.length === 0)
+      return null;
 
+    const isDuplicate = allUserTags.some(
+      (tag) =>
+        (tag.name_pt && normalizedInputPt === tag.name_pt.toLowerCase()) ||
+        (tag.name_en && normalizedInputPt === tag.name_en.toLowerCase()) ||
+        (tag.name_pt && normalizedInputEn === tag.name_pt.toLowerCase()) ||
+        (tag.name_en && normalizedInputEn === tag.name_en.toLowerCase())
+    );
     if (isDuplicate) {
       return t(
         "tag_already_exists_error",
-        "Esta tag (ou a sua tradução) já existe."
+        "Uma tag com um destes nomes já existe."
       );
     }
 
     return null;
-  }, [tagName, allUserTags, t]);
+  }, [namePt, nameEn, allUserTags, t]);
 
   const handleSave = async (close: () => void) => {
-    if (!tagName.trim()) {
+    if (!namePt.trim() && !nameEn.trim()) {
       return;
     }
     if (nameError || colorError) return;
 
     setIsSaving(true);
     try {
-      await service.createTag({ name: tagName.trim(), color: tagColor });
+      await service.createTag({
+        name_pt: namePt.trim() || undefined,
+        name_en: nameEn.trim() || undefined,
+        color: tagColor,
+      });
       onTagCreated();
       close();
     } catch (err: any) {
@@ -133,14 +138,27 @@ export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
           </OverlayArrow>
 
           <TextField className={styles.textField} autoFocus>
+            <Label>{t("tag_name_pt_label", "Nome da Etiqueta (PT)")}</Label>
             <Input
-              value={tagName}
-              onChange={(e) => setTagName(e.target.value)}
+              value={namePt}
+              onChange={(e) => setNamePt(e.target.value)}
               maxLength={MAX_CHARS}
               placeholder={t("new_tag_name_placeholder")}
             />
             <div className={styles.charCounter}>
-              {tagName.length} / {MAX_CHARS}
+              {namePt.length} / {MAX_CHARS}
+            </div>
+          </TextField>
+          <TextField className={styles.textField}>
+            <Label>{t("tag_name_en_label", "Tag Name (EN)")}</Label>
+            <Input
+              value={nameEn}
+              onChange={(e) => setNameEn(e.target.value)}
+              maxLength={MAX_CHARS}
+              placeholder={t("new_tag_name_en_placeholder", "e.g. Study")}
+            />
+            <div className={styles.charCounter}>
+              {nameEn.length} / {MAX_CHARS}
             </div>
           </TextField>
 
@@ -157,7 +175,12 @@ export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
           <Button
             onPress={() => handleSave(close)}
             className={styles.saveButton}
-            isDisabled={isSaving || !!colorError || !tagName.trim()}
+            isDisabled={
+              isSaving ||
+              !!nameError ||
+              !!colorError ||
+              (!namePt.trim() && !nameEn.trim())
+            }
           >
             {isSaving
               ? t("saving_button", "A Guardar...")

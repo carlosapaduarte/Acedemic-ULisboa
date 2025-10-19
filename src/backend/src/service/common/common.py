@@ -24,15 +24,17 @@ def create_user(db: Session, user_data: CreateUserInputDto) -> User:
 
     hashed_password = get_password_hash(user_data.password)
     
-    new_user_model = CommonsSqlRepo.create_user(db, user_data.username, hashed_password) 
+    new_user_model = CommonsSqlRepo.create_user(db, user_data.username, hashed_password)
+    db.flush()
     gamification_service._get_or_create_user_metrics(db, new_user_model.id)
 
-    tag_names_to_query = [tag[0] for tag in predefined_global_tag_names]    
-    predefined_tags_in_db = db.exec( 
-        select(TagModel).where(TagModel.name.in_(tag_names_to_query))
+    tag_names_to_find = [tag['name_pt'] for tag in predefined_global_tag_names]
+
+    tags_to_associate = db.exec( 
+        select(TagModel).where(TagModel.name_pt.in_(tag_names_to_find))
     ).all()
     
-    for tag_model in predefined_tags_in_db:
+    for tag_model in tags_to_associate:
         user_tag_association = UserTagLink(
             user_id=new_user_model.id,
             tag_id=tag_model.id,

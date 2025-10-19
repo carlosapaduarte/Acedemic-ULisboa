@@ -34,24 +34,30 @@ def get_session() -> Generator[Session, None, None]:
         yield session
 
 predefined_global_tag_names = [
-    ("fun", "#FF5733"),
-    ("work", "#33A1FF"),
-    ("personal", "#8E44AD"),
-    ("study", "#27AE60")
+    {"name_pt": "Estudo", "name_en": "Study", "color": "#4287f5"},
+    {"name_pt": "Trabalho", "name_en": "Work", "color": "#f5a742"},
+    {"name_pt": "Pessoal", "name_en": "Personal", "color": "#42f56f"},
+    {"name_pt": "Lazer", "name_en": "Fun", "color": "#f542d4"},
 ]
 
 def seed_global_tags(session: Session):
     """Seed das tags globais padrão."""
     logger.info("A semear tags globais...")
-    for tag_name, tag_color in predefined_global_tag_names:
+
+    for tag_data in predefined_global_tag_names:
+        # Verifica se a tag já existe com o nome em pt
         existing_tag = session.exec(
-            select(TagModel).where(TagModel.name == tag_name)
+            select(TagModel).where(TagModel.name_pt == tag_data["name_pt"])
         ).first()
         
+        #Se não existir, cria uma nova com os dois nomes
         if not existing_tag:
-            new_tag = TagModel(name=tag_name, color=tag_color)
+            new_tag = TagModel(
+                name_pt=tag_data["name_pt"],
+                name_en=tag_data["name_en"],
+                color=tag_data.get("color"),
+            )
             session.add(new_tag)
-            logger.info(f"-> Adicionada Tag: '{tag_name}' com a cor {tag_color}")
 
     session.commit()
     

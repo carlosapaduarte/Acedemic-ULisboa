@@ -36,10 +36,11 @@ class UserOutputDto(BaseModel):
 
 class TagOutputDto(BaseModel):
     id: str
-    name: str
+    name_pt: Optional[str] = None
+    name_en: Optional[str] = None
     user_id: int
     is_custom: bool
-    color: str
+    color: Optional[str] = None
 
 class EventOutputDto(BaseModel):
     id: int

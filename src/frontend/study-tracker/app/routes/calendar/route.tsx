@@ -41,14 +41,38 @@ const EventWithTags = ({
   allUserTags: Tag[];
   style?: React.CSSProperties;
 }) => {
+  const { t, i18n } = useTranslation(["calendar"]);
   const isRecurring = event.resource.everyWeek || event.resource.everyDay;
   const getTagNames = () => {
     if (!event.resource.tags || allUserTags.length === 0) return [];
     return event.resource.tags!.map((tagIdentifier: string | number) => {
       const foundTag: Tag | undefined = allUserTags.find(
-        (tag: Tag) => tag.id === tagIdentifier || tag.name === tagIdentifier
+        (tag: Tag) =>
+          tag.id === tagIdentifier ||
+          tag.name_pt === tagIdentifier ||
+          tag.name_en === tagIdentifier
       );
-      return foundTag ? foundTag.name : tagIdentifier;
+
+      if (!foundTag) {
+        return String(tagIdentifier);
+      }
+
+      if (
+        foundTag.name &&
+        ["fun", "work", "personal", "study"].includes(foundTag.name)
+      ) {
+        return t(`tags:${foundTag.name}`);
+      }
+
+      const lang = i18n.language.toLowerCase();
+      if (lang.startsWith("pt") && foundTag.name_pt) {
+        return foundTag.name_pt;
+      }
+      if (lang.startsWith("en") && foundTag.name_en) {
+        return foundTag.name_en;
+      }
+
+      return foundTag.name_pt || foundTag.name_en || tagIdentifier;
     });
   };
   const tagNames = getTagNames();
@@ -142,7 +166,8 @@ const getEventStyleProps = (
   if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
     const associatedTags = allUserTags.filter(
       (tag) =>
-        tagIdentifiers.includes(tag.id) || tagIdentifiers.includes(tag.name)
+        (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
+        (tag.name_en && tagIdentifiers.includes(tag.name_en))
     );
 
     const colors = associatedTags
@@ -172,6 +197,7 @@ function useMyCalendar() {
   const [userTags, setUserTags] = useState<Tag[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
   const [eventsView, setEventsView] = useState<EventsView>("allEvents");
+  const { i18n } = useTranslation();
   const [displayedDates, setDisplayedDates] = useState<Date[]>(() => {
     const today = new Date();
     const dates = [];
@@ -189,6 +215,7 @@ function useMyCalendar() {
         service.getAllUserEvents(),
         service.fetchUserTags(),
       ]);
+
       setUserTags(tagsFromBackend);
 
       let allOccurrences: CalendarEvent[] = [];
@@ -275,11 +302,12 @@ function useMyCalendar() {
           uniqueEventsMap.set(key, ev);
         }
       });
+
       setEvents(Array.from(uniqueEventsMap.values()));
     } catch (error) {
       console.error("Falha ao carregar dados do calendário:", error);
     }
-  }, [displayedDates, eventsView]);
+  }, [displayedDates, eventsView, i18n.language]);
 
   useEffect(() => {
     refreshAllCalendarData();
@@ -343,6 +371,10 @@ function MyCalendar() {
     eventsView,
   } = useMyCalendar();
   const { t, i18n } = useTranslation(["calendar"]);
+
+  useEffect(() => {
+    refreshUserEvents();
+  }, [i18n.language, refreshUserEvents]);
 
   useEffect(() => {
     const lang = i18n.language.toLowerCase();
@@ -548,15 +580,19 @@ function MyCalendar() {
 
       <div className={styles.calendarContainer}>
         <Calendar
+          key={i18n.language}
           components={{
             agenda: {
               event: (props) => (
                 <AgendaEvent {...props} allUserTags={userTags} />
               ),
             },
-            event: (props) => (
-              <EventWithTags {...props} allUserTags={userTags} />
+            event: React.useMemo(
+              () => (props: any) =>
+                <EventWithTags {...props} allUserTags={userTags} />,
+              [i18n.language, userTags]
             ),
+
             week: {
               header: (props: any) => {
                 const days = [

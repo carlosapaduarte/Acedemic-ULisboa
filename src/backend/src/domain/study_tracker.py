@@ -135,10 +135,11 @@ class Event():
     def from_STEventModel(events: list['STEventModel']) -> list['Event']:
         domain_events: list[Event] = []
         for event_model in events:
+
             tag_names = [
-                assoc.tag_ref.name
+                assoc.tag_ref.name_pt
                 for assoc in event_model.tags_associations
-                if assoc.tag_ref
+                if assoc.tag_ref and assoc.tag_ref.name_pt 
             ]
             
             domain_events.append(
