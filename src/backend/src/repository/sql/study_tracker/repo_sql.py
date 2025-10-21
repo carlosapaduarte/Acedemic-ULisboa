@@ -187,8 +187,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     
     def get_tag_by_name(self, session: Session, tag_name: str) -> TagModel | None:
         """Busca uma tag pelo nome (CASE INSENSITIVE)."""
-        statement = select(TagModel).where(TagModel.name.ilike(tag_name))
-        return session.exec(statement).first()
+        statement = select(TagModel).where( or_(TagModel.name_pt.ilike(tag_name),TagModel.name_en.ilike(tag_name)))
+        tag = session.scalars(statement).first()
+        return tag
     
     def get_tag_by_id(self, session: Session, tag_id: int) -> TagModel | None:
         """Busca uma tag pelo ID."""
