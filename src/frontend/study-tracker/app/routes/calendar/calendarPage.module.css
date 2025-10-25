@@ -33,7 +33,7 @@
 }
 
 .button {
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 0.7rem;
   border: 1px solid transparent;
   border-radius: 5px;
   font-family: var(--font-family2);
@@ -43,26 +43,14 @@
   transition: all 0.2s ease-in-out;
 }
 
-.createEventButton {
-  composes: button;
-  background-color: var(--color-2);
-  color: var(--text-color-1);
-  border-color: var(--color-2);
-}
-
-.createEventButton:hover {
-  background-color: var(--color-2-hover);
-  border-color: var(--color-2-hover);
-}
-
 .toggleButton {
   composes: button;
-  background-color: transparent;
-  color: var(--color-2);
-  border-color: var(--color-2);
+  background-color: var(--color-2);
+  color: var(--color-1);
+  border-color: var(--color-1);
 }
 
 .toggleButton:hover {
-  background-color: rgba(125, 244, 190, 0.15);
+  background-color: var(--color-2-hover);
   color: var(--text-color-2);
 }

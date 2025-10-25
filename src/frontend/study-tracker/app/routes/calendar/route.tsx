@@ -205,7 +205,56 @@ function useMyCalendar() {
     const localeToSet = lang.startsWith("pt") ? "pt" : "en";
 
     if (localeToSet === "pt") {
-      moment.updateLocale("pt", { week: { dow: 1 } });
+      moment.updateLocale("pt", {
+        months: [
+          "Janeiro",
+          "Fevereiro",
+          "Março",
+          "Abril",
+          "Maio",
+          "Junho",
+          "Julho",
+          "Agosto",
+          "Setembro",
+          "Outubro",
+          "Novembro",
+          "Dezembro",
+        ],
+        monthsShort: [
+          "Jan",
+          "Fev",
+          "Mar",
+          "Abr",
+          "Mai",
+          "Jun",
+          "Jul",
+          "Ago",
+          "Set",
+          "Out",
+          "Nov",
+          "Dez",
+        ],
+        weekdays: [
+          "Domingo",
+          "Segunda-feira",
+          "Terça-feira",
+          "Quarta-feira",
+          "Quinta-feira",
+          "Sexta-feira",
+          "Sábado",
+        ],
+        weekdaysShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+        weekdaysMin: ["D", "S", "T", "Q", "Q", "S", "S"],
+        longDateFormat: {
+          LT: "HH:mm",
+          LTS: "HH:mm:ss",
+          L: "DD/MM/YYYY",
+          LL: "D [de] MMMM [de] YYYY",
+          LLL: "D [de] MMMM [de] YYYY HH:mm",
+          LLLL: "dddd, D [de] MMMM [de] YYYY HH:mm",
+        },
+        week: { dow: 1 }, //começa na segunda-feira
+      });
     } else {
       moment.updateLocale("en", { week: { dow: 1 } });
     }
@@ -349,22 +398,58 @@ const AgendaEvent = ({
   event: any;
   allUserTags: Tag[];
 }) => {
-  const eventStyle = event.resource?.style || {};
+  const FALLBACK_COLOR = "#3399FF";
+  let colorDots: string[] = [];
 
-  const dotColor = eventStyle.backgroundColor || "#3399FF";
+  // 1. Verifica se há cor personalizada para o evento
+  const customColor = event.resource?.color;
+
+  if (customColor && customColor !== FALLBACK_COLOR) {
+    colorDots = [customColor];
+  } else {
+    // 2. Se não há cor personalizada, procura as cores das etiquetas
+    const tagIdentifiers = event.resource?.tags || [];
+
+    if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
+      // Compara os nomes da lista de tags com os da lista de 'allUserTags'
+      const associatedTags = allUserTags.filter(
+        (tag) =>
+          (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
+          (tag.name_en && tagIdentifiers.includes(tag.name_en)) ||
+          (tag.name && tagIdentifiers.includes(tag.name))
+      );
+
+      const tagColors = associatedTags
+        .map((tag) => tag.color)
+        .filter(Boolean) as string[];
+
+      if (tagColors.length > 0) {
+        colorDots = tagColors;
+      }
+    }
+  }
+
+  // 3. Fallback se nenhuma cor foi encontrada
+  if (colorDots.length === 0) {
+    colorDots = [FALLBACK_COLOR];
+  }
 
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <div
-        style={{
-          width: "10px",
-          height: "10px",
-          borderRadius: "50%",
-          backgroundColor: dotColor,
-          marginRight: "8px",
-        }}
-      />
-      <div>{event.title}</div>
+      {colorDots.map((color, index) => (
+        <div
+          key={index}
+          style={{
+            width: "10px",
+            height: "10px",
+            borderRadius: "50%",
+            backgroundColor: color,
+            //marginRight: "4px",
+            marginLeft: index > 0 ? "4px" : "0",
+          }}
+        />
+      ))}
+      <div style={{ marginLeft: "8px" }}>{event.title}</div>
     </div>
   );
 };
@@ -512,7 +597,7 @@ function MyCalendar() {
 
       <div className={styles.calendarHeaderActions}>
         {calendarView !== Views.MONTH ? (
-          <button onClick={toggleEventsView}>
+          <button onClick={toggleEventsView} className={styles.toggleButton}>
             {eventsView === "allEvents" ? (
               <span>{t("display_only_recurring_events_button")}</span>
             ) : (
@@ -524,7 +609,7 @@ function MyCalendar() {
         )}
 
         <button
-          className={styles.createEventButton}
+          className={styles.toggleButton}
           onClick={handleCreateEventClick}
         >
           {t("create_event_button")}

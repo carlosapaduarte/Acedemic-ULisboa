@@ -104,8 +104,19 @@ class TagModel(SQLModel, table=True):
     task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
     daily_tag_links: List["DailyTagModel"] = Relationship(back_populates="tag")
 
-    events: List["STEventModel"] = Relationship(back_populates="tags", link_model=STEventTagModel)
-    tasks: List["STTaskModel"] = Relationship(back_populates="tags", link_model=STTaskTagModel)
+    #events: List["STEventModel"] = Relationship(back_populates="tags", link_model=STEventTagModel)
+
+    events: List["STEventModel"] = Relationship(
+        back_populates="tags",
+        link_model=STEventTagModel,
+        sa_relationship_kwargs={"overlaps": "event_links,tag_ref,event"}
+    )
+    #tasks: List["STTaskModel"] = Relationship(back_populates="tags", link_model=STTaskTagModel)
+    tasks: List["STTaskModel"] = Relationship(
+        back_populates="tags",
+        link_model=STTaskTagModel,
+        sa_relationship_kwargs={"overlaps": "tag_ref,task_links,task"}
+    )
 
 class STEventModel(SQLModel, table=True):
     __tablename__ = "st_event"
@@ -122,8 +133,21 @@ class STEventModel(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
     
-    tags_associations: List["STEventTagModel"] = Relationship(back_populates="event", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    tags: List[TagModel] = Relationship(back_populates="events", link_model=STEventTagModel)
+    #tags_associations: List["STEventTagModel"] = Relationship(back_populates="event", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    #tags: List[TagModel] = Relationship(back_populates="events", link_model=STEventTagModel)
+
+    tags_associations: List["STEventTagModel"] = Relationship(
+        back_populates="event",
+        sa_relationship_kwargs={
+            "cascade": "all, delete-orphan",
+            "overlaps": "events"
+        }
+    )
+    tags: List[TagModel] = Relationship(
+        back_populates="events",
+        link_model=STEventTagModel,
+        sa_relationship_kwargs={"overlaps": "event,tags_associations,event_links,tag_ref"}
+    )
     
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"
@@ -140,8 +164,8 @@ class STTaskModel(SQLModel, table=True):
 
     user: "UserModel" = Relationship(back_populates="st_tasks")
 
-    tags_associations: List["STTaskTagModel"] = Relationship(back_populates="task")
-    tags: List[TagModel] = Relationship(back_populates="tasks", link_model=STTaskTagModel)
+    tags_associations: List["STTaskTagModel"] = Relationship(back_populates="task", sa_relationship_kwargs={"overlaps": "tasks"})
+    tags: List[TagModel] = Relationship(back_populates="tasks", link_model=STTaskTagModel, sa_relationship_kwargs={"overlaps": "tags_associations,task,tag_ref,task_links"})
 
     parent_task_id: Optional[int] = Field(default=None, nullable=True)
     parent_user_id: Optional[int] = Field(default=None, nullable=True)
