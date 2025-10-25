@@ -4,51 +4,51 @@
 @import "../../../components/FormModal/formModal.module.css";
 
 .createNewTaskButton {
-    composes: roundButton;
-    height: unset;
-    width: unset;
+  composes: roundButton;
+  height: unset;
+  width: unset;
 
-    margin: 0.5rem 0;
-    padding: 0.25rem 0.5rem;
-    font-size: 1rem;
-    text-align: center;
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  text-align: center;
 }
 
 .newTaskModalContainer {
-    composes: modalContainer;
+  composes: modalContainer;
 }
 
 .newTaskTitleText {
-    composes: mainFormModalTitleText;
+  composes: mainFormModalTitleText;
 }
 
 .newTaskFormContainer {
-    composes: formContainer;
+  composes: formContainer;
 }
 
 .newTaskForm {
-    composes: form;
+  composes: form;
 }
 
 .finishCreatingTaskButtonContainer {
-    padding: 0 1rem;
+  padding: 0 1rem;
 
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 .finishCreatingTaskButton {
-    composes: roundButton;
-    flex-grow: 1;
-    flex-shrink: 0;
+  composes: roundButton;
+  flex-grow: 1;
+  flex-shrink: 0;
 
-    height: 2rem;
-    width: 100%;
+  height: 2rem;
+  width: 100%;
 
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    text-align: center;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  text-align: center;
 }
 
 .formSectionTitle {
@@ -70,82 +70,242 @@
 }
 
 .deadlineSectionContainer {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .prioritySectionContainer {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .tagsSectionContainer {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .formTextField {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .deadlineInputsContainer {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
 }
 
 .closeButton {
-    composes: roundButton formCloseButton;
+  composes: roundButton formCloseButton;
 }
 
 .priorityValuesContainer {
-    height: 2rem;
-    width: 100%;
+  height: 2rem;
+  width: 100%;
 
-    border-radius: 8px;
-    border: 2px solid var(--color-2);
+  border-radius: 8px;
+  border: 2px solid var(--color-2);
 
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .priorityButton {
-    composes: roundButton;
-    width: 100%;
-    height: 100%;
+  composes: roundButton;
+  width: 100%;
+  height: 100%;
 
-    font-size: 1rem;
-    text-align: center;
-    text-transform: uppercase;
+  font-size: 1rem;
+  text-align: center;
+  text-transform: uppercase;
 
-    border-radius: 0;
+  border-radius: 0;
 
-    transition: background-color 0.2s;
+  transition: background-color 0.2s;
 
-    &[aria-selected="true"] {
-        background-color: var(--color-4);
+  &[aria-selected="true"] {
+    background-color: var(--color-4);
 
-        &.lowPriority {
-            background-color: var(--color-4);
-        }
-
-        &.mediumPriority {
-            background-color: #dc9510;
-            color: var(--text-color-1);
-        }
-
-        &.highPriority {
-            background-color: #ac0909;
-        }
+    &.lowPriority {
+      background-color: var(--color-4);
     }
+
+    &.mediumPriority {
+      background-color: #dc9510;
+      color: var(--text-color-1);
+    }
+
+    &.highPriority {
+      background-color: #ac0909;
+    }
+  }
 }
 
 .tagsContainer {
 }
 
 .tag {
-    composes: roundButton;
+  composes: roundButton;
+}
+
+/* --- TAGS --- */
+
+.tagsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.headerButton {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-1);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.headerButton:hover {
+  opacity: 0.75;
+  transform: scale(1.1);
+}
+
+.tagsContent {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  display: flex;
+  flex-wrap: wrap;
+  border: 2px solid var(--color-2);
+}
+
+.tagListContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.addTagButtonRound {
+  background-color: transparent;
+  cursor: pointer;
+
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.addTagButtonRound:hover {
+  transform: scale(1.1);
+}
+
+.tagListAndCreateContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.tagItem {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 5px;
+  color: var(--text-color-2);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  text-transform: uppercase;
+  font-family: var(--font-family1), sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid transparent;
+  word-break: break-word; /* parte palavras muito longas para não saírem do contentor */
+}
+
+.tagItem:hover {
+  background-color: var(--color-2-hover);
+}
+
+.selectedTagItem {
+  background-color: var(--color-4);
+}
+
+.selectedTagItem:hover {
+  background-color: var(--color-4-hover);
+}
+
+.deleteTagButton {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: var(--color-text-danger);
+  color: var(--text-color-2);
+  border: none;
+  cursor: pointer;
+  font-size: 0.8em;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: background-color 0.2s ease;
+  z-index: 10;
+}
+
+.deleteTagButton:hover {
+  background-color: var(--color-2-hover);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.createTagInputAndButtonContainer {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  min-width: 200px;
+  max-width: 100%;
+  gap: 8px;
+}
+
+.createTagInput:focus {
+  outline: none;
+  box-shadow: 0 2px 4px var(--color-1);
+}
+
+.addTagButtonRound {
+  width: 35px;
+  height: 35px;
+  font-size: 1.5rem;
+  background-color: var(--color-4);
+  border-radius: 5px;
+  color: var(--text-color-2);
+  align-items: center;
+  justify-content: center;
+}
+
+.addTagButtonRound:hover {
+  background-color: var(--color-4-hover);
+}
+
+.creatingTagMessage,
+.tagErrorMessage {
+  color: var(--color-text-danger);
+  font-size: 0.9em;
+  text-align: center;
 }

@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
 import styles from "../createTask.module.css";
-import { Button, Input, Label, TextField } from "react-aria-components";
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  Input,
+  Label,
+  Popover,
+  TextField,
+} from "react-aria-components";
 import { SlotToWork } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 import { SlotToWorkDto } from "~/service/output_dtos";
-
-const possibleTags = ["study", "work", "personal", "fun"];
+import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
+import { Tag } from "~/service/service";
+import { RiSettings5Fill } from "react-icons/ri";
 
 const priorityValues = ["low", "medium", "high"];
 
@@ -210,44 +219,95 @@ const PrioritySection = React.memo(function PrioritySection({
   );
 });
 
-const TagSection = React.memo(function TagSection({
-  selectedTags,
-  setSelectedTags,
+const TagSection = ({
+  selectedTagIds,
+  setSelectedTagIds,
+  availableTags,
+  refreshTags,
+  setIsEditTagModalOpen,
 }: {
-  selectedTags: string[];
-  setSelectedTags: (selectedTags: string[]) => void;
-}) {
-  const { t } = useTranslation(["task"]);
+  selectedTagIds: string[];
+  setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
+  availableTags: Tag[];
+  refreshTags: () => void;
+  setIsEditTagModalOpen: (isOpen: boolean) => void;
+}) => {
+  const { t, i18n } = useTranslation(["task"]);
 
-  function tagButtonClickHandler(
-    event: React.MouseEvent<HTMLButtonElement>,
-    tag: string
-  ) {
-    event?.preventDefault();
-
-    if (selectedTags.includes(tag))
-      setSelectedTags(selectedTags.filter((t: string) => t !== tag));
-    else setSelectedTags([...selectedTags, tag]);
-  }
+  const handleToggleTag = (tagId: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
 
   return (
     <div className={styles.tagsSectionContainer}>
-      <h1 className={styles.formSectionTitle}>{t("task:tags_label")}</h1>
-      <div className={styles.tagsContainer}>
-        {possibleTags.map((tag: string, index: number) => (
-          <button
-            key={index}
-            aria-selected={selectedTags.includes(tag)}
-            onClick={(e) => tagButtonClickHandler(e, tag)}
-            className={classNames(styles.tag)}
+      <div className={styles.tagsHeader}>
+        <h2 className={styles.formSectionTitle}>{t("tags_title")}</h2>
+        <div className={styles.tagButtonsContainer}>
+          <Button
+            onPress={() => setIsEditTagModalOpen(true)}
+            className={styles.headerButton}
+            aria-label={t("manage_tags", "Gerir etiquetas")}
           >
-            {tag}
-          </button>
-        ))}
+            <RiSettings5Fill size={18} />
+          </Button>
+        </div>
+      </div>
+      <div className={styles.tagsContent}>
+        <div className={styles.tagListContainer}>
+          {availableTags.map((tag: Tag) => {
+            const isSelected = selectedTagIds.includes(tag.id);
+
+            let displayName: string | undefined | null;
+            if (
+              tag.name &&
+              ["fun", "work", "personal", "study"].includes(tag.name)
+            ) {
+              displayName = t(tag.name);
+            } else {
+              const lang = i18n.language.toLowerCase();
+              displayName =
+                lang.startsWith("en") && tag.name_en
+                  ? tag.name_en
+                  : tag.name_pt;
+            }
+
+            return (
+              <div
+                key={tag.id}
+                className={classNames(styles.tagItem, {
+                  [styles.selectedTagItem]: isSelected,
+                })}
+                onClick={() => handleToggleTag(tag.id)}
+                style={{
+                  backgroundColor: isSelected
+                    ? tag.color || "#888888"
+                    : "var(--color-2)",
+                }}
+              >
+                <span className={styles.tagLabel}>{displayName}</span>
+              </div>
+            );
+          })}
+          <DialogTrigger>
+            <Button
+              className={styles.addTagButtonRound}
+              aria-label={t("add_new_tag", "Adicionar nova etiqueta")}
+            >
+              +
+            </Button>
+            <Popover placement="bottom">
+              <CreateTagModal onTagCreated={refreshTags} />
+            </Popover>
+          </DialogTrigger>
+        </div>
       </div>
     </div>
   );
-});
+};
 
 export function CreateTaskForm({
   description,
@@ -256,12 +316,15 @@ export function CreateTaskForm({
   setSlotsToWork,
   deadline,
   setDeadline,
-  selectedTags,
-  setSelectedTags,
   title,
   setTitle,
   priority,
   setPriority,
+  selectedTagIds,
+  setSelectedTagIds,
+  availableTags,
+  refreshTags,
+  setIsEditTagModalOpen,
 }: {
   description: string | undefined;
   setDescription: (description: string) => void;
@@ -269,12 +332,15 @@ export function CreateTaskForm({
   setSlotsToWork: (slotsToWork: SlotToWorkDto[]) => void;
   deadline: Date | undefined;
   setDeadline: (deadline: Date | undefined) => void;
-  selectedTags: string[];
-  setSelectedTags: (selectedTags: string[]) => void;
   title: string | undefined;
   setTitle: (title: string) => void;
   priority: string | undefined;
   setPriority: (priority: string) => void;
+  selectedTagIds: string[];
+  setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
+  availableTags: Tag[];
+  refreshTags: () => void;
+  setIsEditTagModalOpen: (isOpen: boolean) => void;
 }) {
   return (
     <form className={styles.newTaskForm}>
@@ -290,8 +356,11 @@ export function CreateTaskForm({
       <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
       <PrioritySection priority={priority} setPriority={setPriority} />
       <TagSection
-        selectedTags={selectedTags}
-        setSelectedTags={setSelectedTags}
+        selectedTagIds={selectedTagIds}
+        setSelectedTagIds={setSelectedTagIds}
+        availableTags={availableTags}
+        refreshTags={refreshTags}
+        setIsEditTagModalOpen={setIsEditTagModalOpen}
       />
     </form>
   );
