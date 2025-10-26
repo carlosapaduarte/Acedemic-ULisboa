@@ -657,6 +657,7 @@ async function updateFileContent(
 }
 
 export type Grade = {
+  id: number;
   value: number;
   weight: number;
 };
@@ -718,6 +719,16 @@ async function createGrade(
     return Promise.reject(
       new Error("New Curricular Unit could not be created!")
     );
+}
+
+async function deleteGrade(curricularUnitName: string, gradeId: number) {
+  const request = {
+    path: `study-tracker/users/me/curricular-units/${curricularUnitName}/grades/${gradeId}`,
+    method: "DELETE",
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok)
+    return Promise.reject(new Error("Grade could not be deleted!"));
 }
 
 export enum TimeOfDay {
@@ -924,6 +935,7 @@ export const service = {
   getCurricularUnit,
   createCurricularUnit,
   createGrade,
+  deleteGrade,
   createDailyEnergyStat,
   submitDailyTags,
   getDailyTags,

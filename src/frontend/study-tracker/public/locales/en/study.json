@@ -1,12 +1,15 @@
 {
-    "associate_tasks": "Select tasks to associate!",
-    "confirm": "Confirm",
-    "confirm_associated_tasks": "Confirm associated tasks!",
-    "select_pause_minutes": "Pause time (minutes)",
-    "select_study_minutes": "Study time (minutes)",
-    "timer_pause": "Pause",
-    "timer_resume": "Resume",
-    "timer_start": "Start",
-    "timer_stop": "Stop",
-    "timer_title": "Timer"
+  "associate_tasks": "Select tasks to associate!",
+  "confirm": "Confirm",
+  "confirm_associated_tasks": "Confirm associated tasks!",
+  "select_pause_minutes": "Pause time (minutes)",
+  "select_study_minutes": "Study time (minutes)",
+  "timer_pause": "Pause",
+  "timer_resume": "Resume",
+  "timer_start": "Start",
+  "timer_stop": "Stop",
+  "timer_title": "Timer",
+  "school_grades": "School Grades",
+  "notes": "Notes",
+  "study_subtitle": "Choose a tool to help you study"
 }

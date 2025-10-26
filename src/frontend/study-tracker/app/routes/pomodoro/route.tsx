@@ -12,7 +12,7 @@ import { useTaskList } from "~/routes/tasks/useTaskList";
 export let handle = {
   i18n: ["task", "study"],
 };
-// Hook que gere o estado do temporizador
+//gere o estado do temporizador
 function useTimerSetup(onSessionEnd: () => void) {
   const setError = useSetGlobalError();
   const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(
@@ -60,7 +60,7 @@ function useTimerSetup(onSessionEnd: () => void) {
   };
 }
 
-// Hook que gere a lógica das tarefas
+//gere a lógica das tarefas
 function useAssociatedTasks() {
   const { t } = useTranslation("task");
 
@@ -101,7 +101,7 @@ function useAssociatedTasks() {
   };
 }
 
-// Componente que mostra a lista de tarefas
+// mostra a lista de tarefas
 function AssociatedTaskListView({
   availableTasks,
   selectedTaskIds,
@@ -113,20 +113,126 @@ function AssociatedTaskListView({
 }) {
   const { t } = useTranslation(["task"]);
 
-  // TODO: atualizar o TaskList e o TaskListItem para mostrar a seleção
-  // Por agora, apenas os listamos
-
   return (
     <div className={styles.taskListContainer}>
-      <h2 className={styles.taskListTitle}>
-        {t("task:available_tasks", "Tarefas Disponíveis")}
-      </h2>
+      <h2 className={styles.taskListTitle}>{t("task:available_tasks")}</h2>
       <TaskList
         tasks={availableTasks}
-        onTaskClick={onTaskClick}
+        onTaskClick={() => {}}
         onTaskStatusUpdated={() => {}}
-        // selectedTaskIds={selectedTaskIds} //TODO: (para o próximo passo)
+        selectedTaskIds={selectedTaskIds}
+        onSelectionToggle={onTaskClick}
       />
+    </div>
+  );
+}
+
+function SetupAndStartTimer({
+  availableTasks,
+  selectedTaskIds,
+  onTaskClick,
+  onSessionEnd,
+  // Props do timer vindas do pai
+  timerStopDate,
+  onTimeSelected,
+  studyStopDate,
+  onStopClick,
+  onTimerFinish,
+  markTimerStart,
+}: {
+  availableTasks: Task[];
+  selectedTaskIds: number[];
+  onTaskClick: (task: Task) => void;
+  onSessionEnd: () => void;
+  timerStopDate: Date | undefined;
+  onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void;
+  studyStopDate: Date | undefined;
+  onStopClick: () => void;
+  onTimerFinish: () => void;
+  markTimerStart: () => void;
+}) {
+  const { t } = useTranslation("study");
+
+  if (timerStopDate == undefined) {
+    return (
+      <div className={styles.pomodoroLayout}>
+        <SelectTime onTimeSelected={onTimeSelected} />
+      </div>
+    );
+  }
+
+  const title = studyStopDate
+    ? t("study:study_time", "Tempo de Estudo")
+    : t("study:pause_time", "Pausa");
+  return (
+    <div className={styles.pomodoroLayout}>
+      <Timer
+        title={title}
+        stopDate={timerStopDate}
+        onStart={markTimerStart}
+        onStopClick={onStopClick}
+        onFinish={onTimerFinish}
+      />
+
+      {studyStopDate && (
+        <AssociatedTaskListView
+          availableTasks={availableTasks}
+          selectedTaskIds={selectedTaskIds}
+          onTaskClick={onTaskClick}
+        />
+      )}
+    </div>
+  );
+}
+
+function StartTimerByStudyBlock({
+  availableTasks,
+  selectedTaskIds,
+  onTaskClick,
+  onSessionEnd,
+  happeningStudyBlock,
+  timerStopDate,
+  studyStopDate,
+  onStopClick,
+  onTimerFinish,
+  markTimerStart,
+}: {
+  availableTasks: Task[];
+  selectedTaskIds: number[];
+  onTaskClick: (task: Task) => void;
+  onSessionEnd: () => void;
+  happeningStudyBlock: Event;
+  timerStopDate: Date | undefined;
+  studyStopDate: Date | undefined;
+  onStopClick: () => void;
+  onTimerFinish: () => void;
+  markTimerStart: () => void;
+}) {
+  const { t } = useTranslation("study");
+
+  const timerTitleMsg =
+    happeningStudyBlock.title +
+    (studyStopDate
+      ? t("study:study_time", " (Tempo de Estudo)")
+      : t("study:pause_time", " (Pausa)"));
+
+  return (
+    <div className={styles.pomodoroLayout}>
+      {" "}
+      <Timer
+        title={timerTitleMsg}
+        stopDate={happeningStudyBlock.endDate}
+        onStart={markTimerStart}
+        onStopClick={onStopClick}
+        onFinish={onTimerFinish}
+      />
+      {studyStopDate && (
+        <AssociatedTaskListView
+          availableTasks={availableTasks}
+          selectedTaskIds={selectedTaskIds}
+          onTaskClick={onTaskClick}
+        />
+      )}
     </div>
   );
 }
@@ -168,61 +274,37 @@ function TimerAndAssociatedTasksView() {
     return <div>A carregar...</div>;
   }
 
-  // 1. Se há um bloco de estudo a decorrer, força o temporizador desse bloco
-  if (happeningStudyBlock) {
-    const timerTitleMsg =
-      happeningStudyBlock.title +
-      (studyStopDate
-        ? t("study:study_time", " (Tempo de Estudo)")
-        : t("study:pause_time", " (Pausa)"));
-
+  if (happeningStudyBlock == undefined) {
     return (
-      <div>
-        <Timer
-          title={timerTitleMsg}
-          stopDate={happeningStudyBlock.endDate}
-          onStart={markTimerStart}
-          onStopClick={onStopClick}
-          onFinish={onTimerFinish}
-        />
-        {studyStopDate && (
-          <AssociatedTaskListView
-            availableTasks={availableTasks}
-            selectedTaskIds={selectedTaskIds}
-            onTaskClick={toggleTaskSelection}
-          />
-        )}
-      </div>
+      <SetupAndStartTimer
+        availableTasks={availableTasks}
+        selectedTaskIds={selectedTaskIds}
+        onTaskClick={toggleTaskSelection}
+        onSessionEnd={completeSelectedTasks}
+        timerStopDate={timerStopDate}
+        onTimeSelected={onTimeSelected}
+        studyStopDate={studyStopDate}
+        onStopClick={onStopClick}
+        onTimerFinish={onTimerFinish}
+        markTimerStart={markTimerStart}
+      />
+    );
+  } else {
+    return (
+      <StartTimerByStudyBlock
+        availableTasks={availableTasks}
+        selectedTaskIds={selectedTaskIds}
+        onTaskClick={toggleTaskSelection}
+        onSessionEnd={completeSelectedTasks}
+        happeningStudyBlock={happeningStudyBlock}
+        timerStopDate={timerStopDate}
+        studyStopDate={studyStopDate}
+        onStopClick={onStopClick}
+        onTimerFinish={onTimerFinish}
+        markTimerStart={markTimerStart}
+      />
     );
   }
-
-  // 2. Se não há bloco de estudo, mostra o fluxo de Pomodoro livre
-  // O ecrã de seleção de tempo é mostrado primeiro se timerStopDate for undefined
-  if (timerStopDate == undefined) {
-    return <SelectTime onTimeSelected={onTimeSelected} />;
-  }
-
-  const title = studyStopDate
-    ? t("study:study_time", "Tempo de Estudo")
-    : t("study:pause_time", "Pausa");
-  return (
-    <div>
-      <Timer
-        title={title}
-        stopDate={timerStopDate}
-        onStart={markTimerStart}
-        onStopClick={onStopClick}
-        onFinish={onTimerFinish}
-      />
-      {studyStopDate && (
-        <AssociatedTaskListView
-          availableTasks={availableTasks}
-          selectedTaskIds={selectedTaskIds}
-          onTaskClick={toggleTaskSelection}
-        />
-      )}
-    </div>
-  );
 }
 
 function StudyPage() {

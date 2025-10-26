@@ -20,6 +20,9 @@
     0 calc(100% - var(--edge-size)),
     0 var(--edge-size)
   );
+  flex-basis: 400px;
+  flex-shrink: 0;
+  margin: 0;
 }
 
 .title {
@@ -132,4 +135,47 @@
 .controlButton:hover {
   background-color: rgba(125, 244, 190, 0.15);
   color: var(--text-color-2);
+}
+
+.pomodoroLayout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.taskListContainer {
+  flex-grow: 1;
+  padding: 1.5rem;
+  background-color: var(--color-3);
+  color: var(--text-color-2);
+  --edge-size: 0.5rem;
+  clip-path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+}
+
+.taskListTitle {
+  font-family: var(--font-family2);
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: var(--text-color-2);
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  border-bottom: 2px solid var(--color-2);
+  padding-bottom: 0.5rem;
 }

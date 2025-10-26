@@ -242,7 +242,16 @@ def create_grade(
         value=dto.value,
         weight=dto.weight
     ))
-        
+
+@router.delete("/users/me/curricular-units/{curricular_unit_name}/grades/{grade_id}")
+def delete_grade(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    curricular_unit_name: str,
+    grade_id: int
+) -> Response:
+    study_tracker_service.delete_grade(user_id, curricular_unit_name, grade_id)
+    return Response(status_code=204)
+
 @router.post("/users/me/statistics/daily-energy-status")
 def create_daily_energy_stat(
     user_id: Annotated[int, Depends(get_current_user_id)],

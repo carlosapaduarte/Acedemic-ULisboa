@@ -28,10 +28,8 @@ function useTaskView(task: Task, onTaskStatusUpdated: (task: Task) => void) {
 
   function passedDeadline(): boolean {
     if (internalTask.data.deadline == undefined) return false;
-
     return internalTask.data.deadline < new Date();
   }
-
   return { internalTask, updateTaskStatus };
 }
 
@@ -39,29 +37,47 @@ export function TaskListItem({
   taskToDisplay,
   onTaskClick,
   onTaskStatusUpdated,
+  isSelected,
+  onSelectionToggle,
 }: {
   taskToDisplay: Task;
   onTaskClick: (task: Task) => void;
   onTaskStatusUpdated: (task: Task) => void;
+  isSelected?: boolean;
+  onSelectionToggle?: (task: Task) => void;
 }) {
   const { internalTask, updateTaskStatus } = useTaskView(
     taskToDisplay,
     onTaskStatusUpdated
   );
 
+  const isSelectionMode = onSelectionToggle !== undefined;
+  const isChecked = isSelectionMode
+    ? isSelected
+    : internalTask.data.status == "completed";
+  // Só mostra o riscado se NÃO estivermos em modo de seleção
+  const showStrikeThrough =
+    !isSelectionMode && internalTask.data.status == "completed";
+
   return (
     <div
-      aria-checked={internalTask.data.status == "completed"}
-      className={styles.checkboxAndTitleContainer}
+      aria-checked={!!isChecked}
+      className={classNames(styles.checkboxAndTitleContainer, {
+        [styles.selectedTask]: isSelectionMode && isSelected,
+      })}
     >
       <div className={styles.checkboxContainer}>
         <TaskCheckbox
-          checked={internalTask.data.status == "completed"}
+          checked={!!isChecked}
           onClick={() => {
-            if (internalTask.data.status == "completed") {
-              updateTaskStatus("not_completed");
+            if (isSelectionMode) {
+              onSelectionToggle(internalTask);
             } else {
-              updateTaskStatus("completed");
+              if (internalTask.data.status == "completed") {
+                updateTaskStatus("not_completed");
+              } else {
+                updateTaskStatus("completed");
+              }
             }
           }}
           className={styles.listCheckbox}
@@ -70,14 +86,14 @@ export function TaskListItem({
       <button
         className={classNames(
           styles.taskTitleContainer,
-          internalTask.data.status == "completed" && styles.strikeThrough
+          showStrikeThrough && styles.strikeThrough
         )}
         onClick={() => onTaskClick(internalTask)}
       >
         <p
           className={classNames(
             styles.taskTitle,
-            internalTask.data.status == "completed" && styles.strikeThrough
+            showStrikeThrough && styles.strikeThrough
           )}
         >
           {internalTask.data.title}

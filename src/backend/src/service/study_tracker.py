@@ -163,6 +163,9 @@ def create_curricular_unit(user_id: int, name: str):
 def create_grade(user_id: int, curricular_unit: str, grade: Grade):
     return study_tracker_repo.create_grade(user_id, curricular_unit, grade)
 
+def delete_grade(user_id: int, curricular_unit_name: str, grade_id: int):
+    return study_tracker_repo.delete_grade(user_id, curricular_unit_name, grade_id)
+
 def create_daily_energy_status(user_id: int, level: int, time_of_day: str):
     if not verify_time_of_day(time_of_day):
         raise # TODO

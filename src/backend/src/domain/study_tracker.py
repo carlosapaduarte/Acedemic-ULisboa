@@ -192,10 +192,12 @@ class Archive():
         return archives
 
 class Grade():
+    id: int
     value: float
     weight: float
 
-    def __init__(self, value: float, weight: float) -> None:
+    def __init__(self,id:int, value: float, weight: float) -> None:
+        self.id=id
         self.value=value
         self.weight=weight
 
@@ -204,6 +206,7 @@ class Grade():
         grades: list[Grade] = []
         for grade_model in grade_models:
             grades.append(Grade(
+                id=grade_model.id,
                 value=grade_model.value,
                 weight=grade_model.weight
             ))

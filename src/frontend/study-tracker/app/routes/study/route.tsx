@@ -11,39 +11,32 @@ const MENU_ITEMS = [
     icon: "icons/study_icon.png",
   },
   {
-    name: "notes",
+    name: "school_grades",
     path: "/curricular-units",
     icon: "icons/tasks_icon.png",
   },
   {
-    name: "notebooks",
-    path: "/archives",
+    name: "notes",
+    path: "/notes",
     icon: "icons/notes_icon.png",
   },
 ];
 
-// Carrega os namespaces de tradução necessários
 export let handle = {
-  i18n: ["navigation"],
+  i18n: ["study"],
 };
 
 function StudyPage() {
-  const { t } = useTranslation("navigation");
+  const { t } = useTranslation("study");
 
   return (
     <div className={styles.pageContainer}>
       <h1 className={styles.title}>{t("study")}</h1>
-      <p className={styles.subtitle}>
-        {t(
-          "study_subtitle",
-          "Escolhe uma ferramenta para te ajudar a estudar."
-        )}
-      </p>
+      <p className={styles.subtitle}>{t("study_subtitle")}</p>
       <div className={styles.menuGrid}>
         {MENU_ITEMS.map((item) => (
           <Link key={item.name} to={item.path} className={styles.menuButton}>
             <img src={item.icon} alt="" className={styles.menuIcon} />
-            {/* O 't(item.name)' vai procurar por "pomodoro", "notes", etc. */}
             <span className={styles.menuText}>{t(item.name)}</span>
           </Link>
         ))}

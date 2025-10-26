@@ -128,6 +128,7 @@ class ArchiveOutputDto(BaseModel):
         return archive_output_dtos
     
 class GradeOutputDto(BaseModel):
+    id: int
     value: float
     weight: float
     
@@ -137,6 +138,7 @@ class GradeOutputDto(BaseModel):
         
         for grade in grades:
             grade_output_dtos.append(GradeOutputDto(
+                id=grade.id,
                 value=grade.value,
                 weight=grade.weight
             ))

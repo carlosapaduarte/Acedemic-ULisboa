@@ -11,13 +11,16 @@ export function TaskList({
   tasks,
   onTaskClick,
   onTaskStatusUpdated,
+  selectedTaskIds,
+  onSelectionToggle,
 }: {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
   onTaskStatusUpdated: (task: Task) => void;
+  selectedTaskIds?: number[];
+  onSelectionToggle?: (task: Task) => void;
 }) {
   const { t } = useTranslation(["task"]);
-  console.log("tasks", tasks);
 
   if (!tasks || tasks.length === 0) {
     return (
@@ -40,6 +43,8 @@ export function TaskList({
           taskToDisplay={task}
           onTaskClick={onTaskClick}
           onTaskStatusUpdated={onTaskStatusUpdated}
+          isSelected={selectedTaskIds?.includes(task.id)}
+          onSelectionToggle={onSelectionToggle}
         />
       ))}
     </div>

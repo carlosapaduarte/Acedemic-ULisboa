@@ -1,0 +1,196 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 900px;
+  margin: 2rem auto;
+}
+
+.cardContainer {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  background-color: var(--color-3);
+  color: var(--text-color-2);
+  --edge-size: 0.5rem;
+  clip-path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+  box-sizing: border-box;
+}
+
+.cardTitle {
+  font-family: var(--font-family2);
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: var(--text-color-2);
+  margin: 0 0 1.5rem 0;
+  text-align: left;
+  border-bottom: 2px solid var(--color-2);
+  padding-bottom: 0.5rem;
+}
+
+.subTitle {
+  font-family: var(--font-family2);
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: var(--text-color-2);
+  margin: 1.5rem 0 1rem 0;
+  font-weight: 600;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color-2);
+}
+
+.input {
+  font-family: var(--font-family2);
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-2);
+  border-radius: 6px;
+  color: var(--text-color-2);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.button {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 5px;
+  font-family: var(--font-family2);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  background-color: var(--color-2);
+  color: var(--text-color-2);
+  transition: background-color 0.2s ease-in-out;
+  margin-top: 1.5rem;
+}
+
+.button:hover {
+  background-color: var(--color-2-hover);
+}
+
+.button:disabled {
+  background-color: #888;
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.gradeList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--color-2);
+  margin-bottom: 1.5rem;
+}
+
+.gradeItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.gradeItem span {
+  font-family: var(--font-family1);
+  font-size: 1.1rem;
+}
+
+.gradeItem span:first-child {
+  font-weight: 700;
+  font-family: var(--font-family2);
+  font-size: 1.2rem;
+}
+
+.gradeItem span:last-child {
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* --- Média Final --- */
+
+.finalGrade {
+  font-family: var(--font-family2);
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: right;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px dashed var(--color-2);
+}
+
+.finalGradeLabel {
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.errorMessage {
+  color: var(--color-1);
+  background-color: var(--color-text-danger);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: var(--font-family1);
+  font-weight: 500;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.deleteButton {
+  background-color: var(--color-text-danger);
+  color: var(--text-color-2);
+  border: none;
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  font-family: var(--font-family1);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteButton:hover {
+  background-color: var(--color-1);
+  color: var(--color-text-danger);
+}

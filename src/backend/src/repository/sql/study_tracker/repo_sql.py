@@ -610,7 +610,24 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             session.add(curricular_unit_model)
             session.commit()
+    
+    def delete_grade(self, user_id: int, curricular_unit_name: str, grade_id: int):
+        with Session(engine) as session:
+            statement = select(STGradeModel).where(
+                STGradeModel.id == grade_id,
+                STGradeModel.user_id == user_id,
+                STGradeModel.curricular_unit_name == curricular_unit_name
+            )
             
+            result = session.exec(statement)
+            grade_model_to_delete = result.first()
+            
+            if not grade_model_to_delete:
+                raise NotFoundException(f"Grade with id {grade_id} not found for user {user_id}")
+            
+            session.delete(grade_model_to_delete)
+            session.commit()
+
     def create_or_override_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
         with Session(engine) as session:
             
