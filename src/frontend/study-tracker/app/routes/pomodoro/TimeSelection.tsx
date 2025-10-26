@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import styles from "./timerPage.module.css"; // 1. Importar os estilos
+import styles from "./pomodoroPage.module.css";
 
 function useSelectTime(
   onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void
@@ -42,7 +42,6 @@ export function SelectTime({
     onConfirmButtonClick,
   } = useSelectTime(onTimeSelected);
 
-  // 2. Aplicar as novas classes CSS
   return (
     <div className={styles.pomodoroContainer}>
       <form className={styles.timeSelectionForm}>

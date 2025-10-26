@@ -8,16 +8,25 @@
   width: 90%;
   max-width: 500px;
   background-color: var(--color-3);
-  border-radius: 12px;
   color: var(--text-color-2);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  --edge-size: 0.5rem;
+  clip-path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
 }
 
 .title {
   font-family: var(--font-family2);
   font-size: 1.5rem;
   text-transform: uppercase;
-  color: var(--color-2);
+  color: var(--text-color-2);
   margin-bottom: 1rem;
 }
 
@@ -72,7 +81,7 @@
   text-transform: uppercase;
   cursor: pointer;
   background-color: var(--color-2);
-  color: var(--text-color-1);
+  color: var(--text-color-2);
   transition: background-color 0.2s ease-in-out;
   margin-top: 1rem;
 }
@@ -110,9 +119,8 @@
 
 .controlButton {
   padding: 0.6rem 1.2rem;
-  border: 1px solid var(--color-2);
-  background-color: transparent;
-  color: var(--color-2);
+  background-color: var(--color-2);
+  color: var(--text-color-2);
   border-radius: 5px;
   font-family: var(--font-family2);
   font-weight: 700;

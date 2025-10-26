@@ -347,7 +347,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             if filter_uncompleted_tasks:
                 statement = statement\
-                    .where(STTaskModel.status == "completed")
+                    .where(STTaskModel.status != "completed")
 
             result = session.exec(statement)
             

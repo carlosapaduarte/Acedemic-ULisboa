@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useTimer from "react-timer-hook";
 import { utils } from "~/utils";
-import styles from "./timerPage.module.css";
+import styles from "./pomodoroPage.module.css";
 
 export function Timer({
   title,
