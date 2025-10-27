@@ -1,0 +1,80 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 900px;
+  margin: 2rem auto;
+}
+
+.cardContainer {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  background-color: var(--color-3);
+  color: var(--text-color-2);
+  --edge-size: 0.5rem;
+  clip-path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+  box-sizing: border-box;
+}
+
+.cardTitle {
+  font-family: var(--font-family2);
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: var(--text-color-2);
+  margin: 0 0 1.5rem 0;
+  text-align: left;
+  border-bottom: 2px solid var(--color-2);
+  padding-bottom: 0.5rem;
+}
+
+.notesTextarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 1rem;
+  box-sizing: border-box;
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-2);
+  border-radius: 6px;
+  color: var(--text-color-2);
+  resize: vertical;
+}
+
+.button {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 5px;
+  font-family: var(--font-family2);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  background-color: var(--color-2);
+  color: var(--text-color-2);
+  transition: background-color 0.2s ease-in-out;
+  margin-top: 1.5rem;
+}
+
+.button:hover {
+  background-color: var(--color-2-hover);
+}
+
+.button:disabled {
+  background-color: #888;
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
