@@ -100,7 +100,7 @@
   transform: scale(0.9);
 }
 
-/* Tooltip para acessibilidade */
+/* cores personalizadas  */
 .clearButton::after {
   content: attr(aria-label);
   position: absolute;
@@ -117,5 +117,43 @@
 }
 
 .clearButton:hover::after {
+  opacity: 1;
+}
+
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  max-width: 300px;
+}
+
+.swatch {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px var(--color-2);
+}
+
+.noColorSwatch {
+  background-color: var(--color-3, #444);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  opacity: 0.7;
+}
+
+.noColorSwatch:hover {
   opacity: 1;
 }

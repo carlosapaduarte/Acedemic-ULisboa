@@ -35,6 +35,7 @@ export interface EventData {
   color?: string;
   everyDay?: boolean;
   everyWeek?: boolean;
+  is_uc?: boolean;
 }
 
 export type RecurrenceType = "none" | "daily" | "weekly";
@@ -51,9 +52,12 @@ interface EventModalProps {
 const TitleSection = React.memo(function TitleSection({
   title,
   setTitle,
+  setIsUC,
 }: {
   title: string;
   setTitle: (title: string) => void;
+  isUC: boolean;
+  setIsUC: (isUC: boolean) => void;
 }) {
   const { t } = useTranslation("calendar");
   return (
@@ -68,6 +72,19 @@ const TitleSection = React.memo(function TitleSection({
           placeholder={t("title_label")}
         />
       </TextField>
+      <label htmlFor="is-uc-checkbox" className={styles.isUcContainer}>
+        <span className={styles.formSectionTitle}>
+          {t("is_uc_label", "Is uc?")}
+        </span>
+        <input
+          type="checkbox"
+          id="is-uc-checkbox"
+          checked={isUC}
+          onChange={(e) => setIsUC(e.target.checked)}
+          className={styles.nativeCheckbox}
+        />
+        <span className={styles.customCheckbox}></span>
+      </label>
     </div>
   );
 });
@@ -303,7 +320,12 @@ const TagSection = ({
 const EventForm = (props: any) => {
   return (
     <div className={styles.newEventForm}>
-      <TitleSection title={props.title} setTitle={props.setTitle} />
+      <TitleSection
+        title={props.title}
+        setTitle={props.setTitle}
+        isUC={props.isUC}
+        setIsUC={props.setIsUC}
+      />
       <DateSection
         eventStartDate={props.startDate}
         setEventStartDate={props.setStartDate}
@@ -357,6 +379,7 @@ export function EventModal({
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [saving, setSaving] = useState(false);
   const [isEditTagModalOpen, setIsEditTagModalOpen] = useState(false);
+  const [isUC, setIsUC] = useState(false);
 
   const refreshTags = async () => {
     try {
@@ -385,6 +408,8 @@ export function EventModal({
           else if (eventToEdit.everyWeek) setRecurrenceType("weekly");
           else setRecurrenceType("none");
 
+          setIsUC(eventToEdit.is_uc ?? false);
+
           const tagIdentifiers = eventToEdit.tags || [];
           const tagIdsToSelect = tagIdentifiers
             .map((identifier) => {
@@ -406,6 +431,7 @@ export function EventModal({
           setColor(null);
           setRecurrenceType("none");
           setSelectedTagIds([]);
+          setIsUC(false);
         }
       } catch (err) {
         console.error("Erro ao inicializar o formulário do evento:", err);
@@ -440,6 +466,7 @@ export function EventModal({
       tags: selectedTagIds,
       everyDay: recurrenceType === "daily",
       everyWeek: recurrenceType === "weekly",
+      is_uc: isUC,
     };
     setSaving(true);
     try {
@@ -519,6 +546,9 @@ export function EventModal({
                   label={t("custom_color_label")}
                   refreshTags={refreshTags}
                   setIsEditTagModalOpen={setIsEditTagModalOpen}
+                  isUC={isUC}
+                  setIsUC={setIsUC}
+                  t={t}
                 />
               </div>
 

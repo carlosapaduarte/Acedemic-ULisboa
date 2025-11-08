@@ -61,3 +61,7 @@
   background-color: var(--color-4-hover);
   border-radius: 4px;
 }
+
+.completedTask {
+  opacity: 0.6;
+}

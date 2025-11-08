@@ -129,6 +129,7 @@ class STEventModel(SQLModel, table=True):
     every_day: bool = Field(default=False)
     notes: str = Field(default="", nullable=False)
     color: str = Field(nullable=False)
+    is_uc: bool = Field(default=False, nullable=False)
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")

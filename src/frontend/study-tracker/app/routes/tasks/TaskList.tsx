@@ -35,9 +35,19 @@ export function TaskList({
     );
   }
 
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (a.data.status === "completed" && b.data.status !== "completed") {
+      return 1;
+    }
+    if (a.data.status !== "completed" && b.data.status === "completed") {
+      return -1;
+    }
+    return 0;
+  });
+
   return (
     <div>
-      {tasks?.map((task: Task, index: number) => (
+      {sortedTasks?.map((task: Task, index: number) => (
         <TaskListItem
           key={task.id}
           taskToDisplay={task}

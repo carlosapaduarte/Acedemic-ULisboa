@@ -2,12 +2,19 @@ import { doFetch, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { utils } from "~/utils";
-import { Tag } from "~/routes/calendar/CreateEvent/EventModal";
 
 export type LoginResult = {
   access_token: string;
   token_type: string;
 };
+
+export interface Tag {
+  id: string;
+  name_pt: string;
+  name_en?: string;
+  user_id: number;
+  color?: string;
+}
 
 export type AuthErrorType =
   | "USERNAME_ALREADY_EXISTS"
@@ -559,10 +566,17 @@ async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
 }
 
 async function getTask(taskId: number): Promise<Task> {
-  const tasks = await getTasks(false);
-  const task = tasks.find((task: Task) => task.id == taskId);
-  if (task != undefined) return task;
-  return Promise.reject(new Error(`Task with ID ${taskId} doesn't exist!`));
+  const request = {
+    path: `study-tracker/users/me/tasks/${taskId}`,
+    method: "GET",
+  };
+  const response: Response = await doFetch(request);
+  if (response.ok) {
+    const responseObject: TaskDto = await response.json();
+    return fromTaskDtoToTask(responseObject);
+  } else {
+    return Promise.reject(new Error(`Task with ID ${taskId} doesn't exist!`));
+  }
 }
 
 async function updateTaskStatus(taskId: number, newStatus: string) {
@@ -575,6 +589,17 @@ async function updateTaskStatus(taskId: number, newStatus: string) {
   if (!response.ok)
     return Promise.reject(new Error("Task status could not be updated!"));
 }
+
+deleteTask: async (taskId: number): Promise<void> => {
+  const request = {
+    path: `study-tracker/users/me/tasks/${taskId}`,
+    method: "DELETE",
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    return Promise.reject(new Error("Task could not be deleted!"));
+  }
+};
 
 async function createArchive(name: string) {
   const request = {
@@ -902,6 +927,17 @@ async function finishStudySession() {
     return Promise.reject(new Error("Could not finish study session!"));
 }
 
+async function deleteTask(taskId: number): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/tasks/${taskId}`,
+    method: "DELETE",
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    return Promise.reject(new Error("Task could not be deleted!"));
+  }
+}
+
 export const service = {
   login,
   testTokenValidity,
@@ -925,6 +961,7 @@ export const service = {
   createNewTask,
   updateTask,
   updateTaskStatus,
+  deleteTask,
   createArchive,
   getArchives,
   getArchive,

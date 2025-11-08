@@ -56,8 +56,15 @@ def update_task_status(
     task_id: int,
     dto: UpdateTaskStatus
 ):
-    print("Here")
     study_tracker_service.update_task_status(user_id, task_id, dto.newStatus)
+
+@router.delete("/users/me/tasks/{task_id}", status_code=204)
+def delete_task(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    task_id: int
+) -> Response:
+    study_tracker_service.delete_task(user_id, task_id)
+    return Response(status_code=204) # 204 = No Content (sucesso)
 
 @router.get("/users/me/tasks")
 def get_tasks(
@@ -67,6 +74,14 @@ def get_tasks(
 ) -> list[UserTaskOutputDto]:
     tasks = study_tracker_service.get_user_tasks(user_id, orderByDeadlineAndPriority, filterUncompletedTasks, False)
     return UserTaskOutputDto.from_Tasks(tasks)
+
+@router.get("/users/me/tasks/{task_id}")
+def get_task(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    task_id: int
+) -> UserTaskOutputDto:
+    task = study_tracker_service.get_user_task(user_id, task_id)
+    return UserTaskOutputDto.from_Task(task)
 
 @router.get("/users/me/statistics/daily-tasks-progress")
 def get_daily_tasks_progress(

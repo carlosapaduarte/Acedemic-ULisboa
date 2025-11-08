@@ -132,15 +132,20 @@ def get_user_tasks(
     )
 
 def get_user_task(user_id: int, task_id: int) -> Task:
-    # TODO: improve later
-    user_tasks = get_user_tasks(user_id, False, False, False)
-    for task in user_tasks:
-        if task.id == task_id:
-            return task
-    raise NotFoundException(user_id)
+    try:
+        return study_tracker_repo.get_task(user_id, task_id)
+    except Exception as e:
+        raise NotFoundException(user_id)
 
 def update_task_status(user_id: int, task_id: int, new_status: str):
     study_tracker_repo.update_task_status(user_id, task_id, new_status)
+
+def delete_task(user_id: int, task_id: int):
+    """Apaga uma tarefa pelo ID."""
+    try:
+        study_tracker_repo.delete_task(user_id, task_id)
+    except Exception as e:
+        raise NotFoundException(f"Task {task_id} to delete not found")
     
 def create_archive(user_id: int, name: str):
     study_tracker_repo.create_archive(user_id, name)

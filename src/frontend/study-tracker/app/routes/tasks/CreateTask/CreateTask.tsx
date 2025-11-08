@@ -43,7 +43,6 @@ function useCreateNewTask() {
     setSubTasks([]);
     setSlotsToWork([]);
     setSelectedTagIds([]);
-    setAvailableTags([]);
   }
 
   function appendSubSubTask(subTask: CreateTaskInputDto) {

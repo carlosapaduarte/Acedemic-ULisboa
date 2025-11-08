@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { service, Task } from "~/service/service";
 import styles from "./taskListItem.module.css";
 import classNames from "classnames";
+import Confetti from "react-confetti";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
 
 function useTaskView(task: Task, onTaskStatusUpdated: (task: Task) => void) {
@@ -50,7 +51,14 @@ export function TaskListItem({
     taskToDisplay,
     onTaskStatusUpdated
   );
-
+  const [showConfetti, setShowConfetti] = useState(false);
+  const checkboxRef = useRef<HTMLDivElement>(null);
+  const [confettiSource, setConfettiSource] = useState<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  } | null>(null);
   const isSelectionMode = onSelectionToggle !== undefined;
   const isChecked = isSelectionMode
     ? isSelected
@@ -60,45 +68,70 @@ export function TaskListItem({
     !isSelectionMode && internalTask.data.status == "completed";
 
   return (
-    <div
-      aria-checked={!!isChecked}
-      className={classNames(styles.checkboxAndTitleContainer, {
-        [styles.selectedTask]: isSelectionMode && isSelected,
-      })}
-    >
-      <div className={styles.checkboxContainer}>
-        <TaskCheckbox
-          checked={!!isChecked}
-          onClick={() => {
-            if (isSelectionMode) {
-              onSelectionToggle(internalTask);
-            } else {
-              if (internalTask.data.status == "completed") {
-                updateTaskStatus("not_completed");
-              } else {
-                updateTaskStatus("completed");
-              }
-            }
+    <>
+      {showConfetti && confettiSource && (
+        <Confetti
+          recycle={false}
+          numberOfPieces={50}
+          confettiSource={confettiSource}
+          onConfettiComplete={() => {
+            setShowConfetti(false);
+            setConfettiSource(null);
           }}
-          className={styles.listCheckbox}
         />
-      </div>
-      <button
-        className={classNames(
-          styles.taskTitleContainer,
-          showStrikeThrough && styles.strikeThrough
-        )}
-        onClick={() => onTaskClick(internalTask)}
+      )}
+
+      <div
+        aria-checked={!!isChecked}
+        className={classNames(styles.checkboxAndTitleContainer, {
+          [styles.selectedTask]: isSelectionMode && isSelected,
+          [styles.completedTask]: showStrikeThrough,
+        })}
       >
-        <p
+        <div className={styles.checkboxContainer} ref={checkboxRef}>
+          <TaskCheckbox
+            checked={!!isChecked}
+            onClick={() => {
+              if (isSelectionMode) {
+                onSelectionToggle(internalTask);
+              } else {
+                if (internalTask.data.status == "completed") {
+                  updateTaskStatus("not_completed");
+                } else {
+                  updateTaskStatus("completed");
+                  if (checkboxRef.current) {
+                    const rect = checkboxRef.current.getBoundingClientRect();
+                    setConfettiSource({
+                      x: rect.x + rect.width / 2,
+                      y: rect.y + rect.height / 2,
+                      w: 0,
+                      h: 0,
+                    });
+                  }
+                  setShowConfetti(true);
+                }
+              }
+            }}
+            className={styles.listCheckbox}
+          />
+        </div>
+        <button
           className={classNames(
-            styles.taskTitle,
+            styles.taskTitleContainer,
             showStrikeThrough && styles.strikeThrough
           )}
+          onClick={() => onTaskClick(internalTask)}
         >
-          {internalTask.data.title}
-        </p>
-      </button>
-    </div>
+          <p
+            className={classNames(
+              styles.taskTitle,
+              showStrikeThrough && styles.strikeThrough
+            )}
+          >
+            {internalTask.data.title}
+          </p>
+        </button>
+      </div>
+    </>
   );
 }

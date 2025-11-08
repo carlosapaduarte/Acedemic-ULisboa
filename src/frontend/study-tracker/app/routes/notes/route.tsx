@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CurricularUnit, service } from "~/service/service";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
@@ -25,8 +25,16 @@ function useCurricularUnitList() {
 
 function NoteCard({ curricularUnit }: { curricularUnit: CurricularUnit }) {
   const { t } = useTranslation();
-
   const [notes, setNotes] = useState("");
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [notes]);
 
   function handleSave() {
     console.log("A guardar notas (ainda não implementado):", notes);
@@ -36,10 +44,12 @@ function NoteCard({ curricularUnit }: { curricularUnit: CurricularUnit }) {
     <div className={styles.cardContainer}>
       <h1 className={styles.cardTitle}>{curricularUnit.name}</h1>
       <textarea
+        ref={textareaRef}
         className={styles.notesTextarea}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         placeholder={t("Escreve os teus apontamentos para esta cadeira...")}
+        rows={1}
       />
       <button className={styles.button} onClick={handleSave} disabled={true}>
         Guardar Apontamentos (Brevemente)

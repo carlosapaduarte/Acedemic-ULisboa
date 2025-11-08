@@ -9,6 +9,8 @@ from datetime import datetime
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from sqlalchemy.orm import selectinload
 from utils import get_datetime_utc
+from sqlalchemy.orm import selectinload
+from utils import get_datetime_utc
 from datetime import date
 from domain.study_tracker import (
     Event, DateInterval, Task, UnavailableScheduleBlock, Archive,
@@ -300,9 +302,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
         tags: list[str] = []
         for tag_model in task_model.tags:
-            display_name = tag_model.name_pt or tag_model.name_en
-            if display_name:
-                tags.append(display_name)
+            tags.append(str(tag_model.id))
             
         return Task(
             id=task_model.id,
@@ -344,6 +344,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
                 .where(STTaskModel.parent_task_id == None)\
+                .options(selectinload(STTaskModel.tags))
                 
             if filter_uncompleted_tasks:
                 statement = statement\
@@ -422,31 +423,32 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session.add(new_task_model)
         session.flush()
 
-        for tag_name in task.tags:
-            # 1. Procura a tag na base de dados pelo nome (pt ou en)
-            tag_obj = session.exec(
-                select(TagModel).where(
-                    or_(
-                        TagModel.name_pt.ilike(tag_name),
-                        TagModel.name_en.ilike(tag_name)
-                    )
-                )
-            ).first()
-
-            # 2. Se não existir, cria-a
-            if not tag_obj:
-                # TODO: a cor e descrição podem precisar de valores padrão ou vir do frontend
-                tag_obj = TagModel(name=tag_name.lower(), color="#CCCCCC", description="") 
-                session.add(tag_obj)
-                session.flush() 
-            
-            association = STTaskTagModel(
+        for tag_id_str in task.tags:
+            try:
+                tag_id = int(tag_id_str)
+                tag_obj = session.get(TagModel, tag_id)
+            except (ValueError, TypeError):
+                tag_obj = None
+                
+            if tag_obj:
+                association = STTaskTagModel(
                 tag_id=tag_obj.id,
-                task_id=new_task_model.id,
+                task_id=new_task_model.id, 
                 user_id=user_id
-            )
-            session.add(association)
-            
+        )
+                session.add(association)
+
+                user_link = session.exec(
+                    select(UserTagLink).where(
+                        UserTagLink.user_id == user_id,
+                        UserTagLink.tag_id == tag_obj.id
+                    )
+                ).first()
+
+                if not user_link:
+                    new_link = UserTagLink(user_id=user_id, tag_id=tag_obj.id, is_custom=True) 
+                    session.add(new_link)
+    
         for sub_task in task.sub_tasks:
             StudyTrackerSqlRepo.create_task_with_parent(
                 sub_task, 
@@ -845,14 +847,49 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     new_average = study_session_time    
                 else:
                     new_average = ((week_study_time_model.average_by_session * week_study_time_model.n_of_sessions) + study_session_time) / (week_study_time_model.n_of_sessions + 1)
-                    new_average = round(new_average, 1)
-                
+                    new_average = round(new_average, 1)                
                 week_study_time_model.average_by_session = new_average
                 week_study_time_model.n_of_sessions += 1
                 session.add(week_study_time_model)
                 session.commit()
                 
     
+    def get_task(self, user_id: int, task_id: int) -> Task:
+        """Busca uma ÚNICA tarefa pelo ID, com as tags carregadas."""
+
+        with Session(engine) as session:
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)\
+                .where(STTaskModel.id == task_id)\
+                .options(selectinload(STTaskModel.tags))           
+
+            task_model = session.exec(statement).first()
+            if not task_model:
+                raise NotFoundException(f"Task with id {task_id} not found for user {user_id}")           
+
+            return StudyTrackerSqlRepo.build_task(task_model)
+
+
+
+    def delete_task(self, user_id: int, task_id: int):
+        """Apaga uma tarefa e as suas associações."""
+
+        with Session(engine) as session:
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)\
+                .where(STTaskModel.id == task_id)            
+
+            task_to_delete = session.exec(statement).first()
+            if not task_to_delete:
+                raise NotFoundException(f"Task with id {task_id} not found for user {user_id}")
+            
+            tag_links_to_delete = session.exec(select(STTaskTagModel).where(STTaskTagModel.task_id == task_id).where(STTaskTagModel.user_id == user_id)).all()
+            for link in tag_links_to_delete:
+                session.delete(link)
+
+            session.delete(task_to_delete)
+            session.commit()
+
     def delete_tag(self, session: Session, tag_id: int) -> bool:
         tag = session.get(TagModel, tag_id)
         

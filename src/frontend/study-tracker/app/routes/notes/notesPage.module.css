@@ -11,20 +11,9 @@
 
 .cardContainer {
   width: 100%;
-  padding: 1.5rem 2rem;
-  background-color: var(--color-3);
-  color: var(--text-color-2);
-  --edge-size: 0.5rem;
-  clip-path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
+  padding: 0;
+  background-color: transparent;
+  color: var(--text-color-1);
   box-sizing: border-box;
 }
 
@@ -32,7 +21,7 @@
   font-family: var(--font-family2);
   font-size: 1.5rem;
   text-transform: uppercase;
-  color: var(--text-color-2);
+  color: var(--text-color-1);
   margin: 0 0 1.5rem 0;
   text-align: left;
   border-bottom: 2px solid var(--color-2);
@@ -41,20 +30,34 @@
 
 .notesTextarea {
   width: 100%;
-  min-height: 200px;
-  padding: 1rem;
+  padding: 0.5rem 0;
   box-sizing: border-box;
   font-family: var(--font-family1);
   font-size: 1rem;
   line-height: 1.5;
-  background-color: rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--color-2);
-  border-radius: 6px;
-  color: var(--text-color-2);
-  resize: vertical;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text-color-1);
+  min-height: auto;
+  resize: none;
+  overflow: hidden;
+}
+
+.notesTextarea::placeholder {
+  color: var(--text-color-1);
+  opacity: 0.6;
+}
+
+.notesTextarea:focus,
+.notesTextarea:focus-visible {
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .button {
+  display: none;
   padding: 0.8rem 2rem;
   border: none;
   border-radius: 5px;
