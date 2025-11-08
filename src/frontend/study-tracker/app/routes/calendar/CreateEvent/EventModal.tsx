@@ -52,6 +52,7 @@ interface EventModalProps {
 const TitleSection = React.memo(function TitleSection({
   title,
   setTitle,
+  isUC,
   setIsUC,
 }: {
   title: string;
