@@ -75,7 +75,7 @@ const TitleSection = React.memo(function TitleSection({
       </TextField>
       <label htmlFor="is-uc-checkbox" className={styles.isUcContainer}>
         <span className={styles.formSectionTitle}>
-          {t("is_uc_label", "Is uc?")}
+          {t("is_uc_label", "uc?")}
         </span>
         <input
           type="checkbox"

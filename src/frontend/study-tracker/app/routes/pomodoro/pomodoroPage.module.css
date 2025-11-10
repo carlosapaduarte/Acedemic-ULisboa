@@ -155,7 +155,6 @@
   flex-grow: 1;
   padding: 1.5rem;
   background-color: var(--color-3);
-  color: var(--text-color-2);
   --edge-size: 0.5rem;
   clip-path: polygon(
     var(--edge-size) 0,
@@ -178,4 +177,103 @@
   text-align: center;
   border-bottom: 2px solid var(--color-2);
   padding-bottom: 0.5rem;
+}
+
+.taskListContainer :global(.taskTitle) {
+  color: var(--text-color-2);
+}
+
+.otherTasksTitle {
+  margin-top: 2rem;
+}
+
+.pomodoroOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.pomodoroDialog {
+  padding: 1.5rem 2rem;
+  background-color: var(--color-1);
+  color: var(--text-color-1);
+  border-radius: 8px;
+  max-width: 450px;
+  width: 90%;
+  outline: none;
+  border: 2px solid var(--color-3);
+}
+
+.modalTitle {
+  font-family: var(--font-family2);
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color-1);
+}
+
+.pomodoroDialog p {
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalTaskList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-3) var(--color-1-light);
+}
+
+.modalTaskItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  color: var(--text-color-1);
+  cursor: pointer;
+}
+
+.modalCheckbox {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  border-width: 2px !important;
+}
+
+.modalButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modalButtonPrimary,
+.modalButtonSecondary {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  font-family: var(--font-family2);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.modalButtonPrimary {
+  background-color: var(--color-3);
+  color: var(--text-color-2) !important;
+}
+
+.modalButtonSecondary {
+  background-color: var(--color-2);
+  color: var(--text-color-1);
 }

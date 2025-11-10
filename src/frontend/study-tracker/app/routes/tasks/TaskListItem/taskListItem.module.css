@@ -51,14 +51,13 @@
   max-width: 100%;
   text-align: left;
   font-size: 1rem;
-
   text-wrap: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
 .selectedTask {
-  background-color: var(--color-4-hover);
+  background-color: #ffffff1a;
   border-radius: 4px;
 }
 

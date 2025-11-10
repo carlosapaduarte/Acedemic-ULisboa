@@ -8,12 +8,14 @@ import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
 function useTaskView(task: Task, onTaskStatusUpdated: (task: Task) => void) {
   const [internalTask, setInternalTask] = useState<Task>(task);
 
-  function updateTask() {
+  function updateTask(callback?: (updatedTask: Task) => void) {
     service
       .getTask(task.id)
       .then((updatedTask: Task) => {
         setInternalTask(updatedTask);
-        onTaskStatusUpdated(updatedTask);
+        if (callback) {
+          callback(updatedTask);
+        }
       })
       .catch((error) => {});
   }
@@ -22,15 +24,19 @@ function useTaskView(task: Task, onTaskStatusUpdated: (task: Task) => void) {
     service
       .updateTaskStatus(task.id, newStatus)
       .then(() => {
-        updateTask();
+        updateTask((updatedTask) => {
+          if (newStatus === "completed") {
+            setTimeout(() => {
+              onTaskStatusUpdated(updatedTask);
+            }, 600);
+          } else {
+            onTaskStatusUpdated(updatedTask);
+          }
+        });
       })
       .catch((error) => {});
   }
 
-  function passedDeadline(): boolean {
-    if (internalTask.data.deadline == undefined) return false;
-    return internalTask.data.deadline < new Date();
-  }
   return { internalTask, updateTaskStatus };
 }
 

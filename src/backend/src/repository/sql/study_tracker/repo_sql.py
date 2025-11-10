@@ -213,8 +213,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     
     @staticmethod
     def is_study_event(event: STEventModel) -> bool:
-        for tag_name in event.tags:
-            if tag_name.lower() == "study":
+        for tag in event.tags:
+            if (tag.name_pt and tag.name_pt.lower() == "study") or (tag.name_en and tag.name_en.lower() == "study"):
                 return True
         return False
     
@@ -729,9 +729,10 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             return daily_energy_history
             
     @staticmethod
+
     def compute_elapsed_minutes(date1: datetime, date2: datetime) -> int:
-        total_seconds = (get_datetime_utc(date1) - get_datetime_utc(date2)).total_seconds()
-        return int(total_seconds / 60)
+        total_seconds = (get_datetime_utc(date1) - get_datetime_utc(date2))
+        return int(total_seconds / 60) 
             
     def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
         # TODO: events that repeat every week
@@ -756,12 +757,16 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 week = event.start_date.isocalendar().week
                             
                 tags = event.tags
+
                 for tag in tags:
-                    tag_name = tag.tag
                     
+                    tag_name = tag.name_pt or tag.name_en
+                    if not tag_name:
+                        tag_name = "Sem nome"
+
                     if stats.get(year) is None:
                         stats[year] = {}
-                        
+
                     if stats[year].get(week) is None:
                         stats[year][week] = {}
                     if stats[year][week].get(tag_name) is None:
