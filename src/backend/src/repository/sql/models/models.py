@@ -1,7 +1,7 @@
 from datetime import date, timezone, datetime
 from typing import Optional, List # Importar List
 from uuid import UUID
-
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import ForeignKeyConstraint, UniqueConstraint, String
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -270,7 +270,7 @@ class STArchiveModel(SQLModel, table=True):
 class STFileModel(SQLModel, table=True):
     __tablename__ = "st_file"
     name: str = Field(primary_key=True)
-    text: str
+    text: dict = Field(default={}, sa_column=SAColumn(JSONB))
     archive_name: str = Field(primary_key=True)
     user_id: int = Field(primary_key=True)
     __table_args__ = (

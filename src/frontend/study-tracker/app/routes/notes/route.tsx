@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CurricularUnit, service } from "~/service/service";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import styles from "./notesPage.module.css";
 import { useTranslation } from "react-i18next";
+
+import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
+import { useDebouncedCallback } from "use-debounce";
 
 function useCurricularUnitList() {
   const setGlobalError = useSetGlobalError();
@@ -25,35 +28,41 @@ function useCurricularUnitList() {
 
 function NoteCard({ curricularUnit }: { curricularUnit: CurricularUnit }) {
   const { t } = useTranslation();
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState<any>(
+    curricularUnit.notes ||
+      `<p>${t("Escreve os teus apontamentos para esta cadeira...")}</p>`
+  );
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [notes]);
+  const handleSave = useDebouncedCallback((newContent: any) => {
+    setIsSaving(true);
+    console.log("A guardar (JSON):", newContent);
+    // TODO: guardar na BD
+    // service.updateCurricularUnitNotes(curricularUnit.name, newContent)
+    //   .then(() => setIsSaving(false))
+    //   .catch(() => setIsSaving(false));
 
-  function handleSave() {
-    console.log("A guardar notas (ainda não implementado):", notes);
-  }
+    //para a demo:
+    setTimeout(() => setIsSaving(false), 1000);
+  }, 1500);
+
+  const handleEditorUpdate = (newContent: any) => {
+    setNotes(newContent);
+    handleSave(newContent);
+  };
 
   return (
     <div className={styles.cardContainer}>
       <h1 className={styles.cardTitle}>{curricularUnit.name}</h1>
-      <textarea
-        ref={textareaRef}
-        className={styles.notesTextarea}
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        placeholder={t("Escreve os teus apontamentos para esta cadeira...")}
-        rows={1}
-      />
-      <button className={styles.button} onClick={handleSave} disabled={true}>
-        Guardar Apontamentos (Brevemente)
-      </button>
+
+      <RichTextEditor content={notes} onUpdate={handleEditorUpdate} />
+
+      <div className={styles.saveStatus}>
+        {isSaving
+          ? t("notes:saving", "A guardar...")
+          : t("notes:saved", "Guardado")}
+      </div>
     </div>
   );
 }

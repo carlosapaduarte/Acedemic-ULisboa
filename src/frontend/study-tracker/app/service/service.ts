@@ -618,7 +618,7 @@ async function createArchive(name: string) {
 
 export type File = {
   name: string;
-  text: string;
+  text: any;
 };
 
 export type Archive = {

@@ -24,13 +24,13 @@
   color: var(--text-color-1);
   margin: 0 0 1.5rem 0;
   text-align: left;
-  border-bottom: 2px solid var(--color-2);
   padding-bottom: 0.5rem;
 }
 
 .notesTextarea {
   width: 100%;
-  padding: 0.5rem 0;
+  min-height: 200px;
+  padding: 1rem 0;
   box-sizing: border-box;
   font-family: var(--font-family1);
   font-size: 1rem;
@@ -39,9 +39,8 @@
   border: none;
   border-radius: 0;
   color: var(--text-color-1);
-  min-height: auto;
-  resize: none;
-  overflow: hidden;
+  resize: vertical;
+  outline: none;
 }
 
 .notesTextarea::placeholder {
