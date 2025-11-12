@@ -82,7 +82,7 @@ function useTimerSetup(onSessionEnd: () => void) {
 }
 
 //gere a lógica das tarefas
-function useAssociatedTasks() {
+function useAssociatedTasks(showMicroTasks: boolean) {
   const { t } = useTranslation("task");
 
   const { tasks: availableTasks, refreshTasks } = useTaskList(true);
@@ -96,6 +96,10 @@ function useAssociatedTasks() {
     const others: Task[] = [];
 
     for (const task of availableTasks) {
+      if (!showMicroTasks && task.data.is_micro_task) {
+        continue;
+      }
+
       if (isDateToday(task.data.deadline)) {
         today.push(task);
       } else {
@@ -103,7 +107,7 @@ function useAssociatedTasks() {
       }
     }
     return [today, others];
-  }, [availableTasks]);
+  }, [availableTasks, showMicroTasks]);
 
   function toggleTaskSelection(task: Task) {
     setSelectedTaskIds((prevIds) => {
@@ -188,16 +192,29 @@ function AssociatedTaskListView({
   otherTasks,
   selectedTaskIds,
   onTaskClick,
+  showMicroTasks,
+  onToggleMicroTasks,
 }: {
   tasksForToday: Task[];
   otherTasks: Task[];
   selectedTaskIds: number[];
   onTaskClick: (task: Task) => void;
+  showMicroTasks: boolean;
+  onToggleMicroTasks: () => void;
 }) {
   const { t } = useTranslation(["task"]);
 
   return (
     <div className={styles.taskListContainer}>
+      <label className={styles.microTaskToggle}>
+        <TaskCheckbox
+          checked={showMicroTasks}
+          onClick={onToggleMicroTasks}
+          className={styles.modalCheckbox}
+        />
+        {t("task:show_micro_tasks", "Incluir micro-tarefas")}
+      </label>
+
       <h2 className={styles.taskListTitle}>
         {t("task:tasks_for_today", "Tarefas para Hoje")}
       </h2>
@@ -414,8 +431,8 @@ function TimerAndAssociatedTasksView() {
   const setGlobalError = useSetGlobalError();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [tasksToConfirm, setTasksToConfirm] = useState<Task[]>([]);
+  const [showMicroTasks, setShowMicroTasks] = useState(true);
 
-  // 1. Ir buscar todos os dados
   const {
     tasksForToday,
     otherTasks,
@@ -423,8 +440,7 @@ function TimerAndAssociatedTasksView() {
     toggleTaskSelection,
     refreshTasks,
     setSelectedTaskIds,
-    completeSelectedTasks,
-  } = useAssociatedTasks();
+  } = useAssociatedTasks(showMicroTasks);
 
   const [happeningStudyBlock, setHappeningStudyBlock] = useState<
     Event | undefined
@@ -449,14 +465,19 @@ function TimerAndAssociatedTasksView() {
 
   const handleConfirmCompletion = (completedTaskIds: number[]) => {
     setIsConfirmModalOpen(false);
+
     if (completedTaskIds.length === 0) {
       setSelectedTaskIds([]);
       return;
     }
-    // Chamar a função 'completeSelectedTasks' atualizada
-    completeSelectedTasks(completedTaskIds)
+    const tasksToComplete = completedTaskIds.map((id) =>
+      service.updateTaskStatus(id, "completed")
+    );
+
+    Promise.all(tasksToComplete)
       .then(() => {
-        // Já faz refresh e setSelectedTaskIds([])
+        refreshTasks();
+        setSelectedTaskIds([]);
       })
       .catch((err) => {
         console.error("Erro ao completar tarefas", err);
@@ -465,7 +486,6 @@ function TimerAndAssociatedTasksView() {
       });
   };
 
-  // 3. Hook do Temporizador
   const {
     timerStopDate,
     onTimeSelected,
@@ -475,7 +495,6 @@ function TimerAndAssociatedTasksView() {
     markTimerStart,
   } = useTimerSetup(openConfirmationModal);
 
-  // 4. Hook do Bloco Atual
   useEffect(() => {
     service
       .getStudyBlockHappeningNow()
@@ -488,7 +507,6 @@ function TimerAndAssociatedTasksView() {
     return <div>A carregar...</div>; // O 'loading' principal
   }
 
-  // --- O NOVO LAYOUT DE 3 COLUNAS ---
   return (
     <>
       <div className={styles.pomodoroLayout}>
@@ -516,6 +534,8 @@ function TimerAndAssociatedTasksView() {
             otherTasks={otherTasks}
             selectedTaskIds={selectedTaskIds}
             onTaskClick={toggleTaskSelection}
+            showMicroTasks={showMicroTasks}
+            onToggleMicroTasks={() => setShowMicroTasks((prev) => !prev)}
           />
         )}
       </div>

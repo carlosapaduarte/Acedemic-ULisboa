@@ -312,6 +312,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             priority=task_model.priority,
             tags=tags,
             status=task_model.status,
+            is_micro_task=task_model.is_micro_task,
             sub_tasks=subtasks
         )
     
@@ -418,6 +419,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             status=task.status,
             user_id=user_id,
             parent_task_id=parent_task_id,
+            is_micro_task=task.is_micro_task,
             parent_user_id=user_id if parent_task_id else None
         )
         session.add(new_task_model)

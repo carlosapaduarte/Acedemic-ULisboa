@@ -161,6 +161,7 @@ class STTaskModel(SQLModel, table=True):
     deadline: datetime | None
     priority: str
     status: str
+    is_micro_task: bool = Field(default=False, nullable=False)
     
 
     user: "UserModel" = Relationship(back_populates="st_tasks")

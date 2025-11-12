@@ -423,6 +423,7 @@ export type TaskData = {
   priority: string;
   tags: string[];
   status: string;
+  is_micro_task: boolean;
 };
 
 function requestBody(newTaskInfo: CreateTaskInputDto): any {
@@ -435,6 +436,7 @@ function requestBody(newTaskInfo: CreateTaskInputDto): any {
     priority: newTaskInfo.priority,
     tags: newTaskInfo.tags,
     status: newTaskInfo.status,
+    is_micro_task: newTaskInfo.is_micro_task,
     subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) =>
       requestBody(subTaskInfo)
     ),
@@ -502,6 +504,7 @@ export type TaskDto = {
   priority: string;
   tags: string[];
   status: string;
+  is_micro_task: boolean;
   subTasks: TaskDto[];
 };
 
@@ -516,6 +519,7 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
       priority: dto.priority,
       tags: dto.tags,
       status: dto.status,
+      is_micro_task: dto.is_micro_task,
     },
     subTasks,
   };

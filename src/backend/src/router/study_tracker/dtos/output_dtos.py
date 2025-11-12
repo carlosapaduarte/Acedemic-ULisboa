@@ -29,6 +29,7 @@ class UserTaskOutputDto(BaseModel):
     priority: str
     tags: list[str]
     status: str
+    is_micro_task: bool
     subTasks: list['UserTaskOutputDto']
     
     @staticmethod
@@ -56,6 +57,7 @@ class UserTaskOutputDto(BaseModel):
             priority=task.priority,
             tags=task.tags,
             status=task.status,
+            is_micro_task=task.is_micro_task,
             subTasks=sub_tasks_output_dto
         )
 

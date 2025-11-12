@@ -39,7 +39,7 @@
 
   &:hover {
     text-decoration: underline;
-    background-color: #dc9510;
+    background-color: #592e258f;
   }
 
   &:hover.strikeThrough {
@@ -63,4 +63,45 @@
 
 .completedTask {
   opacity: 0.6;
+}
+
+.deleteButton {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-color-1);
+  font-size: 0.5rem;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.deleteButton:hover {
+  background-color: var(--color-text-danger);
+  color: white;
+}
+
+.microTaskToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  color: var(--text-color-2);
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  padding-left: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.microTaskToggle:hover {
+  opacity: 1;
 }
