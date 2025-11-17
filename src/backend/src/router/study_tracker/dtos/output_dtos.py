@@ -71,7 +71,7 @@ class EventOutputDto(BaseModel):
     everyDay: bool
     color: str | None = None
     notes: str | None = None
-
+    task_id: int | None = None
 
     @staticmethod
     def from_events(events: list[Event]) -> list['EventOutputDto']:
@@ -91,7 +91,8 @@ class EventOutputDto(BaseModel):
                     everyWeek=event.every_week,
                     everyDay=event.every_day,
                     color=event.color,
-                    notes=event.notes
+                    notes=event.notes,
+                    task_id=event.task_id
                 )
             )
 

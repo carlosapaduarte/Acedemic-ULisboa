@@ -58,7 +58,7 @@ def get_events(user_id: int, today: bool, recurrentEvents: bool, study_events: b
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
 
-def create_event_from_task(user_id: int, task: Task, slot: SlotToWork):
+def create_event_from_task(user_id: int, task: Task, slot: SlotToWork, task_id: int):
     associatedEvent = Event(
         id=None,
         title=task.title,
@@ -68,15 +68,18 @@ def create_event_from_task(user_id: int, task: Task, slot: SlotToWork):
         ),
         tags=task.tags,
         every_week=False,
-        every_day=False
+        every_day=False,
+        task_id=task_id
     )
     create_event(user_id, associatedEvent)
 
 def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
+    new_task_id = study_tracker_repo.create_task(user_id, task, task_id=None)
+
     for slot in slotsToWork:
-        create_event_from_task(user_id, task, slot)
+        create_event_from_task(user_id, task, slot, new_task_id)
         
-    return study_tracker_repo.create_task(user_id, task, task_id=None) # Generates random and available task ID
+    return new_task_id
 
 def update_task(user_id: int, task_id: int, updated_task: Task, slotsToWork: list[SlotToWork], previous_task_name: str):
     study_tracker_repo.update_task(user_id, task_id, updated_task)
@@ -140,6 +143,9 @@ def get_user_task(user_id: int, task_id: int) -> Task:
 def update_task_status(user_id: int, task_id: int, new_status: str):
     study_tracker_repo.update_task_status(user_id, task_id, new_status)
 
+    if new_status == "completed":
+        delete_future_slots_for_task(user_id, task_id)
+
 def delete_task(user_id: int, task_id: int):
     """Apaga uma tarefa pelo ID."""
     try:
@@ -147,6 +153,9 @@ def delete_task(user_id: int, task_id: int):
     except Exception as e:
         raise NotFoundException(f"Task {task_id} to delete not found")
     
+def delete_future_slots_for_task(user_id: int, task_id: int):
+    study_tracker_repo.delete_future_slots_for_task(user_id, task_id) 
+
 def create_archive(user_id: int, name: str):
     study_tracker_repo.create_archive(user_id, name)
     

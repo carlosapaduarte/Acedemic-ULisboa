@@ -275,6 +275,7 @@ type EventDto = {
   everyDay: boolean;
   color?: string;
   notes: string;
+  task_id?: number;
 };
 
 export type Event = {
@@ -287,6 +288,7 @@ export type Event = {
   everyDay: boolean;
   color: string;
   notes: string;
+  task_id?: number;
 };
 
 export type UpdateEventInputDto = {
@@ -353,6 +355,7 @@ async function getUserEvents(
         everyDay: eventDto.everyDay,
         notes: eventDto.notes,
         color: eventDto.color || "#3399FF",
+        task_id: eventDto.task_id,
       };
     });
   } else {

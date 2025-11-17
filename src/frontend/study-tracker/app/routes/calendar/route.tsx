@@ -7,7 +7,7 @@ import {
 } from "react-big-calendar";
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
-import { Event, service, Tag } from "~/service/service";
+import { Event, service, Tag, Task } from "~/service/service";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar.css";
@@ -30,15 +30,18 @@ interface CalendarEventResource {
   originalEndDate?: Date;
   notes?: string;
   style?: React.CSSProperties;
+  task_id?: number;
 }
 
 const EventWithTags = ({
   event,
   allUserTags,
+  allTasks,
   style,
 }: {
   event: CalendarEvent & { resource?: CalendarEventResource };
   allUserTags: Tag[];
+  allTasks: Task[];
   style?: React.CSSProperties;
 }) => {
   const { t, i18n } = useTranslation(["calendar"]);
@@ -77,6 +80,24 @@ const EventWithTags = ({
   };
   const tagNames = getTagNames();
 
+  let isCompletedTaskSlot = false;
+  const taskId = event.resource?.task_id;
+
+  const now = new Date();
+  const eventEndDate = new Date(event.end as Date);
+  const isPastEvent = eventEndDate < now;
+
+  if (taskId) {
+    const associatedTask = allTasks.find((t) => t.id === taskId);
+    if (associatedTask && associatedTask.data.status === "completed") {
+      isCompletedTaskSlot = true;
+    }
+  }
+  // O evento deve ser esbatido se:
+  // 1. For um slot de trabalho E já tiver passado (se for antigo)
+  // 2. For um slot de trabalho E a tarefa-mãe estiver concluída.
+  const applyPastStyle = taskId && (isPastEvent || isCompletedTaskSlot);
+
   const combinedStyle: React.CSSProperties = {
     ...style,
     width: "100%",
@@ -85,6 +106,8 @@ const EventWithTags = ({
     overflow: "hidden",
     color: "white",
     display: "flex",
+    opacity: applyPastStyle ? 0.6 : 1,
+    textDecoration: applyPastStyle ? "line-through" : "none",
   };
 
   const innerWrapperStyle: React.CSSProperties = {
@@ -195,6 +218,7 @@ type EventsView = "allEvents" | "recurringEvents";
 function useMyCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [userTags, setUserTags] = useState<Tag[]>([]);
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
   const [eventsView, setEventsView] = useState<EventsView>("allEvents");
   const { i18n } = useTranslation();
@@ -270,12 +294,15 @@ function useMyCalendar() {
 
   const refreshAllCalendarData = useCallback(async () => {
     try {
-      const [eventsFromBackend, tagsFromBackend] = await Promise.all([
-        service.getAllUserEvents(),
-        service.fetchUserTags(),
-      ]);
+      const [eventsFromBackend, tagsFromBackend, tasksFromBackend] =
+        await Promise.all([
+          service.getAllUserEvents(),
+          service.fetchUserTags(),
+          service.getTasks(false), //Vai buscar TODAS as tarefas (concluídas ou não)
+        ]);
 
       setUserTags(tagsFromBackend);
+      setAllTasks(tasksFromBackend);
 
       let allOccurrences: CalendarEvent[] = [];
       eventsFromBackend.forEach((event) => {
@@ -338,6 +365,7 @@ function useMyCalendar() {
                 color: event.color,
                 notes: event.notes,
                 style: styleProps,
+                task_id: event.task_id,
               } as CalendarEventResource,
             });
           }
@@ -382,6 +410,7 @@ function useMyCalendar() {
   return {
     events,
     userTags,
+    allTasks,
     calendarView,
     setCalendarView,
     eventsView,
@@ -458,6 +487,7 @@ function MyCalendar() {
   const {
     events,
     userTags,
+    allTasks,
     calendarView,
     setCalendarView,
     setDisplayedDates,
@@ -627,8 +657,14 @@ function MyCalendar() {
             },
             event: React.useMemo(
               () => (props: any) =>
-                <EventWithTags {...props} allUserTags={userTags} />,
-              [i18n.language, userTags]
+                (
+                  <EventWithTags
+                    {...props}
+                    allUserTags={userTags}
+                    allTasks={allTasks}
+                  />
+                ),
+              [i18n.language, userTags, allTasks]
             ),
 
             week: {
@@ -680,15 +716,44 @@ function MyCalendar() {
           eventPropGetter={(
             event: CalendarEvent & { resource?: CalendarEventResource }
           ) => {
+            const now = new Date();
+            const eventEndDate = new Date(event.end as Date);
+            const isPastEvent = eventEndDate < now;
+
+            let isCompletedTaskSlot = false;
+            const taskId = event.resource?.task_id;
+
+            if (taskId && allTasks) {
+              const associatedTask = allTasks.find((t) => t.id === taskId);
+              if (
+                associatedTask &&
+                associatedTask.data.status === "completed"
+              ) {
+                isCompletedTaskSlot = true;
+              }
+            }
+
+            const applyFadedStyle =
+
             const baseStyle: React.CSSProperties = {
               borderRadius: "5px",
               color: "white",
               border: "none",
             };
+
+            const colorStyle = getEventStyleProps(event, userTags);
+
             const finalStyle = {
               ...baseStyle,
               ...event.resource?.style,
             };
+
+            if (applyFadedStyle) {
+              finalStyle.opacity = 0.5;
+
+              finalStyle.textDecoration = "line-through";
+              finalStyle.textDecorationThickness = "2px";
+            }
 
             if (calendarView === Views.AGENDA) {
               finalStyle.backgroundColor = "transparent";

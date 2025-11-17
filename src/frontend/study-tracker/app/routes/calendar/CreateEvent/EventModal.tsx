@@ -36,6 +36,7 @@ export interface EventData {
   everyDay?: boolean;
   everyWeek?: boolean;
   is_uc?: boolean;
+  task_id?: number;
 }
 
 export type RecurrenceType = "none" | "daily" | "weekly";

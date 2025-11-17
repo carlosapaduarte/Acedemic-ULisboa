@@ -4,6 +4,7 @@ import styles from "./taskListItem.module.css";
 import classNames from "classnames";
 import Confetti from "react-confetti";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
+import { FaBolt } from "react-icons/fa";
 
 const desenhaConfetisPequenos = (ctx: CanvasRenderingContext2D) => {
   ctx.rect(0, 0, 6, 12);
@@ -51,12 +52,16 @@ export function TaskListItem({
   onTaskStatusUpdated,
   isSelected,
   onSelectionToggle,
+  textColor,
+  showIcon,
 }: {
   taskToDisplay: Task;
   onTaskClick: (task: Task) => void;
   onTaskStatusUpdated: (task: Task) => void;
   isSelected?: boolean;
   onSelectionToggle?: (task: Task) => void;
+  textColor?: string;
+  showIcon?: boolean;
 }) {
   const { internalTask, updateTaskStatus } = useTaskView(
     taskToDisplay,
@@ -119,7 +124,6 @@ export function TaskListItem({
               className={styles.listCheckbox}
             />
           </div>
-
           <div
             className={classNames(
               styles.taskTitleContainer,
@@ -136,10 +140,12 @@ export function TaskListItem({
                 styles.taskTitle,
                 showStrikeThrough && styles.strikeThrough
               )}
+              style={{ color: textColor }}
             >
               {internalTask.data.title}
             </p>
           </div>
+          {showIcon && <FaBolt className={styles.microTaskIcon} />}
 
           {!isSelectionMode && (
             <button onClick={handleDelete} className={styles.deleteButton}>
@@ -210,6 +216,7 @@ export function TaskListItem({
                   styles.taskTitle,
                   showStrikeThrough && styles.strikeThrough
                 )}
+                style={{ color: textColor }}
               >
                 {internalTask.data.title}
               </p>
@@ -217,7 +224,6 @@ export function TaskListItem({
           </div>
         </>
       )}
-         {" "}
     </>
   );
 }

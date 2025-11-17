@@ -105,3 +105,10 @@
 .microTaskToggle:hover {
   opacity: 1;
 }
+
+.microTaskIcon {
+  flex-shrink: 0;
+  color: var(--color-2);
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}

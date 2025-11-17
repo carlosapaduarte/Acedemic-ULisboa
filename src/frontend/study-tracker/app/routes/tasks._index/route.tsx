@@ -43,6 +43,7 @@ export default function TasksPage() {
   return (
     <div className={styles.taskListPage}>
       <div className={styles.layoutContainer}>
+        <div className={styles.mainTasksColumn}>
           <div className={styles.header}>
             <h1 className={styles.tasksListTitle}>
               {t("task:my_tasks_list_title", "Tarefas Principais")}

@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useTaskList } from "~/routes/tasks/useTaskList";
 import { Modal, Dialog, DialogTrigger, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
+import { FaBolt } from "react-icons/fa";
 
 function isDateToday(date: Date | undefined): boolean {
   if (!date) return false;
@@ -24,7 +25,23 @@ function isDateToday(date: Date | undefined): boolean {
 }
 
 function formatEventTime(date: Date): string {
-  return new Date(date).toLocaleTimeString(navigator.language, {
+  const d = new Date(date);
+  if (!isDateToday(d)) {
+    // Formato "dd/mm hh:mm"
+    return (
+      d.toLocaleDateString(navigator.language, {
+        day: "2-digit",
+        month: "2-digit",
+      }) +
+      " " +
+      d.toLocaleTimeString(navigator.language, {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+  }
+  // Formato "hh:mm"
+  return d.toLocaleTimeString(navigator.language, {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -33,7 +50,6 @@ function formatEventTime(date: Date): string {
 export let handle = {
   i18n: ["task", "study"],
 };
-//gere o estado do temporizador
 function useTimerSetup(onSessionEnd: () => void) {
   const setError = useSetGlobalError();
   const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(
@@ -81,25 +97,19 @@ function useTimerSetup(onSessionEnd: () => void) {
   };
 }
 
-//gere a lógica das tarefas
 function useAssociatedTasks(showMicroTasks: boolean) {
   const { t } = useTranslation("task");
-
   const { tasks: availableTasks, refreshTasks } = useTaskList(true);
-
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
 
   const [tasksForToday, otherTasks] = React.useMemo(() => {
     if (!availableTasks) return [[], []];
-
     const today: Task[] = [];
     const others: Task[] = [];
-
     for (const task of availableTasks) {
       if (!showMicroTasks && task.data.is_micro_task) {
         continue;
       }
-
       if (isDateToday(task.data.deadline)) {
         today.push(task);
       } else {
@@ -119,12 +129,12 @@ function useAssociatedTasks(showMicroTasks: boolean) {
     });
   }
 
-  function completeSelectedTasks() {
-    const tasksToComplete = selectedTaskIds.map((id) =>
+  function completeSelectedTasks(completedTaskIds: number[]) {
+    const tasksToComplete = completedTaskIds.map((id) =>
       service.updateTaskStatus(id, "completed")
     );
 
-    Promise.all(tasksToComplete)
+    return Promise.all(tasksToComplete)
       .then(() => {
         refreshTasks();
         setSelectedTaskIds([]);
@@ -139,9 +149,9 @@ function useAssociatedTasks(showMicroTasks: boolean) {
     otherTasks,
     selectedTaskIds,
     toggleTaskSelection,
-    completeSelectedTasks,
     refreshTasks,
     setSelectedTaskIds,
+    completeSelectedTasks,
   };
 }
 
@@ -159,10 +169,8 @@ function useUpcomingEvents() {
         const today: Event[] = [];
         const future: Event[] = [];
 
-        // Separa os eventos em duas listas
         for (const event of eventsList) {
           const eventEndDate = new Date(event.endDate);
-          // Só queremos eventos que ainda não acabaram
           if (eventEndDate >= now) {
             if (isDateToday(event.startDate)) {
               today.push(event);
@@ -172,12 +180,11 @@ function useUpcomingEvents() {
           }
         }
 
-        // Ordena ambos pela data de início
         const sortFn = (a: Event, b: Event) =>
           new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
 
         setTodayEvents(today.sort(sortFn));
-        setFutureEvents(future.sort(sortFn));
+        setFutureEvents(future.sort(sortFn).slice(0, 10));
       })
       .catch(setGlobalError)
       .finally(() => setIsLoading(false));
@@ -186,7 +193,6 @@ function useUpcomingEvents() {
   return { todayEvents, futureEvents, isLoading };
 }
 
-// mostra a lista de tarefas
 function AssociatedTaskListView({
   tasksForToday,
   otherTasks,
@@ -194,6 +200,7 @@ function AssociatedTaskListView({
   onTaskClick,
   showMicroTasks,
   onToggleMicroTasks,
+  isReadOnly = false,
 }: {
   tasksForToday: Task[];
   otherTasks: Task[];
@@ -201,8 +208,38 @@ function AssociatedTaskListView({
   onTaskClick: (task: Task) => void;
   showMicroTasks: boolean;
   onToggleMicroTasks: () => void;
+  isReadOnly?: boolean;
 }) {
   const { t } = useTranslation(["task"]);
+
+  if (isReadOnly) {
+    const allTasks = [...tasksForToday, ...otherTasks];
+    const selectedTasks = allTasks.filter((t) =>
+      selectedTaskIds.includes(t.id)
+    );
+
+    return (
+      <div className={styles.taskListContainer}>
+        <h2 className={styles.taskListTitle}>
+          {t("task:tasks_in_progress", "Tarefas em Curso")}
+        </h2>
+        {selectedTasks.length > 0 ? (
+          <TaskList
+            tasks={selectedTasks}
+            onTaskClick={() => {}}
+            onTaskStatusUpdated={() => {}}
+            selectedTaskIds={selectedTaskIds}
+            onSelectionToggle={() => {}}
+            textColor={"var(--text-color-2)"}
+          />
+        ) : (
+          <p className={styles.noEventsText}>
+            {t("task:no_task_selected", "Nenhuma tarefa selecionada.")}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={styles.taskListContainer}>
@@ -224,6 +261,8 @@ function AssociatedTaskListView({
         onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
         onSelectionToggle={onTaskClick}
+        textColor={"var(--text-color-2)"}
+        showIcon={true}
       />
 
       <h2 className={classNames(styles.taskListTitle, styles.otherTasksTitle)}>
@@ -235,6 +274,8 @@ function AssociatedTaskListView({
         onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
         onSelectionToggle={onTaskClick}
+        textColor={"var(--text-color-2)"}
+        showIcon={true}
       />
     </div>
   );
@@ -250,7 +291,6 @@ function ConfirmationModalContent({
   onConfirm: (completedTaskIds: number[]) => void;
 }) {
   const { t } = useTranslation(["task"]);
-
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -273,7 +313,6 @@ function ConfirmationModalContent({
       <p>
         {t("task:pomodoro_multi_q", "Quais das seguintes tarefas concluíste?")}
       </p>
-
       <div className={styles.modalTaskList}>
         {tasks.map((task) => (
           <label key={task.id} className={styles.modalTaskItem}>
@@ -286,7 +325,6 @@ function ConfirmationModalContent({
           </label>
         ))}
       </div>
-
       <div className={styles.modalButtonContainer}>
         <Button className={styles.modalButtonSecondary} onPress={onCancel}>
           {t("task:cancel", "Cancelar")}
@@ -354,7 +392,6 @@ function TodayEventsList({
       ) : (
         renderList(todayEvents)
       )}
-
       <h2 className={classNames(styles.taskListTitle, styles.otherTasksTitle)}>
         {t("study:upcoming_events", "PRÓXIMOS EVENTOS")}
       </h2>
@@ -372,16 +409,13 @@ function TodayEventsList({
 function TimerView({
   happeningStudyBlock,
   timerStopDate,
-  onTimeSelected,
   studyStopDate,
   onStopClick,
   onTimerFinish,
   markTimerStart,
 }: {
   happeningStudyBlock: Event | undefined;
-  // (Props de useTimerSetup)
   timerStopDate: Date | undefined;
-  onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void;
   studyStopDate: Date | undefined;
   onStopClick: () => void;
   onTimerFinish: () => void;
@@ -389,16 +423,6 @@ function TimerView({
 }) {
   const { t } = useTranslation("study");
 
-  // Se não há um evento a decorrer E não há um temporizador definido:
-  if (!happeningStudyBlock && !timerStopDate) {
-    return (
-      <div className={styles.pomodoroContainer}>
-        <SelectTime onTimeSelected={onTimeSelected} />
-      </div>
-    );
-  }
-
-  // Se há um evento a decorrer:
   let title = t("study:study_time", "Tempo de Estudo");
   let stopDate = timerStopDate;
 
@@ -410,7 +434,6 @@ function TimerView({
         ? t("study:study_time", " (Tempo de Estudo)")
         : t("study:pause_time", " (Pausa)"));
   } else if (!studyStopDate) {
-    // Se não há evento E não é tempo de estudo, é pausa
     title = t("study:pause_time", "Pausa");
   }
 
@@ -418,7 +441,7 @@ function TimerView({
     <div className={styles.pomodoroContainer}>
       <Timer
         title={title}
-        stopDate={stopDate!} // Sabemos que uma destas datas está definida
+        stopDate={stopDate!}
         onStart={markTimerStart}
         onStopClick={onStopClick}
         onFinish={onTimerFinish}
@@ -426,7 +449,8 @@ function TimerView({
     </div>
   );
 }
-function TimerAndAssociatedTasksView() {
+
+function PomodoroPage() {
   const { t } = useTranslation("study");
   const setGlobalError = useSetGlobalError();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -440,12 +464,8 @@ function TimerAndAssociatedTasksView() {
     toggleTaskSelection,
     refreshTasks,
     setSelectedTaskIds,
+    completeSelectedTasks,
   } = useAssociatedTasks(showMicroTasks);
-
-  const [happeningStudyBlock, setHappeningStudyBlock] = useState<
-    Event | undefined
-  >();
-  const [isLoadingBlock, setIsLoadingBlock] = useState(true);
 
   const {
     todayEvents,
@@ -453,7 +473,11 @@ function TimerAndAssociatedTasksView() {
     isLoading: isLoadingEvents,
   } = useUpcomingEvents();
 
-  // 2. Lógica do Modal
+  const [happeningStudyBlock, setHappeningStudyBlock] = useState<
+    Event | undefined
+  >();
+  const [isLoadingBlock, setIsLoadingBlock] = useState(true);
+
   const openConfirmationModal = () => {
     if (selectedTaskIds.length > 0) {
       const allTasks = [...tasksForToday, ...otherTasks];
@@ -465,20 +489,12 @@ function TimerAndAssociatedTasksView() {
 
   const handleConfirmCompletion = (completedTaskIds: number[]) => {
     setIsConfirmModalOpen(false);
-
     if (completedTaskIds.length === 0) {
       setSelectedTaskIds([]);
       return;
     }
-    const tasksToComplete = completedTaskIds.map((id) =>
-      service.updateTaskStatus(id, "completed")
-    );
-
-    Promise.all(tasksToComplete)
-      .then(() => {
-        refreshTasks();
-        setSelectedTaskIds([]);
-      })
+    completeSelectedTasks(completedTaskIds)
+      .then(() => {})
       .catch((err) => {
         console.error("Erro ao completar tarefas", err);
         refreshTasks();
@@ -504,43 +520,44 @@ function TimerAndAssociatedTasksView() {
   }, [setGlobalError]);
 
   if (isLoadingBlock) {
-    return <div>A carregar...</div>; // O 'loading' principal
+    return <div>A carregar...</div>;
   }
 
   return (
     <>
       <div className={styles.pomodoroLayout}>
-        {(timerStopDate || happeningStudyBlock) && (
-          <TodayEventsList
-            todayEvents={todayEvents}
-            futureEvents={futureEvents}
-            isLoading={isLoadingEvents}
-          />
-        )}
-
-        <TimerView
-          happeningStudyBlock={happeningStudyBlock}
-          timerStopDate={timerStopDate}
-          onTimeSelected={onTimeSelected}
-          studyStopDate={studyStopDate}
-          onStopClick={onStopClick}
-          onTimerFinish={onTimerFinish}
-          markTimerStart={markTimerStart}
+        <TodayEventsList
+          todayEvents={todayEvents}
+          futureEvents={futureEvents}
+          isLoading={isLoadingEvents}
         />
 
-        {(timerStopDate || happeningStudyBlock) && (
-          <AssociatedTaskListView
-            tasksForToday={tasksForToday}
-            otherTasks={otherTasks}
-            selectedTaskIds={selectedTaskIds}
-            onTaskClick={toggleTaskSelection}
-            showMicroTasks={showMicroTasks}
-            onToggleMicroTasks={() => setShowMicroTasks((prev) => !prev)}
+        {timerStopDate || happeningStudyBlock ? (
+          <TimerView
+            happeningStudyBlock={happeningStudyBlock}
+            timerStopDate={timerStopDate}
+            studyStopDate={studyStopDate}
+            onStopClick={onStopClick}
+            onTimerFinish={onTimerFinish}
+            markTimerStart={markTimerStart}
           />
+        ) : (
+          <div className={styles.pomodoroContainer}>
+            <SelectTime onTimeSelected={onTimeSelected} />
+          </div>
         )}
+
+        <AssociatedTaskListView
+          tasksForToday={tasksForToday}
+          otherTasks={otherTasks}
+          selectedTaskIds={selectedTaskIds}
+          onTaskClick={toggleTaskSelection}
+          showMicroTasks={showMicroTasks}
+          onToggleMicroTasks={() => setShowMicroTasks((prev) => !prev)}
+          isReadOnly={!!(timerStopDate || happeningStudyBlock)}
+        />
       </div>
 
-      {/* O Modal (continua a funcionar) */}
       <Modal
         isOpen={isConfirmModalOpen}
         onOpenChange={setIsConfirmModalOpen}
@@ -557,14 +574,10 @@ function TimerAndAssociatedTasksView() {
   );
 }
 
-function StudyPage() {
-  return <TimerAndAssociatedTasksView />;
-}
-
 export default function StudyPageAuthControlled() {
   return (
     <RequireAuthn>
-      <StudyPage />
+      <PomodoroPage />
     </RequireAuthn>
   );
 }

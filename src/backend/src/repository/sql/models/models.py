@@ -131,6 +131,9 @@ class STEventModel(SQLModel, table=True):
     color: str = Field(nullable=False)
     is_uc: bool = Field(default=False, nullable=False)
 
+    task_id: Optional[int] = Field(default=None, nullable=True)
+    task_user_id: Optional[int] = Field(default=None, nullable=True)
+
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
     
@@ -149,6 +152,15 @@ class STEventModel(SQLModel, table=True):
         link_model=STEventTagModel,
         sa_relationship_kwargs={"overlaps": "event,tags_associations,event_links,tag_ref"}
     )
+
+    __table_args__ = (
+    ForeignKeyConstraint(
+        ['task_id', 'task_user_id'],
+        ['st_task.id', 'st_task.user_id'],
+        name="fk_st_event_task_composite"
+    ),
+    )
+    
     
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"

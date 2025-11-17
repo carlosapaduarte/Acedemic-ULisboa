@@ -73,7 +73,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 every_week=event.every_week,
                 every_day=event.every_day,
                 notes=event.notes,
-                color=event.color
+                color=event.color,
+                task_id=event.task_id,
+                task_user_id=user_id if event.task_id else None
             )
 
             session.add(new_event_model)
@@ -895,6 +897,23 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 session.delete(link)
 
             session.delete(task_to_delete)
+            session.commit()
+
+    def delete_future_slots_for_task(self, user_id: int, task_id: int):
+        """Apaga todos os slots dos eventos futuros ligados a uma tarefa caso a mesma seja marcada como concluída antes de se fazer todos os slots"""
+        with Session(engine) as session:
+            now = datetime.utcnow()
+            
+            statement = select(STEventModel).where(
+                STEventModel.user_id == user_id,
+                STEventModel.task_id == task_id,
+                STEventModel.start_date > now # Apenas eventos no futuro
+            )
+            
+            future_events_to_delete = session.exec(statement).all()
+            for event in future_events_to_delete:
+                session.delete(event)
+            
             session.commit()
 
     def delete_tag(self, session: Session, tag_id: int) -> bool:

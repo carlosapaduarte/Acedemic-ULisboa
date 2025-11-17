@@ -1,11 +1,7 @@
 import { Task } from "~/service/service";
 import { TaskListItem } from "./TaskListItem/TaskListItem";
 import { useTranslation } from "react-i18next";
-
-const styles = {
-  emptyListContainer: "emptyListContainer",
-  emptyListText: "emptyListText",
-};
+import styles from "./tasksPage.module.css";
 
 export function TaskList({
   tasks,
@@ -13,12 +9,16 @@ export function TaskList({
   onTaskStatusUpdated,
   selectedTaskIds,
   onSelectionToggle,
+  textColor,
+  showIcon,
 }: {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
   onTaskStatusUpdated: (task: Task) => void;
   selectedTaskIds?: number[];
   onSelectionToggle?: (task: Task) => void;
+  textColor?: string;
+  showIcon?: boolean;
 }) {
   const { t } = useTranslation(["task"]);
 
@@ -26,10 +26,7 @@ export function TaskList({
     return (
       <div className={styles.emptyListContainer}>
         <p className={styles.emptyListText}>
-          {t(
-            "task:no_tasks_associated",
-            "Nenhuma tarefa associada a esta sessão."
-          )}
+          {t("task:no_tasks_associated", "Nenhuma tarefa para hoje")}
         </p>
       </div>
     );
@@ -55,6 +52,8 @@ export function TaskList({
           onTaskStatusUpdated={onTaskStatusUpdated}
           isSelected={selectedTaskIds?.includes(task.id)}
           onSelectionToggle={onSelectionToggle}
+          textColor={textColor}
+          showIcon={showIcon}
         />
       ))}
     </div>
