@@ -20,6 +20,7 @@ function useEditTask(task: Task) {
   //const { tags, appendTag, removeTag } = useTags();
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
+  const [isMicroTask, setIsMicroTask] = useState<boolean>(false);
 
   const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -42,9 +43,12 @@ function useEditTask(task: Task) {
       setDeadline(task.data.deadline);
       setPriority(task.data.priority);
       setStatus(task.data.status);
-      /*setSubTasks(task.data.subTasks);
-            setSlotsToWork(task.data.slotsToWork);*/
-      setSelectedTags(task.data.tags);
+      //setSubTasks(task.data.subTasks || []);
+      //setSubTasks(task.subTasks || []);
+      //setSlotsToWork(task.data.slotsToWork || []);
+      setSlotsToWork([]);
+      setSelectedTags(task.data.tags || []);
+      setIsMicroTask(task.data.is_micro_task);
       refreshTags();
     }
   }, [task]);
@@ -93,6 +97,7 @@ function useEditTask(task: Task) {
     refreshTags,
     isEditTagModalOpen,
     setIsEditTagModalOpen,
+    isMicroTask,
   };
 }
 
@@ -193,6 +198,7 @@ const EditTaskModal = React.memo(function CreateTaskModal({
                     status: status ?? "not_completed",
                     subTasks,
                     slotsToWork,
+                    is_micro_task: isMicroTask,
                   });
                   clearFields();
                 }}

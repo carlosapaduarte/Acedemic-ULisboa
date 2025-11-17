@@ -227,6 +227,7 @@ export type NewEventInfo = {
   everyDay: boolean;
   notes: string;
   color?: string;
+  is_uc: boolean;
 };
 
 async function createNewEvent(newEventInfo: NewEventInfo) {
@@ -242,6 +243,7 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
       everyDay: newEventInfo.everyDay,
       notes: newEventInfo.notes,
       color: newEventInfo.color,
+      is_uc: newEventInfo.is_uc,
     }),
   };
 
@@ -276,6 +278,7 @@ type EventDto = {
   color?: string;
   notes: string;
   task_id?: number;
+  is_uc: boolean;
 };
 
 export type Event = {
@@ -289,6 +292,7 @@ export type Event = {
   color: string;
   notes: string;
   task_id?: number;
+  is_uc: boolean;
 };
 
 export type UpdateEventInputDto = {
@@ -300,6 +304,7 @@ export type UpdateEventInputDto = {
   everyDay: boolean;
   notes: string;
   color?: string;
+  is_uc: boolean;
 };
 
 async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
@@ -315,6 +320,7 @@ async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
       everyDay: inputDto.everyDay,
       notes: inputDto.notes,
       color: inputDto.color,
+      is_uc: inputDto.is_uc,
     }),
   };
   const response: Response = await doFetch(request);
@@ -356,6 +362,7 @@ async function getUserEvents(
         notes: eventDto.notes,
         color: eventDto.color || "#3399FF",
         task_id: eventDto.task_id,
+        is_uc: eventDto.is_uc,
       };
     });
   } else {
@@ -597,7 +604,7 @@ async function updateTaskStatus(taskId: number, newStatus: string) {
     return Promise.reject(new Error("Task status could not be updated!"));
 }
 
-deleteTask: async (taskId: number): Promise<void> => {
+async function deleteTask(taskId: number): Promise<void> {
   const request = {
     path: `study-tracker/users/me/tasks/${taskId}`,
     method: "DELETE",
@@ -606,7 +613,7 @@ deleteTask: async (taskId: number): Promise<void> => {
   if (!response.ok) {
     return Promise.reject(new Error("Task could not be deleted!"));
   }
-};
+}
 
 async function createArchive(name: string) {
   const request = {
@@ -932,17 +939,6 @@ async function finishStudySession() {
   const response: Response = await doFetch(request);
   if (!response.ok)
     return Promise.reject(new Error("Could not finish study session!"));
-}
-
-async function deleteTask(taskId: number): Promise<void> {
-  const request = {
-    path: `study-tracker/users/me/tasks/${taskId}`,
-    method: "DELETE",
-  };
-  const response: Response = await doFetch(request);
-  if (!response.ok) {
-    return Promise.reject(new Error("Task could not be deleted!"));
-  }
 }
 
 export const service = {

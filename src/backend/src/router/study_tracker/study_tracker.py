@@ -120,7 +120,8 @@ def create_event(
         every_week=dto.everyWeek,
         every_day=dto.everyDay,
         color=dto.color,
-        notes=dto.notes
+        notes=dto.notes,
+        is_uc=dto.is_uc
         )
     )
     return Response()
@@ -145,7 +146,8 @@ def update_event(
             every_week=dto.everyWeek,
             every_day=dto.everyDay,
             color=dto.color,
-            notes=dto.notes
+            notes=dto.notes,
+            is_uc=dto.is_uc
         )
     )
     return Response()

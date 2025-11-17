@@ -21,6 +21,7 @@ class CreateEventInputDto(BaseModel):
     everyDay: bool = False
     notes: str | None
     color: str = "#3399FF"
+    is_uc: bool = False
 
 class UpdateEventInputDto(BaseModel):
     startDate: float
@@ -31,6 +32,7 @@ class UpdateEventInputDto(BaseModel):
     everyDay: bool = False
     notes: Optional[str] = None
     color: str = None
+    is_uc: bool = False
 
 class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int

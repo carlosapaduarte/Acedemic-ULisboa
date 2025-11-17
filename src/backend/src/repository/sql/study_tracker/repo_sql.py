@@ -75,7 +75,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 notes=event.notes,
                 color=event.color,
                 task_id=event.task_id,
-                task_user_id=user_id if event.task_id else None
+                task_user_id=user_id if event.task_id else None,
+                is_uc=event.is_uc
             )
 
             session.add(new_event_model)
@@ -142,6 +143,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             event_model.every_day = event.every_day
             event_model.notes = event.notes
             event_model.color = event.color
+            event_model.is_uc = event.is_uc
             
             new_tags = []
             

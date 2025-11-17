@@ -72,6 +72,7 @@ class EventOutputDto(BaseModel):
     color: str | None = None
     notes: str | None = None
     task_id: int | None = None
+    is_uc: bool = False
 
     @staticmethod
     def from_events(events: list[Event]) -> list['EventOutputDto']:
@@ -92,7 +93,8 @@ class EventOutputDto(BaseModel):
                     everyDay=event.every_day,
                     color=event.color,
                     notes=event.notes,
-                    task_id=event.task_id
+                    task_id=event.task_id,
+                    is_uc=event.is_uc
                 )
             )
 

@@ -31,6 +31,7 @@ interface CalendarEventResource {
   notes?: string;
   style?: React.CSSProperties;
   task_id?: number;
+  is_uc?: boolean;
 }
 
 const EventWithTags = ({
@@ -366,6 +367,7 @@ function useMyCalendar() {
                 notes: event.notes,
                 style: styleProps,
                 task_id: event.task_id,
+                is_uc: event.is_uc,
               } as CalendarEventResource,
             });
           }
@@ -496,6 +498,7 @@ function MyCalendar() {
     eventsView,
   } = useMyCalendar();
   const { t, i18n } = useTranslation(["calendar"]);
+  const [viewMode, setViewMode] = useState<"all" | "classes_only">("all");
 
   useEffect(() => {
     refreshUserEvents();
@@ -531,6 +534,7 @@ function MyCalendar() {
       color: event.resource.color,
       everyDay: event.resource.everyDay,
       everyWeek: event.resource.everyWeek,
+      is_uc: event.resource.is_uc || false,
     });
     setSelectedSlot(null);
     setIsModalOpen(true);
@@ -614,6 +618,16 @@ function MyCalendar() {
         .format(t("rbc_time_range_format"))}`,
   };
 
+  const filteredEvents = React.useMemo(() => {
+    if (viewMode === "classes_only") {
+      // Filtra SÓ os eventos que têm 'is_uc: true'
+      return events.filter(
+        (event) => (event.resource as CalendarEventResource)?.is_uc
+      );
+    }
+    return events; // Se for 'all', retorna todos
+  }, [events, viewMode]);
+
   return (
     <div className={styles.calendarPageContainer}>
       <EventModal
@@ -637,7 +651,14 @@ function MyCalendar() {
         ) : (
           <div></div>
         )}
-
+        <button
+          onClick={() =>
+            setViewMode(viewMode === "all" ? "classes_only" : "all")
+          }
+          className={styles.toggleButton}
+        >
+          {viewMode === "all" ? t("Ver só Aulas") : t("Ver Todos os Eventos")}
+        </button>
         <button
           className={styles.toggleButton}
           onClick={handleCreateEventClick}
@@ -700,7 +721,7 @@ function MyCalendar() {
           }}
           localizer={localizer}
           scrollToTime={new Date(2000, 1, 1, 7)}
-          events={events}
+          events={filteredEvents}
           startAccessor="start"
           endAccessor="end"
           onSelectEvent={handleSelectEvent}
@@ -734,6 +755,7 @@ function MyCalendar() {
             }
 
             const applyFadedStyle =
+              taskId && (isPastEvent || isCompletedTaskSlot);
 
             const baseStyle: React.CSSProperties = {
               borderRadius: "5px",
