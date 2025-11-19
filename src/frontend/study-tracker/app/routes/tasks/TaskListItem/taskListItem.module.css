@@ -106,9 +106,32 @@
   opacity: 1;
 }
 
-.microTaskIcon {
-  flex-shrink: 0;
-  color: var(--color-2);
-  font-size: 0.8rem;
+.iconsContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
   margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
+.priorityIcon {
+  color: #e74c3c;
+  font-size: 0.9rem;
+}
+
+.upcomingIcon {
+  color: #e67e22;
+  font-size: 0.9rem;
+}
+
+.microTaskIcon {
+  color: #f1c40f;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 1px rgba(241, 196, 15, 0.5));
+}
+
+.taskTitleContainer {
+  margin-left: 0.2rem !important;
 }

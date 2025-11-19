@@ -8,7 +8,7 @@ import {
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
 import { Event, service, Tag, Task } from "~/service/service";
-
+import { FaListCheck } from "react-icons/fa6";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar.css";
 import "./CreateEvent/createEventReactAriaModal.css";
@@ -47,6 +47,7 @@ const EventWithTags = ({
 }) => {
   const { t, i18n } = useTranslation(["calendar"]);
   const isRecurring = event.resource.everyWeek || event.resource.everyDay;
+
   const getTagNames = () => {
     if (!event.resource.tags || allUserTags.length === 0) return [];
     return event.resource.tags!.map((tagIdentifier: string | number) => {
@@ -84,20 +85,14 @@ const EventWithTags = ({
   let isCompletedTaskSlot = false;
   const taskId = event.resource?.task_id;
 
-  const now = new Date();
-  const eventEndDate = new Date(event.end as Date);
-  const isPastEvent = eventEndDate < now;
-
-  if (taskId) {
+  if (taskId && allTasks) {
     const associatedTask = allTasks.find((t) => t.id === taskId);
     if (associatedTask && associatedTask.data.status === "completed") {
       isCompletedTaskSlot = true;
     }
   }
-  // O evento deve ser esbatido se:
-  // 1. For um slot de trabalho E já tiver passado (se for antigo)
-  // 2. For um slot de trabalho E a tarefa-mãe estiver concluída.
-  const applyPastStyle = taskId && (isPastEvent || isCompletedTaskSlot);
+
+  const applyPastStyle = taskId && isCompletedTaskSlot;
 
   const combinedStyle: React.CSSProperties = {
     ...style,
@@ -118,55 +113,82 @@ const EventWithTags = ({
     padding: "4px",
     height: "100%",
     width: "100%",
+    overflow: "hidden",
   };
 
   const titleStyle: React.CSSProperties = {
     overflow: "hidden",
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
+    marginBottom: "2px",
+    flexShrink: 0,
   };
 
   const tagsChipStyle: React.CSSProperties = {
-    fontSize: "0.7em",
+    fontSize: "0.75em",
     background: "rgba(0,0,0,0.25)",
-    padding: "3px 8px",
+    padding: "2px 6px",
     borderRadius: "10px",
     zIndex: 2,
     display: "flex",
     alignItems: "center",
-    gap: "5px",
-    marginTop: "4px",
+    gap: "6px",
+    marginTop: "auto",
     alignSelf: "flex-start",
-    overflow: "hidden",
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
     maxWidth: "100%",
+    overflow: "hidden",
   };
+
+  const tagTextStyle: React.CSSProperties = {
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    minWidth: 0,
+    flex: 1,
+  };
+
+  const iconStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    flexShrink: 0,
+  };
+
+  const isWorkSlot = !!taskId;
 
   return (
     <div style={combinedStyle}>
       <div style={innerWrapperStyle}>
-        <div style={titleStyle}>{event.title}</div>
+        <div style={titleStyle} title={event.title}>
+          {event.title}
+        </div>
 
-        {(tagNames.length > 0 || isRecurring) && (
+        {(tagNames.length > 0 || isRecurring || isWorkSlot) && (
           <div style={tagsChipStyle}>
             {isRecurring && (
-              <span
-                title="Evento Recorrente"
-                style={{ display: "flex", alignItems: "center" }}
-              >
+              <span title="Evento Recorrente" style={iconStyle}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  height="16px"
+                  height="12px"
                   viewBox="0 -960 960 960"
-                  width="16px"
+                  width="12px"
                   fill="#e3e3e3"
                 >
                   <path d="M280-80 120-240l160-160 56 58-62 62h406v-160h80v240H274l62 62-56 58Zm-80-440v-240h486l-62-62 56-58 160 160-160 160-56-58 62-62H280v160h-80Z" />
                 </svg>
               </span>
             )}
-            {tagNames.length > 0 && <span>{tagNames.join(", ")}</span>}
+
+            {isWorkSlot && (
+              <span title="Slot de Trabalho" style={iconStyle}>
+                <FaListCheck size={12} color="#e3e3e3" />
+              </span>
+            )}
+
+            {tagNames.length > 0 && (
+              <span style={tagTextStyle} title={tagNames.join(", ")}>
+                {tagNames.join(", ")}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -754,8 +776,7 @@ function MyCalendar() {
               }
             }
 
-            const applyFadedStyle =
-              taskId && (isPastEvent || isCompletedTaskSlot);
+            const applyFadedStyle = taskId && isCompletedTaskSlot;
 
             const baseStyle: React.CSSProperties = {
               borderRadius: "5px",

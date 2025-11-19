@@ -43,5 +43,7 @@
   "work": "Trabalho",
   "personal": "Pessoal",
   "study": "Estudo",
-  "available_tasks": "Tarefas Disponíveis"
+  "available_tasks": "Tarefas Disponíveis",
+  "micro_tasks_list_title": "Tarefas Relâmpago",
+  "show_micro_tasks": "Incluir tarefas relâmpago"
 }

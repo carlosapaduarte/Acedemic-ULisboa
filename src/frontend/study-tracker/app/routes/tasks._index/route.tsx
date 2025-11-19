@@ -65,7 +65,7 @@ export default function TasksPage() {
 
         <div className={styles.microTasksColumn}>
           <h1 className={styles.tasksListTitle}>
-            {t("task:micro_tasks_list_title", "Tarefas Rápidas")}
+            {t("task:micro_tasks_list_title", "Tarefas Relâmpago")}
           </h1>
           <QuickTaskForm onTaskCreated={onTaskCreated} />
           <div className={styles.taskListContainer}>

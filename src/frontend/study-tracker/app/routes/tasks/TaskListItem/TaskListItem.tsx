@@ -4,7 +4,7 @@ import styles from "./taskListItem.module.css";
 import classNames from "classnames";
 import Confetti from "react-confetti";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
-import { FaBolt } from "react-icons/fa";
+import { FaBolt, FaExclamation, FaRegClock } from "react-icons/fa6";
 
 const desenhaConfetisPequenos = (ctx: CanvasRenderingContext2D) => {
   ctx.rect(0, 0, 6, 12);
@@ -53,7 +53,6 @@ export function TaskListItem({
   isSelected,
   onSelectionToggle,
   textColor,
-  showIcon,
 }: {
   taskToDisplay: Task;
   onTaskClick: (task: Task) => void;
@@ -61,7 +60,6 @@ export function TaskListItem({
   isSelected?: boolean;
   onSelectionToggle?: (task: Task) => void;
   textColor?: string;
-  showIcon?: boolean;
 }) {
   const { internalTask, updateTaskStatus } = useTaskView(
     taskToDisplay,
@@ -75,25 +73,61 @@ export function TaskListItem({
     w: number;
     h: number;
   } | null>(null);
+
   const isSelectionMode = onSelectionToggle !== undefined;
+
   const isChecked = isSelectionMode
     ? isSelected
     : internalTask.data.status == "completed";
+
   // Só mostra o riscado se NÃO estivermos em modo de seleção
   const showStrikeThrough =
     !isSelectionMode && internalTask.data.status == "completed";
 
+  const isHighPriority = internalTask.data.priority === "high";
+
+  const isUpcoming = () => {
+    if (!internalTask.data.deadline) return false;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const deadline = new Date(internalTask.data.deadline);
+    deadline.setHours(0, 0, 0, 0);
+
+    const diffTime = deadline.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays >= 0 && diffDays <= 5;
+  };
+
+  const showClock = isUpcoming() && internalTask.data.status !== "completed";
+
+  const StatusIcons = () => (
+    <div className={styles.iconsContainer}>
+      {isHighPriority && (
+        <span title="Alta Prioridade">
+          <FaExclamation className={styles.priorityIcon} />
+        </span>
+      )}
+      {showClock && (
+        <span title="Prazo Próximo (5 dias)">
+          <FaRegClock className={styles.upcomingIcon} />
+        </span>
+      )}
+    </div>
+  );
+
   const handleDelete = async () => {
     if (
       window.confirm(
-        `Tens a certeza que queres apagar a micro-tarefa "${internalTask.data.title}"?`
+        `Tens a certeza que queres apagar a tarefa relâmpago"${internalTask.data.title}"?`
       )
     ) {
       try {
         await service.deleteTask(internalTask.id);
         onTaskStatusUpdated(internalTask);
       } catch (error) {
-        console.error("Erro ao apagar micro-tarefa:", error);
+        console.error("Erro ao apagar tarefa relâmpago:", error);
       }
     }
   };
@@ -124,6 +158,7 @@ export function TaskListItem({
               className={styles.listCheckbox}
             />
           </div>
+          <FaBolt className={styles.microTaskIcon} />
           <div
             className={classNames(
               styles.taskTitleContainer,
@@ -145,7 +180,6 @@ export function TaskListItem({
               {internalTask.data.title}
             </p>
           </div>
-          {showIcon && <FaBolt className={styles.microTaskIcon} />}
 
           {!isSelectionMode && (
             <button onClick={handleDelete} className={styles.deleteButton}>
@@ -204,6 +238,7 @@ export function TaskListItem({
                 className={styles.listCheckbox}
               />
             </div>
+            <StatusIcons />
             <button
               className={classNames(
                 styles.taskTitleContainer,

@@ -249,7 +249,7 @@ function AssociatedTaskListView({
           onClick={onToggleMicroTasks}
           className={styles.modalCheckbox}
         />
-        {t("task:show_micro_tasks", "Incluir micro-tarefas")}
+        {t("task:show_micro_tasks", "Incluir tarefas relâmpago")}
       </label>
 
       <h2 className={styles.taskListTitle}>
