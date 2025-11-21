@@ -20,6 +20,7 @@ function useCreateNewTask() {
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
   const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
+  const [isMicroTask, setIsMicroTask] = useState(false);
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
@@ -43,6 +44,7 @@ function useCreateNewTask() {
     setSubTasks([]);
     setSlotsToWork([]);
     setSelectedTagIds([]);
+    setIsMicroTask(false);
   }
 
   function appendSubSubTask(subTask: CreateTaskInputDto) {
@@ -78,6 +80,8 @@ function useCreateNewTask() {
     refreshTags,
     isEditTagModalOpen,
     setIsEditTagModalOpen,
+    isMicroTask,
+    setIsMicroTask,
   };
 }
 
@@ -108,6 +112,8 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
     refreshTags,
     isEditTagModalOpen,
     setIsEditTagModalOpen,
+    isMicroTask,
+    setIsMicroTask,
   } = useCreateNewTask();
 
   const { t } = useTranslation();
@@ -168,6 +174,8 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
                   availableTags={availableTags}
                   refreshTags={refreshTags}
                   setIsEditTagModalOpen={setIsEditTagModalOpen}
+                  isMicroTask={isMicroTask}
+                  setIsMicroTask={setIsMicroTask}
                 />
               </div>
               <div className={styles.finishCreatingTaskButtonContainer}>
@@ -188,6 +196,7 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
                       status: status ?? "not_completed",
                       subTasks,
                       slotsToWork,
+                      is_micro_task: isMicroTask,
                     });
                     clearFields();
                   }}
