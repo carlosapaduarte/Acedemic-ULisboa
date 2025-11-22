@@ -34,10 +34,11 @@ def get_session() -> Generator[Session, None, None]:
         yield session
 
 predefined_global_tag_names = [
-    {"name_pt": "Estudo", "name_en": "Study", "color": "#4287f5"},
-    {"name_pt": "Trabalho", "name_en": "Work", "color": "#f5a742"},
-    {"name_pt": "Pessoal", "name_en": "Personal", "color": "#42f56f"},
-    {"name_pt": "Lazer", "name_en": "Fun", "color": "#f542d4"},
+    {"name_pt": "Estudo", "name_en": "Study", "color": "#4169E1"},
+    {"name_pt": "Aula", "name_en": "Class", "color": "#FF8C00"},
+    {"name_pt": "Auto-cuidado", "name_en": "Self-care", "color": "#32CD32"},
+    {"name_pt": "Lazer", "name_en": "Leisure", "color": "#FF69B4"},
+    {"name_pt": "Projeto", "name_en": "Project", "color": "#9370DB"},
 ]
 
 def seed_global_tags(session: Session):
@@ -56,6 +57,7 @@ def seed_global_tags(session: Session):
                 name_pt=tag_data["name_pt"],
                 name_en=tag_data["name_en"],
                 color=tag_data.get("color"),
+                is_global=True
             )
             session.add(new_tag)
 

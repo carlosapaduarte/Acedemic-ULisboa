@@ -13,7 +13,7 @@ from pydantic import BaseModel
 #from service.common.badge_service import 
 from repository.sql.models.database import get_session as get_db_session
 from typing import Annotated, Any, List
-
+from repository.sql.models.database import predefined_global_tag_names
 from router.commons.dtos.output_dtos import TagOutputDto
 from router.academic_challenge.dtos.input_dtos import SetShareProgressPreferenceDto
 from router.commons.dtos.input_dtos import CreateUserInputDto, SetUserAvatarDto
@@ -86,6 +86,7 @@ async def test_token_validity(
     It does not replace the login action, which is required to create the JWT token.
 """
 @router.post("/create-user", response_model=UserOutputDto)
+@router.post("/create-user", response_model=UserOutputDto)
 def create_user_route(
     dto: CreateUserInputDto,
     db: Annotated[Session, Depends(get_db_session)] 
@@ -100,14 +101,47 @@ def create_user_route(
         new_user = common_service.create_user(db, dto)
         if not new_user:
             raise Exception("Erro: create_user retornou None")
+
+        for tag_conf in predefined_global_tag_names:
+            existing_tag = db.exec(
+                select(TagModel).where(
+                    or_(TagModel.name_pt == tag_conf["name_pt"], TagModel.name_en == tag_conf["name_en"])
+                )
+            ).first()
+
+            tag_to_link = existing_tag
+            
+            if not tag_to_link:
+                tag_to_link = TagModel(
+                    name_pt=tag_conf["name_pt"], 
+                    name_en=tag_conf["name_en"], 
+                    color=tag_conf["color"], 
+                    is_global=True
+                )
+                db.add(tag_to_link)
+                db.flush()
+
+            existing_link = db.exec(
+                select(UserTagLink).where(
+                    UserTagLink.user_id == new_user.id,
+                    UserTagLink.tag_id == tag_to_link.id
+                )
+            ).first()
+
+            if not existing_link:
+                link = UserTagLink(user_id=new_user.id, tag_id=tag_to_link.id, is_custom=False)
+                db.add(link)
         return UserOutputDto.fromUser(new_user)
+        
     except HTTPException:
         raise
     except Exception as e:
+        db.rollback()
+        print(f"Erro ao criar utilizador e tags: {str(e)}") 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"type": "USER_CREATION_FAILED", "field": "general"}
-        )
+)
 
 @router.get("/users/me", response_model=UserOutputDto)
 def get_user_info( 
