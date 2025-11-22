@@ -10,7 +10,6 @@ export function TaskList({
   selectedTaskIds,
   onSelectionToggle,
   textColor,
-  showIcon,
 }: {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
@@ -18,7 +17,6 @@ export function TaskList({
   selectedTaskIds?: number[];
   onSelectionToggle?: (task: Task) => void;
   textColor?: string;
-  showIcon?: boolean;
 }) {
   const { t } = useTranslation(["task"]);
 
@@ -53,7 +51,6 @@ export function TaskList({
           isSelected={selectedTaskIds?.includes(task.id)}
           onSelectionToggle={onSelectionToggle}
           textColor={textColor}
-          showIcon={showIcon}
         />
       ))}
     </div>

@@ -25,11 +25,85 @@
 
 .calendarHeaderActions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
+  gap: 1rem;
   padding: 0.75rem 1rem;
   background-color: var(--color-3);
   border-bottom: 1px solid var(--color-2, #7df4be);
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem;
+  background-color: var(--color-2);
+  border-radius: 8px;
+  color: var(--color-1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--color-2);
+}
+
+.filterButton:hover,
+.filterButton[data-pressed] {
+  background-color: transparent;
+  border: 2px solid var(--color-1);
+  color: var(--color-1);
+}
+
+.filterPopover {
+  min-width: 200px;
+  background-color: var(--color-1);
+  border: 2px solid var(--color-3);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+
+  &[data-entering] {
+    animation: fade 200ms;
+  }
+  &[data-exiting] {
+    animation: fade 200ms reverse;
+  }
+}
+
+.filterMenu {
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filterMenuItem {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
+  outline: none;
+  color: var(--text-color-1);
+  font-family: var(--font-family1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s;
+
+  &[data-focused],
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &[data-selected] {
+    background-color: var(--color-2);
+    color: var(--text-color-2);
+    font-weight: 600;
+  }
+}
+
+.filterMenuItem[data-selected]::after {
+  margin-left: 0.5rem;
+  content: "✓";
+  font-weight: bold;
 }
 
 .button {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SelectTime } from "./TimeSelection";
 import { Timer } from "./Timer";
-import { Event, service, Task } from "~/service/service";
+import { Event, service, Task, Tag } from "~/service/service";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { TaskList } from "~/routes/tasks/TaskList";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
@@ -252,6 +252,10 @@ function AssociatedTaskListView({
         {t("task:show_micro_tasks", "Incluir tarefas relâmpago")}
       </label>
 
+      <h3 className={styles.instructionTitle}>
+        SELECIONE AS TAREFAS EM QUE QUER TRABALHAR
+      </h3>
+
       <h2 className={styles.taskListTitle}>
         {t("task:tasks_for_today", "Tarefas para Hoje")}
       </h2>
@@ -261,8 +265,7 @@ function AssociatedTaskListView({
         onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
         onSelectionToggle={onTaskClick}
-        textColor={"var(--text-color-2)"}
-        showIcon={true}
+        textColor={"var(--color-3)"}
       />
 
       <h2 className={classNames(styles.taskListTitle, styles.otherTasksTitle)}>
@@ -274,8 +277,7 @@ function AssociatedTaskListView({
         onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
         onSelectionToggle={onTaskClick}
-        textColor={"var(--text-color-2)"}
-        showIcon={true}
+        textColor={"var(--color-3)"}
       />
     </div>
   );
@@ -345,12 +347,66 @@ function TodayEventsList({
   todayEvents,
   futureEvents,
   isLoading,
+  allTags = [],
 }: {
   todayEvents: Event[];
   futureEvents: Event[];
   isLoading: boolean;
+  allTags?: Tag[];
 }) {
   const { t } = useTranslation(["study", "task"]);
+
+  const renderColorBars = (event: Event) => {
+    if (event.tags && event.tags.length > 0) {
+      return (
+        <div className={styles.eventColorStripContainer}>
+          {event.tags.map((tagIdentifier: string, index: number) => {
+            const tagObj = allTags.find(
+              (t) =>
+                t.name_pt === tagIdentifier ||
+                t.name_en === tagIdentifier ||
+                t.id === tagIdentifier
+            );
+
+            const finalColor = tagObj?.color || "var(--color-2)";
+            const finalName = tagObj
+              ? tagObj.name_en || tagObj.name_pt
+              : tagIdentifier;
+
+            return (
+              <div
+                key={index}
+                className={styles.colorStripe}
+                style={{ backgroundColor: finalColor }}
+                title={finalName}
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (event.color && event.color.trim() !== "") {
+      return (
+        <div className={styles.eventColorStripContainer}>
+          <div
+            className={styles.colorStripe}
+            style={{ backgroundColor: event.color }}
+            title={event.title}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.eventColorStripContainer}>
+        <div
+          className={styles.colorStripe}
+          style={{ backgroundColor: "var(--color-2)" }}
+        />
+      </div>
+    );
+  };
 
   const renderList = (list: Event[]) => {
     if (list.length === 0) {
@@ -368,12 +424,10 @@ function TodayEventsList({
               {formatEventTime(event.startDate)} -{" "}
               {formatEventTime(event.endDate)}
             </span>
-            <span
-              className={styles.eventTitle}
-              style={{ borderLeftColor: event.color || "var(--color-2)" }}
-            >
-              {event.title}
-            </span>
+
+            {renderColorBars(event)}
+
+            <span className={styles.eventTitle}>{event.title}</span>
           </li>
         ))}
       </ul>
@@ -453,6 +507,8 @@ function TimerView({
 function PomodoroPage() {
   const { t } = useTranslation("study");
   const setGlobalError = useSetGlobalError();
+
+  const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [tasksToConfirm, setTasksToConfirm] = useState<Task[]>([]);
   const [showMicroTasks, setShowMicroTasks] = useState(true);
@@ -477,6 +533,13 @@ function PomodoroPage() {
     Event | undefined
   >();
   const [isLoadingBlock, setIsLoadingBlock] = useState(true);
+
+  useEffect(() => {
+    service
+      .fetchUserTags()
+      .then((tags) => setAllUserTags(tags))
+      .catch((err) => console.error("Erro ao carregar tags para cores:", err));
+  }, []);
 
   const openConfirmationModal = () => {
     if (selectedTaskIds.length > 0) {
@@ -530,6 +593,7 @@ function PomodoroPage() {
           todayEvents={todayEvents}
           futureEvents={futureEvents}
           isLoading={isLoadingEvents}
+          allTags={allUserTags}
         />
 
         {timerStopDate || happeningStudyBlock ? (

@@ -377,7 +377,7 @@ export function CreateTaskForm({
           title="Tarefas rápidas sem detalhes ou slots de tempo"
           style={{ cursor: "help", fontSize: "0.9rem" }}
         >
-          ℹ️
+          ℹ
         </span>
       </div>
       <TitleSection title={title} setTitle={setTitle} />

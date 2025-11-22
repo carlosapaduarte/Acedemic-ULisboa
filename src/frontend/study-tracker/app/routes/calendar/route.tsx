@@ -8,7 +8,6 @@ import {
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
 import { Event, service, Tag, Task } from "~/service/service";
-import { FaListCheck } from "react-icons/fa6";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar.css";
 import "./CreateEvent/createEventReactAriaModal.css";
@@ -19,6 +18,15 @@ import { useTranslation } from "react-i18next";
 import { utils } from "~/utils";
 import "moment/locale/pt";
 import { getCalendarMessages } from "../../calendarUtils";
+import { FaListCheck, FaFilter } from "react-icons/fa6";
+import {
+  Button,
+  Menu,
+  MenuItem,
+  MenuTrigger,
+  Popover,
+  type Selection,
+} from "react-aria-components";
 
 interface CalendarEventResource {
   id: number;
@@ -243,7 +251,6 @@ function useMyCalendar() {
   const [userTags, setUserTags] = useState<Tag[]>([]);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
-  const [eventsView, setEventsView] = useState<EventsView>("allEvents");
   const { i18n } = useTranslation();
   const [displayedDates, setDisplayedDates] = useState<Date[]>([]);
 
@@ -300,7 +307,7 @@ function useMyCalendar() {
           LLL: "D [de] MMMM [de] YYYY HH:mm",
           LLLL: "dddd, D [de] MMMM [de] YYYY HH:mm",
         },
-        week: { dow: 1 }, //começa na segunda-feira
+        week: { dow: 1 },
       });
     } else {
       moment.updateLocale("en", { week: { dow: 1 } });
@@ -321,7 +328,7 @@ function useMyCalendar() {
         await Promise.all([
           service.getAllUserEvents(),
           service.fetchUserTags(),
-          service.getTasks(false), //Vai buscar TODAS as tarefas (concluídas ou não)
+          service.getTasks(false),
         ]);
 
       setUserTags(tagsFromBackend);
@@ -396,16 +403,9 @@ function useMyCalendar() {
         });
       });
 
-      const filteredOccurrences = allOccurrences.filter((event) => {
-        if (eventsView === "recurringEvents") {
-          const resource = event.resource as CalendarEventResource;
-          return resource.everyDay || resource.everyWeek;
-        }
-        return true; // Se for 'allEvents', mantém todos
-      });
-
+      // --- CORREÇÃO: Usamos allOccurrences diretamente, sem filtrar por eventsView ---
       const uniqueEventsMap = new Map<string, CalendarEvent>();
-      filteredOccurrences.forEach((ev) => {
+      allOccurrences.forEach((ev) => {
         const key = `${(ev.resource as CalendarEventResource).id}-${ev
           .start!.toISOString()
           .slice(0, 10)}`;
@@ -418,18 +418,11 @@ function useMyCalendar() {
     } catch (error) {
       console.error("Falha ao carregar dados do calendário:", error);
     }
-  }, [displayedDates, eventsView, i18n.language]);
+  }, [displayedDates, i18n.language]); // eventsView removido daqui
 
   useEffect(() => {
     refreshAllCalendarData();
-  }, [eventsView, displayedDates, refreshAllCalendarData]);
-  useEffect(() => {
-    if (calendarView === Views.MONTH) setEventsView("allEvents");
-  }, [calendarView]);
-  function toggleEventsView() {
-    if (eventsView === "allEvents") setEventsView("recurringEvents");
-    else setEventsView("allEvents");
-  }
+  }, [displayedDates, refreshAllCalendarData]);
 
   return {
     events,
@@ -437,10 +430,10 @@ function useMyCalendar() {
     allTasks,
     calendarView,
     setCalendarView,
-    eventsView,
     setDisplayedDates,
     refreshUserEvents: refreshAllCalendarData,
-    toggleEventsView,
+    // eventsView removido
+    // toggleEventsView removido
   };
 }
 
@@ -516,11 +509,34 @@ function MyCalendar() {
     setCalendarView,
     setDisplayedDates,
     refreshUserEvents,
-    toggleEventsView,
-    eventsView,
   } = useMyCalendar();
   const { t, i18n } = useTranslation(["calendar"]);
-  const [viewMode, setViewMode] = useState<"all" | "classes_only">("all");
+  const [selectedFilters, setSelectedFilters] = useState<Selection>(
+    new Set([])
+  );
+
+  const filteredEvents = React.useMemo(() => {
+    // Se nenhum filtro estiver ativo (set vazio), mostra tudo
+    if (selectedFilters === "all" || selectedFilters.size === 0) {
+      return events;
+    }
+
+    return events.filter((event) => {
+      const resource = event.resource as CalendarEventResource;
+
+      // 1. Se o filtro "Classes Only" estiver ativo, verifica se é UC
+      if (selectedFilters.has("classes_only")) {
+        if (!resource.is_uc) return false;
+      }
+
+      // 2. Se o filtro "Recurring Only" estiver ativo, verifica se é recorrente
+      if (selectedFilters.has("recurring_only")) {
+        if (!resource.everyDay && !resource.everyWeek) return false;
+      }
+
+      return true; // Passou nos filtros ativos
+    });
+  }, [events, selectedFilters]);
 
   useEffect(() => {
     refreshUserEvents();
@@ -640,16 +656,6 @@ function MyCalendar() {
         .format(t("rbc_time_range_format"))}`,
   };
 
-  const filteredEvents = React.useMemo(() => {
-    if (viewMode === "classes_only") {
-      // Filtra SÓ os eventos que têm 'is_uc: true'
-      return events.filter(
-        (event) => (event.resource as CalendarEventResource)?.is_uc
-      );
-    }
-    return events; // Se for 'all', retorna todos
-  }, [events, viewMode]);
-
   return (
     <div className={styles.calendarPageContainer}>
       <EventModal
@@ -662,25 +668,31 @@ function MyCalendar() {
       />
 
       <div className={styles.calendarHeaderActions}>
-        {calendarView !== Views.MONTH ? (
-          <button onClick={toggleEventsView} className={styles.toggleButton}>
-            {eventsView === "allEvents" ? (
-              <span>{t("display_only_recurring_events_button")}</span>
-            ) : (
-              <span>{t("display_all_events_button")}</span>
-            )}
-          </button>
-        ) : (
-          <div></div>
-        )}
-        <button
-          onClick={() =>
-            setViewMode(viewMode === "all" ? "classes_only" : "all")
-          }
-          className={styles.toggleButton}
-        >
-          {viewMode === "all" ? t("Ver só Aulas") : t("Ver Todos os Eventos")}
-        </button>
+        {/* --- NOVO MENU DE FILTROS --- */}
+        <MenuTrigger>
+          <Button
+            aria-label={t("filter_events", "Filtrar Eventos")}
+            className={styles.filterButton}
+          >
+            <FaFilter size={18} />
+          </Button>
+          <Popover className={styles.filterPopover} placement="bottom end">
+            <Menu
+              className={styles.filterMenu}
+              selectionMode="multiple"
+              selectedKeys={selectedFilters}
+              onSelectionChange={setSelectedFilters}
+            >
+              <MenuItem id="recurring_only" className={styles.filterMenuItem}>
+                {t("display_only_recurring_events_button", "Só Recorrentes")}
+              </MenuItem>
+              <MenuItem id="classes_only" className={styles.filterMenuItem}>
+                {t("display_classes_only", "Só Aulas")}
+              </MenuItem>
+            </Menu>
+          </Popover>
+        </MenuTrigger>
+
         <button
           className={styles.toggleButton}
           onClick={handleCreateEventClick}
