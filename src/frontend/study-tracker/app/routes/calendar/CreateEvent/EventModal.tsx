@@ -74,19 +74,6 @@ const TitleSection = React.memo(function TitleSection({
           placeholder={t("title_label")}
         />
       </TextField>
-      <label htmlFor="is-uc-checkbox" className={styles.isUcContainer}>
-        <span className={styles.formSectionTitle}>
-          {t("is_uc_label", "uc?")}
-        </span>
-        <input
-          type="checkbox"
-          id="is-uc-checkbox"
-          checked={isUC}
-          onChange={(e) => setIsUC(e.target.checked)}
-          className={styles.nativeCheckbox}
-        />
-        <span className={styles.customCheckbox}></span>
-      </label>
     </div>
   );
 });

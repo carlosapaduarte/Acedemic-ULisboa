@@ -8,7 +8,6 @@ import pageStyles from "./taskPage.module.css";
 import classNames from "classnames";
 import { CreateTaskForm } from "~/routes/tasks/CreateTask/CreateTaskForm/CreateTaskForm";
 import { useTranslation } from "react-i18next";
-import { useTags } from "~/hooks/useTags";
 import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { SecondModalContext } from "../tasks/CreateTask/SecondModalContext";
 
@@ -17,7 +16,6 @@ function useEditTask(task: Task) {
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [deadline, setDeadline] = useState<Date | undefined>(undefined);
   const [priority, setPriority] = useState<string | undefined>("low");
-  //const { tags, appendTag, removeTag } = useTags();
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
   const [isMicroTask, setIsMicroTask] = useState<boolean>(false);
@@ -43,9 +41,6 @@ function useEditTask(task: Task) {
       setDeadline(task.data.deadline);
       setPriority(task.data.priority);
       setStatus(task.data.status);
-      //setSubTasks(task.data.subTasks || []);
-      //setSubTasks(task.subTasks || []);
-      //setSlotsToWork(task.data.slotsToWork || []);
       setSlotsToWork([]);
       setSelectedTags(task.data.tags || []);
       setIsMicroTask(task.data.is_micro_task);
@@ -62,6 +57,7 @@ function useEditTask(task: Task) {
     setSubTasks([]);
     setSlotsToWork([]);
     setSelectedTags([]);
+    setIsMicroTask(false);
   }
 
   function appendSubSubTask(subTask: CreateTaskInputDto) {
@@ -98,6 +94,7 @@ function useEditTask(task: Task) {
     isEditTagModalOpen,
     setIsEditTagModalOpen,
     isMicroTask,
+    setIsMicroTask,
   };
 }
 
@@ -120,28 +117,29 @@ const EditTaskModal = React.memo(function CreateTaskModal({
     priority,
     setPriority,
     status,
-    setStatus,
     slotsToWork,
     setSlotsToWork,
     selectedTags,
     setSelectedTags,
-    appendSubSubTask,
     subTasks,
     clearFields,
     availableTags,
     refreshTags,
     isEditTagModalOpen,
     setIsEditTagModalOpen,
+    isMicroTask,
+    setIsMicroTask,
   } = useEditTask(task);
 
   const { t } = useTranslation(["task"]);
 
   function updateTask(newTaskInfo: CreateTaskInputDto, onDone: () => void) {
-    //console.log(taskId)
     service
       .updateTask(taskId, newTaskInfo, task.data.title)
       .then(() => onDone())
-      .catch((error) => {} /*setGlobalError(error)*/);
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   function onConfirmClick(newTaskInfo: CreateTaskInputDto) {
@@ -178,6 +176,8 @@ const EditTaskModal = React.memo(function CreateTaskModal({
                 setTitle={setTitle}
                 priority={priority}
                 setPriority={setPriority}
+                isMicroTask={isMicroTask}
+                setIsMicroTask={setIsMicroTask}
               />
             </div>
             <div className={styles.finishCreatingTaskButtonContainer}>
@@ -188,12 +188,11 @@ const EditTaskModal = React.memo(function CreateTaskModal({
                   if (finishCreatingTaskButtonDisabled) {
                     return;
                   }
-                  close();
                   onConfirmClick({
-                    title,
+                    title: title!,
                     description,
                     deadline,
-                    priority,
+                    priority: priority!,
                     tags: selectedTags,
                     status: status ?? "not_completed",
                     subTasks,
@@ -201,6 +200,7 @@ const EditTaskModal = React.memo(function CreateTaskModal({
                     is_micro_task: isMicroTask,
                   });
                   clearFields();
+                  close();
                 }}
               >
                 {t("task:update_task")}

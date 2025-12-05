@@ -50,6 +50,7 @@ class Task():
             sub_tasks: list['Task'],
             is_micro_task: bool = False,
             status: str="not_completed",
+            completed_at: datetime | None = None
 
     ) -> None:
         self.id=id
@@ -61,6 +62,7 @@ class Task():
         self.sub_tasks=sub_tasks
         self.status=status
         self.is_micro_task = is_micro_task
+        self.completed_at = completed_at
 
     @staticmethod
     def from_create_task_input_dto(task_dto: CreateTaskInputDto) -> 'Task':

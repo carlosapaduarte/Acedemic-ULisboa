@@ -434,6 +434,7 @@ export type TaskData = {
   tags: string[];
   status: string;
   is_micro_task: boolean;
+  completed_at?: string;
 };
 
 function requestBody(newTaskInfo: CreateTaskInputDto): any {
@@ -515,6 +516,7 @@ export type TaskDto = {
   tags: string[];
   status: string;
   is_micro_task: boolean;
+  completed_at: number | undefined | null;
   subTasks: TaskDto[];
 };
 
@@ -530,6 +532,9 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
       tags: dto.tags,
       status: dto.status,
       is_micro_task: dto.is_micro_task,
+      completed_at: dto.completed_at
+        ? new Date(dto.completed_at * 1000).toISOString()
+        : undefined,
     },
     subTasks,
   };

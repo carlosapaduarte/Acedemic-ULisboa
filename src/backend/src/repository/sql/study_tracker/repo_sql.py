@@ -17,6 +17,7 @@ from domain.study_tracker import (
     CurricularUnit, Grade, DailyEnergyStatus, WeekTimeStudy, WeekAndYear, SlotToWork
 )
 from service.gamification import core as gamification_service
+from datetime import timezone
 
 engine = database.get_engine()
 
@@ -317,6 +318,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             tags=tags,
             status=task_model.status,
             is_micro_task=task_model.is_micro_task,
+            completed_at=task_model.completed_at,
             sub_tasks=subtasks
         )
     
@@ -497,9 +499,11 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             result = session.exec(statement)
             task_model: STTaskModel = result.one()
             
-            # Delete existent task
-            session.delete(task_model)
+            events_to_delete = session.exec(statement_events).all()
+            for event in events_to_delete:
+                session.delete(event)
             session.commit()
+            
             
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
@@ -507,9 +511,19 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             result = session.exec(statement)
             child_tasks_models = result.all()
-            # Delete child tasks
+            
             for child in child_tasks_models:
                 session.delete(child)
+            session.commit()
+
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)\
+                .where(STTaskModel.id == task_id)
+            
+            result = session.exec(statement)
+            task_model = result.one()
+            
+            session.delete(task_model)
             session.commit()
             
             StudyTrackerSqlRepo.create_task(self, user_id, task, task_id)
@@ -520,6 +534,10 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             result = session.exec(statement)
             task_model: STTaskModel = result.one()
             task_model.status = new_status
+            if new_status == "completed":
+                task_model.completed_at = datetime.now(timezone.utc)
+            else:
+                task_model.completed_at = None
             session.add(task_model)
             session.commit()
             

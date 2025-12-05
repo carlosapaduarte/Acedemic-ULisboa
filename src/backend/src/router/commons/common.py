@@ -131,6 +131,7 @@ def create_user_route(
             if not existing_link:
                 link = UserTagLink(user_id=new_user.id, tag_id=tag_to_link.id, is_custom=False)
                 db.add(link)
+        db.commit()
         return UserOutputDto.fromUser(new_user)
         
     except HTTPException:

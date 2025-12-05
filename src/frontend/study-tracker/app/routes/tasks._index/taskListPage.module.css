@@ -58,3 +58,76 @@
 .tasksListTitle {
   margin: 0;
 }
+.headerActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+  padding-right: 0.5rem;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background-color: transparent;
+  border: 2px solid var(--color-2);
+  border-radius: 8px;
+  color: var(--color-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+}
+
+.filterButton:hover,
+.filterButton[data-pressed] {
+  background-color: var(--color-2);
+  color: var(--color-1);
+}
+
+.filterPopover {
+  min-width: 200px;
+  background-color: #fffaf0;
+  border: 2px solid var(--color-3);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  z-index: 50;
+}
+
+.filterMenu {
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filterMenuItem {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
+  outline: none;
+  color: var(--text-color-1);
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s;
+}
+
+.filterMenuItem:hover,
+.filterMenuItem[data-focused] {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.filterMenuItem[data-selected] {
+  background-color: var(--color-2);
+  color: white;
+  font-weight: 600;
+}
+
+.filterMenuItem[data-selected]::after {
+  content: "✓";
+  font-weight: bold;
+}

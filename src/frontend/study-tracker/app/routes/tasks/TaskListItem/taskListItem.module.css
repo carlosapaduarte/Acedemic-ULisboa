@@ -22,15 +22,10 @@
 .taskTitleContainer {
   max-width: 100%;
   flex-grow: 1;
-
-  margin-left: 0.5rem;
   padding: 0.25rem 0.5rem;
-
   display: flex;
-
   background-color: transparent;
   border-radius: 0.25rem;
-
   overflow: hidden;
 
   &.strikeThrough {
@@ -109,8 +104,8 @@
 .iconsContainer {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  margin-left: 0.5rem;
+  justify-content: center;
+  width: 1.5rem;
   flex-shrink: 0;
 }
 
@@ -127,11 +122,4 @@
 .microTaskIcon {
   color: #f1c40f;
   font-size: 0.9rem;
-  margin-left: 0.5rem;
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 1px rgba(241, 196, 15, 0.5));
-}
-
-.taskTitleContainer {
-  margin-left: 0.2rem !important;
 }

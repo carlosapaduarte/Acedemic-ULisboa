@@ -217,7 +217,7 @@ const StatusSection = memo(function StatusSection({
     statusText = t("task:status_completed", "Completa");
     statusClass = styles.statusCompleted;
   } else if (deadline && new Date(deadline) < new Date()) {
-    statusText = t("task:status_overdue", "Atrasada");
+    statusText = t("task:status_overdue", "Em atraso");
     statusClass = styles.statusOverdue;
   } else {
     statusText = t("task:status_in_progress", "Em curso");

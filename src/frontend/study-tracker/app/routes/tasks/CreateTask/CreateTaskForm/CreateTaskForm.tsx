@@ -16,7 +16,7 @@ import { SlotToWorkDto } from "~/service/output_dtos";
 import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
 import { Tag } from "~/service/service";
 import { RiSettings5Fill } from "react-icons/ri";
-
+import { FaTrash } from "react-icons/fa";
 const priorityValues = ["low", "medium", "high"];
 
 const TitleSection = React.memo(function TitleSection({
@@ -79,18 +79,62 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
   const { t } = useTranslation(["task"]);
   const [slotAddingQueue, setSlotAddingQueue] = useState<number[]>([]);
 
-  const [slotsToWorkNumber, setSlotsToWorkNumber] = useState(
-    slotsToWork.length
-  );
+  const [localSlots, setLocalSlots] = useState<
+    { id: string; data: SlotToWorkDto | undefined }[]
+  >(() => slotsToWork.map((slot) => ({ id: crypto.randomUUID(), data: slot })));
+
+  useEffect(() => {
+    const currentValidCount = localSlots.filter(
+      (s) => s.data !== undefined
+    ).length;
+
+    if (slotsToWork.length > 0 && slotsToWork.length !== currentValidCount) {
+      setLocalSlots(
+        slotsToWork.map((slot) => ({ id: crypto.randomUUID(), data: slot }))
+      );
+    }
+  }, [slotsToWork]);
+
+  useEffect(() => {
+    const validSlots = localSlots
+      .map((s) => s.data)
+      .filter((slot): slot is SlotToWorkDto => slot !== undefined);
+
+    if (JSON.stringify(validSlots) !== JSON.stringify(slotsToWork)) {
+      setSlotsToWork(validSlots);
+    }
+  }, [localSlots]);
 
   function addToSlotAddingQueue(index: number) {
-    setSlotAddingQueue((slotAddingQueue) => [...slotAddingQueue, index]);
+    setSlotAddingQueue((prev) => [...prev, index]);
     setTimeout(() => {
-      setSlotAddingQueue((slotAddingQueue) =>
-        slotAddingQueue.filter((i) => i !== index)
-      );
+      setSlotAddingQueue((prev) => prev.filter((i) => i !== index));
     }, 1000);
   }
+
+  const handleAddVisualSlot = () => {
+    const newIndex = localSlots.length;
+    setLocalSlots((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), data: undefined },
+    ]);
+    addToSlotAddingQueue(newIndex);
+  };
+
+  const handleRemoveSlot = (idToRemove: string) => {
+    setLocalSlots((prev) => prev.filter((slot) => slot.id !== idToRemove));
+  };
+
+  const handleUpdateSlotData = (idToUpdate: string, data: SlotToWorkDto) => {
+    setLocalSlots((prev) =>
+      prev.map((slot) => {
+        if (slot.id === idToUpdate) {
+          return { ...slot, data: data };
+        }
+        return slot;
+      })
+    );
+  };
 
   return (
     <div className={styles.slotsToWorkSectionContainer}>
@@ -98,27 +142,48 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
         {t("task:slots_to_work_label")}
       </h2>
       <div className={styles.slotsToWorkContainer}>
-        {Array.from({ length: slotsToWorkNumber }).map((_, index) => (
-          <SlotToWork
-            key={index}
-            index={index}
-            newlyAdded={slotAddingQueue.includes(index)}
-            onClosePressed={(slot: SlotToWorkDto | undefined) => {
-              if (slot) {
-                console.log(slot);
-                const newSlotsToWork = [...slotsToWork];
-                newSlotsToWork.push(slot);
-                setSlotsToWork(newSlotsToWork);
-              } else console.log("Invalid date");
-            }}
-          />
+        {localSlots.map((slotWrapper, index) => (
+          <div
+            key={slotWrapper.id}
+            style={{ position: "relative", width: "100%" }}
+          >
+            <SlotToWork
+              index={index}
+              newlyAdded={slotAddingQueue.includes(index)}
+              onClosePressed={(data: SlotToWorkDto | undefined) => {
+                if (data) {
+                  handleUpdateSlotData(slotWrapper.id, data);
+                }
+              }}
+            />
+
+            <Button
+              onPress={() => handleRemoveSlot(slotWrapper.id)}
+              style={{
+                position: "absolute",
+                top: "5px",
+                right: "5px",
+                background: "rgba(0,0,0,0.5)",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+              }}
+              aria-label="Remover slot"
+            >
+              <FaTrash size={12} />
+            </Button>
+          </div>
         ))}
       </div>
       <Button
-        onPress={() => {
-          setSlotsToWorkNumber(slotsToWorkNumber + 1);
-          addToSlotAddingQueue(slotsToWorkNumber);
-        }}
+        onPress={handleAddVisualSlot}
         className={classNames(styles.addSlotToWorkButton)}
       >
         {t("task:add_slot_to_work")}

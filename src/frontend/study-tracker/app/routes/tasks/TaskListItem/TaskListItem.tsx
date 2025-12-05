@@ -106,13 +106,22 @@ export function TaskListItem({
     <div className={styles.iconsContainer}>
       {isHighPriority && (
         <span title="Alta Prioridade">
-          <FaExclamation className={styles.priorityIcon} />
+          <FaExclamation className={styles.priorityIcon} color="#FF4D4D" />
         </span>
       )}
-      {showClock && (
-        <span title="Prazo Próximo (5 dias)">
-          <FaRegClock className={styles.upcomingIcon} />
+
+      {internalTask.data.deadline &&
+      new Date(internalTask.data.deadline) < new Date() &&
+      internalTask.data.status !== "completed" ? (
+          <FaRegClock className={styles.overdueIcon} color="#FFA500" />
         </span>
+      ) : (
+        showClock && (
+          // Próximo (mas não atrasado)
+          <span title="Prazo Próximo (5 dias)">
+            <FaRegClock className={styles.upcomingIcon} />
+          </span>
+        )
       )}
     </div>
   );
@@ -158,7 +167,9 @@ export function TaskListItem({
               className={styles.listCheckbox}
             />
           </div>
-          <FaBolt className={styles.microTaskIcon} />
+          <div className={styles.iconsContainer}>
+            <FaBolt className={styles.microTaskIcon} />
+          </div>
           <div
             className={classNames(
               styles.taskTitleContainer,
