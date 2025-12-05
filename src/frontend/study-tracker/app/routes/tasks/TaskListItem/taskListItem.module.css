@@ -27,21 +27,17 @@
   background-color: transparent;
   border-radius: 0.25rem;
   overflow: hidden;
-
-  &.strikeThrough {
-    text-decoration: line-through;
-  }
-
-  &:hover {
-    text-decoration: underline;
-    background-color: #592e258f;
-  }
-
-  &:hover.strikeThrough {
-    text-decoration: underline line-through;
-  }
+  cursor: pointer;
 }
 
+.taskTitleContainer:hover {
+  text-decoration: underline;
+  background-color: #592e258f;
+}
+
+.taskTitleContainer.strikeThrough:hover {
+  text-decoration: underline line-through;
+}
 .taskTitle {
   max-width: 100%;
   text-align: left;
@@ -59,28 +55,31 @@
 .completedTask {
   opacity: 0.6;
 }
-
 .deleteButton {
-  flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
   background: none;
   border: none;
   color: var(--text-color-1);
-  font-size: 0.5rem;
-  font-weight: 900;
+  font-size: 1rem;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.35rem;
   border-radius: 50%;
-  width: 1rem;
-  height: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
 .deleteButton:hover {
   background-color: var(--color-text-danger);
   color: white;
+}
+
+.taskTitleContainer:hover + .deleteButton,
+.taskTitleContainer:hover ~ .deleteButton {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .microTaskToggle {
@@ -122,4 +121,9 @@
 .microTaskIcon {
   color: #f1c40f;
   font-size: 0.9rem;
+}
+
+.checkboxAndTitleContainer:hover .deleteButton {
+  opacity: 1;
+  pointer-events: auto;
 }

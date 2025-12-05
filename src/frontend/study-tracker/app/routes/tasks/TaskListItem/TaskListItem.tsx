@@ -4,7 +4,7 @@ import styles from "./taskListItem.module.css";
 import classNames from "classnames";
 import Confetti from "react-confetti";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
-import { FaBolt, FaExclamation, FaRegClock } from "react-icons/fa6";
+import { FaBolt, FaExclamation, FaRegClock, FaTrash } from "react-icons/fa6";
 
 const desenhaConfetisPequenos = (ctx: CanvasRenderingContext2D) => {
   ctx.rect(0, 0, 6, 12);
@@ -176,11 +176,6 @@ export function TaskListItem({
               styles.taskTitleContainer,
               showStrikeThrough && styles.strikeThrough
             )}
-            style={{
-              flexGrow: 1,
-              cursor: "default",
-              backgroundColor: "transparent",
-            }}
           >
             <p
               className={classNames(
@@ -195,7 +190,7 @@ export function TaskListItem({
 
           {!isSelectionMode && (
             <button onClick={handleDelete} className={styles.deleteButton}>
-              ✕
+              <FaTrash />
             </button>
           )}
         </div>
