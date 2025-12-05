@@ -113,6 +113,7 @@ export function TaskListItem({
       {internalTask.data.deadline &&
       new Date(internalTask.data.deadline) < new Date() &&
       internalTask.data.status !== "completed" ? (
+        <span title="Em Atraso">
           <FaRegClock className={styles.overdueIcon} color="#FFA500" />
         </span>
       ) : (
