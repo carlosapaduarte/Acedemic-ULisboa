@@ -413,56 +413,49 @@ export function CreateTaskForm({
 }) {
   return (
     <form className={styles.newTaskForm}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          marginBottom: "1rem",
-        }}
-      >
+      <div className={styles.microTaskContainer}>
         <input
           type="checkbox"
           id="micro-task-checkbox"
+          className={styles.hiddenCheckbox}
           checked={isMicroTask}
           onChange={(e) => setIsMicroTask(e.target.checked)}
-          style={{ width: "1.2rem", height: "1.2rem" }}
         />
-        <label
-          htmlFor="micro-task-checkbox"
-          style={{
-            fontFamily: "var(--font-family1)",
-            fontSize: "1rem",
-            color: "var(--text-color-1)",
-          }}
-        >
-          Micro-tarefa
+        <label htmlFor="micro-task-checkbox" className={styles.microTaskLabel}>
+          Tarefa relâmpago
         </label>
-        <span
-          title="Tarefas rápidas sem detalhes ou slots de tempo"
-          style={{ cursor: "help", fontSize: "0.9rem" }}
+
+        <div
+          className={styles.infoIcon}
+          title="Tarefas rápidas apenas com título, sem horários ou detalhes."
         >
-          ℹ
-        </span>
+          i
+        </div>
       </div>
+
       <TitleSection title={title} setTitle={setTitle} />
-      <DescriptionSection
-        description={description}
-        setDescription={setDescription}
-      />
-      <SlotsToWorkSection
-        slotsToWork={slotsToWork}
-        setSlotsToWork={setSlotsToWork}
-      />
-      <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
-      <PrioritySection priority={priority} setPriority={setPriority} />
-      <TagSection
-        selectedTagIds={selectedTagIds}
-        setSelectedTagIds={setSelectedTagIds}
-        availableTags={availableTags}
-        refreshTags={refreshTags}
-        setIsEditTagModalOpen={setIsEditTagModalOpen}
-      />
+
+      {!isMicroTask && (
+        <>
+          <DescriptionSection
+            description={description}
+            setDescription={setDescription}
+          />
+          <SlotsToWorkSection
+            slotsToWork={slotsToWork}
+            setSlotsToWork={setSlotsToWork}
+          />
+          <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
+          <PrioritySection priority={priority} setPriority={setPriority} />
+          <TagSection
+            selectedTagIds={selectedTagIds}
+            setSelectedTagIds={setSelectedTagIds}
+            availableTags={availableTags}
+            refreshTags={refreshTags}
+            setIsEditTagModalOpen={setIsEditTagModalOpen}
+          />
+        </>
+      )}
     </form>
   );
 }

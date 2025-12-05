@@ -309,3 +309,71 @@
   font-size: 0.9em;
   text-align: center;
 }
+
+.microTaskContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.microTaskContainer:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.hiddenCheckbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-1);
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.hiddenCheckbox:checked {
+  background-color: var(--color-1);
+}
+
+.hiddenCheckbox:checked::after {
+  content: "✔";
+  font-size: 14px;
+  color: #3e2723;
+  font-weight: bold;
+}
+
+.microTaskLabel {
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  color: var(--text-color-2);
+  cursor: pointer;
+  font-weight: 500;
+  user-select: none;
+}
+
+.infoIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: help;
+  margin-left: auto;
+}
