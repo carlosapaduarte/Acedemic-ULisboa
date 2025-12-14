@@ -6,7 +6,7 @@ import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
 import { Tag } from "~/service/service";
 import classNames from "classnames";
 import { useNavigate } from "@remix-run/react";
-import styles from "./tagSection.module.css";
+import styles from "./TagSection.module.css";
 
 export const TagSection = ({
   selectedTagIds,
@@ -14,48 +14,37 @@ export const TagSection = ({
   availableTags,
   refreshTags,
   setIsEditTagModalOpen,
-}: {
-  selectedTagIds: string[];
-  setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
-  availableTags: Tag[];
-  refreshTags: () => void;
-  setIsEditTagModalOpen: (isOpen: boolean) => void;
-}) => {
+}: any) => {
   const { t, i18n } = useTranslation(["task"]);
   const navigate = useNavigate();
 
-  const safeTags = Array.isArray(availableTags)
-    ? availableTags.filter((tag) => tag !== null && tag !== undefined)
-    : [];
-
+  const safeTags = Array.isArray(availableTags) ? availableTags : [];
   const safeSelectedIds = Array.isArray(selectedTagIds) ? selectedTagIds : [];
-
-  if (safeTags.length === 0) {
-    console.warn("A lista de tags está vazia após a limpeza.");
-  }
 
   const customTags = safeTags.filter((tag) => !tag.is_uc);
   const ucTags = safeTags.filter((tag) => tag.is_uc);
 
   const handleToggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) => {
-      const safePrev = Array.isArray(prev) ? prev : [];
-      return safePrev.includes(tagId)
-        ? safePrev.filter((id) => id !== tagId)
-        : [...safePrev, tagId];
+    setSelectedTagIds((prev: string[]) => {
+      const current = Array.isArray(prev) ? prev : [];
+      return current.includes(tagId)
+        ? current.filter((id) => id !== tagId)
+        : [...current, tagId];
     });
   };
 
   const renderTagPill = (tag: Tag) => {
     const isSelected = safeSelectedIds.includes(tag.id);
-    let displayName: string | undefined | null;
 
+    let displayName = tag.name_pt;
     if (tag.name && ["fun", "work", "personal", "study"].includes(tag.name)) {
       displayName = t(tag.name);
     } else {
-      const lang = i18n.language.toLowerCase();
-      displayName =
-        lang.startsWith("en") && tag.name_en ? tag.name_en : tag.name_pt;
+      // Tenta mostrar em inglês se o browser estiver em inglês e existir tradução
+      const lang = i18n.language ? i18n.language.toLowerCase() : "pt";
+      if (lang.startsWith("en") && tag.name_en) {
+        displayName = tag.name_en;
+      }
     }
 
     return (
@@ -69,7 +58,7 @@ export const TagSection = ({
           backgroundColor: isSelected && tag.color ? tag.color : undefined,
         }}
       >
-        {displayName}
+        {displayName || "Sem Nome"}
       </div>
     );
   };

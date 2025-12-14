@@ -257,7 +257,6 @@ const EventForm = (props: any) => {
         setColor={props.setColor}
         clearColor={() => props.setColor(null)}
       />
-      {/* --- ta a rebentar}
 
       <TagSection
         selectedTagIds={props.selectedTagIds}
@@ -265,9 +264,7 @@ const EventForm = (props: any) => {
         availableTags={props.availableTags}
         refreshTags={props.refreshTags}
         setIsEditTagModalOpen={props.setIsEditTagModalOpen}
-      /> 
-      */}
-      {/* --------------------------------------------- */}
+      />
     </div>
   );
 };
