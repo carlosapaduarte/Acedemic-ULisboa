@@ -154,6 +154,7 @@ export type UserInfo = {
   startDate: number;
   shareProgress: boolean;
   avatarFilename: string;
+  custom_colors?: string[];
 };
 
 async function fetchUserInfo(): Promise<UserInfo> {
@@ -1071,6 +1072,22 @@ export const service = {
     } catch (error) {
       console.error(`Erro ao apagar tag com ID ${tagId}:`, error);
       throw error;
+    }
+  },
+
+  async updateUserCustomColors(colors: string[]): Promise<string[]> {
+    const request = {
+      path: `commons/users/me/colors`,
+      method: "PUT",
+      body: toJsonBody({ colors }),
+    };
+    const response = await doFetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.colors;
+    } else {
+      throw new Error("Failed to update custom colors");
     }
   },
 };

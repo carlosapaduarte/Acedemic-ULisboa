@@ -119,24 +119,28 @@ const DateSection = React.memo(function DateSection({
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
   const formatTime = (date: Date) => date.toTimeString().slice(0, 5);
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.value) return;
     const [year, month, day] = e.target.value.split("-").map(Number);
     const newStartDate = new Date(eventStartDate);
     newStartDate.setFullYear(year, month - 1, day);
     setEventStartDate(newStartDate);
   };
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.value) return;
     const [hours, minutes] = e.target.value.split(":").map(Number);
     const newStartDate = new Date(eventStartDate);
     newStartDate.setHours(hours, minutes);
     setEventStartDate(newStartDate);
   };
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.value) return;
     const [year, month, day] = e.target.value.split("-").map(Number);
     const newEndDate = new Date(eventEndDate);
     newEndDate.setFullYear(year, month - 1, day);
     setEventEndDate(newEndDate);
   };
   const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.value) return;
     const [hours, minutes] = e.target.value.split(":").map(Number);
     const newEndDate = new Date(eventEndDate);
     newEndDate.setHours(hours, minutes);
@@ -219,8 +223,7 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection({
       >
         {recurrenceOptions.map((option) => (
           <option key={option.id} value={option.id}>
-            {" "}
-            {t(option.labelKey)}{" "}
+            {t(option.labelKey)}
           </option>
         ))}
       </select>
@@ -254,13 +257,17 @@ const EventForm = (props: any) => {
         setColor={props.setColor}
         clearColor={() => props.setColor(null)}
       />
+      {/* --- ta a rebentar}
+
       <TagSection
         selectedTagIds={props.selectedTagIds}
         setSelectedTagIds={props.setSelectedTagIds}
         availableTags={props.availableTags}
         refreshTags={props.refreshTags}
         setIsEditTagModalOpen={props.setIsEditTagModalOpen}
-      />
+      /> 
+      */}
+      {/* --------------------------------------------- */}
     </div>
   );
 };
@@ -275,7 +282,6 @@ export function EventModal({
 }: EventModalProps) {
   const { t } = useTranslation("calendar");
   const isEditMode = !!eventToEdit;
-  const FALLBACK_COLOR = "#3399FF";
 
   const [error, setError] = useState<string | null>(null);
 
@@ -283,7 +289,6 @@ export function EventModal({
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [notes, setNotes] = useState("");
-  //const [color, setColor] = useState(FALLBACK_COLOR);
   const [color, setColor] = useState<string | null>(null);
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
@@ -295,9 +300,10 @@ export function EventModal({
   const refreshTags = async () => {
     try {
       const freshTags = await service.fetchUserTags();
-      setAvailableTags(freshTags);
+      setAvailableTags(Array.isArray(freshTags) ? freshTags : []);
     } catch (error) {
       console.error("Falha ao buscar tags atualizadas:", error);
+      setAvailableTags([]);
     }
   };
 
@@ -306,7 +312,8 @@ export function EventModal({
     const initializeForm = async () => {
       try {
         const fetchedTags = await service.fetchUserTags();
-        setAvailableTags(fetchedTags);
+        const safeTags = Array.isArray(fetchedTags) ? fetchedTags : [];
+        setAvailableTags(safeTags);
 
         if (eventToEdit) {
           setTitle(eventToEdit.title ?? "");
@@ -324,7 +331,7 @@ export function EventModal({
           const tagIdentifiers = eventToEdit.tags || [];
           const tagIdsToSelect = tagIdentifiers
             .map((identifier) => {
-              const foundTag = fetchedTags.find(
+              const foundTag = safeTags.find(
                 (t) =>
                   t.name_pt === identifier ||
                   t.name_en === identifier ||

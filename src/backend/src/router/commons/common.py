@@ -149,10 +149,16 @@ def get_user_info(
     user_id: Annotated[int, Depends(get_current_user_id)],
     db: Annotated[Session, Depends(get_db_session)]
 ) -> UserOutputDto:
-    user = common_service.get_user_info(db, user_id)
-    if user is None:
+    user_domain = common_service.get_user_info(db, user_id)
+    if user_domain is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
-    return UserOutputDto.fromUser(user)
+    dto = UserOutputDto.fromUser(user_domain)
+    user_db = db.get(UserModel, user_id)
+    
+    if user_db and user_db.custom_colors:
+        dto.custom_colors = user_db.custom_colors
+        
+    return dto
 
 @router.put("/users/me/publish-state", status_code=status.HTTP_204_NO_CONTENT)
 def set_share_progress_preference( 
@@ -349,3 +355,22 @@ def update_user_tag(
         is_custom=user_tag_link.is_custom,
         color=tag_to_update.color 
     )
+class UpdateUserColorsDto(BaseModel):
+    colors: List[str]
+
+@router.put("/users/me/colors", status_code=status.HTTP_200_OK)
+def update_user_custom_colors(
+    dto: UpdateUserColorsDto,
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    db: Annotated[Session, Depends(get_db_session)]
+):
+    """Atualiza a lista de cores personalizadas do utilizador."""
+    user = db.get(UserModel, user_id)
+    if not user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    user.custom_colors = dto.colors
+    db.add(user)
+    db.commit()
+    
+    return {"colors": user.custom_colors}

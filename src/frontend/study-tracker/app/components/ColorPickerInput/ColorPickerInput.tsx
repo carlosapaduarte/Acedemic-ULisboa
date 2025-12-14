@@ -1,53 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Label, Input, Button } from "react-aria-components";
+import { RiAddFill, RiCloseLine } from "react-icons/ri";
 import styles from "./ColorPickerInput.module.css";
-
-const PRESET_COLORS = [
-  // Linha 1: Cinzas
-  "#000000",
-  "#434343",
-  "#666666",
-  "#999999",
-  "#B7B7B7",
-  "#D9D9D9",
-  "#EFEFEF",
-  "#F3F3F3",
-  "#FFFFFF",
-  // Linha 2: Cores Vivas
-  "#980000",
-  "#FF0000",
-  "#FF9900",
-  "#FFFF00",
-  "#00FF00",
-  "#00FFFF",
-  "#4A86E8",
-  "#0000FF",
-  "#9900FF",
-  "#FF00FF",
-  // Linha 3: Cores Pastel
-  "#E6B8AF",
-  "#F4CCCC",
-  "#FCE5CD",
-  "#FFF2CC",
-  "#D9EAD3",
-  "#D0E0E3",
-  "#C9DAF8",
-  "#CFE2F3",
-  "#D9D2E9",
-  "#EAD1DC",
-  // Linha 4: Cores Principais
-  "#660000",
-  "#CC0000",
-  "#E69138",
-  "#F1C232",
-  "#6AA84F",
-  "#45818E",
-  "#3C78D8",
-  "#3D85C6",
-  "#674EA7",
-  "#A64D79",
-];
+import { service } from "~/service/service";
 
 interface ColorPickerInputProps {
   label?: string;
@@ -63,67 +19,129 @@ export function ColorPickerInput({
   clearColor,
 }: ColorPickerInputProps) {
   const { t } = useTranslation("calendar");
-
   const fallbackHexValue = "#703f3a";
+  const currentColor = color || fallbackHexValue;
+
+  const [customColors, setCustomColors] = useState<string[]>([]);
+
+  useEffect(() => {
+    service
+      .fetchUserInfoFromApi()
+      .then((user) => {
+        const coresVindasDaBD =
+          user.custom_colors ||
+          (user as any).customColors ||
+          (user as any).colors ||
+          [];
+
+        if (Array.isArray(coresVindasDaBD)) {
+          setCustomColors(coresVindasDaBD);
+        }
+      })
+      .catch((err) => console.error("Erro ao carregar user info:", err));
+  }, []);
+
+  const handleSaveColor = async () => {
+    if (customColors.includes(currentColor)) return;
+
+    const newColors = [currentColor, ...customColors];
+    setCustomColors(newColors);
+
+    try {
+      await service.updateUserCustomColors(newColors);
+    } catch (error) {
+      console.error("Erro ao guardar cor:", error);
+    }
+  };
+
+  const handleDeleteColor = async (colorToDelete: string) => {
+    const newColors = customColors.filter((c) => c !== colorToDelete);
+    setCustomColors(newColors);
+
+    try {
+      await service.updateUserCustomColors(newColors);
+    } catch (error) {
+      console.error("Erro ao apagar cor:", error);
+    }
+  };
+
+  const isColorSaved = customColors.includes(currentColor);
 
   return (
-    <>
-      <div className={styles.colorPickerContainer}>
-        <Label className={styles.label}>{label}</Label>
-        <div className={styles.inputWrapper}>
+    <div className={styles.container}>
+      <Label className={styles.label}>{label}</Label>
+
+      <div className={styles.inputWrapper}>
+        <div className={styles.colorPreviewWrapper}>
           <Input
             type="color"
-            value={color || fallbackHexValue}
-            style={{
-              backgroundColor: color ? color : "var(--color-event-fallback)",
-            }}
-            onChange={(e) => {
-              setColor(e.target.value);
-            }}
+            value={currentColor}
+            onChange={(e) => setColor(e.target.value)}
             className={styles.colorInput}
           />
-          {color ? (
-            <span className={styles.hexValue}>{color.toUpperCase()}</span>
-          ) : (
-            <span className={styles.hexValue}>
-              {t("choose_a_color", "Escolha uma cor")}
-            </span>
-          )}
-
-          {color && (
-            <Button
-              className={styles.clearButton}
-              onPress={() => {
-                clearColor();
-              }}
-              aria-label={t("clear_custom_color")}
-            >
-              &times;
-            </Button>
-          )}
+          <div
+            className={styles.colorPreview}
+            style={{ backgroundColor: currentColor }}
+          />
         </div>
-      </div>
-      <div className={styles.presetGrid}>
-        {/* Botão "Nenhuma Cor" */}
+
+        <span className={styles.hexValue}>{currentColor.toUpperCase()}</span>
+
         <Button
-          className={`${styles.swatch} ${styles.noColorSwatch}`}
-          onPress={clearColor}
-          aria-label={t("no_color", "Nenhuma cor")}
+          className={`${styles.actionButton} ${
+            isColorSaved ? styles.disabled : ""
+          }`}
+          isDisabled={isColorSaved}
+          onPress={handleSaveColor}
+          title="Guardar cor"
         >
-          🚫
+          <RiAddFill />
         </Button>
 
-        {/* Grelha de Cores Predefinidas */}
-        {PRESET_COLORS.map((preset) => (
+        {color && (
           <Button
-            key={preset}
-            className={styles.swatch}
-            style={{ backgroundColor: preset }}
-            onPress={() => setColor(preset)}
-            aria-label={preset}
-          />
-        ))}
+            className={styles.actionButton}
+            onPress={clearColor}
+            title="Limpar cor"
+          >
+            <RiCloseLine />
+          </Button>
+        )}
       </div>
-    </>
+
+      {customColors.length > 0 ? (
+        <div className={styles.paletteSection}>
+          <span className={styles.sectionTitle}>Minhas Cores</span>
+          <div className={styles.presetGrid}>
+            {customColors.map((c, index) => (
+              <div key={`${c}-${index}`} className={styles.customColorWrapper}>
+                <Button
+                  className={styles.swatch}
+                  style={{ backgroundColor: c }}
+                  onPress={() => setColor(c)}
+                />
+                <Button
+                  className={styles.deleteColorBtn}
+                  onPress={() => handleDeleteColor(c)}
+                >
+                  <RiCloseLine size={12} />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            fontSize: "0.8rem",
+            color: "#888",
+            fontStyle: "italic",
+            marginTop: "5px",
+          }}
+        >
+          As tuas cores guardadas aparecerão aqui.
+        </div>
+      )}
+    </div>
   );
 }

@@ -15,25 +15,41 @@ class LoginOutputDto(BaseModel):
 class UserOutputDto(BaseModel):
     id: int
     username: str
-    avatarFilename: str | None
-    shareProgress: bool | None
-    batches: list[BatchDto] | None
-    currentChallengeLevel: Optional[int] = None
+    level: int = 1
+    startDate: int = 0
+    shareProgress: bool = False
+    
+    avatarFilename: Optional[str] = None 
+    batches: list = []
 
-    class Config:
-        populate_by_name = True
+    custom_colors: List[str] = [] 
 
-    @staticmethod
-    def fromUser(user: User) -> 'UserOutputDto':
-        return UserOutputDto(
+    @classmethod
+    def fromUser(cls, user):
+        colors = getattr(user, "custom_colors", [])
+        if colors is None:
+            colors = []
+
+        start_date = 0
+        if hasattr(user, "study_session_time") and user.study_session_time:
+            start_date = int(user.study_session_time.timestamp())
+        elif hasattr(user, "start_date") and user.start_date:
+             start_date = int(user.start_date)
+
+        return cls(
             id=user.id,
             username=user.username,
-            avatarFilename=user.avatar_filename,
-            shareProgress=user.share_progress,
-            batches=BatchDto.fromBatches(user.batches),
-            currentChallengeLevel=user.metrics.current_challenge_level if user.metrics else None
-        )
+            level=getattr(user, "level", 1),
+            startDate=start_date,
+            shareProgress=getattr(user, "share_progress", False) or False,
+            
+            avatarFilename=getattr(user, "avatar_filename", None),
+            
+            batches=[], 
 
+            custom_colors=colors
+        )
+    
 class TagOutputDto(BaseModel):
     id: str
     name_pt: Optional[str] = None

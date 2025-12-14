@@ -1,6 +1,7 @@
 from datetime import date, timezone, datetime
 from typing import Optional, List # Importar List
 from uuid import UUID
+from pydantic import BaseModel
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import ForeignKeyConstraint, UniqueConstraint, String
 from sqlmodel import Field, Relationship, SQLModel
@@ -29,6 +30,7 @@ class UserModel(SQLModel, table=True):
     st_archives: list["STArchiveModel"] = Relationship(back_populates="user")
     st_curricular_units: list["STCurricularUnitModel"] = Relationship(back_populates="user")
 
+    custom_colors: List[str] = Field(default=[], sa_column=SAColumn(JSONB))
     daily_energy_status: list["DailyEnergyStatusModel"] = Relationship(back_populates="user")
     daily_tag: list["DailyTagModel"] = Relationship(back_populates="user")
 
@@ -437,3 +439,5 @@ class UserLeague(SQLModel, table=True):
         UniqueConstraint('user_id', 'league_id', name='_user_league_uc'),
     )
 
+class UpdateUserColorsDto(BaseModel):
+    colors: List[str]

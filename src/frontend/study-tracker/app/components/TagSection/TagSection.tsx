@@ -26,23 +26,29 @@ export const TagSection = ({
 
   const safeTags = Array.isArray(availableTags)
     ? availableTags.filter((t) => t && typeof t === "object" && "id" in t)
+    ? availableTags.filter((tag) => tag !== null && tag !== undefined)
     : [];
 
-  if (safeTags.length === 0)
-    console.warn("A lista de tags está vazia ou inválida !");
+  const safeSelectedIds = Array.isArray(selectedTagIds) ? selectedTagIds : [];
+
+  if (safeTags.length === 0) {
+    console.warn("A lista de tags está vazia após a limpeza.");
+  }
+
   const customTags = safeTags.filter((tag) => !tag.is_uc);
   const ucTags = safeTags.filter((tag) => tag.is_uc);
 
   const handleToggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
-    );
+    setSelectedTagIds((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return safePrev.includes(tagId)
+        ? safePrev.filter((id) => id !== tagId)
+        : [...safePrev, tagId];
+    });
   };
 
   const renderTagPill = (tag: Tag) => {
-    const isSelected = selectedTagIds.includes(tag.id);
+    const isSelected = safeSelectedIds.includes(tag.id);
     let displayName: string | undefined | null;
 
     if (tag.name && ["fun", "work", "personal", "study"].includes(tag.name)) {
@@ -61,11 +67,7 @@ export const TagSection = ({
         })}
         onClick={() => handleToggleTag(tag.id)}
         style={{
-          // Se selecionado, usa a cor da tag. Se não, transparente.
-          backgroundColor: isSelected
-            ? tag.color || "var(--color-4)"
-            : "transparent",
-          borderColor: isSelected ? "transparent" : "var(--color-2, #555)",
+          backgroundColor: isSelected && tag.color ? tag.color : undefined,
         }}
       >
         {displayName}
@@ -90,7 +92,6 @@ export const TagSection = ({
         </div>
       </div>
 
-      {/* Caixa Castanha (Tags Normais) */}
       <div className={styles.tagsBox}>
         {customTags.map(renderTagPill)}
 
@@ -102,7 +103,6 @@ export const TagSection = ({
         </DialogTrigger>
       </div>
 
-      {/* Caixa Tracejada (UCs) */}
       <div className={styles.ucTagsContainer}>
         <div className={styles.ucTagsLabel}>AULAS / UCS</div>
 
