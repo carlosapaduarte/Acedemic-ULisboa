@@ -25,7 +25,6 @@ export const TagSection = ({
   const navigate = useNavigate();
 
   const safeTags = Array.isArray(availableTags)
-    ? availableTags.filter((t) => t && typeof t === "object" && "id" in t)
     ? availableTags.filter((tag) => tag !== null && tag !== undefined)
     : [];
 
