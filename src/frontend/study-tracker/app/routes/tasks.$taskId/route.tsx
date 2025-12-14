@@ -341,7 +341,7 @@ function RenderPage() {
           className={classNames(styles.button, styles.deleteButton)}
           onClick={handleDeleteTask}
         >
-          {t("task:delete_task", "Apagar Tarefa")}
+          {t("task:delete_task")}
         </button>
       </div>
     </div>

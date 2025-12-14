@@ -17,6 +17,9 @@ import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
 import { Tag } from "~/service/service";
 import { RiSettings5Fill } from "react-icons/ri";
 import { FaTrash } from "react-icons/fa";
+import { useNavigate } from "@remix-run/react";
+import { TagSection } from "~/components/TagSection/TagSection";
+
 const priorityValues = ["low", "medium", "high"];
 
 const TitleSection = React.memo(function TitleSection({
@@ -283,96 +286,6 @@ const PrioritySection = React.memo(function PrioritySection({
     </div>
   );
 });
-
-const TagSection = ({
-  selectedTagIds,
-  setSelectedTagIds,
-  availableTags,
-  refreshTags,
-  setIsEditTagModalOpen,
-}: {
-  selectedTagIds: string[];
-  setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
-  availableTags: Tag[];
-  refreshTags: () => void;
-  setIsEditTagModalOpen: (isOpen: boolean) => void;
-}) => {
-  const { t, i18n } = useTranslation(["task"]);
-
-  const handleToggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
-    );
-  };
-
-  return (
-    <div className={styles.tagsSectionContainer}>
-      <div className={styles.tagsHeader}>
-        <h2 className={styles.formSectionTitle}>{t("tags_title")}</h2>
-        <div className={styles.tagButtonsContainer}>
-          <Button
-            onPress={() => setIsEditTagModalOpen(true)}
-            className={styles.headerButton}
-            aria-label={t("manage_tags", "Gerir etiquetas")}
-          >
-            <RiSettings5Fill size={18} />
-          </Button>
-        </div>
-      </div>
-      <div className={styles.tagsContent}>
-        <div className={styles.tagListContainer}>
-          {availableTags.map((tag: Tag) => {
-            const isSelected = selectedTagIds.includes(tag.id);
-
-            let displayName: string | undefined | null;
-            if (
-              tag.name &&
-              ["fun", "work", "personal", "study"].includes(tag.name)
-            ) {
-              displayName = t(tag.name);
-            } else {
-              const lang = i18n.language.toLowerCase();
-              displayName =
-                lang.startsWith("en") && tag.name_en
-                  ? tag.name_en
-                  : tag.name_pt;
-            }
-
-            return (
-              <div
-                key={tag.id}
-                className={classNames(styles.tagItem, {
-                  [styles.selectedTagItem]: isSelected,
-                })}
-                onClick={() => handleToggleTag(tag.id)}
-                style={{
-                  backgroundColor: isSelected
-                    ? tag.color || "#888888"
-                    : "var(--color-2)",
-                }}
-              >
-                <span className={styles.tagLabel}>{displayName}</span>
-              </div>
-            );
-          })}
-          <DialogTrigger>
-            <Button
-              className={styles.addTagButtonRound}
-              aria-label={t("add_new_tag", "Adicionar nova etiqueta")}
-            >
-              +
-            </Button>
-            <Popover placement="bottom">
-              <CreateTagModal onTagCreated={refreshTags} />
-            </Popover>
-          </DialogTrigger>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export function CreateTaskForm({
   description,

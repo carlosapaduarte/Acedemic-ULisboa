@@ -31,7 +31,6 @@
 }
 
 .taskTitleContainer:hover {
-  text-decoration: underline;
   background-color: #592e258f;
 }
 
@@ -126,4 +125,11 @@
 .checkboxAndTitleContainer:hover .deleteButton {
   opacity: 1;
   pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .deleteButton {
+    opacity: 1;
+    visibility: visible;
+  }
 }

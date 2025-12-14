@@ -14,6 +14,7 @@ export interface Tag {
   name_en?: string;
   user_id: number;
   color?: string;
+  is_uc: boolean;
 }
 
 export type AuthErrorType =

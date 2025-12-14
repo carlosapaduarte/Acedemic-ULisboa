@@ -98,7 +98,9 @@ class TagModel(SQLModel, table=True):
     name_pt: Optional[str] = Field(default=None, index=True, nullable=True)
     name_en: Optional[str] = Field(default=None, index=True, nullable=True)
     color: str = Field(nullable=False)
-    
+    is_uc: bool = Field(default=False, nullable=False)
+    is_global: bool = Field(default=False, nullable=False)
+
     user_links: List["UserTagLink"] = Relationship(back_populates="tag")
     event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
     task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")

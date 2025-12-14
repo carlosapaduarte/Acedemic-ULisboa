@@ -4,7 +4,13 @@ import styles from "./taskListItem.module.css";
 import classNames from "classnames";
 import Confetti from "react-confetti";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
-import { FaBolt, FaExclamation, FaRegClock, FaTrash } from "react-icons/fa6";
+import {
+  FaBolt,
+  FaExclamation,
+  FaRegClock,
+  FaTrash,
+  FaTriangleExclamation,
+} from "react-icons/fa6";
 
 const desenhaConfetisPequenos = (ctx: CanvasRenderingContext2D) => {
   ctx.rect(0, 0, 6, 12);
@@ -110,20 +116,25 @@ export function TaskListItem({
         </span>
       )}
 
-      {internalTask.data.deadline &&
-      new Date(internalTask.data.deadline) < new Date() &&
-      internalTask.data.status !== "completed" ? (
-        <span title="Em Atraso">
-          <FaRegClock className={styles.overdueIcon} color="#FFA500" />
-        </span>
-      ) : (
-        showClock && (
-          // Próximo (mas não atrasado)
-          <span title="Prazo Próximo (5 dias)">
-            <FaRegClock className={styles.upcomingIcon} />
+      {internalTask.data.deadline ? (
+        new Date(internalTask.data.deadline) < new Date() &&
+        internalTask.data.status !== "completed" ? (
+          <span title="Em Atraso">
+            <FaTriangleExclamation
+              className={styles.overdueIcon}
+              color="#FF4D4D"
+            />
           </span>
+        ) : (
+          internalTask.data.status !== "completed" && (
+            <span
+              title={new Date(internalTask.data.deadline).toLocaleDateString()}
+            >
+              <FaRegClock className={styles.upcomingIcon} />
+            </span>
+          )
         )
-      )}
+      ) : null}
     </div>
   );
 

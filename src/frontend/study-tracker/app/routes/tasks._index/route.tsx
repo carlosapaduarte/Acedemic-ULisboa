@@ -25,10 +25,6 @@ export default function TasksPage() {
     refreshTasks: () => void;
   }>();
 
-  function onTaskCreated() {
-    refreshTasks();
-  }
-
   const [filterMode, setFilterMode] = useState<Selection>(new Set(["all"]));
 
   const filteredTasks = useMemo(() => {

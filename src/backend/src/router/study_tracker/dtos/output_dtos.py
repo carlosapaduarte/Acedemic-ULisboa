@@ -215,3 +215,4 @@ class TagOutputDto(BaseModel):
     name_pt: Optional[str] = None
     name_en: Optional[str] = None
     color: str
+    is_uc: bool = False

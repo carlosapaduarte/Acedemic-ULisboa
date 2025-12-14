@@ -195,7 +195,8 @@ def get_user_tags(
                     name_en=tag.name_en,
                     user_id=link.user_id,
                     is_custom=link.is_custom,
-                    color=tag.color
+                    color=tag.color,
+                    is_uc=tag.is_uc
                 )
             )
         return response_tags
@@ -261,7 +262,7 @@ def create_user_tag(
         tag_to_associate: TagModel
 
         if not existing_tag:
-            new_tag = TagModel(name_pt=final_pt, name_en=final_en, color=tag_input.color, is_global=True)
+            new_tag = TagModel(name_pt=final_pt, name_en=final_en, color=tag_input.color, is_global=True, is_uc=getattr(tag_input, 'is_uc', False))
             db.add(new_tag)
             db.flush()
             tag_to_associate = new_tag
