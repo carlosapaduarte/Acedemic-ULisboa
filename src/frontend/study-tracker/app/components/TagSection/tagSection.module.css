@@ -45,7 +45,8 @@
 }
 
 .tagItem {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-color-2);
+  background-color: var(--color-2);
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;

@@ -57,6 +57,7 @@ class TagOutputDto(BaseModel):
     user_id: int
     is_custom: bool
     color: Optional[str] = None
+    is_uc: bool = False
 
 class EventOutputDto(BaseModel):
     id: int

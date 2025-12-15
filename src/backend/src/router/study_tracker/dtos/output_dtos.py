@@ -44,7 +44,7 @@ class UserTaskOutputDto(BaseModel):
     def from_Task(task: Task) -> 'UserTaskOutputDto':
         task_id = task.id
         if task_id is None:
-            raise
+            raise Exception("Task ID cannot be None")
 
         sub_tasks_output_dto: list[UserTaskOutputDto] = []
         for sub_task in task.sub_tasks:
@@ -84,7 +84,7 @@ class EventOutputDto(BaseModel):
         for event in events:
             event_id = event.id
             if event_id is None:
-                raise
+                continue 
         
             output_dtos_events.append(
                 EventOutputDto(
@@ -209,10 +209,3 @@ class WeekTimeStudyOutputDto(BaseModel):
                 )
             )
         return dtos
-    
-class TagOutputDto(BaseModel):
-    id: int
-    name_pt: Optional[str] = None
-    name_en: Optional[str] = None
-    color: str
-    is_uc: bool = False

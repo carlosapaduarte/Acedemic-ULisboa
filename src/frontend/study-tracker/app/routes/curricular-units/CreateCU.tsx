@@ -13,7 +13,7 @@ function useCreateCurricularUnit(onCuCreated: () => void) {
           name_pt: name,
           name_en: name,
           color: "#5DADE2",
-          description: "Tag gerada automaticamente pela UC",
+          is_uc: true,
         } as any);
       })
       .then(() => {

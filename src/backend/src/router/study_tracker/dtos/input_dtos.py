@@ -100,7 +100,7 @@ class CreateTagInputDto(BaseModel):
     name_pt: Optional[str] = None
     name_en: Optional[str] = None
     color: Optional[str] = None
-
+    is_uc: bool = False
     @model_validator(mode='before')
     @classmethod
     def check_at_least_one_name(cls, data: dict):

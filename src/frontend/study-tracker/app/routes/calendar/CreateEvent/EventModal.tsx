@@ -3,28 +3,19 @@ import { useTranslation } from "react-i18next";
 import {
   Button,
   Dialog,
-  DialogTrigger,
   Input,
   Label,
   Modal,
-  Popover,
   TextField,
 } from "react-aria-components";
 import classNames from "classnames";
-import { service } from "../../../service/service";
+import { service, Tag } from "../../../service/service";
 import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
 import { EditTagModal } from "../../../components/TagsModal/EditTagModal";
 import { CreateTagModal } from "../../../components/TagsModal/CreateTagModal";
 import styles from "./EventModal.module.css";
-import { RiSettings5Fill } from "react-icons/ri";
 import { TagSection } from "~/components/TagSection/TagSection";
-interface Tag {
-  id: string;
-  name_pt: string;
-  name_en?: string;
-  user_id: number;
   color?: string;
-}
 
 export interface EventData {
   id: number;
@@ -56,12 +47,9 @@ const TitleSection = React.memo(function TitleSection({
   setTitle,
   isUC,
   setIsUC,
-}: {
-  title: string;
-  setTitle: (title: string) => void;
-  isUC: boolean;
   setIsUC: (isUC: boolean) => void;
 }) {
+}: any) {
   const { t } = useTranslation("calendar");
   return (
     <div className={styles.titleSectionContainer}>
@@ -82,10 +70,7 @@ const TitleSection = React.memo(function TitleSection({
 const NotesSection = React.memo(function NotesSection({
   notes,
   setNotes,
-}: {
-  notes: string;
-  setNotes: (notes: string) => void;
-}) {
+}: any) {
   const { t } = useTranslation("calendar");
   return (
     <div className={styles.notesSectionContainer}>
@@ -109,42 +94,37 @@ const DateSection = React.memo(function DateSection({
   setEventStartDate,
   eventEndDate,
   setEventEndDate,
-}: {
-  eventStartDate: Date;
-  setEventStartDate: (startDate: Date) => void;
-  eventEndDate: Date;
-  setEventEndDate: (endDate: Date) => void;
-}) {
+}: any) {
   const { t } = useTranslation("calendar");
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
   const formatTime = (date: Date) => date.toTimeString().slice(0, 5);
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) return;
-    const [year, month, day] = e.target.value.split("-").map(Number);
-    const newStartDate = new Date(eventStartDate);
-    newStartDate.setFullYear(year, month - 1, day);
-    setEventStartDate(newStartDate);
+    const [y, m, d] = e.target.value.split("-").map(Number);
+    const n = new Date(eventStartDate);
+    n.setFullYear(y, m - 1, d);
+    setEventStartDate(n);
   };
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) return;
-    const [hours, minutes] = e.target.value.split(":").map(Number);
-    const newStartDate = new Date(eventStartDate);
-    newStartDate.setHours(hours, minutes);
-    setEventStartDate(newStartDate);
+    const [h, min] = e.target.value.split(":").map(Number);
+    const n = new Date(eventStartDate);
+    n.setHours(h, min);
+    setEventStartDate(n);
   };
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) return;
-    const [year, month, day] = e.target.value.split("-").map(Number);
-    const newEndDate = new Date(eventEndDate);
-    newEndDate.setFullYear(year, month - 1, day);
-    setEventEndDate(newEndDate);
+    const [y, m, d] = e.target.value.split("-").map(Number);
+    const n = new Date(eventEndDate);
+    n.setFullYear(y, m - 1, d);
+    setEventEndDate(n);
   };
   const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) return;
-    const [hours, minutes] = e.target.value.split(":").map(Number);
-    const newEndDate = new Date(eventEndDate);
-    newEndDate.setHours(hours, minutes);
-    setEventEndDate(newEndDate);
+    const [h, min] = e.target.value.split(":").map(Number);
+    const n = new Date(eventEndDate);
+    n.setHours(h, min);
+    setEventEndDate(n);
   };
   return (
     <div className={styles.dateSectionContainer}>
@@ -201,16 +181,8 @@ const DateSection = React.memo(function DateSection({
 const IsRecurrentSection = React.memo(function IsRecurrentSection({
   recurrenceType,
   setRecurrenceType,
-}: {
-  recurrenceType: RecurrenceType;
-  setRecurrenceType: (value: RecurrenceType) => void;
-}) {
+}: any) {
   const { t } = useTranslation("calendar");
-  const recurrenceOptions = [
-    { id: "none", labelKey: "recurrence_none_label" },
-    { id: "daily", labelKey: "recurrence_daily_label" },
-    { id: "weekly", labelKey: "recurrence_weekly_label" },
-  ];
   return (
     <div className={styles.recurrentEventSectionContainer}>
       <h2 className={styles.formSectionTitle}>{t("recurrence_title")}</h2>
@@ -221,11 +193,9 @@ const IsRecurrentSection = React.memo(function IsRecurrentSection({
         onChange={(e) => setRecurrenceType(e.target.value as RecurrenceType)}
         className={styles.nativeSelect}
       >
-        {recurrenceOptions.map((option) => (
-          <option key={option.id} value={option.id}>
-            {t(option.labelKey)}
-          </option>
-        ))}
+        <option value="none">{t("recurrence_none_label")}</option>
+        <option value="daily">{t("recurrence_daily_label")}</option>
+        <option value="weekly">{t("recurrence_weekly_label")}</option>
       </select>
     </div>
   );
@@ -263,7 +233,7 @@ const EventForm = (props: any) => {
         setSelectedTagIds={props.setSelectedTagIds}
         availableTags={props.availableTags}
         refreshTags={props.refreshTags}
-        setIsEditTagModalOpen={props.setIsEditTagModalOpen}
+        onEditTags={() => props.setIsEditTagModalOpen(true)}
       />
     </div>
   );
@@ -294,13 +264,19 @@ export function EventModal({
   const [isEditTagModalOpen, setIsEditTagModalOpen] = useState(false);
   const [isUC, setIsUC] = useState(false);
 
-  const refreshTags = async () => {
+  const refreshTags = async (newTag?: Tag) => {
+    // 1. Se criámos uma tag nova, adiciona-a já à lista local
+    if (newTag) {
+      setAvailableTags((prev) => {
+        if (prev.some((t) => t.id === newTag.id)) return prev;
+        return [...prev, newTag];
+      });
+    }
     try {
       const freshTags = await service.fetchUserTags();
       setAvailableTags(Array.isArray(freshTags) ? freshTags : []);
     } catch (error) {
       console.error("Falha ao buscar tags atualizadas:", error);
-      setAvailableTags([]);
     }
   };
 
@@ -472,7 +448,6 @@ export function EventModal({
                   <p>{error}</p>
                 </div>
               )}
-
               <div className={styles.finishCreatingEventButtonContainer}>
                 {isEditMode && (
                   <Button
