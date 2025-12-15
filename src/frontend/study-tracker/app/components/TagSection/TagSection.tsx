@@ -4,20 +4,13 @@ import { RiSettings5Fill } from "react-icons/ri";
 import { Link } from "@remix-run/react";
 import { Tag } from "~/service/service";
 import styles from "./TagSection.module.css";
-import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
-import {
-  DialogTrigger,
-  Popover,
-  Dialog,
-  OverlayArrow,
-  Button,
-} from "react-aria-components";
 
 interface Props {
   availableTags: Tag[];
   selectedTagIds: string[];
   setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
   onEditTags: () => void;
+  onAddTag: () => void;
   refreshTags: (newTag?: Tag) => void;
 }
 
@@ -26,6 +19,7 @@ export const TagSection = ({
   setSelectedTagIds,
   availableTags,
   onEditTags,
+  onAddTag,
   refreshTags,
 }: Props) => {
   const { t, i18n } = useTranslation(["task", "calendar"]);
@@ -47,37 +41,31 @@ export const TagSection = ({
   };
 
   const getTagName = (tag: Tag) => {
-    if (!tag) return ""; // Proteção extra
-
+    if (!tag) return "";
     if (tag.name && ["fun", "work", "personal", "study"].includes(tag.name)) {
       return t(tag.name);
     }
     const lang = i18n?.language ? i18n.language.toLowerCase() : "pt";
-    return tag.name_pt || tag.name || "Sem nome";
-  };
-    refreshTags(newTag);
-    if (newTag && newTag.id) {
-      setSelectedTagIds((prev) => {
-        const current = Array.isArray(prev) ? prev : [];
-        return current.includes(newTag.id) ? current : [...current, newTag.id];
-      });
+    if (lang.startsWith("en") && tag.name_en) {
+      return tag.name_en;
     }
+    return tag.name_pt || tag.name || "Sem nome";
   };
 
   const renderTagButton = (tag: Tag) => {
     if (!tag || !tag.id) return null;
-
     const isSelected = safeSelectedIds.includes(tag.id);
-    const buttonClasses = `${styles.tagItem || "tag-item"} ${
-      isSelected ? styles.selectedTagItem || "selected" : ""
-    }`;
+
+    const btnClass = styles.tagItem
+      ? `${styles.tagItem} ${isSelected ? styles.selectedTagItem : ""}`
+      : "tag-item";
 
     return (
       <button
         key={tag.id}
         type="button"
         onClick={() => toggle(tag.id)}
-        className={buttonClasses}
+        className={btnClass}
         style={{
           backgroundColor: isSelected ? tag.color || "#ccc" : undefined,
         }}
@@ -90,7 +78,7 @@ export const TagSection = ({
   const customTags = validTags.filter((tag) => !tag.is_uc);
   const ucTags = validTags.filter((tag) => tag.is_uc);
 
-  if (!styles) return <div>Erro ao carregar estilos das tags.</div>;
+  if (!styles) return null;
 
   return (
     <div className={styles.tagsSectionContainer}>
@@ -111,27 +99,14 @@ export const TagSection = ({
       <div className={styles.tagsBox}>
         {customTags.map(renderTagButton)}
 
-        {/* Botão de Adicionar (+) */}
-        <DialogTrigger>
-          <Button className={styles.addTagButtonRound}>+</Button>
-          <Popover placement="bottom" className={styles.popoverContainer}>
-            <OverlayArrow>
-              <svg width={12} height={12} viewBox="0 0 12 12">
-                <path
-                  d="M0 12 L6 6 L12 12"
-                  fill="white"
-                  stroke="#ccc"
-                  strokeWidth="1"
-                />
-              </svg>
-            </OverlayArrow>
-            <Dialog style={{ outline: "none" }}>
-              {({ close }) => (
-                <CreateTagModal close={close} onTagCreated={handleTagCreated} />
-              )}
-            </Dialog>
-          </Popover>
-        </DialogTrigger>
+        <button
+          type="button"
+          className={styles.addTagButtonRound}
+          onClick={onAddTag}
+          aria-label={t("add_tag", "Criar nova etiqueta")}
+        >
+          +
+        </button>
       </div>
 
       <div className={styles.ucTagsContainer}>
@@ -143,11 +118,8 @@ export const TagSection = ({
         ) : (
           <p className={styles.emptyUcText}>
             {t("task:no_ucs_text", "Ainda não tens UCs associadas.")}{" "}
-            <Link to="/curricular-units" className={styles.emptyUcLink}>
-              {t(
-                "task:add_ucs_link",
-                "Adiciona as tuas UCs na página de Estudo."
-              )}
+            <Link to="/tracker/curricular-units" className={styles.emptyUcLink}>
+              {t("task:add_ucs_link", "Adicionar UCs")}
             </Link>
           </p>
         )}

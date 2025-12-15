@@ -69,8 +69,7 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
   }, [tagColor, deselectedTagColor, t]);
 
   const nameError = useMemo(() => {
-      (tag) =>
-        "tag_already_exists_error",
+    const pt = namePt.trim().toLowerCase();
     const en = nameEn.trim().toLowerCase();
     if (!pt && !en) return null;
     const isDuplicate = allUserTags.some((tag) => {
@@ -104,10 +103,6 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
       setIsSaving(false);
     }
   };
-            </svg>
-            />
-            <div className={styles.charCounter}>
-
   return (
     <div className={styles.tagModalContent}>
       <TextField className={styles.textField} autoFocus>
