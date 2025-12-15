@@ -7,6 +7,7 @@ import {
   Label,
   Modal,
   TextField,
+  TextArea,
 } from "react-aria-components";
 import classNames from "classnames";
 import { service, Tag } from "../../../service/service";
@@ -51,19 +52,20 @@ const TitleSection = React.memo(({ title, setTitle }: any) => {
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          placeholder={t("title_label")}
         />
       </TextField>
     </div>
   );
 });
+
 const NotesSection = React.memo(({ notes, setNotes }: any) => {
   const { t } = useTranslation("calendar");
   return (
     <div className={styles.notesSectionContainer}>
       <TextField className={styles.formTextField}>
         <Label className={styles.formSectionTitle}>{t("notes_label")}</Label>
-        <textarea
-          id="notes"
+        <TextArea
           className={styles.formInput}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -74,6 +76,7 @@ const NotesSection = React.memo(({ notes, setNotes }: any) => {
     </div>
   );
 });
+
 const IsRecurrentSection = React.memo(
   ({ recurrenceType, setRecurrenceType }: any) => {
     const { t } = useTranslation("calendar");
@@ -81,9 +84,11 @@ const IsRecurrentSection = React.memo(
       <div className={styles.recurrentEventSectionContainer}>
         <h2 className={styles.formSectionTitle}>{t("recurrence_title")}</h2>
         <select
+          id="recurrence-select"
           className={styles.nativeSelect}
           value={recurrenceType}
           onChange={(e) => setRecurrenceType(e.target.value)}
+          aria-label={t("recurrence_label")}
         >
           <option value="none">{t("recurrence_none_label")}</option>
           <option value="daily">{t("recurrence_daily_label")}</option>
@@ -93,6 +98,7 @@ const IsRecurrentSection = React.memo(
     );
   }
 );
+
 const DateSection = React.memo(
   ({
     eventStartDate,
@@ -100,59 +106,86 @@ const DateSection = React.memo(
     eventEndDate,
     setEventEndDate,
   }: any) => {
+    const { t } = useTranslation("calendar");
     const formatDate = (d: Date) => d.toISOString().split("T")[0];
     const formatTime = (d: Date) => d.toTimeString().slice(0, 5);
+
+    const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.value) return;
+      const [y, m, d] = e.target.value.split("-").map(Number);
+      const n = new Date(eventStartDate);
+      n.setFullYear(y, m - 1, d);
+      setEventStartDate(n);
+    };
+    const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.value) return;
+      const [h, m] = e.target.value.split(":").map(Number);
+      const n = new Date(eventStartDate);
+      n.setHours(h, m);
+      setEventStartDate(n);
+    };
+    const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.value) return;
+      const [y, m, d] = e.target.value.split("-").map(Number);
+      const n = new Date(eventEndDate);
+      n.setFullYear(y, m - 1, d);
+      setEventEndDate(n);
+    };
+    const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.value) return;
+      const [h, m] = e.target.value.split(":").map(Number);
+      const n = new Date(eventEndDate);
+      n.setHours(h, m);
+      setEventEndDate(n);
+    };
+
     return (
       <div className={styles.dateSectionContainer}>
         <div className={styles.deadlineInputsContainer}>
-          <input
-            type="date"
-            className={styles.dateInput}
-            value={formatDate(eventStartDate)}
-            onChange={(e) => {
-              if (!e.target.value) return;
-              const [y, m, d] = e.target.value.split("-").map(Number);
-              const n = new Date(eventStartDate);
-              n.setFullYear(y, m - 1, d);
-              setEventStartDate(n);
-            }}
-          />
-          <input
-            type="time"
-            className={styles.timeInput}
-            value={formatTime(eventStartDate)}
-            onChange={(e) => {
-              if (!e.target.value) return;
-              const [h, m] = e.target.value.split(":").map(Number);
-              const n = new Date(eventStartDate);
-              n.setHours(h, m);
-              setEventStartDate(n);
-            }}
-          />
-          <input
-            type="date"
-            className={styles.dateInput}
-            value={formatDate(eventEndDate)}
-            onChange={(e) => {
-              if (!e.target.value) return;
-              const [y, m, d] = e.target.value.split("-").map(Number);
-              const n = new Date(eventEndDate);
-              n.setFullYear(y, m - 1, d);
-              setEventEndDate(n);
-            }}
-          />
-          <input
-            type="time"
-            className={styles.timeInput}
-            value={formatTime(eventEndDate)}
-            onChange={(e) => {
-              if (!e.target.value) return;
-              const [h, m] = e.target.value.split(":").map(Number);
-              const n = new Date(eventEndDate);
-              n.setHours(h, m);
-              setEventEndDate(n);
-            }}
-          />
+          <TextField className={styles.formTextField}>
+            <Label className={styles.formSectionTitle}>
+              {t("start_date_label")}
+            </Label>
+            <Input
+              type="date"
+              className={classNames(styles.dateInput)}
+              value={formatDate(eventStartDate)}
+              onChange={handleStartDateChange}
+            />
+          </TextField>
+          <TextField className={styles.formTextField}>
+            <Label className={styles.formSectionTitle}>
+              {t("start_time_label")}
+            </Label>
+            <Input
+              type="time"
+              className={classNames(styles.timeInput)}
+              value={formatTime(eventStartDate)}
+              onChange={handleStartTimeChange}
+            />
+          </TextField>
+          <TextField className={styles.formTextField}>
+            <Label className={styles.formSectionTitle}>
+              {t("end_date_label")}
+            </Label>
+            <Input
+              type="date"
+              className={classNames(styles.dateInput)}
+              value={formatDate(eventEndDate)}
+              onChange={handleEndDateChange}
+            />
+          </TextField>
+          <TextField className={styles.formTextField}>
+            <Label className={styles.formSectionTitle}>
+              {t("end_time_label")}
+            </Label>
+            <Input
+              type="time"
+              className={classNames(styles.timeInput)}
+              value={formatTime(eventEndDate)}
+              onChange={handleEndTimeChange}
+            />
+          </TextField>
         </div>
       </div>
     );
@@ -164,10 +197,6 @@ const EventForm = (props: any) => {
     <div className={styles.newEventForm}>
       <TitleSection title={props.title} setTitle={props.setTitle} />
       <DateSection
-        startDate={props.startDate}
-        setStartDate={props.setStartDate}
-        endDate={props.endDate}
-        setEndDate={props.setEndDate}
         eventStartDate={props.startDate}
         setEventStartDate={props.setStartDate}
         eventEndDate={props.endDate}
@@ -405,7 +434,6 @@ export function EventModal({
         onTagsUpdate={refreshTags}
       />
 
-      {/* MODAL DE CRIAR TAG (RESTABELECIDO) */}
       <Modal
         isOpen={isCreateTagModalOpen}
         onOpenChange={setIsCreateTagModalOpen}
