@@ -124,26 +124,6 @@ export function TaskList({
           marginBottom: "0.5rem",
         }}
       >
-        <Button
-          onPress={() => setFilterUrgent(!filterUrgent)}
-          style={{
-            background: filterUrgent ? "rgba(255, 77, 77, 0.2)" : "transparent",
-            border: filterUrgent ? "1px solid #FF4D4D" : "none",
-            borderRadius: "4px",
-            color: filterUrgent ? "#FF4D4D" : "var(--text-color-1)",
-            fontSize: "0.8rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "5px",
-            cursor: "pointer",
-            padding: "2px 8px",
-            transition: "all 0.2s",
-          }}
-        >
-          <FaFilter size={10} />
-          <span>Prioritárias / &lt;5 dias</span>
-        </Button>
-
         {activeTasks.some((t) => t.data.is_micro_task) && (
           <Button
             onPress={() => setMicroTasksAtTop(!microTasksAtTop)}

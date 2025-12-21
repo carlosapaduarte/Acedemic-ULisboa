@@ -524,19 +524,35 @@ function MyCalendar() {
     return events.filter((event) => {
       const resource = event.resource as CalendarEventResource;
 
-      // 1. Se o filtro "Classes Only" estiver ativo, verifica se é UC
+      // 1. FILTRO DE AULAS (CLASSES ONLY)
       if (selectedFilters.has("classes_only")) {
-        if (!resource.is_uc) return false;
+        // Verifica se é UC diretamente no evento
+        const isDirectlyUC = !!resource.is_uc;
+
+        const hasUCTag =
+          resource.tags &&
+          resource.tags.some((tagIdentifier) => {
+            const foundTag = userTags.find(
+              (t) =>
+                t.id === tagIdentifier ||
+                t.name_pt === tagIdentifier ||
+                t.name_en === tagIdentifier
+            );
+            return foundTag && foundTag.is_uc;
+          });
+
+        // Se NÃO for UC direta E NÃO tiver tag de UC, remove da lista
+        if (!isDirectlyUC && !hasUCTag) return false;
       }
 
-      // 2. Se o filtro "Recurring Only" estiver ativo, verifica se é recorrente
+      // 2. Se o filtro "Recurring Only" estiver ativo
       if (selectedFilters.has("recurring_only")) {
         if (!resource.everyDay && !resource.everyWeek) return false;
       }
 
-      return true; // Passou nos filtros ativos
+      return true;
     });
-  }, [events, selectedFilters]);
+  }, [events, selectedFilters, userTags]);
 
   useEffect(() => {
     refreshUserEvents();
