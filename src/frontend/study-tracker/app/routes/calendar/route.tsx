@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { utils } from "~/utils";
 import "moment/locale/pt";
 import { getCalendarMessages } from "../../calendarUtils";
-import { FaListCheck, FaFilter } from "react-icons/fa6";
+import { FaListCheck, FaFilter, FaCheck } from "react-icons/fa6";
 import {
   Button,
   Menu,
@@ -27,6 +27,23 @@ import {
   Popover,
   type Selection,
 } from "react-aria-components";
+
+const hexToRgba = (hex: string, alpha: number) => {
+  if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    return hex;
+  }
+
+  let c = hex.substring(1).split("");
+  if (c.length === 3) {
+    c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+  }
+  const cStr = c.join("");
+  const r = parseInt(cStr.substring(0, 2), 16);
+  const g = parseInt(cStr.substring(2, 4), 16);
+  const b = parseInt(cStr.substring(4, 6), 16);
+
+  return `rgba(${r},${g},${b},${alpha})`;
+};
 
 interface CalendarEventResource {
   id: number;
@@ -110,7 +127,7 @@ const EventWithTags = ({
     overflow: "hidden",
     color: "white",
     display: "flex",
-    opacity: applyPastStyle ? 0.6 : 1,
+    position: "relative",
     textDecoration: applyPastStyle ? "line-through" : "none",
   };
 
@@ -122,6 +139,7 @@ const EventWithTags = ({
     height: "100%",
     width: "100%",
     overflow: "hidden",
+    zIndex: 1,
   };
 
   const titleStyle: React.CSSProperties = {
@@ -165,6 +183,33 @@ const EventWithTags = ({
 
   return (
     <div style={combinedStyle}>
+      {isCompletedTaskSlot && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10,
+            pointerEvents: "none",
+          }}
+        >
+          <FaCheck
+            size="7em"
+            color="#008000"
+            style={{
+              opacity: 1,
+              filter: "drop-shadow(0px 0px 8px rgba(0,0,0,0.6))",
+              transform: "rotate(-15deg)",
+            }}
+          />
+        </div>
+      )}
+
       <div style={innerWrapperStyle}>
         <div style={titleStyle} title={event.title}>
           {event.title}
@@ -206,42 +251,48 @@ const EventWithTags = ({
 
 const getEventStyleProps = (
   event: Event,
-  allUserTags: Tag[]
+  allUserTags: Tag[],
+  isCompleted: boolean = false
 ): React.CSSProperties => {
   const FALLBACK_COLOR = "#3399FF";
+  const BG_OPACITY = 0.7;
+
+  let baseColor = FALLBACK_COLOR;
+  let gradient: string | null = null;
 
   //1º prioridade: cor personalizada definida no evento.
   if (event.color && event.color !== FALLBACK_COLOR) {
-    return { backgroundColor: event.color };
+    baseColor = event.color;
+  } else {
+    const tagIdentifiers = event.tags || [];
+    if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
+      const associatedTags = allUserTags.filter(
+        (tag) =>
+          (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
+          (tag.name_en && tagIdentifiers.includes(tag.name_en))
+      );
+
+      const colors = associatedTags
+        .map((tag) => tag.color)
+        .filter(Boolean) as string[];
+
+      if (colors.length > 0) {
+        baseColor = colors[0];
+        if (colors.length > 1) {
+          gradient = `linear-gradient(45deg, ${colors.join(",")})`;
+        }
+      }
+    }
   }
 
-  //2º Procurar cores nas tags associadas
-  const tagIdentifiers = event.tags || [];
-  if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
-    const associatedTags = allUserTags.filter(
-      (tag) =>
-        (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
-        (tag.name_en && tagIdentifiers.includes(tag.name_en))
-    );
-
-    const colors = associatedTags
-      .map((tag) => tag.color)
-      .filter(Boolean) as string[];
-
-    //Se só houver uma cor, usa cor sólida
-    if (colors.length === 1) {
-      return { backgroundColor: colors[0] };
-    }
-
-    //Se houver várias cores, cria um gradiente
-    if (colors.length > 1) {
-      const gradient = `linear-gradient(45deg, ${colors.join(",")})`;
+  if (isCompleted) {
+    return { backgroundColor: hexToRgba(baseColor, BG_OPACITY) };
+  } else {
+    if (gradient) {
       return { backgroundImage: gradient };
     }
+    return { backgroundColor: baseColor };
   }
-
-  //fallback
-  return { backgroundColor: FALLBACK_COLOR };
 };
 
 type EventsView = "allEvents" | "recurringEvents";
@@ -336,7 +387,7 @@ function useMyCalendar() {
 
       let allOccurrences: CalendarEvent[] = [];
       eventsFromBackend.forEach((event) => {
-        const styleProps = getEventStyleProps(event, tagsFromBackend);
+        const styleProps = {}; // Placeholder
 
         displayedDates.forEach((currentDisplayDate) => {
           let shouldAddEvent = false;
@@ -403,7 +454,6 @@ function useMyCalendar() {
         });
       });
 
-      // --- CORREÇÃO: Usamos allOccurrences diretamente, sem filtrar por eventsView ---
       const uniqueEventsMap = new Map<string, CalendarEvent>();
       allOccurrences.forEach((ev) => {
         const key = `${(ev.resource as CalendarEventResource).id}-${ev
@@ -418,7 +468,7 @@ function useMyCalendar() {
     } catch (error) {
       console.error("Falha ao carregar dados do calendário:", error);
     }
-  }, [displayedDates, i18n.language]); // eventsView removido daqui
+  }, [displayedDates, i18n.language]);
 
   useEffect(() => {
     refreshAllCalendarData();
@@ -432,8 +482,6 @@ function useMyCalendar() {
     setCalendarView,
     setDisplayedDates,
     refreshUserEvents: refreshAllCalendarData,
-    // eventsView removido
-    // toggleEventsView removido
   };
 }
 
@@ -447,17 +495,14 @@ const AgendaEvent = ({
   const FALLBACK_COLOR = "#3399FF";
   let colorDots: string[] = [];
 
-  // 1. Verifica se há cor personalizada para o evento
   const customColor = event.resource?.color;
 
   if (customColor && customColor !== FALLBACK_COLOR) {
     colorDots = [customColor];
   } else {
-    // 2. Se não há cor personalizada, procura as cores das etiquetas
     const tagIdentifiers = event.resource?.tags || [];
 
     if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
-      // Compara os nomes da lista de tags com os da lista de 'allUserTags'
       const associatedTags = allUserTags.filter(
         (tag) =>
           (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
@@ -475,7 +520,6 @@ const AgendaEvent = ({
     }
   }
 
-  // 3. Fallback se nenhuma cor foi encontrada
   if (colorDots.length === 0) {
     colorDots = [FALLBACK_COLOR];
   }
@@ -490,7 +534,6 @@ const AgendaEvent = ({
             height: "10px",
             borderRadius: "50%",
             backgroundColor: color,
-            //marginRight: "4px",
             marginLeft: index > 0 ? "4px" : "0",
           }}
         />
@@ -516,7 +559,6 @@ function MyCalendar() {
   );
 
   const filteredEvents = React.useMemo(() => {
-    // Se nenhum filtro estiver ativo (set vazio), mostra tudo
     if (selectedFilters === "all" || selectedFilters.size === 0) {
       return events;
     }
@@ -524,28 +566,36 @@ function MyCalendar() {
     return events.filter((event) => {
       const resource = event.resource as CalendarEventResource;
 
-      // 1. FILTRO DE AULAS (CLASSES ONLY)
       if (selectedFilters.has("classes_only")) {
-        // Verifica se é UC diretamente no evento
-        const isDirectlyUC = !!resource.is_uc;
+        const eventTags = resource.tags || [];
 
-        const hasUCTag =
-          resource.tags &&
-          resource.tags.some((tagIdentifier) => {
-            const foundTag = userTags.find(
-              (t) =>
-                t.id === tagIdentifier ||
-                t.name_pt === tagIdentifier ||
-                t.name_en === tagIdentifier
-            );
-            return foundTag && foundTag.is_uc;
+        const hasClassTag = eventTags.some((tagIdentifier) => {
+          const foundTag = userTags.find(
+            (t) =>
+              t.id === tagIdentifier ||
+              t.name_pt === tagIdentifier ||
+              t.name_en === tagIdentifier
+          );
+
+          const namesToCheck: string[] = [];
+          if (foundTag) {
+            if (foundTag.name_pt) namesToCheck.push(foundTag.name_pt);
+            if (foundTag.name_en) namesToCheck.push(foundTag.name_en);
+            if (foundTag.name) namesToCheck.push(foundTag.name);
+          }
+          if (typeof tagIdentifier === "string") {
+            namesToCheck.push(tagIdentifier);
+          }
+
+          return namesToCheck.some((n) => {
+            const lower = n.toLowerCase().trim();
+            return lower === "aula" || lower === "classes";
           });
+        });
 
-        // Se NÃO for UC direta E NÃO tiver tag de UC, remove da lista
-        if (!isDirectlyUC && !hasUCTag) return false;
+        if (!hasClassTag) return false;
       }
 
-      // 2. Se o filtro "Recurring Only" estiver ativo
       if (selectedFilters.has("recurring_only")) {
         if (!resource.everyDay && !resource.everyWeek) return false;
       }
@@ -684,7 +734,6 @@ function MyCalendar() {
       />
 
       <div className={styles.calendarHeaderActions}>
-        {/* --- NOVO MENU DE FILTROS --- */}
         <MenuTrigger>
           <Button
             aria-label={t("filter_events", "Filtrar Eventos")}
@@ -789,11 +838,10 @@ function MyCalendar() {
           ) => {
             const now = new Date();
             const eventEndDate = new Date(event.end as Date);
-            const isPastEvent = eventEndDate < now;
 
+            // 1. Verificar se é tarefa concluída
             let isCompletedTaskSlot = false;
             const taskId = event.resource?.task_id;
-
             if (taskId && allTasks) {
               const associatedTask = allTasks.find((t) => t.id === taskId);
               if (
@@ -804,7 +852,7 @@ function MyCalendar() {
               }
             }
 
-            const applyFadedStyle = taskId && isCompletedTaskSlot;
+            const applyCompletedStyle = taskId && isCompletedTaskSlot;
 
             const baseStyle: React.CSSProperties = {
               borderRadius: "5px",
@@ -812,16 +860,19 @@ function MyCalendar() {
               border: "none",
             };
 
-            const colorStyle = getEventStyleProps(event, userTags);
+            const colorStyle = getEventStyleProps(
+              event,
+              userTags,
+              applyCompletedStyle // Passa true se estiver concluída
+            );
 
             const finalStyle = {
               ...baseStyle,
               ...event.resource?.style,
+              ...colorStyle, // Aplica a cor de fundo (agora com transparência se concluído)
             };
 
-            if (applyFadedStyle) {
-              finalStyle.opacity = 0.5;
-
+            if (applyCompletedStyle) {
               finalStyle.textDecoration = "line-through";
               finalStyle.textDecorationThickness = "2px";
             }

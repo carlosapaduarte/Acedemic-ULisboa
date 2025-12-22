@@ -257,7 +257,7 @@ function AssociatedTaskListView({
       </h3>
 
       <h2 className={styles.taskListTitle}>
-        {t("task:tasks_for_today", "Tarefas para Hoje")}
+        {t("task:tasks_for_today", "Prazo para Hoje")}
       </h2>
       <TaskList
         tasks={tasksForToday}

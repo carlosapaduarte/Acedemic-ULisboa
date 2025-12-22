@@ -1,37 +1,37 @@
 {
-    "title": "Estatísticas",
-    "energy_container_title": "ENERGIA",
-    "energy_level": "Nível de energia:",
-    "energy_question": "Quanta energia tens hoje?",
-    "i_feel": "Sinto-me",
-    "tired": "Cansado(a)",
-    "energetic": "Energético(a)",
+  "title": "Estatísticas",
+  "energy_container_title": "ENERGIA",
+  "energy_level": "Nível de energia:",
+  "energy_question": "Como te estás a sentir hoje?",
+  "i_feel": "Sinto-me",
+  "tired": "Cansado(a)",
+  "energetic": "Energético(a)",
 
-    "focus_container_title": "FOCO",
-    "total_time_study": "Tempo total de estudo",
-    "average_attention_span": "Tempo médio de atenção",
+  "focus_container_title": "FOCO",
+  "total_time_study": "Tempo total de estudo",
+  "average_attention_span": "Tempo médio de atenção",
 
-    "workload_distribution_container_title": "DISTRIBUIÇÃO DE CARGA DE TRABALHO",
+  "workload_distribution_container_title": "DISTRIBUIÇÃO DE CARGA DE TRABALHO",
 
-    "progress_container_title": "PROGRESSO",
+  "progress_container_title": "PROGRESSO",
 
-    "save": "Guardar",
-    "secondary_message": "O teu plano de estudo irá se adaptar conforme",
-    "skip": "Saltar",
-    "saved_level_successfully": "Nível guardado com sucesso!",
-    "energy_very_well": "Muito Bem",
-    "energy_well": "Bem",
-    "energy_bad": "Mal",
-    "energy_very_bad": "Muito Mal",
+  "save": "Guardar",
+  "secondary_message": "O teu plano de estudo irá se adaptar conforme",
+  "skip": "Saltar",
+  "saved_level_successfully": "Nível guardado com sucesso!",
+  "energy_very_well": "Muito Bem",
+  "energy_well": "Bem",
+  "energy_bad": "Mal",
+  "energy_very_bad": "Muito Mal",
 
-    "no_data_available_yet": "Ainda não há dados disponíveis...",
+  "no_data_available_yet": "Ainda não há dados disponíveis...",
 
-    "week": "SEMANA",
-    "today": "HOJE",
-    "minutes": "minutos",
+  "week": "SEMANA",
+  "today": "HOJE",
+  "minutes": "minutos",
 
-    "see_full_history": "Ver histórico completo",
-    "history": "Histórico",
+  "see_full_history": "Ver histórico completo",
+  "history": "Histórico",
 
-    "what_have_you_done_lately": "O que tens feito?"
+  "what_have_you_done_lately": "O que tens feito?"
 }

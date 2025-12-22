@@ -36,7 +36,7 @@ def get_session() -> Generator[Session, None, None]:
 predefined_global_tag_names = [
     {"name_pt": "Estudo", "name_en": "Study", "color": "#4169E1"},
     {"name_pt": "Aula", "name_en": "Class", "color": "#FF8C00"},
-    {"name_pt": "Auto-cuidado", "name_en": "Self-care", "color": "#32CD32"},
+    {"name_pt": "Autocuidado", "name_en": "Self-care", "color": "#32CD32"},
     {"name_pt": "Lazer", "name_en": "Leisure", "color": "#FF69B4"},
     {"name_pt": "Projeto", "name_en": "Project", "color": "#9370DB"},
 ]

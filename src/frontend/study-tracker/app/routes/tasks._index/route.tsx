@@ -70,11 +70,11 @@ export default function TasksPage() {
   return (
     <div className={styles.taskListPage}>
       <div className={styles.header}>
-        <h1 className={styles.tasksListTitle}>
-          {t("task:my_tasks_list_title", "As minhas tarefas")}
-        </h1>
+        <div className={styles.headerTopRow}>
+          <h1 className={styles.tasksListTitle}>
+            {t("task:my_tasks_list_title", "As minhas tarefas")}
+          </h1>
 
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           <MenuTrigger>
             <Button
               aria-label={t("task:filter_tasks", "Filtrar")}
@@ -109,7 +109,9 @@ export default function TasksPage() {
               </Menu>
             </Popover>
           </MenuTrigger>
+        </div>
 
+        <div className={styles.headerBottomRow}>
           <CreateTaskButton onTaskCreated={onTaskCreated} />
         </div>
       </div>

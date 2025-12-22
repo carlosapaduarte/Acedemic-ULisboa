@@ -111,14 +111,14 @@ export const TagSection = ({
 
       <div className={styles.ucTagsContainer}>
         <div className={styles.ucTagsLabel}>
-          {t("ucs_classes", "UCS / Aulas")}
+          {t("ucs_tags", "Unidades Curriculares")}
         </div>
         {ucTags.length > 0 ? (
           <div className={styles.ucTagsList}>{ucTags.map(renderTagButton)}</div>
         ) : (
           <p className={styles.emptyUcText}>
             {t("task:no_ucs_text", "Ainda não tens UCs associadas.")}{" "}
-            <Link to="/tracker/curricular-units" className={styles.emptyUcLink}>
+            <Link to="/curricular-units" className={styles.emptyUcLink}>
               {t("task:add_ucs_link", "Adicionar UCs")}
             </Link>
           </p>
