@@ -14,7 +14,7 @@ interface Props {
   refreshTags: (newTag?: Tag) => void;
 }
 
-export const TagSection = ({
+const TagSectionContent = ({
   selectedTagIds,
   setSelectedTagIds,
   availableTags,
@@ -22,16 +22,22 @@ export const TagSection = ({
   onAddTag,
   refreshTags,
 }: Props) => {
-  const { t, i18n } = useTranslation(["task", "calendar"]);
+  const { t, i18n, ready } = useTranslation(["task", "calendar"]);
+
+  if (!ready) return null;
 
   const validTags = React.useMemo(() => {
-    if (!Array.isArray(availableTags)) return [];
+    if (!availableTags || !Array.isArray(availableTags)) return [];
     return availableTags.filter((tag) => tag && tag.id);
   }, [availableTags]);
 
-  const safeSelectedIds = Array.isArray(selectedTagIds) ? selectedTagIds : [];
+  const safeSelectedIds = React.useMemo(() => {
+    if (!selectedTagIds || !Array.isArray(selectedTagIds)) return [];
+    return selectedTagIds;
+  }, [selectedTagIds]);
 
   const toggle = (id: string) => {
+    if (!id) return;
     setSelectedTagIds((prev) => {
       const current = Array.isArray(prev) ? prev : [];
       return current.includes(id)
@@ -42,32 +48,42 @@ export const TagSection = ({
 
   const getTagName = (tag: Tag) => {
     if (!tag) return "";
+
     if (tag.name && ["fun", "work", "personal", "study"].includes(tag.name)) {
-      return t(tag.name);
+      return t(`tags:${tag.name}`, { defaultValue: t(tag.name) });
     }
+
     const lang = i18n?.language ? i18n.language.toLowerCase() : "pt";
+
     if (lang.startsWith("en") && tag.name_en) {
       return tag.name_en;
     }
+
     return tag.name_pt || tag.name || "Sem nome";
+  };
+
+  const getStyle = (className: string) => {
+    return styles && styles[className] ? styles[className] : className;
   };
 
   const renderTagButton = (tag: Tag) => {
     if (!tag || !tag.id) return null;
     const isSelected = safeSelectedIds.includes(tag.id);
 
-    const btnClass = styles.tagItem
-      ? `${styles.tagItem} ${isSelected ? styles.selectedTagItem : ""}`
-      : "tag-item";
+    const baseClass = getStyle("tagItem");
+    const selectedClass = getStyle("selectedTagItem");
+    const className = isSelected ? `${baseClass} ${selectedClass}` : baseClass;
 
     return (
       <button
         key={tag.id}
         type="button"
         onClick={() => toggle(tag.id)}
-        className={btnClass}
+        className={className}
         style={{
           backgroundColor: isSelected ? tag.color || "#ccc" : undefined,
+          border: !styles ? "1px solid #ccc" : undefined,
+          margin: !styles ? "2px" : undefined,
         }}
       >
         {getTagName(tag)}
@@ -78,30 +94,28 @@ export const TagSection = ({
   const customTags = validTags.filter((tag) => !tag.is_uc);
   const ucTags = validTags.filter((tag) => tag.is_uc);
 
-  if (!styles) return null;
-
   return (
-    <div className={styles.tagsSectionContainer}>
-      <div className={styles.tagsHeader}>
-        <h3 className={styles.formSectionTitle}>
+    <div className={getStyle("tagsSectionContainer")}>
+      <div className={getStyle("tagsHeader")}>
+        <h3 className={getStyle("formSectionTitle")}>
           {t("tags_title", "Etiquetas")}
         </h3>
         <button
           type="button"
           onClick={onEditTags}
-          className={styles.headerButton}
+          className={getStyle("headerButton")}
           aria-label={t("manage_tags", "Gerir etiquetas")}
         >
           <RiSettings5Fill size={20} />
         </button>
       </div>
 
-      <div className={styles.tagsBox}>
+      <div className={getStyle("tagsBox")}>
         {customTags.map(renderTagButton)}
 
         <button
           type="button"
-          className={styles.addTagButtonRound}
+          className={getStyle("addTagButtonRound")}
           onClick={onAddTag}
           aria-label={t("add_tag", "Criar nova etiqueta")}
         >
@@ -109,16 +123,18 @@ export const TagSection = ({
         </button>
       </div>
 
-      <div className={styles.ucTagsContainer}>
-        <div className={styles.ucTagsLabel}>
+      <div className={getStyle("ucTagsContainer")}>
+        <div className={getStyle("ucTagsLabel")}>
           {t("ucs_tags", "Unidades Curriculares")}
         </div>
         {ucTags.length > 0 ? (
-          <div className={styles.ucTagsList}>{ucTags.map(renderTagButton)}</div>
+          <div className={getStyle("ucTagsList")}>
+            {ucTags.map(renderTagButton)}
+          </div>
         ) : (
-          <p className={styles.emptyUcText}>
+          <p className={getStyle("emptyUcText")}>
             {t("task:no_ucs_text", "Ainda não tens UCs associadas.")}{" "}
-            <Link to="/curricular-units" className={styles.emptyUcLink}>
+            <Link to="/curricular-units" className={getStyle("emptyUcLink")}>
               {t("task:add_ucs_link", "Adicionar UCs")}
             </Link>
           </p>
@@ -127,3 +143,11 @@ export const TagSection = ({
     </div>
   );
 };
+
+export const TagSection = (props: Props) => (
+  <React.Suspense
+    fallback={<div className={styles?.tagsSectionContainer}>A carregar...</div>}
+  >
+    <TagSectionContent {...props} />
+  </React.Suspense>
+);

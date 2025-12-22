@@ -9,6 +9,7 @@ import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
 import { Event, service, Tag, Task } from "~/service/service";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "./calendar.css";
 import "./CreateEvent/createEventReactAriaModal.css";
 import styles from "./calendarPage.module.css";
@@ -28,11 +29,23 @@ import {
   type Selection,
 } from "react-aria-components";
 
+import * as DnDModule from "react-big-calendar/lib/addons/dragAndDrop";
+
+let DnDCalendar = Calendar;
+try {
+  const withDragAndDrop = DnDModule.default || DnDModule;
+  if (typeof withDragAndDrop === "function") {
+    // @ts-ignore
+    DnDCalendar = withDragAndDrop(Calendar);
+  }
+} catch (e) {
+  console.error("Erro ao inicializar DragAndDrop:", e);
+}
+
 const hexToRgba = (hex: string, alpha: number) => {
   if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
     return hex;
   }
-
   let c = hex.substring(1).split("");
   if (c.length === 3) {
     c = [c[0], c[0], c[1], c[1], c[2], c[2]];
@@ -41,7 +54,6 @@ const hexToRgba = (hex: string, alpha: number) => {
   const r = parseInt(cStr.substring(0, 2), 16);
   const g = parseInt(cStr.substring(2, 4), 16);
   const b = parseInt(cStr.substring(4, 6), 16);
-
   return `rgba(${r},${g},${b},${alpha})`;
 };
 
@@ -134,7 +146,7 @@ const EventWithTags = ({
   const innerWrapperStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     padding: "4px",
     height: "100%",
     width: "100%",
@@ -147,7 +159,9 @@ const EventWithTags = ({
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
     marginBottom: "2px",
-    flexShrink: 0,
+    flexShrink: 1,
+    minHeight: 0,
+    fontWeight: 500,
   };
 
   const tagsChipStyle: React.CSSProperties = {
@@ -159,10 +173,10 @@ const EventWithTags = ({
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    marginTop: "auto",
     alignSelf: "flex-start",
     maxWidth: "100%",
     overflow: "hidden",
+    flexShrink: 0,
   };
 
   const tagTextStyle: React.CSSProperties = {
@@ -183,6 +197,7 @@ const EventWithTags = ({
 
   return (
     <div style={combinedStyle}>
+      {/*TODO: ajustar o certo de acordo com o tamanho do evento (duração)*/}
       {isCompletedTaskSlot && (
         <div
           style={{
@@ -200,7 +215,7 @@ const EventWithTags = ({
         >
           <FaCheck
             size="7em"
-            color="#008000"
+            color="#00ff40"
             style={{
               opacity: 1,
               filter: "drop-shadow(0px 0px 8px rgba(0,0,0,0.6))",
@@ -250,26 +265,29 @@ const EventWithTags = ({
 };
 
 const getEventStyleProps = (
-  event: Event,
+  resource: CalendarEventResource | undefined,
   allUserTags: Tag[],
   isCompleted: boolean = false
 ): React.CSSProperties => {
   const FALLBACK_COLOR = "#3399FF";
   const BG_OPACITY = 0.7;
 
+  if (!resource) return { backgroundColor: FALLBACK_COLOR };
+
   let baseColor = FALLBACK_COLOR;
   let gradient: string | null = null;
 
   //1º prioridade: cor personalizada definida no evento.
-  if (event.color && event.color !== FALLBACK_COLOR) {
-    baseColor = event.color;
+  if (resource.color && resource.color !== FALLBACK_COLOR) {
+    baseColor = resource.color;
   } else {
-    const tagIdentifiers = event.tags || [];
+    const tagIdentifiers = resource.tags || [];
     if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
       const associatedTags = allUserTags.filter(
         (tag) =>
           (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
-          (tag.name_en && tagIdentifiers.includes(tag.name_en))
+          (tag.name_en && tagIdentifiers.includes(tag.name_en)) ||
+          (tag.name && tagIdentifiers.includes(tag.name))
       );
 
       const colors = associatedTags
@@ -302,7 +320,7 @@ function useMyCalendar() {
   const [userTags, setUserTags] = useState<Tag[]>([]);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslation(["calendar"]);
   const [displayedDates, setDisplayedDates] = useState<Date[]>([]);
 
   useEffect(() => {
@@ -387,7 +405,7 @@ function useMyCalendar() {
 
       let allOccurrences: CalendarEvent[] = [];
       eventsFromBackend.forEach((event) => {
-        const styleProps = {}; // Placeholder
+        const styleProps = {};
 
         displayedDates.forEach((currentDisplayDate) => {
           let shouldAddEvent = false;
@@ -474,6 +492,53 @@ function useMyCalendar() {
     refreshAllCalendarData();
   }, [displayedDates, refreshAllCalendarData]);
 
+  const onEventDrop = useCallback(
+    async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
+      try {
+        const resource = event.resource as CalendarEventResource;
+        await service.updateEvent(resource.id, {
+          title: event.title,
+          startDate: start,
+          endDate: end,
+          tags: resource.tags || [],
+          everyWeek: resource.everyWeek || false,
+          everyDay: resource.everyDay || false,
+          notes: resource.notes || "",
+          color: resource.color,
+          is_uc: resource.is_uc || false,
+        });
+        refreshAllCalendarData();
+      } catch (error) {
+        console.error("Erro ao mover evento:", error);
+        alert("Não foi possível mover o evento. Tente novamente.");
+      }
+    },
+    [refreshAllCalendarData]
+  );
+
+  const onEventResize = useCallback(
+    async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
+      try {
+        const resource = event.resource as CalendarEventResource;
+        await service.updateEvent(resource.id, {
+          title: event.title,
+          startDate: start,
+          endDate: end,
+          tags: resource.tags || [],
+          everyWeek: resource.everyWeek || false,
+          everyDay: resource.everyDay || false,
+          notes: resource.notes || "",
+          color: resource.color,
+          is_uc: resource.is_uc || false,
+        });
+        refreshAllCalendarData();
+      } catch (error) {
+        console.error("Erro ao redimensionar evento:", error);
+      }
+    },
+    [refreshAllCalendarData]
+  );
+
   return {
     events,
     userTags,
@@ -482,6 +547,8 @@ function useMyCalendar() {
     setCalendarView,
     setDisplayedDates,
     refreshUserEvents: refreshAllCalendarData,
+    onEventDrop,
+    onEventResize,
   };
 }
 
@@ -552,6 +619,8 @@ function MyCalendar() {
     setCalendarView,
     setDisplayedDates,
     refreshUserEvents,
+    onEventDrop,
+    onEventResize,
   } = useMyCalendar();
   const { t, i18n } = useTranslation(["calendar"]);
   const [selectedFilters, setSelectedFilters] = useState<Selection>(
@@ -581,6 +650,7 @@ function MyCalendar() {
           if (foundTag) {
             if (foundTag.name_pt) namesToCheck.push(foundTag.name_pt);
             if (foundTag.name_en) namesToCheck.push(foundTag.name_en);
+            // @ts-ignore
             if (foundTag.name) namesToCheck.push(foundTag.name);
           }
           if (typeof tagIdentifier === "string") {
@@ -767,7 +837,8 @@ function MyCalendar() {
       </div>
 
       <div className={styles.calendarContainer}>
-        <Calendar
+        {/* @ts-ignore */}
+        <DnDCalendar
           key={i18n.language}
           components={{
             agenda: {
@@ -833,13 +904,15 @@ function MyCalendar() {
           messages={calendarMessages}
           culture={i18n.language}
           formats={calendarFormats}
+          onEventDrop={onEventDrop}
+          onEventResize={onEventResize}
+          resizable={true}
           eventPropGetter={(
             event: CalendarEvent & { resource?: CalendarEventResource }
           ) => {
             const now = new Date();
             const eventEndDate = new Date(event.end as Date);
 
-            // 1. Verificar se é tarefa concluída
             let isCompletedTaskSlot = false;
             const taskId = event.resource?.task_id;
             if (taskId && allTasks) {
@@ -861,15 +934,15 @@ function MyCalendar() {
             };
 
             const colorStyle = getEventStyleProps(
-              event,
+              event.resource,
               userTags,
-              applyCompletedStyle // Passa true se estiver concluída
+              applyCompletedStyle
             );
 
             const finalStyle = {
               ...baseStyle,
               ...event.resource?.style,
-              ...colorStyle, // Aplica a cor de fundo (agora com transparência se concluído)
+              ...colorStyle,
             };
 
             if (applyCompletedStyle) {
