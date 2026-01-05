@@ -172,7 +172,8 @@ const EventWithTags = ({
   const innerWrapperStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
+    gap: "10%",
     padding: "4px",
     height: "100%",
     width: "100%",
@@ -545,11 +546,24 @@ function useMyCalendar() {
     async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
       try {
         const resource = event.resource as CalendarEventResource;
+
+        const rawTags = resource.tags || [];
+
+        const cleanTagIds = rawTags
+          .map((t: any) => {
+            if (typeof t === "object" && t !== null) {
+              const val = t.id || t.name_pt || t.name_en || t.name;
+              return val ? String(val) : null;
+            }
+            return String(t);
+          })
+          .filter((t: any) => t !== null && t !== "null" && t !== "");
+
         await service.updateEvent(resource.id, {
           title: event.title,
           startDate: start,
           endDate: end,
-          tags: resource.tags || [],
+          tags: cleanTagIds,
           everyWeek: resource.everyWeek || false,
           everyDay: resource.everyDay || false,
           notes: resource.notes || "",
@@ -561,7 +575,7 @@ function useMyCalendar() {
         refreshAllCalendarData();
       } catch (error) {
         console.error("Erro ao mover evento:", error);
-        alert("Não foi possível mover o evento. Tente novamente.");
+        alert("Não foi possível mover o evento.");
       }
     },
     [refreshAllCalendarData]
@@ -571,11 +585,24 @@ function useMyCalendar() {
     async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
       try {
         const resource = event.resource as CalendarEventResource;
+
+        const rawTags = resource.tags || [];
+
+        const cleanTagIds = rawTags
+          .map((t: any) => {
+            if (typeof t === "object" && t !== null) {
+              const val = t.id || t.name_pt || t.name_en || t.name;
+              return val ? String(val) : null;
+            }
+            return String(t);
+          })
+          .filter((t: any) => t !== null && t !== "null" && t !== "");
+
         await service.updateEvent(resource.id, {
           title: event.title,
           startDate: start,
           endDate: end,
-          tags: resource.tags || [],
+          tags: cleanTagIds,
           everyWeek: resource.everyWeek || false,
           everyDay: resource.everyDay || false,
           notes: resource.notes || "",
