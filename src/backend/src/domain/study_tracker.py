@@ -125,31 +125,65 @@ class ScheduleBlock():
             )
         )
 """
-
 class Event():
-    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool, every_day: bool, color: Optional[str] = None,notes: str = "", task_id: Optional[int] = None, is_uc: bool = False) -> None:
-        self.id=id
-        self.title=title
-        self.date=date
-        self.tags=tags if tags is not None else []
-        self.every_week=every_week
-        self.every_day=every_day
+    def __init__(
+        self, 
+        id: int | None, 
+        title: str, 
+        date: DateInterval, 
+        tags: list[any],
+        every_week: bool, 
+        every_day: bool, 
+        color: Optional[str] = None,
+        notes: str = "", 
+        task_id: Optional[int] = None, 
+        is_uc: bool = False,
+        recurrence_start: Optional[datetime] = None,
+        recurrence_end: Optional[datetime] = None
+    ) -> None:
+        self.id = id
+        self.title = title
+        self.date = date
+        self.tags = tags if tags is not None else []
+        self.every_week = every_week
+        self.every_day = every_day
         self.color = color
         self.notes = notes
         self.task_id = task_id
         self.is_uc = is_uc
+        self.recurrence_start = recurrence_start
+        self.recurrence_end = recurrence_end
 
     @staticmethod
     def from_STEventModel(events: list['STEventModel']) -> list['Event']:
         domain_events: list[Event] = []
         for event_model in events:
-
-            tag_names = [
-                assoc.tag_ref.name_pt
-                for assoc in event_model.tags_associations
-                if assoc.tag_ref and assoc.tag_ref.name_pt 
-            ]
             
+            tags_list = []
+            
+            if event_model.tags_associations:
+                
+                for assoc in event_model.tags_associations:
+                    if assoc.tag_ref:
+                        tag = assoc.tag_ref
+                        
+                        t_name = "N/A"
+                        if hasattr(tag, 'name_pt') and tag.name_pt:
+                            t_name = tag.name_pt
+                        elif hasattr(tag, 'name_en') and tag.name_en:
+                            t_name = tag.name_en
+                        
+                        tag_obj = {
+                            "id": tag.id,
+                            "name": t_name,
+                            "color": getattr(tag, "color", None),
+                            "name_pt": getattr(tag, "name_pt", None),
+                            "name_en": getattr(tag, "name_en", None),
+                            "is_uc": getattr(tag, "is_uc", False)
+                        }
+
+                        tags_list.append(tag_obj)
+
             domain_events.append(
                 Event(
                     id=event_model.id,
@@ -158,17 +192,20 @@ class Event():
                         start_date=event_model.start_date,
                         end_date=event_model.end_date
                     ),
-                    tags=tag_names,
+                    tags=tags_list,
                     every_week=event_model.every_week,
                     every_day=event_model.every_day,
                     notes=event_model.notes,
                     color=event_model.color,
                     task_id=event_model.task_id,
-                    is_uc=event_model.is_uc
+                    is_uc=event_model.is_uc,
+                    recurrence_start=event_model.recurrence_start,
+                    recurrence_end=event_model.recurrence_end
                 )
             )
+
         return domain_events
-    
+
 class File():
     def __init__(self, name: str, text: str):
         self.name=name

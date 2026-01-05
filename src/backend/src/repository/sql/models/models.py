@@ -135,15 +135,15 @@ class STEventModel(SQLModel, table=True):
     color: str = Field(nullable=False)
     is_uc: bool = Field(default=False, nullable=False)
 
+    recurrence_start: Optional[datetime] = Field(default=None, nullable=True)
+    recurrence_end: Optional[datetime] = Field(default=None, nullable=True)
+
     task_id: Optional[int] = Field(default=None, nullable=True)
     task_user_id: Optional[int] = Field(default=None, nullable=True)
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
     
-    #tags_associations: List["STEventTagModel"] = Relationship(back_populates="event", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    #tags: List[TagModel] = Relationship(back_populates="events", link_model=STEventTagModel)
-
     tags_associations: List["STEventTagModel"] = Relationship(
         back_populates="event",
         sa_relationship_kwargs={
@@ -163,8 +163,7 @@ class STEventModel(SQLModel, table=True):
         ['st_task.id', 'st_task.user_id'],
         name="fk_st_event_task_composite"
     ),
-    )
-    
+    ) 
     
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"

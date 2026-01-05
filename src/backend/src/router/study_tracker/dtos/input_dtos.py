@@ -22,6 +22,8 @@ class CreateEventInputDto(BaseModel):
     notes: str | None
     color: str = "#3399FF"
     is_uc: bool = False
+    recurrenceStart: Optional[float] = None
+    recurrenceEnd: Optional[float] = None
 
 class UpdateEventInputDto(BaseModel):
     startDate: float
@@ -33,6 +35,8 @@ class UpdateEventInputDto(BaseModel):
     notes: Optional[str] = None
     color: str = None
     is_uc: bool = False
+    recurrenceStart: Optional[float] = None
+    recurrenceEnd: Optional[float] = None
 
 class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int

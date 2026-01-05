@@ -230,6 +230,8 @@ export type NewEventInfo = {
   notes: string;
   color?: string;
   is_uc: boolean;
+  recurrenceStart?: Date;
+  recurrenceEnd?: Date;
 };
 
 async function createNewEvent(newEventInfo: NewEventInfo) {
@@ -246,6 +248,12 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
       notes: newEventInfo.notes,
       color: newEventInfo.color,
       is_uc: newEventInfo.is_uc,
+      recurrenceStart: newEventInfo.recurrenceStart
+        ? newEventInfo.recurrenceStart.getTime() / 1000
+        : undefined,
+      recurrenceEnd: newEventInfo.recurrenceEnd
+        ? newEventInfo.recurrenceEnd.getTime() / 1000
+        : undefined,
     }),
   };
 
@@ -281,6 +289,8 @@ type EventDto = {
   notes: string;
   task_id?: number;
   is_uc: boolean;
+  recurrenceStart?: number;
+  recurrenceEnd?: number;
 };
 
 export type Event = {
@@ -295,6 +305,8 @@ export type Event = {
   notes: string;
   task_id?: number;
   is_uc: boolean;
+  recurrenceStart?: Date;
+  recurrenceEnd?: Date;
 };
 
 export type UpdateEventInputDto = {
@@ -307,6 +319,8 @@ export type UpdateEventInputDto = {
   notes: string;
   color?: string;
   is_uc: boolean;
+  recurrenceStart?: Date;
+  recurrenceEnd?: Date;
 };
 
 async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
@@ -323,6 +337,12 @@ async function updateEvent(eventId: number, inputDto: UpdateEventInputDto) {
       notes: inputDto.notes,
       color: inputDto.color,
       is_uc: inputDto.is_uc,
+      recurrenceStart: inputDto.recurrenceStart
+        ? inputDto.recurrenceStart.getTime() / 1000
+        : undefined,
+      recurrenceEnd: inputDto.recurrenceEnd
+        ? inputDto.recurrenceEnd.getTime() / 1000
+        : undefined,
     }),
   };
   const response: Response = await doFetch(request);
@@ -365,6 +385,12 @@ async function getUserEvents(
         color: eventDto.color || "#3399FF",
         task_id: eventDto.task_id,
         is_uc: eventDto.is_uc,
+        recurrenceStart: eventDto.recurrenceStart
+          ? new Date(eventDto.recurrenceStart * 1000)
+          : undefined,
+        recurrenceEnd: eventDto.recurrenceEnd
+          ? new Date(eventDto.recurrenceEnd * 1000)
+          : undefined,
       };
     });
   } else {

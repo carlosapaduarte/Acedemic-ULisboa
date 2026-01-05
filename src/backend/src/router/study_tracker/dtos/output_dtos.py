@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from pydantic import BaseModel
 
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task, WeekTimeStudy
@@ -70,13 +70,15 @@ class EventOutputDto(BaseModel):
     startDate: int
     endDate: int
     title: str
-    tags: list[str]
+    tags: list[Any]
     everyWeek: bool
     everyDay: bool
     color: str | None = None
     notes: str | None = None
     task_id: int | None = None
     is_uc: bool = False
+    recurrenceStart: int | None = None
+    recurrenceEnd: int | None = None
 
     @staticmethod
     def from_events(events: list[Event]) -> list['EventOutputDto']:
@@ -98,7 +100,9 @@ class EventOutputDto(BaseModel):
                     color=event.color,
                     notes=event.notes,
                     task_id=event.task_id,
-                    is_uc=event.is_uc
+                    is_uc=event.is_uc,
+                    recurrenceStart=get_datetime_utc(event.recurrence_start) if event.recurrence_start else None,
+                    recurrenceEnd=get_datetime_utc(event.recurrence_end) if event.recurrence_end else None,
                 )
             )
 

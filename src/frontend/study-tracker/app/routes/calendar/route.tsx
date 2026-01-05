@@ -33,6 +33,7 @@ import * as DnDModule from "react-big-calendar/lib/addons/dragAndDrop";
 
 let DnDCalendar = Calendar;
 try {
+  // @ts-ignore
   const withDragAndDrop = DnDModule.default || DnDModule;
   if (typeof withDragAndDrop === "function") {
     // @ts-ignore
@@ -69,6 +70,8 @@ interface CalendarEventResource {
   style?: React.CSSProperties;
   task_id?: number;
   is_uc?: boolean;
+  recurrenceStart?: Date;
+  recurrenceEnd?: Date;
 }
 
 const EventWithTags = ({
@@ -85,25 +88,47 @@ const EventWithTags = ({
   const { t, i18n } = useTranslation(["calendar"]);
   const isRecurring = event.resource.everyWeek || event.resource.everyDay;
 
+  const start = moment(event.start);
+  const end = moment(event.end);
+  const durationMinutes = end.diff(start, "minutes");
+
+  let checkIconSize = "5em";
+  if (durationMinutes <= 60) {
+    checkIconSize = "2em";
+  } else if (durationMinutes <= 120) {
+    checkIconSize = "3.5em";
+  }
+
   const getTagNames = () => {
-    if (!event.resource.tags || allUserTags.length === 0) return [];
-    return event.resource.tags!.map((tagIdentifier: string | number) => {
-      const foundTag: Tag | undefined = allUserTags.find(
-        (tag: Tag) =>
-          tag.id === tagIdentifier ||
-          tag.name_pt === tagIdentifier ||
-          tag.name_en === tagIdentifier
-      );
+    if (!event.resource?.tags || allUserTags.length === 0) return [];
+
+    return event.resource.tags!.map((tagItem: any) => {
+      let foundTag: Tag | undefined;
+
+      if (typeof tagItem === "object" && tagItem !== null) {
+        foundTag = allUserTags.find((t) => t.id === tagItem.id);
+        if (!foundTag) foundTag = tagItem as Tag;
+      } else {
+        foundTag = allUserTags.find(
+          (tag: Tag) =>
+            tag.id === tagItem ||
+            tag.name_pt === tagItem ||
+            tag.name_en === tagItem
+        );
+      }
 
       if (!foundTag) {
-        return String(tagIdentifier);
+        if (typeof tagItem === "object") {
+          return tagItem.name_pt || tagItem.name_en || tagItem.name || "Tag";
+        }
+        return String(tagItem);
       }
 
       if (
-        foundTag.name &&
-        ["fun", "work", "personal", "study"].includes(foundTag.name)
+        foundTag.name_en &&
+        ["fun", "work", "personal", "study"].includes(foundTag.name_en)
       ) {
-        return t(`tags:${foundTag.name}`);
+        return t(`tags:${foundTag.name_en}`);
       }
 
       const lang = i18n.language.toLowerCase();
@@ -114,9 +139,10 @@ const EventWithTags = ({
         return foundTag.name_en;
       }
 
-      return foundTag.name_pt || foundTag.name_en || tagIdentifier;
+      return foundTag.name_pt || foundTag.name_en || String(tagItem);
     });
   };
+
   const tagNames = getTagNames();
 
   let isCompletedTaskSlot = false;
@@ -197,7 +223,6 @@ const EventWithTags = ({
 
   return (
     <div style={combinedStyle}>
-      {/*TODO: ajustar o certo de acordo com o tamanho do evento (duração)*/}
       {isCompletedTaskSlot && (
         <div
           style={{
@@ -214,11 +239,11 @@ const EventWithTags = ({
           }}
         >
           <FaCheck
-            size="7em"
+            size={checkIconSize}
             color="#00ff40"
             style={{
               opacity: 1,
-              filter: "drop-shadow(0px 0px 8px rgba(0,0,0,0.6))",
+              filter: "drop-shadow(0px 0px 5px rgba(0,0,0,0.5))",
               transform: "rotate(-15deg)",
             }}
           />
@@ -236,9 +261,9 @@ const EventWithTags = ({
               <span title="Evento Recorrente" style={iconStyle}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  height="12px"
+                  height="10px"
                   viewBox="0 -960 960 960"
-                  width="12px"
+                  width="10px"
                   fill="#e3e3e3"
                 >
                   <path d="M280-80 120-240l160-160 56 58-62 62h406v-160h80v240H274l62 62-56 58Zm-80-440v-240h486l-62-62 56-58 160 160-160 160-56-58 62-62H280v160h-80Z" />
@@ -248,7 +273,7 @@ const EventWithTags = ({
 
             {isWorkSlot && (
               <span title="Slot de Trabalho" style={iconStyle}>
-                <FaListCheck size={12} color="#e3e3e3" />
+                <FaListCheck size={10} color="#e3e3e3" />
               </span>
             )}
 
@@ -270,7 +295,7 @@ const getEventStyleProps = (
   isCompleted: boolean = false
 ): React.CSSProperties => {
   const FALLBACK_COLOR = "#3399FF";
-  const BG_OPACITY = 0.7;
+  const BG_OPACITY = 0.6;
 
   if (!resource) return { backgroundColor: FALLBACK_COLOR };
 
@@ -281,24 +306,31 @@ const getEventStyleProps = (
   if (resource.color && resource.color !== FALLBACK_COLOR) {
     baseColor = resource.color;
   } else {
-    const tagIdentifiers = resource.tags || [];
-    if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
-      const associatedTags = allUserTags.filter(
-        (tag) =>
-          (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
-          (tag.name_en && tagIdentifiers.includes(tag.name_en)) ||
-          (tag.name && tagIdentifiers.includes(tag.name))
-      );
+    // 2º: Cor das Tags
+    const eventTags = resource.tags || [];
 
-      const colors = associatedTags
-        .map((tag) => tag.color)
-        .filter(Boolean) as string[];
-
-      if (colors.length > 0) {
-        baseColor = colors[0];
-        if (colors.length > 1) {
-          gradient = `linear-gradient(45deg, ${colors.join(",")})`;
+    const tagColors = eventTags
+      .map((t: any) => {
+        // A. Se for objeto vindo do backend (pode ter .color)
+        if (typeof t === "object" && t !== null && t.color) {
+          return t.color;
         }
+
+        // B. Se for ID ou string, procuramos na lista global
+        if (typeof t !== "object") {
+          const found = allUserTags.find(
+            (ut) => ut.id === t || ut.name_pt === t || ut.name_en === t
+          );
+          return found?.color;
+        }
+        return null;
+      })
+      .filter((c): c is string => !!c);
+
+    if (tagColors.length > 0) {
+      baseColor = tagColors[0];
+      if (tagColors.length > 1) {
+        gradient = `linear-gradient(135deg, ${tagColors.join(",")})`;
       }
     }
   }
@@ -407,38 +439,52 @@ function useMyCalendar() {
       eventsFromBackend.forEach((event) => {
         const styleProps = {};
 
+        // Se recurrenceStart existir, usa-o. Se não, usa startDate.
+        const recurrenceStartDay = event.recurrenceStart
+          ? new Date(event.recurrenceStart)
+          : new Date(event.startDate);
+        recurrenceStartDay.setHours(0, 0, 0, 0);
+
+        const recurrenceEndDay = event.recurrenceEnd
+          ? new Date(event.recurrenceEnd)
+          : null;
+        if (recurrenceEndDay) recurrenceEndDay.setHours(23, 59, 59, 999);
+
         displayedDates.forEach((currentDisplayDate) => {
           let shouldAddEvent = false;
           let eventOccurrenceStartDate = new Date(currentDisplayDate);
           let eventOccurrenceEndDate = new Date(currentDisplayDate);
+
           const eventStartDay = new Date(event.startDate);
           eventStartDay.setHours(0, 0, 0, 0);
+
           const displayDay = new Date(currentDisplayDate);
           displayDay.setHours(0, 0, 0, 0);
+
           if (!event.everyDay && !event.everyWeek) {
             if (utils.sameDay(event.startDate, currentDisplayDate)) {
               shouldAddEvent = true;
               eventOccurrenceStartDate = new Date(event.startDate);
               eventOccurrenceEndDate = new Date(event.endDate);
             }
-          } else if (event.everyDay) {
-            if (displayDay >= eventStartDay) {
-              shouldAddEvent = true;
-              eventOccurrenceStartDate.setHours(
-                event.startDate.getHours(),
-                event.startDate.getMinutes()
-              );
-              eventOccurrenceEndDate.setHours(
-                event.endDate.getHours(),
-                event.endDate.getMinutes()
-              );
+          }
+          // Evento Recorrente (Diário ou Semanal)
+          else {
+            const isAfterStart = displayDay >= recurrenceStartDay;
+            const isBeforeEnd =
+              !recurrenceEndDay || displayDay <= recurrenceEndDay;
+
+            if (isAfterStart && isBeforeEnd) {
+              if (event.everyDay) {
+                shouldAddEvent = true;
+              } else if (event.everyWeek) {
+                if (event.startDate.getDay() === currentDisplayDate.getDay()) {
+                  shouldAddEvent = true;
+                }
+              }
             }
-          } else if (event.everyWeek) {
-            if (
-              event.startDate.getDay() === currentDisplayDate.getDay() &&
-              displayDay >= eventStartDay
-            ) {
-              shouldAddEvent = true;
+
+            if (shouldAddEvent) {
               eventOccurrenceStartDate.setHours(
                 event.startDate.getHours(),
                 event.startDate.getMinutes()
@@ -449,6 +495,7 @@ function useMyCalendar() {
               );
             }
           }
+
           if (shouldAddEvent) {
             allOccurrences.push({
               title: event.title,
@@ -466,6 +513,8 @@ function useMyCalendar() {
                 style: styleProps,
                 task_id: event.task_id,
                 is_uc: event.is_uc,
+                recurrenceStart: event.recurrenceStart,
+                recurrenceEnd: event.recurrenceEnd,
               } as CalendarEventResource,
             });
           }
@@ -506,6 +555,8 @@ function useMyCalendar() {
           notes: resource.notes || "",
           color: resource.color,
           is_uc: resource.is_uc || false,
+          recurrenceStart: resource.recurrenceStart,
+          recurrenceEnd: resource.recurrenceEnd,
         });
         refreshAllCalendarData();
       } catch (error) {
@@ -530,6 +581,8 @@ function useMyCalendar() {
           notes: resource.notes || "",
           color: resource.color,
           is_uc: resource.is_uc || false,
+          recurrenceStart: resource.recurrenceStart,
+          recurrenceEnd: resource.recurrenceEnd,
         });
         refreshAllCalendarData();
       } catch (error) {
@@ -709,6 +762,8 @@ function MyCalendar() {
       everyDay: event.resource.everyDay,
       everyWeek: event.resource.everyWeek,
       is_uc: event.resource.is_uc || false,
+      recurrenceStart: event.resource.recurrenceStart,
+      recurrenceEnd: event.resource.recurrenceEnd,
     });
     setSelectedSlot(null);
     setIsModalOpen(true);

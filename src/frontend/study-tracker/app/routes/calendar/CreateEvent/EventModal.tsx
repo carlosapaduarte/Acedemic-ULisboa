@@ -22,14 +22,17 @@ export interface EventData {
   title: string;
   start: Date;
   end: Date;
-  tags: string[];
+  tags: (string | Tag)[];
   notes?: string;
   color?: string;
   everyDay?: boolean;
   everyWeek?: boolean;
   is_uc?: boolean;
   task_id?: number;
+  recurrenceStart?: Date;
+  recurrenceEnd?: Date;
 }
+
 export type RecurrenceType = "none" | "daily" | "weekly";
 
 interface EventModalProps {
@@ -78,8 +81,35 @@ const NotesSection = React.memo(({ notes, setNotes }: any) => {
 });
 
 const IsRecurrentSection = React.memo(
-  ({ recurrenceType, setRecurrenceType }: any) => {
+  ({
+    recurrenceType,
+    setRecurrenceType,
+    recurrenceStart,
+    setRecurrenceStart,
+    recurrenceEnd,
+    setRecurrenceEnd,
+  }: any) => {
     const { t } = useTranslation("calendar");
+
+    const formatDate = (d: Date | null) =>
+      d ? d.toISOString().split("T")[0] : "";
+
+    const handleRecStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.value) {
+        setRecurrenceStart(null);
+        return;
+      }
+      setRecurrenceStart(new Date(e.target.value));
+    };
+
+    const handleRecEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.value) {
+        setRecurrenceEnd(null);
+        return;
+      }
+      setRecurrenceEnd(new Date(e.target.value));
+    };
+
     return (
       <div className={styles.recurrentEventSectionContainer}>
         <h2 className={styles.formSectionTitle}>{t("recurrence_title")}</h2>
@@ -94,6 +124,44 @@ const IsRecurrentSection = React.memo(
           <option value="daily">{t("recurrence_daily_label")}</option>
           <option value="weekly">{t("recurrence_weekly_label")}</option>
         </select>
+
+        {recurrenceType === "weekly" && (
+          <div
+            className={styles.deadlineInputsContainer}
+            style={{ marginTop: "10px" }}
+          >
+            <TextField className={styles.formTextField}>
+              <Label className={styles.formSectionTitle}>
+                Início da Repetição
+              </Label>
+              <Input
+                type="date"
+                className={classNames(styles.dateInput)}
+                value={formatDate(recurrenceStart)}
+                onChange={handleRecStartChange}
+                placeholder="Hoje"
+              />
+              <span style={{ fontSize: "0.8em", color: "#666" }}>
+                {recurrenceStart ? "" : "(Começa hoje)"}
+              </span>
+            </TextField>
+
+            <TextField className={styles.formTextField}>
+              <Label className={styles.formSectionTitle}>
+                Fim da Repetição
+              </Label>
+              <Input
+                type="date"
+                className={classNames(styles.dateInput)}
+                value={formatDate(recurrenceEnd)}
+                onChange={handleRecEndChange}
+              />
+              <span style={{ fontSize: "0.8em", color: "#666" }}>
+                {recurrenceEnd ? "" : "(Infinito)"}
+              </span>
+            </TextField>
+          </div>
+        )}
       </div>
     );
   }
@@ -203,10 +271,16 @@ const EventForm = (props: any) => {
         setEventEndDate={props.setEndDate}
       />
       <NotesSection notes={props.notes} setNotes={props.setNotes} />
+
       <IsRecurrentSection
         recurrenceType={props.recurrenceType}
         setRecurrenceType={props.setRecurrenceType}
+        recurrenceStart={props.recurrenceStart}
+        setRecurrenceStart={props.setRecurrenceStart}
+        recurrenceEnd={props.recurrenceEnd}
+        setRecurrenceEnd={props.setRecurrenceEnd}
       />
+
       <ColorPickerInput
         label={props.label}
         color={props.color}
@@ -242,6 +316,11 @@ export function EventModal({
   const [notes, setNotes] = useState("");
   const [color, setColor] = useState<string | null>(null);
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
+  const [recurrenceStart, setRecurrenceStart] = useState<Date | null>(
+    new Date()
+  );
+  const [recurrenceEnd, setRecurrenceEnd] = useState<Date | null>(null);
+
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [saving, setSaving] = useState(false);
@@ -273,24 +352,42 @@ export function EventModal({
       .fetchUserTags()
       .then((t) => setAvailableTags(Array.isArray(t) ? t : []))
       .catch(console.error);
+
     if (eventToEdit) {
       setTitle(eventToEdit.title);
       setStartDate(new Date(eventToEdit.start));
       setEndDate(new Date(eventToEdit.end));
       setNotes(eventToEdit.notes || "");
       setColor(eventToEdit.color || null);
+
       if (eventToEdit.everyDay) setRecurrenceType("daily");
       else if (eventToEdit.everyWeek) setRecurrenceType("weekly");
       else setRecurrenceType("none");
+
       setIsUC(eventToEdit.is_uc ?? false);
-      setSelectedTagIds(eventToEdit.tags || []);
+
+      const loadedTags = eventToEdit.tags || [];
+
+      const cleanTagIds = loadedTags.map((t: any) =>
+        typeof t === "object" && t !== null && t.id ? String(t.id) : String(t)
+      );
+
+      setSelectedTagIds(cleanTagIds);
+
+      if (eventToEdit.recurrenceStart)
+        setRecurrenceStart(new Date(eventToEdit.recurrenceStart));
+      if (eventToEdit.recurrenceEnd)
+        setRecurrenceEnd(new Date(eventToEdit.recurrenceEnd));
     } else {
+      // RESET FORM
       setTitle("");
       setStartDate(initialStartDate);
       setEndDate(initialEndDate);
       setNotes("");
       setColor(null);
       setRecurrenceType("none");
+      setRecurrenceStart(new Date()); // Default: Hoje
+      setRecurrenceEnd(null); // Default: Infinito
       setSelectedTagIds([]);
       setIsUC(false);
     }
@@ -319,6 +416,10 @@ export function EventModal({
       everyDay: recurrenceType === "daily",
       everyWeek: recurrenceType === "weekly",
       is_uc: isUC,
+      recurrenceStart:
+        recurrenceType === "weekly" ? recurrenceStart || new Date() : undefined,
+      recurrenceEnd:
+        recurrenceType === "weekly" ? recurrenceEnd || undefined : undefined,
     };
 
     setSaving(true);
@@ -384,6 +485,10 @@ export function EventModal({
                   setNotes={setNotes}
                   recurrenceType={recurrenceType}
                   setRecurrenceType={setRecurrenceType}
+                  recurrenceStart={recurrenceStart}
+                  setRecurrenceStart={setRecurrenceStart}
+                  recurrenceEnd={recurrenceEnd}
+                  setRecurrenceEnd={setRecurrenceEnd}
                   selectedTagIds={selectedTagIds}
                   setSelectedTagIds={setSelectedTagIds}
                   availableTags={availableTags}

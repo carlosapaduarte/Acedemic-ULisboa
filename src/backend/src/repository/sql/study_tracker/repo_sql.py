@@ -64,8 +64,10 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 result = session.exec(statement)
                 if result.first() is None:
                     break
+            rec_start_dt = event.recurrence_start
+            rec_end_dt = event.recurrence_end
             new_event_model = STEventModel(
-                id=random_generated_id, #automatic ID is not working
+                id=random_generated_id,
                 title=event.title,
                 start_date=event.date.start_date,
                 end_date=event.date.end_date,
@@ -77,7 +79,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 color=event.color,
                 task_id=event.task_id,
                 task_user_id=user_id if event.task_id else None,
-                is_uc=event.is_uc
+                is_uc=event.is_uc,
+                recurrence_start=rec_start_dt,
+                recurrence_end=rec_end_dt
             )
 
             session.add(new_event_model)
@@ -129,14 +133,10 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
     def update_event(self, user_id: int, event_id: int, event: Event):
         with Session(engine) as session:
-            statement = select(STEventModel).where(
-                STEventModel.user_id == user_id,
-                STEventModel.id == event_id
-            )
+            statement = select(STEventModel).where(STEventModel.id == event_id, STEventModel.user_id == user_id)
             event_model = session.exec(statement).first()
-
             if not event_model:
-                raise NotFoundException(f"Event with id {event_id} not found for user {user_id}")
+                return 
             event_model.title = event.title
             event_model.start_date = event.date.start_date
             event_model.end_date = event.date.end_date
@@ -146,23 +146,50 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             event_model.color = event.color
             event_model.is_uc = event.is_uc
             
-            new_tags = []
+            event_model.recurrence_start = event.recurrence_start
+            event_model.recurrence_end = event.recurrence_end
+
+            event_model.tags_associations.clear()
             
-            if event.tags:
+            # 2. Adicionar as novas tags
+            for tag_input_value in event.tags:
+                tag_model = None
                 try:
-                    new_tag_ids = {int(tag_id) for tag_id in event.tags}
-                except (ValueError, TypeError):
-                    new_tag_ids = set()
+                    tag_id_from_input = int(tag_input_value)
+                    tag_model = self.get_tag_by_id(session, tag_id_from_input)
+                    if tag_model is None:
+                        tag_model = self.get_tag_by_name(session, str(tag_input_value).lower())
+                except ValueError:
+                    tag_model = self.get_tag_by_name(session, str(tag_input_value).lower())
 
-                if new_tag_ids:
-                    new_tags = session.exec(
-                        select(TagModel).where(TagModel.id.in_(new_tag_ids))
-                    ).all()
+                if tag_model is None:
+                    new_tag_name = str(tag_input_value).lower()
+                    new_tag_model = self.create_tag(session, new_tag_name)
+                    tag_model = new_tag_model
+                    
+                if tag_model:
+                    association = STEventTagModel(
+                        user_id=user_id,
+                        tag_id=tag_model.id
+                    )
+                    event_model.tags_associations.append(association)
+                    
+                    # Verificar/Criar UserTagLink (para estatísticas)
+                    existing_user_tag_link = session.exec(
+                        select(UserTagLink).where(
+                            UserTagLink.user_id == user_id,
+                            UserTagLink.tag_id == tag_model.id
+                        )
+                    ).first()
+                    
+                    if not existing_user_tag_link:
+                        new_user_tag_link = UserTagLink(user_id=user_id, tag_id=tag_model.id)
+                        session.add(new_user_tag_link)
 
-            event_model.tags = new_tags
-            
+            session.add(event_model)
             session.commit()
-
+            session.refresh(event_model)
+            
     def delete_event(self, user_id: int, event_id: int):
         with Session(engine) as session:
             statement = select(STEventModel)\
@@ -222,7 +249,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             if (tag.name_pt and tag.name_pt.lower() == "study") or (tag.name_en and tag.name_en.lower() == "study"):
                 return True
         return False
-    
+
     def get_events(
         self, 
         user_id: int, 
@@ -231,6 +258,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         study_events: bool, 
         week_number: int | None
     ) -> list[Event]:
+        
         with Session(engine) as session:
             statement = (
                 select(STEventModel)
@@ -242,29 +270,83 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             if recurrentEvents:
                 statement = statement.where(or_(STEventModel.every_week == True, STEventModel.every_day == True))
-            results = session.exec(statement)
-            events: list[STEventModel] = []
-            for event in results:
-                if (not filter_today or StudyTrackerSqlRepo.is_today(event.start_date)):
-                    #print('From DB: ', event.start_date.timestamp())
-                    events.append(event)    
-                               
-            if study_events:    
-                events_filtered: list[STEventModel] = []
-                for event in events:
-                    if StudyTrackerSqlRepo.is_study_event(event):
-                        events_filtered.append(event)                
-                events = events_filtered
-                
-            if week_number is not None:
-                events_filtered: list[STEventModel] = []
-                for event in events:
-                    if event.start_date.isocalendar().week is week_number:
-                        events_filtered.append(event)                
-                events = events_filtered
             
-            return Event.from_STEventModel(events)
-        
+            results = list(session.exec(statement))
+
+            events_to_return: list[STEventModel] = []
+            now = datetime.now() 
+
+            for event in results:
+                should_add = False
+                rejection_reason = ""
+                
+                # 1. Filtro "Hoje" (Dashboard)
+                if filter_today:
+                    is_today = StudyTrackerSqlRepo.is_today(event.start_date)
+                    is_same_weekday = event.start_date.weekday() == now.weekday()
+                    
+                    if event.every_week and is_same_weekday:
+                        should_add = True
+                    elif event.every_day:
+                        should_add = True
+                    elif is_today:
+                        should_add = True
+                    else:
+                        rejection_reason = "Não é hoje nem dia da recorrência"
+
+                    if should_add and event.recurrence_end:
+                        if event.recurrence_end < now:
+                             should_add = False
+                             rejection_reason = f"Recorrência expirou em {event.recurrence_end}"
+
+                # 2. Filtro por Semana (Calendário)
+                elif week_number is not None:
+                    event_start_week = event.start_date.isocalendar().week
+                    
+                    # A. Evento Recorrente (Semanal)
+                    if event.every_week:
+                        started_already = event_start_week <= week_number
+                        not_ended = True
+                        if event.recurrence_end:
+                            end_week = event.recurrence_end.isocalendar().week
+                            # Se acabou numa semana anterior à que pedimos
+                            if end_week < week_number:
+                                not_ended = False
+                        
+                        if started_already and not_ended:
+                            should_add = True
+                        else:
+                            rejection_reason = f"Recorrente fora do intervalo (StartWeek: {event_start_week}, EndWeek: {event.recurrence_end})"
+
+                    # B. Evento Recorrente (Diário)
+                    elif event.every_day:
+                        if event_start_week <= week_number:
+                            should_add = True
+                            
+                    # C. Evento Normal (Único)
+                    else:
+                        if event_start_week == week_number:
+                            should_add = True
+                        else:
+                            rejection_reason = f"Semana incorreta (Evento: {event_start_week} vs Pedido: {week_number})"
+                
+                else:
+                    should_add = True
+
+                if should_add:
+                    events_to_return.append(event)
+                else:
+                    pass
+
+            if study_events:
+                count_before = len(events_to_return)
+                events_to_return = [e for e in events_to_return if StudyTrackerSqlRepo.is_study_event(e)]
+                if len(events_to_return) < count_before:
+                    print(f"2. Filtro Study Events removeu {count_before - len(events_to_return)} eventos.")
+
+            return Event.from_STEventModel(events_to_return)
+
+
     def update_receive_notifications_pref(self, user_id: int, receive: bool):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)
