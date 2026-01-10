@@ -88,9 +88,12 @@ class CreateGradeInputDto(BaseModel):
     value: float
     weight: float
     
-class CreateDailyEnergyStatus(BaseModel):
-    level: int
-    timeOfDay: str
+class CreateMoodLogInputDto(BaseModel):
+    value: int          # Painel 1 (1-5)
+    label: str          # Painel 1 (Texto)
+    emotions: List[str] # Painel 2 (Tags)
+    impacts: List[str]  # Painel 3 (Tags)
+    date: float
     
 class CreateDailyTags(BaseModel):
     tags: list[str]

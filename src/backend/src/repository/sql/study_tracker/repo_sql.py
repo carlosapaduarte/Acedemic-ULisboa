@@ -1,23 +1,15 @@
 import random
 from sqlmodel import Session, select, or_
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, SlotToWork, DateInterval
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import DailyEnergyStatusModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
-from datetime import datetime
+from repository.sql.models.models import STMoodLogModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
+from datetime import datetime, date, timezone
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from sqlalchemy.orm import selectinload
 from utils import get_datetime_utc
-from sqlalchemy.orm import selectinload
-from utils import get_datetime_utc
-from datetime import date
-from domain.study_tracker import (
-    Event, DateInterval, Task, UnavailableScheduleBlock, Archive,
-    CurricularUnit, Grade, DailyEnergyStatus, WeekTimeStudy, WeekAndYear, SlotToWork
-)
-from service.gamification import core as gamification_service
-from datetime import timezone
+
 
 engine = database.get_engine()
 
@@ -200,10 +192,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             if event_model is None:
                 raise NotFoundException(event_id)
             
-            """ # itera sobre as tags_associations e apaga-as - agora como tem delete on cascade n precisa
-            for tag in event_model.tags:
-                session.delete(tag) """ 
-                
             session.delete(event_model)
             session.commit()
         
@@ -382,7 +370,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     
     @staticmethod
     def build_task(task_model: STTaskModel) -> Task:
-        
         subtasks: list[Task] = []
         for sub_task_model in task_model.subtasks:
             subtasks.append(StudyTrackerSqlRepo.build_task(sub_task_model))
@@ -403,21 +390,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             completed_at=task_model.completed_at,
             sub_tasks=subtasks
         )
-    
-    """
-    @staticmethod
-    def is_task_or_son_completed(task: STTaskModel):
-        # Returns True if task is completed or one of it's sons is completed
-        
-        if (task.status == "completed"):
-            return True
-        
-        for task in task.subtasks:
-            if StudyTrackerSqlRepo.is_task_or_son_completed(task):
-                return True
-
-        return False
-        """
         
     def get_tasks(
         self, 
@@ -440,15 +412,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     .where(STTaskModel.status != "completed")
 
             result = session.exec(statement)
-            
             task_models: list[STTaskModel] = list(result.all())
-            
-            """
-            if filter_uncompleted_tasks:
-                for task_model in task_models:
-                    if not StudyTrackerSqlRepo.is_task_or_son_completed(task_model):
-                        task_models.remove(task_model)
-            """
             
             # Retrieve Tasks
             tasks: list[Task] = []
@@ -457,13 +421,10 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             tasks.sort(key=lambda task: task.id if task.id is not None else 0)
             
-            # TODO: do this using SQL Model!
-            # Right now, he is just sorting based on the task.deadline plus the priority string size
             if order_by_deadline_and_priority:
                 tasks.sort(key=lambda task: task.deadline if task.deadline is not None else datetime.max)
                 tasks.sort(key=lambda task: Priority.from_str(task.priority).value, reverse=True)
                 
-            # Ideally, we would use another where statement. Yet, this was not working for me...
             if filter_deadline_is_today:
                 for task in tasks:
                     if task.deadline is not None and not StudyTrackerSqlRepo.is_today(task.deadline):
@@ -581,11 +542,15 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             result = session.exec(statement)
             task_model: STTaskModel = result.one()
             
+            statement_events = select(STEventModel).where(
+                STEventModel.user_id == user_id,
+                STEventModel.task_id == task_id
+            )
+            
             events_to_delete = session.exec(statement_events).all()
             for event in events_to_delete:
                 session.delete(event)
             session.commit()
-            
             
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
@@ -643,6 +608,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             return Archive.from_STArchiveModel(archive_models)
         
     def create_file(self, user_id: int, archive_name: str, name: str, text_content: str = ""):
+        from service.gamification import core as gamification_service
+        
         with Session(engine) as session:
             statement = select(STArchiveModel)\
                 .where(STArchiveModel.user_id == user_id)\
@@ -709,7 +676,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             curricular_unit_model: STCurricularUnitModel = result.one()
             curricular_unit_model.grades.append(STGradeModel(
-                id=random.randint(1, 999999999), # For some reason, automatic ID is not working
+                id=random.randint(1, 999999999), 
                 value=grade.value,
                 weight=grade.weight,
                 curricular_unit_name=curricular_unit,
@@ -736,45 +703,53 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.delete(grade_model_to_delete)
             session.commit()
 
-    def create_or_override_daily_energy_status(self, user_id: int, status: DailyEnergyStatus):
+    def create_mood_log(self, user_id: int, value: int, label: str, emotions: list[str], impacts: list[str], date_log: datetime):
         with Session(engine) as session:
-            
-            statement = select(DailyEnergyStatusModel)\
-                .where(DailyEnergyStatusModel.user_id == user_id)\
-                .where(DailyEnergyStatusModel.date_ == status.date_) # Not working!
+            # 1. Definir o intervalo do dia (00:00:00 até 23:59:59)
+            start_of_day = date_log.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_of_day = date_log.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+            # 2. Procurar se já existe um log neste dia para este user
+            statement = select(STMoodLogModel).where(
+                STMoodLogModel.user_id == user_id,
+                STMoodLogModel.date_log >= start_of_day,
+                STMoodLogModel.date_log <= end_of_day
+            )
+            existing_log = session.exec(statement).first()
+
+            if existing_log:
+                # ATUALIZAR (OVERWRITE)
+                existing_log.value = value
+                existing_log.label = label
+                existing_log.emotions = emotions
+                existing_log.impacts = impacts
+                existing_log.date_log = date_log # Atualiza para a hora da nova edição
                 
-            result = session.exec(statement)
-            model: DailyEnergyStatusModel | None = result.first()
-            
-            if model is None:            
-                daily_energy_stat = DailyEnergyStatusModel(
-                    date_=status.date_,
-                    time_of_day=status.time_of_day,
-                    level=status.level,
-                    user_id=user_id
-                )
-                
-                session.add(daily_energy_stat)
+                session.add(existing_log)
+                mood_log = existing_log
             else:
-                model.level = status.level
-                model.time_of_day = status.time_of_day
-                session.add(model)
-            
+                # CRIAR NOVO
+                mood_log = STMoodLogModel(
+                    user_id=user_id,
+                    value=value,
+                    label=label,
+                    emotions=emotions,
+                    impacts=impacts,
+                    date_log=date_log
+                )
+                session.add(mood_log)
+
             session.commit()
-            
-    @staticmethod
-    def is_same_day(date_1: date, date_2: date) -> bool:
-        return date_1.year == date_2.year and date_1.month == date_2.month and date_1.day == date_2.day
-    
+            session.refresh(mood_log)
+            return mood_log
+        
     def create_daily_tags(self, user_id: int, tags: list[str], _date: date):
         with Session(engine) as session:
-            
             for tag in tags:
                 statement = select(DailyTagModel)\
                     .where(DailyTagModel.user_id == user_id)\
                     .where(DailyTagModel.tag == tag)
-                    # checking date doesn't work... Check later
-                    
+                
                 result = session.exec(statement)
                 res = result.first()
                 if res is not None:
@@ -787,7 +762,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     user_id=user_id
                 )        
                 session.add(daily_energy_stat)
-            
             session.commit()        
             
     def get_daily_tags(self, user_id: int, _date: date) -> list[str]:
@@ -804,45 +778,12 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 
             return daily_tags
             
-    def is_today_energy_status_created(self, user_id: int) -> bool:
-        today = date.today()
-        with Session(engine) as session:
-            statement = select(DailyEnergyStatusModel)\
-                .where(DailyEnergyStatusModel.user_id == user_id)\
-                .where(DailyEnergyStatusModel.date_ == today) # Not working!
-                
-            result = session.exec(statement)
-            model: DailyEnergyStatusModel | None = result.first()
-            return model is not None
-            
-    def get_daily_energy_history(self, user_id: int) -> list[DailyEnergyStatus]:
-        with Session(engine) as session:
-            statement = select(DailyEnergyStatusModel)\
-                .where(DailyEnergyStatusModel.user_id == user_id)
-                
-            result = session.exec(statement)
-            daily_energy_history_models: list[DailyEnergyStatusModel] = list(result.all())
-            daily_energy_history: list[DailyEnergyStatus] = []
-            for stat_model in daily_energy_history_models:
-                daily_energy_history.append(
-                    DailyEnergyStatus(
-                        date=stat_model.date_,
-                        time_of_day=stat_model.time_of_day,
-                        level=stat_model.level
-                    )
-                )
-                
-            return daily_energy_history
-            
     @staticmethod
-
     def compute_elapsed_minutes(date1: datetime, date2: datetime) -> int:
         total_seconds = (get_datetime_utc(date1) - get_datetime_utc(date2))
         return int(total_seconds / 60) 
             
     def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
-        # TODO: events that repeat every week
-        
         with Session(engine) as session:
             statement = (
             select(STEventModel)
@@ -865,7 +806,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 tags = event.tags
 
                 for tag in tags:
-                    
                     tag_name = tag.name_pt or tag.name_en
                     if not tag_name:
                         tag_name = "Sem nome"
@@ -963,11 +903,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 week_study_time_model.n_of_sessions += 1
                 session.add(week_study_time_model)
                 session.commit()
-                
     
     def get_task(self, user_id: int, task_id: int) -> Task:
-        """Busca uma ÚNICA tarefa pelo ID, com as tags carregadas."""
-
         with Session(engine) as session:
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
@@ -980,11 +917,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
             return StudyTrackerSqlRepo.build_task(task_model)
 
-
-
     def delete_task(self, user_id: int, task_id: int):
-        """Apaga uma tarefa e as suas associações."""
-
         with Session(engine) as session:
             statement = select(STTaskModel)\
                 .where(STTaskModel.user_id == user_id)\
@@ -1002,14 +935,13 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.commit()
 
     def delete_future_slots_for_task(self, user_id: int, task_id: int):
-        """Apaga todos os slots dos eventos futuros ligados a uma tarefa caso a mesma seja marcada como concluída antes de se fazer todos os slots"""
         with Session(engine) as session:
             now = datetime.utcnow()
             
             statement = select(STEventModel).where(
                 STEventModel.user_id == user_id,
                 STEventModel.task_id == task_id,
-                STEventModel.start_date > now # Apenas eventos no futuro
+                STEventModel.start_date > now 
             )
             
             future_events_to_delete = session.exec(statement).all()
@@ -1020,10 +952,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
     def delete_tag(self, session: Session, tag_id: int) -> bool:
         tag = session.get(TagModel, tag_id)
-        
         if tag is None:
             return False
-            
         session.delete(tag)
         session.commit()
         return True

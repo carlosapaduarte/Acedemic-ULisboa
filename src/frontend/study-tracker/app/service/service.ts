@@ -963,6 +963,31 @@ async function startStudySession() {
   if (!response.ok)
     return Promise.reject(new Error("Could not start study session!"));
 }
+async function saveMood(data: {
+  value: number;
+  label: string;
+  emotions: string[];
+  impacts: string[];
+  date: Date;
+}): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/mood-logs`,
+    method: "POST",
+    body: toJsonBody({
+      value: data.value,
+      label: data.label,
+      emotions: data.emotions,
+      impacts: data.impacts,
+      date: data.date.getTime() / 1000,
+    }),
+  };
+
+  const response: Response = await doFetch(request);
+
+  if (!response.ok) {
+    return Promise.reject(new Error("Mood log could not be saved!"));
+  }
+}
 
 async function finishStudySession() {
   const request = {
@@ -1116,4 +1141,6 @@ export const service = {
       throw new Error("Failed to update custom colors");
     }
   },
+
+  saveMood,
 };

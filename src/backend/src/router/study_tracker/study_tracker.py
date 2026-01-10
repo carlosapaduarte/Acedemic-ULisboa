@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Response, Query
 
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -306,12 +306,12 @@ def delete_grade(
     study_tracker_service.delete_grade(user_id, curricular_unit_name, grade_id)
     return Response(status_code=204)
 
-@router.post("/users/me/statistics/daily-energy-status")
-def create_daily_energy_stat(
+@router.post("/users/me/mood-logs")
+def create_mood_log(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    dto: CreateDailyEnergyStatus
+    dto: CreateMoodLogInputDto
 ):
-    study_tracker_service.create_daily_energy_status(user_id, dto.level, dto.timeOfDay)
+    study_tracker_service.create_mood_log(user_id, dto)
 
 @router.post("/users/me/statistics/daily-tags")
 def create_daily_tags(
@@ -326,12 +326,7 @@ def get_daily_tags(
 ) -> list[str]:
     return study_tracker_service.get_daily_tags(user_id)
     
-@router.get("/users/me/statistics/daily-energy-status")
-def get_daily_energy_history(
-    user_id: Annotated[int, Depends(get_current_user_id)]
-) ->  list[DailyEnergyStatusOutputDto]:
-    history = study_tracker_service.get_daily_energy_history(user_id)
-    return DailyEnergyStatusOutputDto.from_domain(history)
+
 
 @router.get("/users/me/statistics/time-by-event-tag")
 def get_task_time_distribution(

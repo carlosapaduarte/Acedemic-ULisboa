@@ -5,6 +5,7 @@ from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
 from datetime import date
 
+from router.study_tracker.dtos.input_dtos import CreateMoodLogInputDto
 study_tracker_repo = StudyTrackerSqlRepo()
 
 FALLBACK_COLOR = "#3399FF"
@@ -179,6 +180,19 @@ def create_grade(user_id: int, curricular_unit: str, grade: Grade):
 
 def delete_grade(user_id: int, curricular_unit_name: str, grade_id: int):
     return study_tracker_repo.delete_grade(user_id, curricular_unit_name, grade_id)
+
+def create_mood_log(user_id: int, dto: CreateMoodLogInputDto):
+    # Converter timestamp para datetime
+    log_date = datetime.fromtimestamp(dto.date)
+    
+    study_tracker_repo.create_mood_log(
+        user_id,
+        dto.value,
+        dto.label,
+        dto.emotions,
+        dto.impacts,
+        log_date
+    )
 
 def create_daily_energy_status(user_id: int, level: int, time_of_day: str):
     if not verify_time_of_day(time_of_day):

@@ -1,8 +1,8 @@
-// src\frontend\study-tracker\app\routes\_index\Home\MoodTracker\MoodTrackerFlow.tsx
 import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./MoodTracker.module.css";
 import { FaCheck, FaChevronLeft } from "react-icons/fa6";
+import { service } from "~/service/service";
 
 interface MoodStepProps {
   onComplete: () => void;
@@ -117,8 +117,9 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
         impacts: selectedImpacts,
         date: new Date(),
       };
-      // await service.saveMood(payload);
-      await new Promise((r) => setTimeout(r, 600));
+
+      await service.saveMood(payload);
+
       setStep(4);
     } catch (error) {
       console.error("Erro ao guardar mood:", error);

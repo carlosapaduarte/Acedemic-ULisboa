@@ -313,8 +313,7 @@ export default function HomePage() {
         {/* 4. POMODORO */}
         <div
           className={styles.card}
-          onClick={
-            handleGoToPomodoro
+          onClick={handleGoToPomodoro}
           style={{ cursor: "pointer" }}
         >
           <div className={styles.cardHeader}>

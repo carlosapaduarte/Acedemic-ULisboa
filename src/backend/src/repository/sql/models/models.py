@@ -31,7 +31,7 @@ class UserModel(SQLModel, table=True):
     st_curricular_units: list["STCurricularUnitModel"] = Relationship(back_populates="user")
 
     custom_colors: List[str] = Field(default=[], sa_column=SAColumn(JSONB))
-    daily_energy_status: list["DailyEnergyStatusModel"] = Relationship(back_populates="user")
+    mood_logs: list["STMoodLogModel"] = Relationship(back_populates="user")
     daily_tag: list["DailyTagModel"] = Relationship(back_populates="user")
 
     week_study_time: list["WeekStudyTimeModel"] = Relationship(back_populates="user")
@@ -318,14 +318,6 @@ class STGradeModel(SQLModel, table=True):
     )
     curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")
 
-class DailyEnergyStatusModel(SQLModel, table=True):
-    __tablename__ = "daily_energy_status"
-    date_: date = Field(primary_key=True, default=None)
-    time_of_day: str
-    level: int
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
-    user: UserModel = Relationship(back_populates="daily_energy_status")
-
 class WeekStudyTimeModel(SQLModel, table=True):
     __tablename__ = "week_study_time"
     year: int = Field(primary_key=True, default=None)
@@ -440,3 +432,23 @@ class UserLeague(SQLModel, table=True):
 
 class UpdateUserColorsDto(BaseModel):
     colors: List[str]
+
+class STMoodLogModel(SQLModel, table=True):
+    __tablename__ = "st_mood_log"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    
+    # Painel 1:
+    value: int 
+    label: str 
+    
+    # Painel 2: "O que descreve melhor este sentimento?" (Lista de tags)
+    emotions: List[str] = Field(default=[], sa_column=SAColumn(JSON))
+    
+    # Painel 3: "O que está a ter maior impacto em ti?" (Lista de tags)
+    impacts: List[str] = Field(default=[], sa_column=SAColumn(JSON))
+    
+    date_log: datetime
+    
+    user: UserModel = Relationship(back_populates="mood_logs")
