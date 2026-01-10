@@ -542,6 +542,7 @@ export function EventModal({
       <Modal
         isOpen={isCreateTagModalOpen}
         onOpenChange={setIsCreateTagModalOpen}
+        className={styles.createTagModal}
       >
         <Dialog aria-label="Create Tag">
           {({ close }) => (

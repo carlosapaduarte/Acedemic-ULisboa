@@ -69,6 +69,17 @@ function NoteCard({ curricularUnit }: { curricularUnit: CurricularUnit }) {
 
 function NotesPage() {
   const { cuList } = useCurricularUnitList();
+  const [pdfPreview, setPdfPreview] = useState<string | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (file && file.type === "application/pdf") {
+      // Cria um URL temporário para o ficheiro local
+      const fileUrl = URL.createObjectURL(file);
+      setPdfPreview(fileUrl);
+    }
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -76,6 +87,29 @@ function NotesPage() {
         cuList.map((cu) => <NoteCard key={cu.name} curricularUnit={cu} />)
       ) : (
         <p>A carregar unidades curriculares...</p>
+      )}
+
+      {/* Área de Upload */}
+      <div className={styles.uploadSection}>
+        <h3>Carregar PDF</h3>
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+          className={styles.fileInput}
+        />
+      </div>
+
+      {/* 3. Área de Visualização */}
+      {pdfPreview && (
+        <div className={styles.previewContainer}>
+          <h4>Pré-visualização do Ficheiro:</h4>
+          <iframe
+            src={pdfPreview}
+            className={styles.pdfViewer}
+            title="PDF Preview"
+          />
+        </div>
       )}
     </div>
   );

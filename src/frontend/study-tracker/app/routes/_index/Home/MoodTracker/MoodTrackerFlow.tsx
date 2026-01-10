@@ -1,7 +1,7 @@
+// src\frontend\study-tracker\app\routes\_index\Home\MoodTracker\MoodTrackerFlow.tsx
 import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./MoodTracker.module.css";
-// import { service } from "~/service/service";
 import { FaCheck, FaChevronLeft } from "react-icons/fa6";
 
 interface MoodStepProps {
@@ -60,42 +60,8 @@ const QUOTES = [
     text: "Não contes os dias, faz com que os dias contem.",
     author: "Muhammad Ali",
   },
-  {
-    text: "A melhor maneira de prever o futuro é criá-lo.",
-    author: "Peter Drucker",
-  },
-  {
-    text: "Tudo parece impossível até que seja feito.",
-    author: "Nelson Mandela",
-  },
-  {
-    text: "O único lugar onde o sucesso vem antes do trabalho é no dicionário.",
-    author: "Vidal Sassoon",
-  },
-  { text: "A persistência é o caminho do êxito.", author: "Charles Chaplin" },
+  { text: "A persistência é o caminho do êxito.", author: "Charlie Chaplin" },
   { text: "A energia flui para onde vai a atenção.", author: "Tony Robbins" },
-  { text: "Se podes sonhar, podes realizar.", author: "Walt Disney" },
-  {
-    text: "A disciplina é a ponte entre metas e realizações.",
-    author: "Jim Rohn",
-  },
-  {
-    text: "Faz o que podes, com o que tens, onde estiveres.",
-    author: "Theodore Roosevelt",
-  },
-  {
-    text: "Pequenos progressos todos os dias somam grandes resultados.",
-    author: "Satya Nani",
-  },
-  {
-    text: "A tua atitude, não a tua aptidão, determina a tua altitude.",
-    author: "Zig Ziglar",
-  },
-  { text: "Foca-te no progresso, não na perfeição.", author: "Bill Phillips" },
-  {
-    text: "Acredita em ti mesmo e em tudo o que és.",
-    author: "Christian D. Larson",
-  },
 ];
 
 export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
@@ -107,10 +73,10 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
   const [selectedImpacts, setSelectedImpacts] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
-  const randomQuote = useMemo(
-    () => QUOTES[Math.floor(Math.random() * QUOTES.length)],
-    []
-  );
+  const randomQuote = useMemo(() => {
+    return QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  }, []);
+
   const currentMood =
     MOOD_LEVELS.find((m) => m.value === moodValue) || MOOD_LEVELS[2];
 
@@ -137,11 +103,8 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
     list: string[],
     setList: React.Dispatch<React.SetStateAction<string[]>>
   ) => {
-    if (list.includes(item)) {
-      setList(list.filter((i) => i !== item));
-    } else {
-      setList([...list, item]);
-    }
+    if (list.includes(item)) setList(list.filter((i) => i !== item));
+    else setList([...list, item]);
   };
 
   const saveData = async () => {
@@ -154,10 +117,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
         impacts: selectedImpacts,
         date: new Date(),
       };
-
-      console.log("Saving Mood:", payload);
       // await service.saveMood(payload);
-
       await new Promise((r) => setTimeout(r, 600));
       setStep(4);
     } catch (error) {
@@ -169,7 +129,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
 
   const renderNavBar = () => {
     if (step === 4) return null;
-
     return (
       <div className={styles.navBar}>
         <div style={{ width: 80 }}>
@@ -179,9 +138,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
             </button>
           )}
         </div>
-
         <span className={styles.navTitle}>Log State of Mind</span>
-
         <div style={{ width: 80, display: "flex", justifyContent: "flex-end" }}>
           <button
             className={styles.navButton}
@@ -196,6 +153,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
   };
 
   // --- 1: SLIDER ---
+
   if (step === 1) {
     return (
       <div className={styles.overlay}>
@@ -215,7 +173,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
               {currentMood.icon}
             </div>
             <h3 className={styles.subtitle}>{currentMood.label}</h3>
-
             <div className={styles.sliderContainer}>
               <div
                 className={styles.sliderLabels}
@@ -235,7 +192,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 style={{ accentColor: currentMood.color }}
               />
             </div>
-
             <div className={styles.footer}>
               <button className={styles.primaryButton} onClick={handleNext}>
                 {t("home:next", "Seguinte")}
@@ -262,6 +218,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                   height: 60,
                   fontSize: "1.5rem",
                   margin: "0 auto 1rem",
+                  backgroundColor: currentMood.color,
                 }}
               >
                 {currentMood.icon}
@@ -279,7 +236,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 )}
               </p>
             </div>
-
             <div className={styles.tagsGrid}>
               {EMOTIONS_LIST.map((emotion) => (
                 <button
@@ -298,7 +254,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 </button>
               ))}
             </div>
-
             <div className={styles.footer}>
               <button className={styles.primaryButton} onClick={handleNext}>
                 {t("home:next", "Seguinte")}
@@ -325,6 +280,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                   height: 60,
                   fontSize: "1.5rem",
                   margin: "0 auto 1rem",
+                  backgroundColor: currentMood.color,
                 }}
               >
                 {currentMood.icon}
@@ -342,7 +298,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 )}
               </p>
             </div>
-
             <div className={styles.tagsGrid}>
               {IMPACT_LIST.map((impact) => (
                 <button
@@ -357,7 +312,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 </button>
               ))}
             </div>
-
             <div className={styles.footer}>
               <button
                 className={styles.primaryButton}
@@ -385,7 +339,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
             <div className={styles.successIconContainer}>
               <FaCheck />
             </div>
-
             <h2
               className={styles.title}
               style={{ fontSize: "1.5rem", marginBottom: "2rem" }}

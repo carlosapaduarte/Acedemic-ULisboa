@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "@remix-run/react";
 import { SelectTime } from "./TimeSelection";
 import { Timer } from "./Timer";
 import { Event, service, Task, Tag } from "~/service/service";
@@ -9,9 +10,8 @@ import styles from "./pomodoroPage.module.css";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 import { useTaskList } from "~/routes/tasks/useTaskList";
-import { Modal, Dialog, DialogTrigger, Button } from "react-aria-components";
+import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
-import { FaBolt } from "react-icons/fa";
 
 function isDateToday(date: Date | undefined): boolean {
   if (!date) return false;
@@ -27,7 +27,6 @@ function isDateToday(date: Date | undefined): boolean {
 function formatEventTime(date: Date): string {
   const d = new Date(date);
   if (!isDateToday(d)) {
-    // Formato "dd/mm hh:mm"
     return (
       d.toLocaleDateString(navigator.language, {
         day: "2-digit",
@@ -40,7 +39,6 @@ function formatEventTime(date: Date): string {
       })
     );
   }
-  // Formato "hh:mm"
   return d.toLocaleTimeString(navigator.language, {
     hour: "2-digit",
     minute: "2-digit",
@@ -50,6 +48,7 @@ function formatEventTime(date: Date): string {
 export let handle = {
   i18n: ["task", "study"],
 };
+
 function useTimerSetup(onSessionEnd: () => void) {
   const setError = useSetGlobalError();
   const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(
@@ -66,6 +65,8 @@ function useTimerSetup(onSessionEnd: () => void) {
     setStudyStopDate(studyStopDate);
     setPauseStopDate(pauseStopDate);
     setTimerStopDate(studyStopDate);
+
+    service.startStudySession().catch((error) => setError(error));
   }
 
   function onStopClick() {
@@ -507,6 +508,14 @@ function TimerView({
 function PomodoroPage() {
   const { t } = useTranslation("study");
   const setGlobalError = useSetGlobalError();
+  const [searchParams] = useSearchParams();
+
+  const initialWork = searchParams.get("work")
+    ? Number(searchParams.get("work"))
+    : 25;
+  const initialBreak = searchParams.get("break")
+    ? Number(searchParams.get("break"))
+    : 5;
 
   const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -607,7 +616,11 @@ function PomodoroPage() {
           />
         ) : (
           <div className={styles.pomodoroContainer}>
-            <SelectTime onTimeSelected={onTimeSelected} />
+            <SelectTime
+              onTimeSelected={onTimeSelected}
+              initialStudyMinutes={initialWork}
+              initialPauseMinutes={initialBreak}
+            />
           </div>
         )}
 

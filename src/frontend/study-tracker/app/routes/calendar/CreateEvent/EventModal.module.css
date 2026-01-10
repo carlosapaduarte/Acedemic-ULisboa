@@ -334,3 +334,16 @@
 .nativeCheckbox:checked + .customCheckbox::after {
   display: block;
 }
+
+
+.createTagModal [data-overlay] {
+  background: transparent;
+}
+
+.createTagModal [data-modal] {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  width: auto;
+  max-width: none;
+}
