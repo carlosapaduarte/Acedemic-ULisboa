@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { service, Task } from "~/service/service";
 import styles from "./taskListItem.module.css";
 import classNames from "classnames";
@@ -10,6 +10,7 @@ import {
   FaRegClock,
   FaTrash,
   FaTriangleExclamation,
+  FaPlus,
 } from "react-icons/fa6";
 
 const desenhaConfetisPequenos = (ctx: CanvasRenderingContext2D) => {
@@ -19,6 +20,10 @@ const desenhaConfetisPequenos = (ctx: CanvasRenderingContext2D) => {
 
 function useTaskView(task: Task, onTaskStatusUpdated: (task: Task) => void) {
   const [internalTask, setInternalTask] = useState<Task>(task);
+
+  useEffect(() => {
+    setInternalTask(task);
+  }, [task]);
 
   function updateTask(callback?: (updatedTask: Task) => void) {
     service
@@ -59,6 +64,7 @@ export function TaskListItem({
   isSelected,
   onSelectionToggle,
   textColor,
+  onAddSubtask,
 }: {
   taskToDisplay: Task;
   onTaskClick: (task: Task) => void;
@@ -66,6 +72,7 @@ export function TaskListItem({
   isSelected?: boolean;
   onSelectionToggle?: (task: Task) => void;
   textColor?: string;
+  onAddSubtask?: (parentId: number) => void;
 }) {
   const { internalTask, updateTaskStatus } = useTaskView(
     taskToDisplay,
@@ -86,7 +93,6 @@ export function TaskListItem({
     ? isSelected
     : internalTask.data.status == "completed";
 
-  // Só mostra o riscado se NÃO estivermos em modo de seleção
   const showStrikeThrough =
     !isSelectionMode && internalTask.data.status == "completed";
 
@@ -105,8 +111,6 @@ export function TaskListItem({
 
     return diffDays >= 0 && diffDays <= 5;
   };
-
-  const showClock = isUpcoming() && internalTask.data.status !== "completed";
 
   const StatusIcons = () => (
     <div className={styles.iconsContainer}>
@@ -141,142 +145,167 @@ export function TaskListItem({
   const handleDelete = async () => {
     if (
       window.confirm(
-        `Tens a certeza que queres apagar a tarefa relâmpago"${internalTask.data.title}"?`
+        `Tens a certeza que queres apagar a tarefa "${internalTask.data.title}"?`
       )
     ) {
       try {
         await service.deleteTask(internalTask.id);
         onTaskStatusUpdated(internalTask);
       } catch (error) {
-        console.error("Erro ao apagar tarefa relâmpago:", error);
+        console.error("Erro ao apagar tarefa:", error);
       }
     }
   };
 
+  // --- RENDER ---
   return (
-    <>
-      {internalTask.data.is_micro_task ? (
-        <div
-          aria-checked={!!isChecked}
-          className={classNames(styles.checkboxAndTitleContainer, {
-            [styles.completedTask]: showStrikeThrough,
-          })}
-        >
-          <div className={styles.checkboxContainer}>
-            <TaskCheckbox
-              checked={!!isChecked}
-              onClick={() => {
-                if (isSelectionMode) {
-                  onSelectionToggle(internalTask);
-                } else {
-                  const newStatus =
-                    internalTask.data.status == "completed"
-                      ? "not_completed"
-                      : "completed";
-                  updateTaskStatus(newStatus);
+    <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+      <div
+        aria-checked={!!isChecked}
+        className={classNames(styles.checkboxAndTitleContainer, {
+          [styles.selectedTask]: isSelectionMode && isSelected,
+          [styles.completedTask]: showStrikeThrough,
+        })}
+      >
+        {/* Confetti */}
+        {!internalTask.data.is_micro_task && showConfetti && confettiSource && (
+          <Confetti
+            recycle={false}
+            confettiSource={confettiSource}
+            onConfettiComplete={() => {
+              setShowConfetti(false);
+              setConfettiSource(null);
+            }}
+            numberOfPieces={40}
+            gravity={0.3}
+            drawShape={desenhaConfetisPequenos}
+          />
+        )}
+
+        {/* Checkbox */}
+        <div className={styles.checkboxContainer} ref={checkboxRef}>
+          <TaskCheckbox
+            checked={!!isChecked}
+            onClick={() => {
+              if (isSelectionMode) {
+                onSelectionToggle && onSelectionToggle(internalTask);
+              } else {
+                const newStatus =
+                  internalTask.data.status == "completed"
+                    ? "not_completed"
+                    : "completed";
+                updateTaskStatus(newStatus);
+                if (
+                  newStatus === "completed" &&
+                  !internalTask.data.is_micro_task
+                ) {
+                  if (checkboxRef.current) {
+                    const rect = checkboxRef.current.getBoundingClientRect();
+                    setConfettiSource({
+                      x: rect.x + rect.width / 2,
+                      y: rect.y + rect.height / 2,
+                      w: 0,
+                      h: 0,
+                    });
+                  }
+                  setShowConfetti(true);
                 }
-              }}
-              className={styles.listCheckbox}
-            />
-          </div>
+              }
+            }}
+            className={styles.listCheckbox}
+          />
+        </div>
+
+        {/* Ícone Micro Task */}
+        {internalTask.data.is_micro_task && (
           <div className={styles.iconsContainer}>
             <FaBolt className={styles.microTaskIcon} />
           </div>
-          <div
+        )}
+
+        {/* Status Icons */}
+        {!internalTask.data.is_micro_task && <StatusIcons />}
+
+        {/* Título (Clicável) */}
+        <button
+          className={classNames(
+            styles.taskTitleContainer,
+            showStrikeThrough && styles.strikeThrough
+          )}
+          onClick={() => onTaskClick(internalTask)}
+          style={{ flex: 1, textAlign: "left" }}
+        >
+          <p
             className={classNames(
-              styles.taskTitleContainer,
+              styles.taskTitle,
               showStrikeThrough && styles.strikeThrough
             )}
+            style={{ color: textColor }}
           >
-            <p
-              className={classNames(
-                styles.taskTitle,
-                showStrikeThrough && styles.strikeThrough
-              )}
-              style={{ color: textColor }}
-            >
-              {internalTask.data.title}
-            </p>
-          </div>
+            {internalTask.data.title}
+          </p>
+        </button>
 
-          {!isSelectionMode && (
-            <button onClick={handleDelete} className={styles.deleteButton}>
+        {/* Botões de Ação (Subtarefa e Delete) */}
+        {!isSelectionMode && (
+          <div
+            className={styles.actionsContainer}
+            style={{ display: "flex", gap: "8px" }}
+          >
+            {onAddSubtask && !internalTask.data.is_micro_task && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddSubtask(internalTask.id);
+                }}
+                className={styles.actionButton}
+                title="Adicionar Subtarefa"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  opacity: 0.6,
+                }}
+              >
+                <FaPlus size={12} />
+              </button>
+            )}
+
+            <button
+              onClick={handleDelete}
+              className={styles.deleteButton}
+              title="Apagar Tarefa"
+            >
               <FaTrash />
             </button>
-          )}
-        </div>
-      ) : (
-        <>
-          {showConfetti && confettiSource && (
-            <Confetti
-              recycle={false}
-              confettiSource={confettiSource}
-              onConfettiComplete={() => {
-                setShowConfetti(false);
-                setConfettiSource(null);
-              }}
-              numberOfPieces={40}
-              gravity={0.3}
-              drawShape={desenhaConfetisPequenos}
-            />
-          )}
-
-          <div
-            aria-checked={!!isChecked}
-            className={classNames(styles.checkboxAndTitleContainer, {
-              [styles.selectedTask]: isSelectionMode && isSelected,
-              [styles.completedTask]: showStrikeThrough,
-            })}
-          >
-            <div className={styles.checkboxContainer} ref={checkboxRef}>
-              <TaskCheckbox
-                checked={!!isChecked}
-                onClick={() => {
-                  if (isSelectionMode) {
-                    onSelectionToggle(internalTask);
-                  } else {
-                    if (internalTask.data.status == "completed") {
-                      updateTaskStatus("not_completed");
-                    } else {
-                      updateTaskStatus("completed");
-                      if (checkboxRef.current) {
-                        const rect =
-                          checkboxRef.current.getBoundingClientRect();
-                        setConfettiSource({
-                          x: rect.x + rect.width / 2,
-                          y: rect.y + rect.height / 2,
-                          w: 0,
-                          h: 0,
-                        });
-                      }
-                      setShowConfetti(true);
-                    }
-                  }
-                }}
-                className={styles.listCheckbox}
-              />
-            </div>
-            <StatusIcons />
-            <button
-              className={classNames(
-                styles.taskTitleContainer,
-                showStrikeThrough && styles.strikeThrough
-              )}
-              onClick={() => onTaskClick(internalTask)}
-            >
-              <p
-                className={classNames(
-                  styles.taskTitle,
-                  showStrikeThrough && styles.strikeThrough
-                )}
-                style={{ color: textColor }}
-              >
-                {internalTask.data.title}
-              </p>
-            </button>
           </div>
-        </>
+        )}
+      </div>
+
+      {/* 2. RECURSÃO: RENDERIZAR AS SUBTAREFAS */}
+      {internalTask.subTasks && internalTask.subTasks.length > 0 && (
+        <div
+          style={{
+            paddingLeft: "24px",
+            borderLeft: "2px solid rgba(0,0,0,0.05)",
+            marginLeft: "10px",
+            marginTop: "4px",
+          }}
+        >
+          {internalTask.subTasks.map((subTask) => (
+            <TaskListItem
+              key={subTask.id}
+              taskToDisplay={subTask}
+              onTaskClick={onTaskClick}
+              onTaskStatusUpdated={onTaskStatusUpdated}
+              isSelected={isSelected}
+              onSelectionToggle={onSelectionToggle}
+              textColor={textColor}
+              onAddSubtask={onAddSubtask}
+            />
+          ))}
+        </div>
       )}
-    </>
+    </div>
   );
 }

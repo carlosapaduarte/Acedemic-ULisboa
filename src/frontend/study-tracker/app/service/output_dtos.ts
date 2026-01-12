@@ -13,4 +13,5 @@ export type CreateTaskInputDto = {
   subTasks: CreateTaskInputDto[];
   slotsToWork: SlotToWorkDto[];
   is_micro_task?: boolean;
+  parent_task_id?: number;
 };

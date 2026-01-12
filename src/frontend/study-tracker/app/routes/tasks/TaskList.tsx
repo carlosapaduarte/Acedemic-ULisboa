@@ -9,9 +9,8 @@ import {
   FaRegClock,
   FaChevronDown,
   FaArrowUp,
-  FaFilter,
-  FaTriangleExclamation,
   FaArrowDown,
+  FaTriangleExclamation,
 } from "react-icons/fa6";
 import { Button } from "react-aria-components";
 
@@ -22,6 +21,7 @@ export function TaskList({
   selectedTaskIds,
   onSelectionToggle,
   textColor,
+  onAddSubtask,
 }: {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
@@ -29,9 +29,9 @@ export function TaskList({
   selectedTaskIds?: number[];
   onSelectionToggle?: (task: Task) => void;
   textColor?: string;
+  onAddSubtask?: (parentId: number) => void;
 }) {
   const { t } = useTranslation(["task"]);
-  const [filterUrgent, setFilterUrgent] = useState(false);
   const [showOldCompleted, setShowOldCompleted] = useState(false);
   const [microTasksAtTop, setMicroTasksAtTop] = useState(true);
 
@@ -45,47 +45,20 @@ export function TaskList({
     );
   }
 
-  const isUrgent = (task: Task) => {
-    // É prioridade alta?
-    if (task.data.priority === "high") return true;
-
-    // Tem deadline próxima (<= 5 dias) ou atrasada?
-    if (task.data.deadline) {
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const deadline = new Date(task.data.deadline);
-      deadline.setHours(0, 0, 0, 0);
-
-      const diffTime = deadline.getTime() - now.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      // Se já passou ou é nos próximos 5 dias
-      return diffDays <= 5;
-    }
-    return false;
-  };
-
   const activeTasks = tasks.filter((t) => t.data.status !== "completed");
   const allCompletedTasks = tasks.filter((t) => t.data.status === "completed");
 
   const sortedActiveTasks = [...activeTasks].sort((a, b) => {
     const aIsMicro = a.data.is_micro_task ? 1 : 0;
     const bIsMicro = b.data.is_micro_task ? 1 : 0;
-
     if (aIsMicro === bIsMicro) return 0;
-
     return microTasksAtTop ? bIsMicro - aIsMicro : aIsMicro - bIsMicro;
   });
-
-  const displayedTasks = filterUrgent
-    ? sortedActiveTasks.filter(isUrgent)
-    : sortedActiveTasks;
 
   const isCompletedToday = (isoDateString?: string) => {
     if (!isoDateString) return false;
     const completedDate = new Date(isoDateString);
     const today = new Date();
-
     return (
       completedDate.getDate() === today.getDate() &&
       completedDate.getMonth() === today.getMonth() &&
@@ -111,6 +84,7 @@ export function TaskList({
         isSelected={selectedTaskIds?.includes(task.id)}
         onSelectionToggle={onSelectionToggle}
         textColor={textColor}
+        onAddSubtask={onAddSubtask} // Passar para o item
       />
     ));
 
@@ -153,12 +127,10 @@ export function TaskList({
       </div>
 
       <div className={styles.activeList}>
-        {renderList(displayedTasks)}
-
+        {renderList(sortedActiveTasks)}
         <div style={{ opacity: 0.8 }}>{renderList(completedToday)}</div>
       </div>
 
-      {/* Separador de tarefas completadas ANTIGAS */}
       {completedOld.length > 0 && (
         <>
           <div
@@ -180,7 +152,6 @@ export function TaskList({
             <div className={styles.separatorLine}></div>
           </div>
 
-          {/* Lista de tarefas antigas (só aparece se for expandido) */}
           {showOldCompleted && (
             <div className={styles.oldTasksList} style={{ opacity: 0.6 }}>
               {renderList(completedOld)}

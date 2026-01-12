@@ -64,6 +64,7 @@ class CreateTaskInputDto(BaseModel):
     subTasks: list['CreateTaskInputDto']
     slotsToWork: list[SlotToWorkInputDto] | None = []
     is_micro_task: Optional[bool] = False
+    parent_task_id: Optional[int] = None
 
 class EditTaskInputDto(BaseModel):
     previous_task_name: str

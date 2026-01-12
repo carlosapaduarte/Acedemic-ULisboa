@@ -517,9 +517,15 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)
             
-            # Create parent Task
-            return StudyTrackerSqlRepo.create_task_with_parent(task, task_id, user_id, user_model, parent_task_id=None, session=session)
-        
+            return StudyTrackerSqlRepo.create_task_with_parent(
+                task, 
+                task_id, 
+                user_id, 
+                user_model, 
+                parent_task_id=task.parent_task_id, 
+                session=session
+            )
+    
     def update_task(self, user_id: int, task_id: int, task: Task):
         with Session(engine) as session:
             

@@ -50,7 +50,8 @@ class Task():
             sub_tasks: list['Task'],
             is_micro_task: bool = False,
             status: str="not_completed",
-            completed_at: datetime | None = None
+            completed_at: datetime | None = None,
+            parent_task_id: int | None = None
 
     ) -> None:
         self.id=id
@@ -63,6 +64,7 @@ class Task():
         self.status=status
         self.is_micro_task = is_micro_task
         self.completed_at = completed_at
+        self.parent_task_id = parent_task_id
 
     @staticmethod
     def from_create_task_input_dto(task_dto: CreateTaskInputDto) -> 'Task':
@@ -78,7 +80,8 @@ class Task():
             tags=task_dto.tags,
             status=task_dto.status,
             sub_tasks=sub_tasks,
-            is_micro_task=task_dto.is_micro_task
+            is_micro_task=task_dto.is_micro_task,
+            parent_task_id=task_dto.parent_task_id
         )
 
 class UnavailableScheduleBlock():

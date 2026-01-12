@@ -476,6 +476,7 @@ function requestBody(newTaskInfo: CreateTaskInputDto): any {
     tags: newTaskInfo.tags,
     status: newTaskInfo.status,
     is_micro_task: newTaskInfo.is_micro_task,
+    parent_task_id: newTaskInfo.parent_task_id,
     subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) =>
       requestBody(subTaskInfo)
     ),

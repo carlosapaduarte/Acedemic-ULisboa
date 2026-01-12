@@ -27,6 +27,10 @@ export default function TasksPage() {
 
   const [filterMode, setFilterMode] = useState<Selection>(new Set(["all"]));
 
+  const [parentTaskIdForCreation, setParentTaskIdForCreation] = useState<
+    number | undefined
+  >(undefined);
+
   const filteredTasks = useMemo(() => {
     if (!tasks) return [];
 
@@ -63,7 +67,13 @@ export default function TasksPage() {
 
   function onTaskCreated() {
     refreshTasks();
+    setParentTaskIdForCreation(undefined);
   }
+
+  const handleAddSubtask = (parentId: number) => {
+    console.log("Criar subtarefa para o pai:", parentId);
+    setParentTaskIdForCreation(parentId);
+  };
 
   if (!tasks) return <div>{t("task:loading")}</div>;
 
@@ -112,7 +122,12 @@ export default function TasksPage() {
         </div>
 
         <div className={styles.headerBottomRow}>
-          <CreateTaskButton onTaskCreated={onTaskCreated} />
+          <CreateTaskButton
+            onTaskCreated={onTaskCreated}
+            parentTaskId={parentTaskIdForCreation}
+            forceOpen={!!parentTaskIdForCreation}
+            onClose={() => setParentTaskIdForCreation(undefined)}
+          />
         </div>
       </div>
 
@@ -127,6 +142,7 @@ export default function TasksPage() {
           onTaskStatusUpdated={(updatedTask) => {
             refreshTasks();
           }}
+          onAddSubtask={handleAddSubtask}
         />
       </div>
     </div>
