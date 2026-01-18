@@ -293,6 +293,7 @@ def create_grade(
     dto: CreateGradeInputDto
 ):
     study_tracker_service.create_grade(user_id, curricular_unit, Grade(
+        id=None,
         value=dto.value,
         weight=dto.weight
     ))

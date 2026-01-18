@@ -1,10 +1,17 @@
-import React, { useEffect, useState, Suspense } from "react";
+import React, {
+  useEffect,
+  useState,
+  Suspense,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { MoodTrackerFlow } from "./MoodTracker/MoodTrackerFlow";
 import { useNavigate } from "@remix-run/react";
 import { service } from "~/service/service";
 import { utils } from "~/utils";
+import Confetti from "react-confetti";
 
 import {
   FaCalendar,
@@ -66,12 +73,79 @@ function useHomePage() {
   const [taskStats, setTaskStats] = useState({ total: 0, completed: 0 });
 
   const [recentNotes, setRecentNotes] = useState<any[]>([]);
-
   const [pomoWork, setPomoWork] = useState(25);
   const [pomoBreak, setPomoBreak] = useState(5);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // --- FUNÇÃO PARA CALCULAR CONTRASTE (PRETO vs BRANCO) ---
+  const getContrastColor = (hexColor: string) => {
+    if (!hexColor || !hexColor.startsWith("#")) {
+      const match = hexColor.match(/#[a-fA-F0-9]{6}/);
+      if (match) hexColor = match[0];
+      else return "#ffffff";
+    }
+
+    const hex = hexColor.replace("#", "");
+    // Converter para RGB
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+
+    // Fórmula de brilho YIQ
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+    // Se for escuro (< 128), retorna branco. Se for claro, retorna preto/cinza escuro
+    return yiq >= 128 ? "#000000" : "#ffffff";
+  };
+
+  const resolveEventStyle = (event: any, allTags: any[]) => {
+    const FALLBACK_COLOR = "#3399FF";
+
+    const eventColorUpper = event.color ? event.color.toUpperCase() : null;
+    const fallbackUpper = FALLBACK_COLOR.toUpperCase();
+
+    // 1. Cor Direta
+    if (eventColorUpper && eventColorUpper !== fallbackUpper) {
+      return { background: event.color };
+    }
+
+    // 2. Cor das Tags
+    if (event.tags && event.tags.length > 0 && allTags.length > 0) {
+      const tagColors = event.tags
+        .map((tagRef: any) => {
+          const found = allTags.find((t) => {
+            if (typeof tagRef === "object") return t.id === tagRef.id;
+            const refStr = String(tagRef).toLowerCase().trim();
+            const tId = String(t.id).toLowerCase();
+            const tNamePt = (t.name_pt || "").toLowerCase();
+            const tNameEn = (t.name_en || "").toLowerCase();
+            const tName = (t.name || "").toLowerCase();
+
+            return (
+              tId === refStr ||
+              tNamePt === refStr ||
+              tNameEn === refStr ||
+              tName === refStr
+            );
+          });
+          return found ? found.color : null;
+        })
+        .filter((c: string | null) => c);
+
+      if (tagColors.length > 0) {
+        if (tagColors.length === 1) {
+          return { background: tagColors[0] };
+        }
+        return {
+          background: `linear-gradient(135deg, ${tagColors.join(", ")})`,
+        };
+      }
+    }
+
+    return { background: FALLBACK_COLOR };
+  };
 
   useEffect(() => {
-    // 1. Verificar Mood
     const promptedState = localStorage.getItem(MOOD_STORAGE_KEY);
     if (promptedState) {
       const prompted = new Date(promptedState);
@@ -87,40 +161,97 @@ function useHomePage() {
 
     async function fetchData() {
       try {
-        const [events, tasks] = await Promise.all([
+        const [events, tasks, tags] = await Promise.all([
           service.getAllUserEvents().catch(() => []),
           service.getTasks(false).catch(() => []),
+          service.fetchUserTags().catch(() => []),
         ]);
 
-        // Mock para a demo das notas
         setRecentNotes(DEMO_RECENT_NOTES);
 
-        const today = new Date();
+        const now = new Date();
+
         const todayEvs = events
-          .filter(
-            (ev: any) =>
-              utils.sameDay(new Date(ev.startDate), today) ||
+          .filter((ev: any) => {
+            const evStartDate = new Date(ev.startDate);
+            const isForToday =
+              utils.sameDay(evStartDate, now) ||
               ev.everyDay ||
-              (ev.everyWeek &&
-                new Date(ev.startDate).getDay() === today.getDay())
-          )
-          .sort(
-            (a: any, b: any) =>
-              new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-          );
+              (ev.everyWeek && evStartDate.getDay() === now.getDay());
 
-        setTodayEvents(todayEvs.slice(0, 3));
+            if (!isForToday) return false;
 
-        let completed = 0;
-        let total = 0;
+            const eventInstanceTime = new Date(now);
+            eventInstanceTime.setHours(
+              evStartDate.getHours(),
+              evStartDate.getMinutes(),
+              0,
+              0,
+            );
+            return eventInstanceTime > now;
+          })
+          .sort((a: any, b: any) => {
+            const dateA = new Date(a.startDate);
+            const dateB = new Date(b.startDate);
+            const minutesA = dateA.getHours() * 60 + dateA.getMinutes();
+            const minutesB = dateB.getHours() * 60 + dateB.getMinutes();
+            return minutesA - minutesB;
+          })
+          .map((ev: any) => {
+            const style = resolveEventStyle(ev, tags);
+            const textColor = getContrastColor(style.background);
+
+            return {
+              ...ev,
+              eventStyle: style,
+              textColor: textColor,
+            };
+          });
+
+        setTodayEvents(todayEvs);
+
+        // --- TAREFAS ---
+        let completedCount = 0;
+        let totalCount = 0;
+
         if (Array.isArray(tasks)) {
           tasks.forEach((t: any) => {
-            if (t.data?.status === "completed" || t.status === "completed")
-              completed++;
-            total++;
+            const taskDateStr =
+              t.dueDate ||
+              t.date ||
+              t.deadline ||
+              t.data?.deadline ||
+              t.data?.date;
+            if (!taskDateStr) return;
+
+            const taskDate = new Date(taskDateStr);
+            const isCompleted =
+              t.status === "completed" ||
+              t.data?.status === "completed" ||
+              t.completed === true;
+
+            const isToday = utils.sameDay(taskDate, now);
+            const taskZero = new Date(taskDate);
+            taskZero.setHours(0, 0, 0, 0);
+            const todayZero = new Date(now);
+            todayZero.setHours(0, 0, 0, 0);
+            const isOverdue =
+              taskZero.getTime() < todayZero.getTime() && !isCompleted;
+
+            if (isToday || isOverdue) {
+              totalCount++;
+              if (isCompleted) completedCount++;
+            }
           });
         }
-        setTaskStats({ total, completed });
+
+        setTaskStats({ total: totalCount, completed: completedCount });
+
+        if (totalCount > 0 && completedCount === totalCount) {
+          setShowConfetti(true);
+        } else {
+          setShowConfetti(false);
+        }
       } catch (error) {
         console.error("Erro dashboard:", error);
       }
@@ -149,6 +280,7 @@ function useHomePage() {
     setPomoWork,
     pomoBreak,
     setPomoBreak,
+    showConfetti,
   };
 }
 
@@ -167,17 +299,28 @@ export default function HomePage() {
     setPomoWork,
     pomoBreak,
     setPomoBreak,
+    showConfetti,
   } = useHomePage();
 
   useAppBar("home");
+
+  const tasksCardRef = useRef<HTMLDivElement>(null);
+  const [cardSize, setCardSize] = useState({ width: 0, height: 0 });
+
+  useLayoutEffect(() => {
+    if (tasksCardRef.current) {
+      setCardSize({
+        width: tasksCardRef.current.offsetWidth,
+        height: tasksCardRef.current.offsetHeight,
+      });
+    }
+  }, [tasksCardRef.current, taskStats]);
 
   const progressPercent =
     taskStats.total > 0
       ? Math.round((taskStats.completed / taskStats.total) * 100)
       : 0;
 
-  // --- LÓGICA POMODORO ---
-  // Esta função constrói o URL com os valores que estão nos inputs
   const handleGoToPomodoro = () => {
     navigate(`/pomodoro?work=${pomoWork}&break=${pomoBreak}`);
   };
@@ -240,44 +383,155 @@ export default function HomePage() {
         </div>
 
         {/* 2. TAREFAS */}
-        <div className={styles.card} onClick={() => navigate("/tasks")}>
-          <div className={styles.cardHeader}>
+        <div
+          className={styles.card}
+          onClick={() => navigate("/tasks")}
+          ref={tasksCardRef}
+          style={{
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {showConfetti && cardSize.width > 0 && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                zIndex: 0,
+                pointerEvents: "none",
+              }}
+            >
+              <Confetti
+                width={cardSize.width}
+                height={cardSize.height}
+                recycle={false}
+                numberOfPieces={200}
+                gravity={0.15}
+              />
+            </div>
+          )}
+
+          <div
+            className={styles.cardHeader}
+            style={{ position: "relative", zIndex: 1 }}
+          >
             <div className={styles.cardTitle}>
-              <FaListCheck /> Tarefas
+              <FaListCheck /> Tarefas de Hoje
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              justifyContent: "space-between",
-            }}
-          >
-            <span className={styles.statNumber}>{taskStats.completed}</span>
-            <span style={{ fontSize: "0.9rem", color: "var(--color-3)" }}>
-              de {taskStats.total}
-            </span>
-          </div>
-          <div className={styles.progressBarBg}>
+
+          {taskStats.total === 0 ? (
             <div
-              className={styles.progressBarFill}
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
+              style={{
+                textAlign: "center",
+                padding: "1.5rem 0",
+                color: "var(--color-3)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <span style={{ fontSize: "1.5rem" }}>🔍</span>
+              <span style={{ fontSize: "0.9rem", fontStyle: "italic" }}>
+                Sem tarefas para hoje!
+              </span>
+            </div>
+          ) : (
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span className={styles.statNumber}>{taskStats.completed}</span>
+                <span style={{ fontSize: "0.9rem", color: "var(--color-3)" }}>
+                  de {taskStats.total}
+                </span>
+              </div>
+              <div className={styles.progressBarBg}>
+                <div
+                  className={styles.progressBarFill}
+                  style={{
+                    width: `${progressPercent}%`,
+                    backgroundColor:
+                      progressPercent === 100 ? "#4CAF50" : undefined,
+                  }}
+                />
+              </div>
+              {progressPercent === 100 && (
+                <div
+                  style={{
+                    fontSize: "0.8rem",
+                    color: "#4CAF50",
+                    marginTop: "5px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Bom trabalho! 💪
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 3. AGENDA */}
-        <div className={styles.card} onClick={() => navigate("/calendar")}>
+        <div
+          className={styles.card}
+          onClick={() => navigate("/calendar")}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            cursor: "pointer",
+            height: "100%",
+            overflow: "hidden",
+          }}
+        >
           <div className={styles.cardHeader}>
             <div className={styles.cardTitle}>
               <FaCalendar /> Agenda
             </div>
           </div>
-          <div className={styles.agendaList}>
+
+          <div
+            className={styles.agendaList}
+            style={{
+              overflowY: "auto",
+              flex: 1,
+              height: "100%",
+              minHeight: 0,
+              paddingRight: "4px",
+            }}
+          >
             {todayEvents.length > 0 ? (
               todayEvents.map((ev, i) => (
-                <div key={i} className={styles.agendaItem}>
-                  <div className={styles.timeBox}>
+                <div
+                  key={i}
+                  className={styles.agendaItem}
+                  style={{
+                    ...ev.eventStyle,
+
+                    // Cor do Texto Geral (Titulo)
+                    color: ev.textColor,
+
+                    borderLeft: "none",
+                    marginBottom: "8px",
+                    flexShrink: 0,
+                  }}
+                >
+                  <div
+                    className={styles.timeBox}
+                    style={{
+                      fontWeight: "bold",
+                      opacity: 0.9,
+                      color: ev.textColor,
+                    }}
+                  >
                     {new Date(ev.startDate).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -288,6 +542,7 @@ export default function HomePage() {
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
+                      fontWeight: 600,
                     }}
                   >
                     {ev.title}
@@ -321,7 +576,6 @@ export default function HomePage() {
               <FaPlay size={12} /> Foco
             </div>
           </div>
-
           <div className={styles.pomodoroContainer}>
             <div className={styles.pomodoroInputs}>
               <div className={styles.inputGroup}>
@@ -345,19 +599,19 @@ export default function HomePage() {
                 />
               </div>
             </div>
-
             <button
               className={styles.startPomoBtn}
               onClick={(e) => {
-                e.stopPropagation(); // Garante que não dispara o evento do pai duas vezes
+                e.stopPropagation();
                 handleGoToPomodoro();
               }}
             >
-              Iniciar Ciclo
+              Iniciar
             </button>
           </div>
         </div>
 
+        {/* 5. APONTAMENTOS */}
         <div
           className={styles.card}
           onClick={() => navigate("/notes")}
@@ -411,18 +665,6 @@ export default function HomePage() {
                       {note.title}
                     </span>
                   </div>
-                  <span
-                    style={{
-                      fontSize: "0.75rem",
-                      opacity: 0.7,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {new Date(note.date).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
                 </div>
               ))
             ) : (

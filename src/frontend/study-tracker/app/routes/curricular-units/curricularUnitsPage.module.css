@@ -1,83 +1,260 @@
 .pageContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #3e2723;
+  min-height: 100vh;
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.statCard {
+  background-color: #fff;
+  border: 1px solid #d7ccc8;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(62, 39, 35, 0.05);
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #8d6e63;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.statValue {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #3e2723;
+  line-height: 1.1;
+}
+
+.statSub {
+  font-size: 0.85rem;
+  color: #a1887f;
+}
+
+.headerAction {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #efebe9;
+  padding-bottom: 1rem;
+}
+
+.pageTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #3e2723;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.topCreateButton {
+  background-color: #3e2723;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.topCreateButton:hover {
+  background-color: #5d4037;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ucGrid {
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
-  padding: 2rem;
-  width: 90%;
-  max-width: 900px;
-  margin: 2rem auto;
 }
 
 .cardContainer {
-  width: 100%;
-  padding: 1.5rem 2rem;
-  background-color: var(--color-3);
-  color: var(--text-color-2);
-  --edge-size: 0.5rem;
-  clip-path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
-  box-sizing: border-box;
+  background-color: #4e342e;
+  color: #efebe9;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(62, 39, 35, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
 }
 
 .cardTitle {
-  font-family: var(--font-family2);
-  font-size: 1.5rem;
-  text-transform: uppercase;
-  color: var(--text-color-2);
-  margin: 0 0 1.5rem 0;
-  text-align: left;
-  border-bottom: 2px solid var(--color-2);
-  padding-bottom: 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.ectsBadge {
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #ffecb3;
+}
+
+.simulatorContainer {
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.progressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.progressBarBg {
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+
+.progressMarker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: rgba(255, 255, 255, 0.6);
+  z-index: 2;
+}
+
+.simulationText {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.gradeList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.gradeItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  border-left: 4px solid #8d6e63;
+  transition: background 0.2s;
+}
+
+.gradeItem:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.gradeValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.gradeWeight {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: 0.8rem;
+}
+
+.addGradeSection {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 1rem;
 }
 
 .subTitle {
-  font-family: var(--font-family2);
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  color: var(--text-color-2);
-  margin: 1.5rem 0 1rem 0;
-  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 1rem 0;
+  font-weight: 700;
 }
 
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .label {
-  font-family: var(--font-family1);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-color-2);
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .input {
-  font-family: var(--font-family2);
-  font-size: 1.2rem;
-  padding: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--color-2);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 0.8rem;
   border-radius: 6px;
-  color: var(--text-color-2);
+  font-size: 1rem;
   width: 100%;
-  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #d7ccc8;
 }
 
 .input::-webkit-outer-spin-button,
@@ -85,112 +262,142 @@
   -webkit-appearance: none;
   margin: 0;
 }
-.input[type="number"] {
-  -moz-appearance: textfield;
-}
 
-.button {
-  padding: 0.8rem 2rem;
+.addButton {
+  width: 100%;
+  padding: 0.9rem;
+  background-color: #8d6e63;
+  color: white;
   border: none;
-  border-radius: 5px;
-  font-family: var(--font-family2);
+  border-radius: 8px;
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
-  background-color: var(--color-2);
-  color: var(--text-color-2);
-  transition: background-color 0.2s ease-in-out;
-  margin-top: 1.5rem;
+  transition: background 0.2s;
 }
 
-.button:hover {
-  background-color: var(--color-2-hover);
-}
-
-.button:disabled {
-  background-color: #888;
-  color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.gradeList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  padding-left: 1rem;
-  border-left: 3px solid var(--color-2);
-  margin-bottom: 1.5rem;
-}
-
-.gradeItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-}
-
-.gradeItem span {
-  font-family: var(--font-family1);
-  font-size: 1.1rem;
-}
-
-.gradeItem span:first-child {
-  font-weight: 700;
-  font-family: var(--font-family2);
-  font-size: 1.2rem;
-}
-
-.gradeItem span:last-child {
-  font-weight: 300;
-  font-style: italic;
-}
-
-/* --- Média Final --- */
-
-.finalGrade {
-  font-family: var(--font-family2);
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  text-align: right;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 2px dashed var(--color-2);
-}
-
-.finalGradeLabel {
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.errorMessage {
-  color: var(--color-1);
-  background-color: var(--color-text-danger);
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-family: var(--font-family1);
-  font-weight: 500;
-  margin-top: 1rem;
-  text-align: center;
+.addButton:hover {
+  background-color: #a1887f;
 }
 
 .deleteButton {
-  background-color: var(--color-text-danger);
-  color: var(--text-color-2);
-  border: none;
-  border-radius: 4px;
-  padding: 0.2rem 0.6rem;
-  font-family: var(--font-family1);
-  font-size: 0.9rem;
-  font-weight: 700;
+  background: transparent;
+  border: 1px solid rgba(239, 83, 80, 0.5);
+  color: #ef5350;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 .deleteButton:hover {
-  background-color: var(--color-1);
-  color: var(--color-text-danger);
+  background-color: rgba(239, 83, 80, 0.1);
+  border-color: #ef5350;
+}
+
+.emptyStateWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: #fff;
+  border-radius: 16px;
+  border: 2px dashed #d7ccc8;
+  text-align: center;
+}
+
+.emptyStateTitle {
+  font-size: 1.8rem;
+  color: #3e2723;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.emptyStateText {
+  color: #8d6e63;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* --- MODAL --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(62, 39, 35, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modalContent {
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.modalInput {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  color: #3e2723;
+  padding: 0.8rem;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+.modalInput:focus {
+  outline: none;
+  border-color: #8d6e63;
+  background-color: #fff;
+}
+.modalLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #5d4037;
+  text-transform: uppercase;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cancelButton {
+  flex: 1;
+  padding: 0.8rem;
+  background: transparent;
+  border: 1px solid #d7ccc8;
+  color: #8d6e63;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.cancelButton:hover {
+  background-color: #f5f5f5;
+}
+
+.confirmButton {
+  flex: 1;
+  padding: 0.8rem;
+  background-color: #3e2723;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.confirmButton:hover {
+  background-color: #5d4037;
 }

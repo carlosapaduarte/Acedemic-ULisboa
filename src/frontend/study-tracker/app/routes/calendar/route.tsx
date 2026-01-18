@@ -113,7 +113,7 @@ const EventWithTags = ({
           (tag: Tag) =>
             tag.id === tagItem ||
             tag.name_pt === tagItem ||
-            tag.name_en === tagItem
+            tag.name_en === tagItem,
         );
       }
 
@@ -293,7 +293,7 @@ const EventWithTags = ({
 const getEventStyleProps = (
   resource: CalendarEventResource | undefined,
   allUserTags: Tag[],
-  isCompleted: boolean = false
+  isCompleted: boolean = false,
 ): React.CSSProperties => {
   const FALLBACK_COLOR = "#3399FF";
   const BG_OPACITY = 0.6;
@@ -320,7 +320,7 @@ const getEventStyleProps = (
         // B. Se for ID ou string, procuramos na lista global
         if (typeof t !== "object") {
           const found = allUserTags.find(
-            (ut) => ut.id === t || ut.name_pt === t || ut.name_en === t
+            (ut) => ut.id === t || ut.name_pt === t || ut.name_en === t,
           );
           return found?.color;
         }
@@ -354,7 +354,14 @@ function useMyCalendar() {
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
   const { i18n } = useTranslation(["calendar"]);
-  const [displayedDates, setDisplayedDates] = useState<Date[]>([]);
+  const [displayedDates, setDisplayedDates] = useState<Date[]>(() => {
+    const startOfWeek = moment().startOf("week").toDate();
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      dates.push(moment(startOfWeek).add(i, "days").toDate());
+    }
+    return dates;
+  });
 
   useEffect(() => {
     const lang = i18n.language.toLowerCase();
@@ -421,7 +428,6 @@ function useMyCalendar() {
     for (let i = 0; i < 7; i++) {
       dates.push(moment(startOfWeek).add(i, "days").toDate());
     }
-    setDisplayedDates(dates);
   }, [i18n.language]);
 
   const refreshAllCalendarData = useCallback(async () => {
@@ -488,11 +494,11 @@ function useMyCalendar() {
             if (shouldAddEvent) {
               eventOccurrenceStartDate.setHours(
                 event.startDate.getHours(),
-                event.startDate.getMinutes()
+                event.startDate.getMinutes(),
               );
               eventOccurrenceEndDate.setHours(
                 event.endDate.getHours(),
-                event.endDate.getMinutes()
+                event.endDate.getMinutes(),
               );
             }
           }
@@ -578,7 +584,7 @@ function useMyCalendar() {
         alert("Não foi possível mover o evento.");
       }
     },
-    [refreshAllCalendarData]
+    [refreshAllCalendarData],
   );
 
   const onEventResize = useCallback(
@@ -616,7 +622,7 @@ function useMyCalendar() {
         console.error("Erro ao redimensionar evento:", error);
       }
     },
-    [refreshAllCalendarData]
+    [refreshAllCalendarData],
   );
 
   return {
@@ -654,7 +660,7 @@ const AgendaEvent = ({
         (tag) =>
           (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
           (tag.name_en && tagIdentifiers.includes(tag.name_en)) ||
-          (tag.name && tagIdentifiers.includes(tag.name))
+          (tag.name && tagIdentifiers.includes(tag.name)),
       );
 
       const tagColors = associatedTags
@@ -704,7 +710,7 @@ function MyCalendar() {
   } = useMyCalendar();
   const { t, i18n } = useTranslation(["calendar"]);
   const [selectedFilters, setSelectedFilters] = useState<Selection>(
-    new Set([])
+    new Set([]),
   );
 
   const filteredEvents = React.useMemo(() => {
@@ -723,7 +729,7 @@ function MyCalendar() {
             (t) =>
               t.id === tagIdentifier ||
               t.name_pt === tagIdentifier ||
-              t.name_en === tagIdentifier
+              t.name_en === tagIdentifier,
           );
 
           const namesToCheck: string[] = [];
@@ -760,7 +766,7 @@ function MyCalendar() {
 
   const localizer = React.useMemo(
     () => momentLocalizer(moment),
-    [i18n.language]
+    [i18n.language],
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -775,7 +781,7 @@ function MyCalendar() {
       setSelectedSlot({ start, end });
       setIsModalOpen(true);
     },
-    []
+    [],
   );
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
     setEventToEdit({
@@ -824,13 +830,13 @@ function MyCalendar() {
         setDisplayedDates(range as Date[]);
       }
     },
-    [setDisplayedDates]
+    [setDisplayedDates],
   );
   const onView = useCallback(
     (newView: View) => {
       setCalendarView(newView);
     },
-    [setCalendarView]
+    [setCalendarView],
   );
   const calendarMessages = getCalendarMessages();
 
@@ -865,7 +871,7 @@ function MyCalendar() {
         .format(t("rbc_time_format")),
     eventTimeRangeFormat: (
       range: { start: Date; end: Date },
-      culture?: string
+      culture?: string,
     ) =>
       `${moment(range.start)
         .locale(culture || i18n.language)
@@ -937,7 +943,7 @@ function MyCalendar() {
                     allTasks={allTasks}
                   />
                 ),
-              [i18n.language, userTags, allTasks]
+              [i18n.language, userTags, allTasks],
             ),
 
             week: {
@@ -954,7 +960,7 @@ function MyCalendar() {
                 const dayOfWeekName = t(
                   `weekdays.${days[props.date.getDay()]}.${
                     isWideScreen ? "medium" : "short"
-                  }`
+                  }`,
                 );
                 return (
                   <div
@@ -990,7 +996,7 @@ function MyCalendar() {
           onEventResize={onEventResize}
           resizable={true}
           eventPropGetter={(
-            event: CalendarEvent & { resource?: CalendarEventResource }
+            event: CalendarEvent & { resource?: CalendarEventResource },
           ) => {
             const now = new Date();
             const eventEndDate = new Date(event.end as Date);
@@ -1018,7 +1024,7 @@ function MyCalendar() {
             const colorStyle = getEventStyleProps(
               event.resource,
               userTags,
-              applyCompletedStyle
+              applyCompletedStyle,
             );
 
             const finalStyle = {
