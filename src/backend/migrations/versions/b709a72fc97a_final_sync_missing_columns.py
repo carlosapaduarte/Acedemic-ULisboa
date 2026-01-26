@@ -1,3 +1,24 @@
+import sqlmodel
+
+"""final_sync_missing_columns
+
+Revision ID: b709a72fc97a
+Revises: a994e1ff294b
+Create Date: 2026-01-26 21:10:09.912906
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision: str = 'b709a72fc97a'
+down_revision: Union[str, None] = 'a994e1ff294b'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
 def upgrade() -> None:
     # 1. Colunas na tabela tags
     op.add_column('tags', sa.Column('is_uc', sa.Boolean(), nullable=True, server_default='false'))
