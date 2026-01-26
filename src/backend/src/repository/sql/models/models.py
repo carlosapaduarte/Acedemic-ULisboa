@@ -1,7 +1,8 @@
 from datetime import date, timezone, datetime
 from typing import Optional, List # Importar List
 from uuid import UUID
-
+from pydantic import BaseModel
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import ForeignKeyConstraint, UniqueConstraint, String
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -29,7 +30,8 @@ class UserModel(SQLModel, table=True):
     st_archives: list["STArchiveModel"] = Relationship(back_populates="user")
     st_curricular_units: list["STCurricularUnitModel"] = Relationship(back_populates="user")
 
-    daily_energy_status: list["DailyEnergyStatusModel"] = Relationship(back_populates="user")
+    custom_colors: List[str] = Field(default=[], sa_column=SAColumn(JSONB))
+    mood_logs: list["STMoodLogModel"] = Relationship(back_populates="user")
     daily_tag: list["DailyTagModel"] = Relationship(back_populates="user")
 
     week_study_time: list["WeekStudyTimeModel"] = Relationship(back_populates="user")
@@ -98,7 +100,9 @@ class TagModel(SQLModel, table=True):
     name_pt: Optional[str] = Field(default=None, index=True, nullable=True)
     name_en: Optional[str] = Field(default=None, index=True, nullable=True)
     color: str = Field(nullable=False)
-    
+    is_uc: bool = Field(default=False, nullable=False)
+    is_global: bool = Field(default=False, nullable=False)
+
     user_links: List["UserTagLink"] = Relationship(back_populates="tag")
     event_links: List["STEventTagModel"] = Relationship(back_populates="tag_ref")
     task_links: List["STTaskTagModel"] = Relationship(back_populates="tag_ref")
@@ -129,13 +133,17 @@ class STEventModel(SQLModel, table=True):
     every_day: bool = Field(default=False)
     notes: str = Field(default="", nullable=False)
     color: str = Field(nullable=False)
+    is_uc: bool = Field(default=False, nullable=False)
+
+    recurrence_start: Optional[datetime] = Field(default=None, nullable=True)
+    recurrence_end: Optional[datetime] = Field(default=None, nullable=True)
+
+    task_id: Optional[int] = Field(default=None, nullable=True)
+    task_user_id: Optional[int] = Field(default=None, nullable=True)
 
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="st_events")
     
-    #tags_associations: List["STEventTagModel"] = Relationship(back_populates="event", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    #tags: List[TagModel] = Relationship(back_populates="events", link_model=STEventTagModel)
-
     tags_associations: List["STEventTagModel"] = Relationship(
         back_populates="event",
         sa_relationship_kwargs={
@@ -148,6 +156,14 @@ class STEventModel(SQLModel, table=True):
         link_model=STEventTagModel,
         sa_relationship_kwargs={"overlaps": "event,tags_associations,event_links,tag_ref"}
     )
+
+    __table_args__ = (
+    ForeignKeyConstraint(
+        ['task_id', 'task_user_id'],
+        ['st_task.id', 'st_task.user_id'],
+        name="fk_st_event_task_composite"
+    ),
+    ) 
     
 class STTaskModel(SQLModel, table=True):
     __tablename__ = "st_task"
@@ -160,7 +176,8 @@ class STTaskModel(SQLModel, table=True):
     deadline: datetime | None
     priority: str
     status: str
-    
+    is_micro_task: bool = Field(default=False, nullable=False)
+    completed_at: datetime | None = Field(default=None, nullable=True)
 
     user: "UserModel" = Relationship(back_populates="st_tasks")
 
@@ -268,7 +285,7 @@ class STArchiveModel(SQLModel, table=True):
 class STFileModel(SQLModel, table=True):
     __tablename__ = "st_file"
     name: str = Field(primary_key=True)
-    text: str
+    text: dict = Field(default={}, sa_column=SAColumn(JSONB))
     archive_name: str = Field(primary_key=True)
     user_id: int = Field(primary_key=True)
     __table_args__ = (
@@ -300,14 +317,6 @@ class STGradeModel(SQLModel, table=True):
         ),
     )
     curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")
-
-class DailyEnergyStatusModel(SQLModel, table=True):
-    __tablename__ = "daily_energy_status"
-    date_: date = Field(primary_key=True, default=None)
-    time_of_day: str
-    level: int
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
-    user: UserModel = Relationship(back_populates="daily_energy_status")
 
 class WeekStudyTimeModel(SQLModel, table=True):
     __tablename__ = "week_study_time"
@@ -421,3 +430,25 @@ class UserLeague(SQLModel, table=True):
         UniqueConstraint('user_id', 'league_id', name='_user_league_uc'),
     )
 
+class UpdateUserColorsDto(BaseModel):
+    colors: List[str]
+
+class STMoodLogModel(SQLModel, table=True):
+    __tablename__ = "st_mood_log"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    
+    # Painel 1:
+    value: int 
+    label: str 
+    
+    # Painel 2: "O que descreve melhor este sentimento?" (Lista de tags)
+    emotions: List[str] = Field(default=[], sa_column=SAColumn(JSON))
+    
+    # Painel 3: "O que está a ter maior impacto em ti?" (Lista de tags)
+    impacts: List[str] = Field(default=[], sa_column=SAColumn(JSON))
+    
+    date_log: datetime
+    
+    user: UserModel = Relationship(back_populates="mood_logs")

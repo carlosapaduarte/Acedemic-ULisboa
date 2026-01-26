@@ -1,82 +1,167 @@
 @import "@/components/Checkbox/checkbox.module.css";
 
 .taskPage {
-    animation: fade 300ms ease;
+  animation: fade 300ms ease;
 }
 
 @keyframes fade {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .mainTaskContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .checkboxAndTitleContainer {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .taskTitle {
-    flex-grow: 1;
+  flex-grow: 1;
 
-    font-size: 1.5rem;
-    font-weight: 900;
+  font-size: 1.5rem;
+  font-weight: 900;
 
-    &.completed {
-        /*text-decoration: line-through;*/
-    }
+  &.completed {
+    /*text-decoration: line-through;*/
+  }
 }
 
 .mainTaskCheckbox {
-    flex-grow: 0;
-    flex-shrink: 0;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .editButton {
-    flex: 0 0 auto;
+  flex: 0 0 auto;
 
-    width: 4rem;
-    height: 4rem;
+  width: 4rem;
+  height: 4rem;
 
-    background-color: var(--color-2);
+  background-color: var(--color-2);
 
-    border-radius: 50%;
+  border-radius: 50%;
 
-    &:hover {
-        background-color: var(--color-2-hover);
-    }
+  &:hover {
+    background-color: var(--color-2-hover);
+  }
 }
 
 .description {
-    font-size: 1rem;
-    font-weight: 700;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .noDescription {
-    font-size: 1rem;
-    font-weight: 700;
-    opacity: 0.5;
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 0.5;
 }
 
 .noDeadline {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 .noTags {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 .noSubtasks {
-    font-size: 1rem;
-    font-weight: 700;
-    opacity: 0.5;
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 0.5;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #ffffff;
+  font-weight: 500;
+  background-color: #888;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.875rem;
+}
+
+.statusCompleted {
+  background-color: #4caf50;
+}
+
+.statusOverdue {
+  background-color: var(--color-text-danger);
+}
+
+.statusInProgress,
+.statusNotStarted {
+  background-color: #607d8b;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  border-top: 2px solid var(--color-2);
+  padding-top: 1.5rem;
+}
+
+.button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  font-family: var(--font-family2);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--color-3);
+  color: var(--text-color-2);
+}
+.button:hover {
+  filter: brightness(1.2);
+}
+
+.deleteButton {
+  background-color: var(--color-text-danger);
+  color: #ffffff;
+}
+
+.deleteButton:hover {
+  background-color: #780606;
+  filter: brightness(1);
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.statusContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
 }

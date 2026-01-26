@@ -6,10 +6,9 @@
   "select_study_minutes": "Tempo de estudo (minutos)",
   "timer_pause": "Pausar",
   "timer_resume": "Continuar",
-  "timer_start": "Iniciar",
   "timer_stop": "Parar",
   "timer_title": "Cronómetro",
-  "school_grades": "Notas escolares",
-  "notes": "Notas",
+  "school_grades": "Classificações",
+  "notes": "Apontamentos",
   "study_subtitle": "Escolhe uma ferramenta para te ajudar a estudar"
 }

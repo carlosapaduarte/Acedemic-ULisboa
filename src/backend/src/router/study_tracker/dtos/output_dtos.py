@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional, Any
 from pydantic import BaseModel
 
 from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task, WeekTimeStudy
@@ -29,6 +29,8 @@ class UserTaskOutputDto(BaseModel):
     priority: str
     tags: list[str]
     status: str
+    is_micro_task: bool
+    completed_at: float | None = None
     subTasks: list['UserTaskOutputDto']
     
     @staticmethod
@@ -42,7 +44,7 @@ class UserTaskOutputDto(BaseModel):
     def from_Task(task: Task) -> 'UserTaskOutputDto':
         task_id = task.id
         if task_id is None:
-            raise
+            raise Exception("Task ID cannot be None")
 
         sub_tasks_output_dto: list[UserTaskOutputDto] = []
         for sub_task in task.sub_tasks:
@@ -56,20 +58,27 @@ class UserTaskOutputDto(BaseModel):
             priority=task.priority,
             tags=task.tags,
             status=task.status,
-            subTasks=sub_tasks_output_dto
+            is_micro_task=task.is_micro_task,
+            completed_at=get_datetime_utc(task.completed_at) if hasattr(task, 'completed_at') and task.completed_at is not None else None,
+            subTasks=sub_tasks_output_dto,
         )
+
+UserTaskOutputDto.update_forward_refs()
 
 class EventOutputDto(BaseModel):
     id: int
     startDate: int
     endDate: int
     title: str
-    tags: list[str]
+    tags: list[Any]
     everyWeek: bool
     everyDay: bool
     color: str | None = None
     notes: str | None = None
-
+    task_id: int | None = None
+    is_uc: bool = False
+    recurrenceStart: int | None = None
+    recurrenceEnd: int | None = None
 
     @staticmethod
     def from_events(events: list[Event]) -> list['EventOutputDto']:
@@ -77,7 +86,7 @@ class EventOutputDto(BaseModel):
         for event in events:
             event_id = event.id
             if event_id is None:
-                raise
+                continue 
         
             output_dtos_events.append(
                 EventOutputDto(
@@ -89,7 +98,11 @@ class EventOutputDto(BaseModel):
                     everyWeek=event.every_week,
                     everyDay=event.every_day,
                     color=event.color,
-                    notes=event.notes
+                    notes=event.notes,
+                    task_id=event.task_id,
+                    is_uc=event.is_uc,
+                    recurrenceStart=get_datetime_utc(event.recurrence_start) if event.recurrence_start else None,
+                    recurrenceEnd=get_datetime_utc(event.recurrence_end) if event.recurrence_end else None,
                 )
             )
 
@@ -201,8 +214,26 @@ class WeekTimeStudyOutputDto(BaseModel):
             )
         return dtos
     
-class TagOutputDto(BaseModel):
+class MoodLogOutputDto(BaseModel):
     id: int
-    name_pt: Optional[str] = None
-    name_en: Optional[str] = None
-    color: str
+    value: int
+    label: str
+    emotions: list[str]
+    impacts: list[str]
+    date: int
+
+    @staticmethod
+    def from_domain(logs: list[Any]) -> list['MoodLogOutputDto']:
+        output = []
+        for log in logs:
+            ts = get_datetime_utc(log.date_log)
+            
+            output.append(MoodLogOutputDto(
+                id=log.id,
+                value=log.value,
+                label=log.label,
+                emotions=log.emotions if log.emotions else [],
+                impacts=log.impacts if log.impacts else [],
+                date=ts
+            ))
+        return output

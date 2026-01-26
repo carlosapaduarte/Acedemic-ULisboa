@@ -1,11 +1,11 @@
+/* --- DEFINIÇÕES GERAIS DO PAINEL ESQUERDO (TIMER) --- */
 .pomodoroContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  margin: 2rem auto;
-  width: 90%;
+  margin: 0;
   max-width: 500px;
   background-color: var(--color-3);
   color: var(--text-color-2);
@@ -22,15 +22,154 @@
   );
   flex-basis: 400px;
   flex-shrink: 0;
-  margin: 0;
+  grid-column: 2;
 }
 
+.taskListContainer,
+.eventsContainer {
+  --path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+}
+
+/* --- ESTRUTURA DAS CAIXAS DE EVENTOS E TAREFAS --- */
+.taskListContainer,
+.eventsContainer {
+  position: relative;
+  flex-grow: 1;
+  padding: 1.5rem;
+  background-color: transparent;
+  color: var(--color-3);
+  --edge-size: 0.5rem;
+  z-index: 1;
+  clip-path: none;
+  transition: opacity 0.3s ease;
+}
+
+.taskListContainer::before,
+.eventsContainer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-3);
+  clip-path: var(--path);
+  z-index: -2;
+}
+
+.taskListContainer::after,
+.eventsContainer::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background-color: var(--color-1);
+  clip-path: var(--path);
+  z-index: -1;
+}
 .title {
   font-family: var(--font-family2);
   font-size: 1.5rem;
   text-transform: uppercase;
   color: var(--text-color-2);
   margin-bottom: 1rem;
+}
+
+.instructionTitle {
+  font-family: var(--font-family2);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  color: var(--color-3);
+  text-align: center;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.taskListTitle {
+  font-family: var(--font-family2);
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: var(--color-3);
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  border-bottom: 2px solid var(--color-3);
+  padding-bottom: 0.5rem;
+}
+
+.otherTasksTitle {
+  margin-top: 2rem;
+}
+
+.taskListContainer :global(.taskTitle) {
+  color: var(--color-3) !important;
+  position: relative;
+  padding-left: 1.4rem;
+  display: flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
+.noEventsText {
+  font-family: var(--font-family1);
+  color: var(--color-3);
+  opacity: 0.7;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.eventList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.eventItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-3);
+}
+
+.eventTime {
+  font-family: var(--font-family1);
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  width: 100px;
+  text-align: right;
+  opacity: 0.8;
+}
+
+.eventTitle {
+  font-family: var(--font-family1);
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+}
+
+.eventColorStripContainer {
+  display: flex;
+  gap: 3px;
+  margin: 0 0.5rem;
+  align-self: stretch;
+}
+
+.colorStripe {
+  width: 4px;
+  height: 50%;
+  min-height: 1.5rem;
 }
 
 .timeSelectionForm {
@@ -138,44 +277,138 @@
 }
 
 .pomodoroLayout {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: flex-start;
   gap: 2rem;
   width: 100%;
-  max-width: 900px;
+  max-width: 1600px; /* Mais largo para 3 colunas */
   margin: 2rem auto;
   padding: 0 1rem;
   box-sizing: border-box;
 }
 
-.taskListContainer {
-  flex-grow: 1;
-  padding: 1.5rem;
-  background-color: var(--color-3);
-  color: var(--text-color-2);
-  --edge-size: 0.5rem;
-  clip-path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
+.pomodoroOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
 }
 
-.taskListTitle {
+.pomodoroDialog {
+  padding: 1.5rem 2rem;
+  background-color: var(--color-1);
+  color: var(--text-color-1);
+  border-radius: 8px;
+  max-width: 450px;
+  width: 90%;
+  outline: none;
+  border: 2px solid var(--color-3);
+}
+
+.pomodoroDialog p {
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalTaskList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-3) var(--color-1-light);
+}
+
+.modalTaskItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-family1);
+  font-size: 1rem;
+  color: var(--text-color-1);
+  cursor: pointer;
+}
+
+.modalCheckbox {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  border-width: 2px !important;
+}
+
+.modalButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modalButtonPrimary,
+.modalButtonSecondary {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
   font-family: var(--font-family2);
-  font-size: 1.5rem;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-color-2);
-  margin: 0 0 1.5rem 0;
-  text-align: center;
-  border-bottom: 2px solid var(--color-2);
-  padding-bottom: 0.5rem;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.modalButtonPrimary:hover,
+.modalButtonSecondary:hover {
+  filter: brightness(1.15);
+}
+
+.modalButtonPrimary {
+  background-color: var(--color-2);
+  color: var(--text-color-2) !important;
+}
+
+.modalButtonSecondary {
+  background-color: var(--color-2);
+  color: var(--text-color-2) !important;
+}
+
+.microTaskToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-family1);
+  font-size: 0.9rem;
+  color: var(--color-3);
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-3);
+  border-radius: 6px;
+
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.microTaskToggle:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.taskListContainer :global(.microTaskContainer) :global(.taskTitle)::before {
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="var(--color-2)"><path d="M0 256L28.5 28c2-16 15.6-28 31.8-28H228.9c10.7 0 20.8 5.7 26.1 14.8l128 216c6.2 10.4 6.2 23.1 0 33.5l-128 216C249.7 498.3 239.6 512 228.9 512H60.3c-16.2 0-29.8-12-31.8-28L0 256z"/></svg>');
+  width: 0.8rem;
+  height: 0.8rem;
+  position: absolute;
+  left: 0.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block;
 }

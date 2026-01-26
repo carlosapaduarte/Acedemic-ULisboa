@@ -2,9 +2,291 @@
 @import "../../../components/avatar.module.css";
 
 .homePage {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: var(--color-2);
+}
 
-    display: flex;
-    flex-direction: column;
+.headerSection {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.dateBadge {
+  background-color: var(--color-2);
+  color: var(--text-color-2);
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  font-family: var(--font-family2);
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+/* --- BENTO GRID --- */
+.bentoGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .bentoGrid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(180px, auto);
+  }
+
+  /* Mood: Ocupa 2 colunas */
+  .moodSection {
+    grid-column: span 2;
+  }
+
+  /* Resto ocupa 1 coluna automaticamente */
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(89, 46, 37, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-2);
+  box-shadow: 0 6px 15px rgba(89, 46, 37, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cardTitle {
+  font-family: var(--font-family2);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- MOOD WIDGET --- */
+.moodContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+}
+
+.moodInitial {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.moodBtn {
+  background-color: var(--color-2);
+  color: var(--text-color-2);
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-family: var(--font-family2);
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.moodBtn:hover {
+  background-color: var(--color-3);
+}
+
+.moodSuccessContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.successHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-4);
+  font-family: var(--font-family2);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.moodQuote {
+  font-style: italic;
+  color: var(--color-3);
+  font-size: 1rem;
+  margin: 10px 0;
+  max-width: 80%;
+}
+
+.editMoodBtn {
+  background: transparent;
+  border: 1px solid var(--color-2);
+  color: var(--color-2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.editMoodBtn:hover {
+  background-color: var(--color-1);
+}
+
+.agendaList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: hidden;
+}
+
+.agendaItem {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: var(--color-1);
+  border-radius: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.timeBox {
+  font-family: var(--font-family2);
+  font-weight: 700;
+  color: var(--color-2);
+  min-width: 45px;
+}
+
+.pomodoroContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  justify-content: center;
+}
+
+.pomodoroInputs {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  width: 48%;
+}
+
+.inputLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-3);
+  margin-bottom: 4px;
+}
+
+.timeInput {
+  background: white;
+  border: 1px solid var(--color-2);
+  border-radius: 6px;
+  padding: 6px;
+  font-family: var(--font-family2);
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-2);
+}
+
+.startPomoBtn {
+  background-color: var(--color-4);
+  color: white;
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  font-family: var(--font-family2);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.startPomoBtn:hover {
+  background-color: var(--color-4-hover);
+}
+
+.progressBarBg {
+  width: 100%;
+  height: 8px;
+  background-color: #eee;
+  border-radius: 4px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: var(--color-2);
+  transition: width 0.5s ease;
+}
+
+.statNumber {
+  font-family: var(--font-family2);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-2);
+}
+
+.noteArea {
+  width: 100%;
+  flex-grow: 1;
+  border: none;
+  resize: none;
+  background: transparent;
+  font-family: var(--font-family1);
+  color: var(--text-color-1);
+  font-size: 0.9rem;
+  outline: none;
+}
+.noteArea::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.quoteAuthor {
+  font-family: var(--font-family2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
 }

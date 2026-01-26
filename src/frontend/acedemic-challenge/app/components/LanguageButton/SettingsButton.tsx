@@ -13,13 +13,15 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
     const logout = useLogOut();
     const [isPending, startTransition] = useTransition();
 
-    return (<DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-                {trigger}
-            </DropdownMenu.Trigger>
+    return (
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
 
             <DropdownMenu.Portal>
-                <DropdownMenu.Content className={dropdownStyles.Content} sideOffset={5}>
+                <DropdownMenu.Content
+                    className={dropdownStyles.Content}
+                    sideOffset={5}
+                >
                     {/*<DropdownMenu.Item className={dropdownStyles.Item}>
                         <a href="/settings"
                            aria-label={t("appbar:settings")}
@@ -31,15 +33,40 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                             Settings
                         </a>
                     </DropdownMenu.Item>*/}
+
                     <DropdownMenu.Item className={dropdownStyles.Item}>
-                        <a href="/"
-                           aria-label={"Acedemic Home"}
-                           className={classNames(dropdownStyles.acedemicHomeItem)}>
+                        <a
+                            href="/"
+                            aria-label={"Acedemic Home"}
+                            className={classNames(
+                                dropdownStyles.acedemicHomeItem,
+                            )}
+                        >
                             Acedemic Home
                         </a>
                     </DropdownMenu.Item>
-                    <DropdownMenu.Item className={dropdownStyles.Item}
-                                       onClick={() => startTransition(logout)}>
+
+                    <DropdownMenu.Item className={dropdownStyles.Item}>
+                        <a
+                            href="mailto:fc58620@alunos.ciencias.ulisboa.pt?subject=Suporte%20Acedemic%20Challenge"
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                textDecoration: "none",
+                                color: "inherit",
+                                width: "100%",
+                                cursor: "pointer",
+                            }}
+                        >
+                            <span>Contactar Suporte</span>
+                        </a>
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Item
+                        className={dropdownStyles.Item}
+                        onClick={() => startTransition(logout)}
+                    >
                         Logout
                     </DropdownMenu.Item>
 
@@ -56,20 +83,26 @@ export function SettingsButton() {
     const { t } = useTranslation("appbar");
 
     return (
-        <Dropdown trigger={
-            <a href="/settings"
-               aria-label={t("appbar:settings")}
-               className={classNames(styles.settingsButton)}
-               onClick={(e) => {
-                   e.preventDefault();
-                   navigate("/settings");
-               }}>
-                <IconContext.Provider value={{
-                    className: classNames(styles.settingsButtonIcon)
-                }}>
-                    <RiSettings5Fill />
-                </IconContext.Provider>
-            </a>
-        } />
+        <Dropdown
+            trigger={
+                <a
+                    href="/settings"
+                    aria-label={t("appbar:settings")}
+                    className={classNames(styles.settingsButton)}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/settings");
+                    }}
+                >
+                    <IconContext.Provider
+                        value={{
+                            className: classNames(styles.settingsButtonIcon),
+                        }}
+                    >
+                        <RiSettings5Fill />
+                    </IconContext.Provider>
+                </a>
+            }
+        />
     );
 }

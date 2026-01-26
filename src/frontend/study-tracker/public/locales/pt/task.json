@@ -1,12 +1,13 @@
 {
   "add_slot_to_work": "Adicionar espaço de trabalho",
   "add_sub_task": "Adicionar subtarefa",
+  "delete_task": "Apagar",
   "close": "Fechar",
-  "confirm": "Confirmar!",
+  "confirm": "Confirmar",
   "create_event_label": "Criar evento associado",
   "create_new_task": "Criar Nova Tarefa",
   "create_task": "Criar Tarefa",
-  "update_task": "Editar Tarefa",
+  "update_task": "Editar",
   "create_task_title": "Criar tarefa:",
   "deadline_label": "Prazo",
   "description_label": "Descrição",
@@ -43,5 +44,7 @@
   "work": "Trabalho",
   "personal": "Pessoal",
   "study": "Estudo",
-  "available_tasks": "Tarefas Disponíveis"
+  "available_tasks": "Tarefas Disponíveis",
+  "micro_tasks_list_title": "Tarefas Relâmpago",
+  "show_micro_tasks": "Incluir tarefas relâmpago"
 }

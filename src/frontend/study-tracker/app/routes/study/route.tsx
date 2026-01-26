@@ -11,14 +11,14 @@ const MENU_ITEMS = [
     icon: "icons/study_icon.png",
   },
   {
-    name: "school_grades",
-    path: "/curricular-units",
-    icon: "icons/tasks_icon.png",
-  },
-  {
     name: "notes",
     path: "/notes",
     icon: "icons/notes_icon.png",
+  },
+  {
+    name: "school_grades",
+    path: "/curricular-units",
+    icon: "icons/tasks_icon.png",
   },
 ];
 

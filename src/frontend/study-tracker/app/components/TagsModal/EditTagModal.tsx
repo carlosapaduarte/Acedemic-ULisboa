@@ -13,13 +13,26 @@ import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput
 import styles from "./TagModals.module.css";
 import classNames from "classnames";
 
+const PREDEFINED_TAG_NAMES = [
+  "estudo",
+  "study",
+  "aula",
+  "class",
+  "auto-cuidado",
+  "self-care",
+  "lazer",
+  "leisure",
+  "projeto",
+  "project",
+  "pessoal",
+  "personal",
+];
+
 interface EditTagModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onTagsUpdate: () => void;
 }
-
-const PREDEFINED_TAG_NAMES = ["fun", "work", "personal", "study"];
 
 export function EditTagModal({
   isOpen,
@@ -32,19 +45,25 @@ export function EditTagModal({
   const [tagToEdit, setTagToEdit] = useState<Tag | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [ucNames, setUcNames] = useState<string[]>([]);
 
   const [namePt, setNamePt] = useState("");
   const [nameEn, setNameEn] = useState("");
   const [color, setColor] = useState("#CCCCCC");
   const [description, setDescription] = useState("");
 
-  const fetchAllTags = async () => {
+  const fetchData = async () => {
     setIsLoading(true);
     try {
-      const tags = await service.fetchUserTags();
+      const [tags, ucs] = await Promise.all([
+        service.fetchUserTags(),
+        service.getCurricularUnits(),
+      ]);
+
       setAllUserTags(tags);
+      setUcNames(ucs.map((u) => u.name.toLowerCase()));
     } catch (error) {
-      console.error("Erro ao buscar as tags do utilizador", error);
+      console.error("Erro ao buscar dados:", error);
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +71,7 @@ export function EditTagModal({
 
   useEffect(() => {
     if (isOpen) {
-      fetchAllTags();
+      fetchData();
     }
   }, [isOpen]);
 
@@ -82,7 +101,7 @@ export function EditTagModal({
         color: color,
       });
       onTagsUpdate();
-      await fetchAllTags();
+      await fetchData();
       setTagToEdit(null);
     } catch (error) {
       console.error("Erro ao atualizar a tag:", error);
@@ -108,7 +127,7 @@ export function EditTagModal({
     try {
       await service.deleteTag(Number(tagToEdit.id));
       onTagsUpdate();
-      await fetchAllTags();
+      await fetchData();
       setTagToEdit(null);
     } catch (error) {
       console.error("Erro ao apagar a tag:", error);
@@ -116,6 +135,27 @@ export function EditTagModal({
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const isProtectedTag = (tag: Tag | null) => {
+    if (!tag) return false;
+    const namePt = tag.name_pt?.toLowerCase() || "";
+    const nameEn = tag.name_en?.toLowerCase() || "";
+
+    // 1. Verifica se é das predefinidas (Aula, Estudo, etc.)
+    if (
+      PREDEFINED_TAG_NAMES.includes(namePt) ||
+      PREDEFINED_TAG_NAMES.includes(nameEn)
+    ) {
+      return true;
+    }
+
+    // 2. Verifica se o nome corresponde a uma UC existente
+    if (ucNames.includes(namePt) || ucNames.includes(nameEn)) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -213,7 +253,17 @@ export function EditTagModal({
                   <Button
                     onPress={handleDelete}
                     className={styles.deleteButton}
-                    isDisabled={isSaving}
+                    isDisabled={isSaving || isProtectedTag(tagToEdit)}
+                    style={
+                      isSaving || isProtectedTag(tagToEdit)
+                        ? {
+                            backgroundColor: "#cccccc",
+                            color: "#666666",
+                            cursor: "not-allowed",
+                            opacity: 0.6,
+                          }
+                        : {}
+                    }
                   >
                     {t("delete_button")}
                   </Button>

@@ -1,19 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Button,
-  Dialog,
-  Label,
-  Input,
-  TextField,
-  OverlayArrow,
-} from "react-aria-components";
 import { useTranslation } from "react-i18next";
-import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
+import { FaXmark } from "react-icons/fa6";
 import { service, Tag } from "~/service/service";
 import styles from "./TagModals.module.css";
 
 interface CreateTagModalProps {
-  onTagCreated: () => void;
+  onTagCreated: (newTag?: Tag) => void;
+  close: () => void;
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -38,156 +31,136 @@ function getColorDistance(color1: string, color2: string): number {
   );
 }
 
-export function CreateTagModal({ onTagCreated }: CreateTagModalProps) {
-  const { t } = useTranslation("calendar");
+export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
+  const { t } = useTranslation(["task", "calendar"]);
   const [namePt, setNamePt] = useState("");
   const [nameEn, setNameEn] = useState("");
-  const [tagColor, setTagColor] = useState("#888888");
+  const [tagColor, setTagColor] = useState("#888888"); // Cor cinza default da imagem
   const [isSaving, setIsSaving] = useState(false);
-  const [colorError, setColorError] = useState<string | null>(null);
-  const [deselectedTagColor, setDeselectedTagColor] = useState<string>("");
   const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
 
-  //vai buscar a lista de todas as tags do utilizador e guarda-a no estado allUserTags
+  const MAX_CHARS = 30;
+
+  // Carregar tags existentes
   useEffect(() => {
     service
       .fetchUserTags()
-      .then(setAllUserTags)
-      .catch((err) => console.error("Falha ao carregar tags existentes:", err));
+      .then((tags) => setAllUserTags(Array.isArray(tags) ? tags : []))
+      .catch(console.error);
   }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const colorValue = getComputedStyle(document.documentElement)
-        .getPropertyValue("--color-2")
-        .trim();
-      setDeselectedTagColor(colorValue || "#8d8d8d");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!deselectedTagColor) return;
-    const distance = getColorDistance(tagColor, deselectedTagColor);
-    if (distance < 30) {
-      setColorError(
-        t(
-          "color_too_similar_error",
-          "Esta cor é muito parecida com a das tags inativas."
-        )
-      );
-    } else {
-      setColorError(null);
-    }
-  }, [tagColor, deselectedTagColor, t]);
 
   const nameError = useMemo(() => {
-    const normalizedInputPt = namePt.trim().toLowerCase();
-    const normalizedInputEn = nameEn.trim().toLowerCase();
-
-    if (normalizedInputPt.length === 0 && normalizedInputEn.length === 0)
-      return null;
-
-    const isDuplicate = allUserTags.some(
-      (tag) =>
-        (tag.name_pt && normalizedInputPt === tag.name_pt.toLowerCase()) ||
-        (tag.name_en && normalizedInputPt === tag.name_en.toLowerCase()) ||
-        (tag.name_pt && normalizedInputEn === tag.name_pt.toLowerCase()) ||
-        (tag.name_en && normalizedInputEn === tag.name_en.toLowerCase())
-    );
-    if (isDuplicate) {
-      return t(
-        "tag_already_exists_error",
-        "Uma tag com um destes nomes já existe."
-      );
-    }
-
-    return null;
+    const pt = namePt.trim().toLowerCase();
+    const en = nameEn.trim().toLowerCase();
+    if (!pt && !en) return null;
+    const isDuplicate = allUserTags.some((tag) => {
+      const existingPt = tag.name_pt?.toLowerCase();
+      const existingEn = tag.name_en?.toLowerCase();
+      const conflictPt = pt && (existingPt === pt || existingEn === pt);
+      const conflictEn = en && (existingPt === en || existingEn === en);
+      return conflictPt || conflictEn;
+    });
+    return isDuplicate ? t("tag_exists", "Tag já existe") : null;
   }, [namePt, nameEn, allUserTags, t]);
 
-  const handleSave = async (close: () => void) => {
-    if (!namePt.trim() && !nameEn.trim()) {
-      return;
-    }
-    if (nameError || colorError) return;
+  const handleSave = async () => {
+    if (!namePt.trim() && !nameEn.trim()) return;
+    if (nameError) return;
 
     setIsSaving(true);
     try {
-      await service.createTag({
+      const createdTag = await service.createTag({
         name_pt: namePt.trim() || undefined,
         name_en: nameEn.trim() || undefined,
         color: tagColor,
-      });
-      onTagCreated();
+        is_uc: false,
+      } as any);
+      onTagCreated?.(createdTag);
       close();
-    } catch (err: any) {
-      console.error("Erro ao criar tag:", err);
-      alert(t("error_creating_tag", "Ocorreu um erro ao criar a tag"));
+    } catch (err) {
+      console.error(err);
+      alert(t("error_creating_tag", "Erro ao criar tag"));
     } finally {
       setIsSaving(false);
     }
   };
-  const MAX_CHARS = 30;
+
   return (
-    <Dialog className={styles.tagModal}>
-      {({ close }) => (
-        <>
-          <OverlayArrow className={styles.arrow}>
-            <svg width={12} height={12} viewBox="0 0 12 12">
-              <path d="M0 12 L6 6 L12 12" />
-            </svg>
-          </OverlayArrow>
+    <div className={styles.createTagTooltip}>
+      {/* 1. NOME PT */}
+      <div>
+        <label>{t("tag_name_pt_label", "Nome da Etiqueta (PT)")}</label>
+        <input
+          type="text"
+          value={namePt}
+          onChange={(e) => setNamePt(e.target.value)}
+          maxLength={MAX_CHARS}
+          placeholder={t("new_tag_name_placeholder", "Nome da nova etiqueta")}
+          autoFocus
+        />
+        <div className={styles.charCounter}>
+          {namePt.length} / {MAX_CHARS}
+        </div>
+      </div>
 
-          <TextField className={styles.textField} autoFocus>
-            <Label>{t("tag_name_pt_label", "Nome da Etiqueta (PT)")}</Label>
-            <Input
-              value={namePt}
-              onChange={(e) => setNamePt(e.target.value)}
-              maxLength={MAX_CHARS}
-              placeholder={t("new_tag_name_placeholder")}
-            />
-            <div className={styles.charCounter}>
-              {namePt.length} / {MAX_CHARS}
-            </div>
-          </TextField>
-          <TextField className={styles.textField}>
-            <Label>{t("tag_name_en_label", "Tag Name (EN)")}</Label>
-            <Input
-              value={nameEn}
-              onChange={(e) => setNameEn(e.target.value)}
-              maxLength={MAX_CHARS}
-              placeholder={t("new_tag_name_en_placeholder", "e.g. Study")}
-            />
-            <div className={styles.charCounter}>
-              {nameEn.length} / {MAX_CHARS}
-            </div>
-          </TextField>
+      <div>
+        <label>{t("tag_name_en_label", "Tag Name (EN)")}</label>
+        <input
+          type="text"
+          value={nameEn}
+          onChange={(e) => setNameEn(e.target.value)}
+          maxLength={MAX_CHARS}
+          placeholder="e.g. Study"
+        />
+        <div className={styles.charCounter}>
+          {nameEn.length} / {MAX_CHARS}
+        </div>
+      </div>
 
-          <ColorPickerInput
-            color={tagColor}
-            setColor={setTagColor}
-            clearColor={() => setTagColor("#888888")}
+      <div>
+        <label>{t("color", "Cor")}</label>
+        <div className={styles.customColorBox}>
+          <input
+            type="color"
+            className={styles.hiddenColorInput}
+            value={tagColor}
+            onChange={(e) => setTagColor(e.target.value)}
           />
 
-          {(nameError || colorError) && (
-            <p className={styles.error}>{nameError || colorError}</p>
-          )}
+          <div
+            className={styles.previewDot}
+            style={{ backgroundColor: tagColor }}
+          />
+          <span className={styles.hexLabel}>{tagColor}</span>
 
-          <Button
-            onPress={() => handleSave(close)}
-            className={styles.saveButton}
-            isDisabled={
-              isSaving ||
-              !!nameError ||
-              !!colorError ||
-              (!namePt.trim() && !nameEn.trim())
-            }
+          <button
+            className={styles.resetColorBtn}
+            onClick={(e) => {
+              e.stopPropagation();
+              setTagColor("#888888");
+            }}
+            title="Resetar cor"
           >
-            {isSaving
-              ? t("saving_button", "A Guardar...")
-              : t("create_new_tag_button", "Criar nova etiqueta")}
-          </Button>
-        </>
+            <FaXmark />
+          </button>
+        </div>
+      </div>
+
+      {nameError && (
+        <div
+          style={{ color: "#ff8a80", fontSize: "0.8rem", textAlign: "center" }}
+        >
+          {nameError}
+        </div>
       )}
-    </Dialog>
+
+      <button
+        className={styles.createBtn}
+        onClick={handleSave}
+        disabled={isSaving || (namePt === "" && nameEn === "")}
+      >
+        {isSaving ? "..." : t("create_new_tag_button", "Criar nova etiqueta")}
+      </button>
+    </div>
   );
 }

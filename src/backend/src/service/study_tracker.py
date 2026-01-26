@@ -1,10 +1,10 @@
 from datetime import datetime
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
+from domain.study_tracker import Archive, CurricularUnit, MoodLog, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
 from exception import InvalidDate, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
 from datetime import date
-
+from router.study_tracker.dtos.input_dtos import CreateMoodLogInputDto
 study_tracker_repo = StudyTrackerSqlRepo()
 
 FALLBACK_COLOR = "#3399FF"
@@ -58,7 +58,7 @@ def get_events(user_id: int, today: bool, recurrentEvents: bool, study_events: b
 def create_schedule_not_available_block(user_id: int, info: UnavailableScheduleBlock):
     study_tracker_repo.create_not_available_schedule_block(user_id, info)
 
-def create_event_from_task(user_id: int, task: Task, slot: SlotToWork):
+def create_event_from_task(user_id: int, task: Task, slot: SlotToWork, task_id: int):
     associatedEvent = Event(
         id=None,
         title=task.title,
@@ -68,15 +68,18 @@ def create_event_from_task(user_id: int, task: Task, slot: SlotToWork):
         ),
         tags=task.tags,
         every_week=False,
-        every_day=False
+        every_day=False,
+        task_id=task_id
     )
     create_event(user_id, associatedEvent)
 
 def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
+    new_task_id = study_tracker_repo.create_task(user_id, task, task_id=None)
+
     for slot in slotsToWork:
-        create_event_from_task(user_id, task, slot)
+        create_event_from_task(user_id, task, slot, new_task_id)
         
-    return study_tracker_repo.create_task(user_id, task, task_id=None) # Generates random and available task ID
+    return new_task_id
 
 def update_task(user_id: int, task_id: int, updated_task: Task, slotsToWork: list[SlotToWork], previous_task_name: str):
     study_tracker_repo.update_task(user_id, task_id, updated_task)
@@ -132,16 +135,27 @@ def get_user_tasks(
     )
 
 def get_user_task(user_id: int, task_id: int) -> Task:
-    # TODO: improve later
-    user_tasks = get_user_tasks(user_id, False, False, False)
-    for task in user_tasks:
-        if task.id == task_id:
-            return task
-    raise NotFoundException(user_id)
+    try:
+        return study_tracker_repo.get_task(user_id, task_id)
+    except Exception as e:
+        raise NotFoundException(user_id)
 
 def update_task_status(user_id: int, task_id: int, new_status: str):
     study_tracker_repo.update_task_status(user_id, task_id, new_status)
+
+    if new_status == "completed":
+        delete_future_slots_for_task(user_id, task_id)
+
+def delete_task(user_id: int, task_id: int):
+    """Apaga uma tarefa pelo ID."""
+    try:
+        study_tracker_repo.delete_task(user_id, task_id)
+    except Exception as e:
+        raise NotFoundException(f"Task {task_id} to delete not found")
     
+def delete_future_slots_for_task(user_id: int, task_id: int):
+    study_tracker_repo.delete_future_slots_for_task(user_id, task_id) 
+
 def create_archive(user_id: int, name: str):
     study_tracker_repo.create_archive(user_id, name)
     
@@ -165,6 +179,19 @@ def create_grade(user_id: int, curricular_unit: str, grade: Grade):
 
 def delete_grade(user_id: int, curricular_unit_name: str, grade_id: int):
     return study_tracker_repo.delete_grade(user_id, curricular_unit_name, grade_id)
+
+def create_mood_log(user_id: int, dto: CreateMoodLogInputDto):
+    # Converter timestamp para datetime
+    log_date = datetime.fromtimestamp(dto.date)
+    
+    study_tracker_repo.create_mood_log(
+        user_id,
+        dto.value,
+        dto.label,
+        dto.emotions,
+        dto.impacts,
+        log_date
+    )
 
 def create_daily_energy_status(user_id: int, level: int, time_of_day: str):
     if not verify_time_of_day(time_of_day):
@@ -245,3 +272,9 @@ def finish_study_session(user_id: int):
 def update_week_time_average_study_time(user_id: int, week_and_year: WeekAndYear, study_session_time: int):
     study_tracker_repo.update_week_time_average_study_time(user_id, week_and_year, study_session_time)
 """
+
+def get_mood_logs(user_id: int) -> list[MoodLog]:
+    """
+    Obtém o histórico de mood logs do repositório.
+    """
+    return study_tracker_repo.get_mood_logs(user_id)

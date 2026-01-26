@@ -20,6 +20,7 @@ function useCreateNewTask() {
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
   const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
+  const [isMicroTask, setIsMicroTask] = useState(false);
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
@@ -43,7 +44,7 @@ function useCreateNewTask() {
     setSubTasks([]);
     setSlotsToWork([]);
     setSelectedTagIds([]);
-    setAvailableTags([]);
+    setIsMicroTask(false);
   }
 
   function appendSubSubTask(subTask: CreateTaskInputDto) {
@@ -79,13 +80,17 @@ function useCreateNewTask() {
     refreshTags,
     isEditTagModalOpen,
     setIsEditTagModalOpen,
+    isMicroTask,
+    setIsMicroTask,
   };
 }
 
 const CreateTaskModal = React.memo(function CreateTaskModal({
   onTaskCreated,
+  parentTaskId,
 }: {
   onTaskCreated: (task: Task) => void;
+  parentTaskId?: number;
 }) {
   const {
     title,
@@ -109,6 +114,8 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
     refreshTags,
     isEditTagModalOpen,
     setIsEditTagModalOpen,
+    isMicroTask,
+    setIsMicroTask,
   } = useCreateNewTask();
 
   const { t } = useTranslation();
@@ -150,7 +157,9 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
                 {t("task:close")}
               </Button>
               <h1 className={styles.newTaskTitleText}>
-                {t("task:new_task_title")}
+                {parentTaskId
+                  ? t("task:new_subtask_title", "Nova Subtarefa")
+                  : t("task:new_task_title")}
               </h1>
               <div className={styles.newTaskFormContainer}>
                 <CreateTaskForm
@@ -169,6 +178,8 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
                   availableTags={availableTags}
                   refreshTags={refreshTags}
                   setIsEditTagModalOpen={setIsEditTagModalOpen}
+                  isMicroTask={isMicroTask}
+                  setIsMicroTask={setIsMicroTask}
                 />
               </div>
               <div className={styles.finishCreatingTaskButtonContainer}>
@@ -181,14 +192,16 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
                     }
                     close();
                     onConfirmClick({
-                      title,
+                      title: title!,
                       description,
                       deadline,
-                      priority,
+                      priority: priority!,
                       tags: selectedTagIds,
                       status: status ?? "not_completed",
                       subTasks,
                       slotsToWork,
+                      is_micro_task: isMicroTask,
+                      parent_task_id: parentTaskId,
                     });
                     clearFields();
                   }}
@@ -212,9 +225,15 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
 const ModalWrapper = React.memo(function ModalWrapper({
   onTaskCreated,
   children,
+  parentTaskId,
+  forceOpen,
+  onClose,
 }: {
   onTaskCreated: (task: Task) => void;
   children: JSX.Element;
+  parentTaskId?: number;
+  forceOpen?: boolean;
+  onClose?: () => void;
 }) {
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [secondModalContent, setSecondModalContent] = useState<
@@ -223,6 +242,21 @@ const ModalWrapper = React.memo(function ModalWrapper({
   const [secondModalClass, setSecondModalClass] = useState<string | undefined>(
     undefined
   );
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (forceOpen) {
+      setIsOpen(true);
+    }
+  }, [forceOpen]);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open && onClose) {
+      onClose();
+    }
+  };
 
   const secondModalContextValue = useMemo(
     () => ({
@@ -244,10 +278,13 @@ const ModalWrapper = React.memo(function ModalWrapper({
   );
 
   return (
-    <DialogTrigger>
+    <DialogTrigger isOpen={isOpen} onOpenChange={handleOpenChange}>
       {children}
       <SecondModalContext.Provider value={secondModalContextValue}>
-        <CreateTaskModal onTaskCreated={onTaskCreated} />
+        <CreateTaskModal
+          onTaskCreated={onTaskCreated}
+          parentTaskId={parentTaskId}
+        />
       </SecondModalContext.Provider>
       <Modal
         isOpen={isSecondModalOpen}
@@ -262,13 +299,24 @@ const ModalWrapper = React.memo(function ModalWrapper({
 
 export function CreateTaskButton({
   onTaskCreated,
+  parentTaskId,
+  forceOpen,
+  onClose,
 }: {
   onTaskCreated: (task: Task) => void;
+  parentTaskId?: number;
+  forceOpen?: boolean;
+  onClose?: () => void;
 }) {
   const { t } = useTranslation();
 
   return (
-    <ModalWrapper onTaskCreated={onTaskCreated}>
+    <ModalWrapper
+      onTaskCreated={onTaskCreated}
+      parentTaskId={parentTaskId}
+      forceOpen={forceOpen}
+      onClose={onClose}
+    >
       <Button className={classNames(styles.createNewTaskButton)}>
         + {t("task:create_new_task")}
       </Button>

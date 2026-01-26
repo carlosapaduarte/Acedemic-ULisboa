@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from repository.sql.models.database import get_session
 from repository.sql.models.models import UserTagLink, TagModel
 from router.study_tracker.dtos.input_dtos import CreateTagInputDto, UpdateTagInputDto
-from router.study_tracker.dtos.output_dtos import TagOutputDto
+from router.commons.dtos.output_dtos import TagOutputDto
 from router.commons.common import get_current_user_id
 
 router = APIRouter(

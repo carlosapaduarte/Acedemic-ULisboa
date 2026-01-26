@@ -3,10 +3,12 @@ import { useTranslation } from "react-i18next";
 import styles from "./pomodoroPage.module.css";
 
 function useSelectTime(
-  onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void
+  onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void,
+  initialStudy: number,
+  initialPause: number
 ) {
-  const [studyMinutes, setStudyMinutes] = useState(25);
-  const [pauseMinutes, setPauseMinutes] = useState(5);
+  const [studyMinutes, setStudyMinutes] = useState(initialStudy);
+  const [pauseMinutes, setPauseMinutes] = useState(initialPause);
 
   function onConfirmButtonClick() {
     const studyStopDate = new Date();
@@ -27,11 +29,17 @@ function useSelectTime(
   };
 }
 
+interface SelectTimeProps {
+  onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void;
+  initialStudyMinutes?: number;
+  initialPauseMinutes?: number;
+}
+
 export function SelectTime({
   onTimeSelected,
-}: {
-  onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void;
-}) {
+  initialStudyMinutes = 25, // Default se não vier nada
+  initialPauseMinutes = 5, // Default se não vier nada
+}: SelectTimeProps) {
   const { t } = useTranslation(["study"]);
 
   const {
@@ -40,14 +48,14 @@ export function SelectTime({
     pauseMinutes,
     setPauseMinutes,
     onConfirmButtonClick,
-  } = useSelectTime(onTimeSelected);
+  } = useSelectTime(onTimeSelected, initialStudyMinutes, initialPauseMinutes);
 
   return (
     <div className={styles.pomodoroContainer}>
       <form className={styles.timeSelectionForm}>
         <div className={styles.timeInputGroup}>
           <label className={styles.timeLabel}>
-            {t("study:select_study_minutes")}
+            {t("study:select_study_minutes", "Minutos de Estudo")}
           </label>
           <input
             className={styles.timeInput}
@@ -60,7 +68,7 @@ export function SelectTime({
 
         <div className={styles.timeInputGroup}>
           <label className={styles.timeLabel}>
-            {t("study:select_pause_minutes")}
+            {t("study:select_pause_minutes", "Minutos de Pausa")}
           </label>
           <input
             className={styles.timeInput}
@@ -76,7 +84,7 @@ export function SelectTime({
           className={styles.confirmButton}
           onClick={onConfirmButtonClick}
         >
-          {t("study:confirm")}
+          {t("study:confirm", "Confirmar e Iniciar")}
         </button>
       </form>
     </div>

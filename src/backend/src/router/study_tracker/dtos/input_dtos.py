@@ -21,6 +21,9 @@ class CreateEventInputDto(BaseModel):
     everyDay: bool = False
     notes: str | None
     color: str = "#3399FF"
+    is_uc: bool = False
+    recurrenceStart: Optional[float] = None
+    recurrenceEnd: Optional[float] = None
 
 class UpdateEventInputDto(BaseModel):
     startDate: float
@@ -31,6 +34,9 @@ class UpdateEventInputDto(BaseModel):
     everyDay: bool = False
     notes: Optional[str] = None
     color: str = None
+    is_uc: bool = False
+    recurrenceStart: Optional[float] = None
+    recurrenceEnd: Optional[float] = None
 
 class CreateScheduleNotAvailableBlockInputDto(BaseModel):
     weekDay: int
@@ -57,6 +63,8 @@ class CreateTaskInputDto(BaseModel):
     status: str
     subTasks: list['CreateTaskInputDto']
     slotsToWork: list[SlotToWorkInputDto] | None = []
+    is_micro_task: Optional[bool] = False
+    parent_task_id: Optional[int] = None
 
 class EditTaskInputDto(BaseModel):
     previous_task_name: str
@@ -81,9 +89,12 @@ class CreateGradeInputDto(BaseModel):
     value: float
     weight: float
     
-class CreateDailyEnergyStatus(BaseModel):
-    level: int
-    timeOfDay: str
+class CreateMoodLogInputDto(BaseModel):
+    value: int          # Painel 1 (1-5)
+    label: str          # Painel 1 (Texto)
+    emotions: List[str] # Painel 2 (Tags)
+    impacts: List[str]  # Painel 3 (Tags)
+    date: float
     
 class CreateDailyTags(BaseModel):
     tags: list[str]
@@ -97,7 +108,7 @@ class CreateTagInputDto(BaseModel):
     name_pt: Optional[str] = None
     name_en: Optional[str] = None
     color: Optional[str] = None
-
+    is_uc: bool = False
     @model_validator(mode='before')
     @classmethod
     def check_at_least_one_name(cls, data: dict):

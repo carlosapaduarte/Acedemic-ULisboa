@@ -48,7 +48,11 @@ class Task():
             priority: str,
             tags: list[str],
             sub_tasks: list['Task'],
+            is_micro_task: bool = False,
             status: str="not_completed",
+            completed_at: datetime | None = None,
+            parent_task_id: int | None = None
+
     ) -> None:
         self.id=id
         self.title=title
@@ -58,6 +62,9 @@ class Task():
         self.tags=tags
         self.sub_tasks=sub_tasks
         self.status=status
+        self.is_micro_task = is_micro_task
+        self.completed_at = completed_at
+        self.parent_task_id = parent_task_id
 
     @staticmethod
     def from_create_task_input_dto(task_dto: CreateTaskInputDto) -> 'Task':
@@ -72,7 +79,9 @@ class Task():
             priority=task_dto.priority,
             tags=task_dto.tags,
             status=task_dto.status,
-            sub_tasks=sub_tasks
+            sub_tasks=sub_tasks,
+            is_micro_task=task_dto.is_micro_task,
+            parent_task_id=task_dto.parent_task_id
         )
 
 class UnavailableScheduleBlock():
@@ -119,29 +128,65 @@ class ScheduleBlock():
             )
         )
 """
-
 class Event():
-    def __init__(self, id: int | None, title: str, date: DateInterval, tags: list[str], every_week: bool, every_day: bool, color: Optional[str] = None,notes: str = ""):
-        self.id=id
-        self.title=title
-        self.date=date
-        self.tags=tags if tags is not None else []
-        self.every_week=every_week
-        self.every_day=every_day
+    def __init__(
+        self, 
+        id: int | None, 
+        title: str, 
+        date: DateInterval, 
+        tags: list[any],
+        every_week: bool, 
+        every_day: bool, 
+        color: Optional[str] = None,
+        notes: str = "", 
+        task_id: Optional[int] = None, 
+        is_uc: bool = False,
+        recurrence_start: Optional[datetime] = None,
+        recurrence_end: Optional[datetime] = None
+    ) -> None:
+        self.id = id
+        self.title = title
+        self.date = date
+        self.tags = tags if tags is not None else []
+        self.every_week = every_week
+        self.every_day = every_day
         self.color = color
         self.notes = notes
+        self.task_id = task_id
+        self.is_uc = is_uc
+        self.recurrence_start = recurrence_start
+        self.recurrence_end = recurrence_end
 
     @staticmethod
     def from_STEventModel(events: list['STEventModel']) -> list['Event']:
         domain_events: list[Event] = []
         for event_model in events:
-
-            tag_names = [
-                assoc.tag_ref.name_pt
-                for assoc in event_model.tags_associations
-                if assoc.tag_ref and assoc.tag_ref.name_pt 
-            ]
             
+            tags_list = []
+            
+            if event_model.tags_associations:
+                
+                for assoc in event_model.tags_associations:
+                    if assoc.tag_ref:
+                        tag = assoc.tag_ref
+                        
+                        t_name = "N/A"
+                        if hasattr(tag, 'name_pt') and tag.name_pt:
+                            t_name = tag.name_pt
+                        elif hasattr(tag, 'name_en') and tag.name_en:
+                            t_name = tag.name_en
+                        
+                        tag_obj = {
+                            "id": tag.id,
+                            "name": t_name,
+                            "color": getattr(tag, "color", None),
+                            "name_pt": getattr(tag, "name_pt", None),
+                            "name_en": getattr(tag, "name_en", None),
+                            "is_uc": getattr(tag, "is_uc", False)
+                        }
+
+                        tags_list.append(tag_obj)
+
             domain_events.append(
                 Event(
                     id=event_model.id,
@@ -150,15 +195,20 @@ class Event():
                         start_date=event_model.start_date,
                         end_date=event_model.end_date
                     ),
-                    tags=tag_names,
+                    tags=tags_list,
                     every_week=event_model.every_week,
                     every_day=event_model.every_day,
                     notes=event_model.notes,
-                    color=event_model.color
+                    color=event_model.color,
+                    task_id=event_model.task_id,
+                    is_uc=event_model.is_uc,
+                    recurrence_start=event_model.recurrence_start,
+                    recurrence_end=event_model.recurrence_end
                 )
             )
+
         return domain_events
-    
+
 class File():
     def __init__(self, name: str, text: str):
         self.name=name
@@ -192,11 +242,11 @@ class Archive():
         return archives
 
 class Grade():
-    id: int
+    id: int | None #TODO: tirar o none
     value: float
     weight: float
 
-    def __init__(self,id:int, value: float, weight: float) -> None:
+    def __init__(self,id:int | None, value: float, weight: float) -> None:
         self.id=id
         self.value=value
         self.weight=weight
@@ -287,3 +337,22 @@ class WeekTimeStudy():
 def verify_time_of_day(time_of_day: str) -> bool:
     print(time_of_day)
     return time_of_day.lower() == "morning" or time_of_day.lower() == "afternoon" or time_of_day.lower() == "night"
+
+class MoodLog:
+    def __init__(
+        self, 
+        id: int, 
+        user_id: int, 
+        value: int, 
+        label: str, 
+        emotions: list[str], 
+        impacts: list[str], 
+        date_log: datetime
+    ):
+        self.id = id
+        self.user_id = user_id
+        self.value = value
+        self.label = label
+        self.emotions = emotions
+        self.impacts = impacts
+        self.date_log = date_log

@@ -39,200 +39,124 @@
   background-color: var(--color-3);
   color: var(--text-color-2);
   padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  max-width: 650px;
-  width: 90%;
-  max-height: 80vh;
-  /*overflow: hidden;*/
-  border: 1px solid var(--color-2);
-  position: relative;
 }
 
-/* Estrutura de Duas Colunas */
-.mainContentContainer {
-  display: flex;
-  gap: 2rem;
-  margin-top: 1rem;
-}
-
-.tagListColumn {
-  flex: 1;
-}
-
-.editFormColumn {
-  flex: 1.5;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Lista de Tags à Esquerda */
-.tagList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-height: 280px;
-  overflow-y: auto;
-  padding-right: 8px;
-}
-
-.tagItem {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: 2px solid;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  color: var(--text-color-2);
-}
-.tagItem:hover {
-  background-color: var(--color-2);
-}
-.tagColorDot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-.currentlyEditingTag {
-  background-color: var(--color-2);
-  font-weight: bold;
-}
-
-/* Formulário direita */
-.editFormContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.noTagSelectedMessage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 2rem;
-  color: var(--color-2);
-  border: 2px dashed var(--color-2);
-  border-radius: 10px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.textField {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.textField Input {
-  background-color: var(--color-1);
-  color: var(--text-color-1);
-  border: 1px solid var(--color-2);
-  border-radius: 6px;
-  padding: 10px 12px;
-  font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-.textField Input:focus {
-  outline: none;
-}
-
-/* --- ESTILOS PARA O POPOVER DE CRIAR TAG --- */
-.tagModal {
+.createTagTooltip {
+  width: 300px !important;
+  max-width: 300px !important;
   background-color: var(--color-3);
-  color: var(--text-color-2);
-  padding: 15px;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  position: relative;
-  border: 1px solid var(--color-2);
-}
-.deleteButton {
-  background-color: var(--color-text-danger);
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  text-align: center;
-  transition: background-color 0.2s ease;
-}
-
-.deleteButton:hover {
-  background-color: #9c140d;
-}
-.actionButtonsContainer {
-  display: flex;
-  justify-content: center;
   gap: 1rem;
-  margin-top: 1rem;
+  color: var(--text-color-2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
-.saveButton {
-  background-color: var(--color-4);
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  text-align: center;
-  transition: background-color 0.2s ease;
-}
-.saveButton:hover {
-  background-color: var(--color-4-hover);
-}
-.saveButton:disabled {
-  background-color: #5877504a;
-  cursor: not-allowed;
-}
-
-.arrow {
-  position: absolute;
-  fill: var(--color-3);
-  stroke: var(--color-2);
-  stroke-width: 1px;
-}
-
-[data-placement="bottom"] .arrow {
-  top: -11px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-[data-placement="top"] .arrow {
-  bottom: -11px;
-  left: 50%;
-  transform: translateX(-50%) rotate(180deg);
-}
-
-.modalContent {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.colorPickerWrapper {
+.createTagTooltip label {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
   display: block;
 }
 
-.error {
-  color: #ff8a80;
-  font-size: 0.8rem;
-  margin: 5px;
-  text-align: center;
+.createTagTooltip input[type="text"] {
+  background-color: var(--color-1);
+  color: var(--text-color-1);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
 }
 
 .charCounter {
-  font-size: 0.8rem;
-  color: grey;
   text-align: right;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
   margin-top: 4px;
-  padding-right: 2px;
+}
+
+.customColorBox {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  position: relative;
+}
+
+.previewDot {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hexLabel {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+  margin-left: 12px;
+  flex: 1;
+}
+
+.resetColorBtn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+.resetColorBtn:hover {
+  color: white;
+}
+
+.createBtn {
+  background-color: var(--color-2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background 0.2s;
+}
+
+.createBtn:hover {
+  background-color: var(--color-2-hover);
+}
+
+.createBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hiddenColorInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }

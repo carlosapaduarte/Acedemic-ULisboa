@@ -68,9 +68,6 @@ export function Timer({
         {isRunning ? t("study:timer_running") : t("study:timer_paused")}
       </p>
       <div className={styles.controls}>
-        <button className={styles.controlButton} onClick={start}>
-          {t("study:timer_start")}
-        </button>
         <button className={styles.controlButton} onClick={pause}>
           {t("study:timer_pause")}
         </button>

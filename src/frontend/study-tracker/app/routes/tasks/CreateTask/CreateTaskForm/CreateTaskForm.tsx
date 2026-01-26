@@ -16,6 +16,9 @@ import { SlotToWorkDto } from "~/service/output_dtos";
 import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
 import { Tag } from "~/service/service";
 import { RiSettings5Fill } from "react-icons/ri";
+import { FaTrash } from "react-icons/fa";
+import { useNavigate } from "@remix-run/react";
+import { TagSection } from "~/components/TagSection/TagSection";
 
 const priorityValues = ["low", "medium", "high"];
 
@@ -79,18 +82,62 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
   const { t } = useTranslation(["task"]);
   const [slotAddingQueue, setSlotAddingQueue] = useState<number[]>([]);
 
-  const [slotsToWorkNumber, setSlotsToWorkNumber] = useState(
-    slotsToWork.length
-  );
+  const [localSlots, setLocalSlots] = useState<
+    { id: string; data: SlotToWorkDto | undefined }[]
+  >(() => slotsToWork.map((slot) => ({ id: crypto.randomUUID(), data: slot })));
+
+  useEffect(() => {
+    const currentValidCount = localSlots.filter(
+      (s) => s.data !== undefined
+    ).length;
+
+    if (slotsToWork.length > 0 && slotsToWork.length !== currentValidCount) {
+      setLocalSlots(
+        slotsToWork.map((slot) => ({ id: crypto.randomUUID(), data: slot }))
+      );
+    }
+  }, [slotsToWork]);
+
+  useEffect(() => {
+    const validSlots = localSlots
+      .map((s) => s.data)
+      .filter((slot): slot is SlotToWorkDto => slot !== undefined);
+
+    if (JSON.stringify(validSlots) !== JSON.stringify(slotsToWork)) {
+      setSlotsToWork(validSlots);
+    }
+  }, [localSlots]);
 
   function addToSlotAddingQueue(index: number) {
-    setSlotAddingQueue((slotAddingQueue) => [...slotAddingQueue, index]);
+    setSlotAddingQueue((prev) => [...prev, index]);
     setTimeout(() => {
-      setSlotAddingQueue((slotAddingQueue) =>
-        slotAddingQueue.filter((i) => i !== index)
-      );
+      setSlotAddingQueue((prev) => prev.filter((i) => i !== index));
     }, 1000);
   }
+
+  const handleAddVisualSlot = () => {
+    const newIndex = localSlots.length;
+    setLocalSlots((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), data: undefined },
+    ]);
+    addToSlotAddingQueue(newIndex);
+  };
+
+  const handleRemoveSlot = (idToRemove: string) => {
+    setLocalSlots((prev) => prev.filter((slot) => slot.id !== idToRemove));
+  };
+
+  const handleUpdateSlotData = (idToUpdate: string, data: SlotToWorkDto) => {
+    setLocalSlots((prev) =>
+      prev.map((slot) => {
+        if (slot.id === idToUpdate) {
+          return { ...slot, data: data };
+        }
+        return slot;
+      })
+    );
+  };
 
   return (
     <div className={styles.slotsToWorkSectionContainer}>
@@ -98,27 +145,48 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
         {t("task:slots_to_work_label")}
       </h2>
       <div className={styles.slotsToWorkContainer}>
-        {Array.from({ length: slotsToWorkNumber }).map((_, index) => (
-          <SlotToWork
-            key={index}
-            index={index}
-            newlyAdded={slotAddingQueue.includes(index)}
-            onClosePressed={(slot: SlotToWorkDto | undefined) => {
-              if (slot) {
-                console.log(slot);
-                const newSlotsToWork = [...slotsToWork];
-                newSlotsToWork.push(slot);
-                setSlotsToWork(newSlotsToWork);
-              } else console.log("Invalid date");
-            }}
-          />
+        {localSlots.map((slotWrapper, index) => (
+          <div
+            key={slotWrapper.id}
+            style={{ position: "relative", width: "100%" }}
+          >
+            <SlotToWork
+              index={index}
+              newlyAdded={slotAddingQueue.includes(index)}
+              onClosePressed={(data: SlotToWorkDto | undefined) => {
+                if (data) {
+                  handleUpdateSlotData(slotWrapper.id, data);
+                }
+              }}
+            />
+
+            <Button
+              onPress={() => handleRemoveSlot(slotWrapper.id)}
+              style={{
+                position: "absolute",
+                top: "5px",
+                right: "5px",
+                background: "rgba(0,0,0,0.5)",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+              }}
+              aria-label="Remover slot"
+            >
+              <FaTrash size={12} />
+            </Button>
+          </div>
         ))}
       </div>
       <Button
-        onPress={() => {
-          setSlotsToWorkNumber(slotsToWorkNumber + 1);
-          addToSlotAddingQueue(slotsToWorkNumber);
-        }}
+        onPress={handleAddVisualSlot}
         className={classNames(styles.addSlotToWorkButton)}
       >
         {t("task:add_slot_to_work")}
@@ -219,96 +287,6 @@ const PrioritySection = React.memo(function PrioritySection({
   );
 });
 
-const TagSection = ({
-  selectedTagIds,
-  setSelectedTagIds,
-  availableTags,
-  refreshTags,
-  setIsEditTagModalOpen,
-}: {
-  selectedTagIds: string[];
-  setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
-  availableTags: Tag[];
-  refreshTags: () => void;
-  setIsEditTagModalOpen: (isOpen: boolean) => void;
-}) => {
-  const { t, i18n } = useTranslation(["task"]);
-
-  const handleToggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
-    );
-  };
-
-  return (
-    <div className={styles.tagsSectionContainer}>
-      <div className={styles.tagsHeader}>
-        <h2 className={styles.formSectionTitle}>{t("tags_title")}</h2>
-        <div className={styles.tagButtonsContainer}>
-          <Button
-            onPress={() => setIsEditTagModalOpen(true)}
-            className={styles.headerButton}
-            aria-label={t("manage_tags", "Gerir etiquetas")}
-          >
-            <RiSettings5Fill size={18} />
-          </Button>
-        </div>
-      </div>
-      <div className={styles.tagsContent}>
-        <div className={styles.tagListContainer}>
-          {availableTags.map((tag: Tag) => {
-            const isSelected = selectedTagIds.includes(tag.id);
-
-            let displayName: string | undefined | null;
-            if (
-              tag.name &&
-              ["fun", "work", "personal", "study"].includes(tag.name)
-            ) {
-              displayName = t(tag.name);
-            } else {
-              const lang = i18n.language.toLowerCase();
-              displayName =
-                lang.startsWith("en") && tag.name_en
-                  ? tag.name_en
-                  : tag.name_pt;
-            }
-
-            return (
-              <div
-                key={tag.id}
-                className={classNames(styles.tagItem, {
-                  [styles.selectedTagItem]: isSelected,
-                })}
-                onClick={() => handleToggleTag(tag.id)}
-                style={{
-                  backgroundColor: isSelected
-                    ? tag.color || "#888888"
-                    : "var(--color-2)",
-                }}
-              >
-                <span className={styles.tagLabel}>{displayName}</span>
-              </div>
-            );
-          })}
-          <DialogTrigger>
-            <Button
-              className={styles.addTagButtonRound}
-              aria-label={t("add_new_tag", "Adicionar nova etiqueta")}
-            >
-              +
-            </Button>
-            <Popover placement="bottom">
-              <CreateTagModal onTagCreated={refreshTags} />
-            </Popover>
-          </DialogTrigger>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export function CreateTaskForm({
   description,
   setDescription,
@@ -325,6 +303,8 @@ export function CreateTaskForm({
   availableTags,
   refreshTags,
   setIsEditTagModalOpen,
+  isMicroTask,
+  setIsMicroTask,
 }: {
   description: string | undefined;
   setDescription: (description: string) => void;
@@ -341,27 +321,54 @@ export function CreateTaskForm({
   availableTags: Tag[];
   refreshTags: () => void;
   setIsEditTagModalOpen: (isOpen: boolean) => void;
+  isMicroTask: boolean;
+  setIsMicroTask: (isMicroTask: boolean) => void;
 }) {
   return (
     <form className={styles.newTaskForm}>
+      <div className={styles.microTaskContainer}>
+        <input
+          type="checkbox"
+          id="micro-task-checkbox"
+          className={styles.hiddenCheckbox}
+          checked={isMicroTask}
+          onChange={(e) => setIsMicroTask(e.target.checked)}
+        />
+        <label htmlFor="micro-task-checkbox" className={styles.microTaskLabel}>
+          Tarefa relâmpago
+        </label>
+
+        <div
+          className={styles.infoIcon}
+          title="Tarefas rápidas apenas com título, sem horários ou detalhes."
+        >
+          i
+        </div>
+      </div>
+
       <TitleSection title={title} setTitle={setTitle} />
-      <DescriptionSection
-        description={description}
-        setDescription={setDescription}
-      />
-      <SlotsToWorkSection
-        slotsToWork={slotsToWork}
-        setSlotsToWork={setSlotsToWork}
-      />
-      <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
-      <PrioritySection priority={priority} setPriority={setPriority} />
-      <TagSection
-        selectedTagIds={selectedTagIds}
-        setSelectedTagIds={setSelectedTagIds}
-        availableTags={availableTags}
-        refreshTags={refreshTags}
-        setIsEditTagModalOpen={setIsEditTagModalOpen}
-      />
+
+      {!isMicroTask && (
+        <>
+          <DescriptionSection
+            description={description}
+            setDescription={setDescription}
+          />
+          <SlotsToWorkSection
+            slotsToWork={slotsToWork}
+            setSlotsToWork={setSlotsToWork}
+          />
+          <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
+          <PrioritySection priority={priority} setPriority={setPriority} />
+          <TagSection
+            selectedTagIds={selectedTagIds}
+            setSelectedTagIds={setSelectedTagIds}
+            availableTags={availableTags}
+            refreshTags={refreshTags}
+            setIsEditTagModalOpen={setIsEditTagModalOpen}
+          />
+        </>
+      )}
     </form>
   );
 }

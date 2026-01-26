@@ -1,231 +1,304 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Dialog, Input, Label, TextField } from "react-aria-components";
 import styles from "./slotToWork.module.css";
 import classNames from "classnames";
 import { SecondModalContext } from "~/routes/tasks/CreateTask/SecondModalContext";
 import { useTranslation } from "react-i18next";
-import { t } from "i18next";
 import { SlotToWorkDto } from "~/service/output_dtos";
 
-const formatDate = (dateString: string | undefined, locale: string = "en-US") => {
-    if (!dateString) return t("task:unset_date");
-    const date = new Date(dateString);
-    return date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
+const formatDate = (
+  dateString: string | undefined,
+  locale: string = "en-US",
+  t: any
+) => {
+  if (!dateString) return t("task:unset_date");
+  const date = new Date(dateString);
+  return date.toLocaleDateString(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 };
 
-const formatTime = (timeString: string | undefined, locale: string = "en-US") => {
-    if (!timeString) return "";
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(parseInt(hours, 10));
-    date.setMinutes(parseInt(minutes, 10));
-    return date.toLocaleTimeString(locale, { hour: "numeric", minute: "numeric" });
+const formatTime = (
+  timeString: string | undefined,
+  locale: string = "en-US"
+) => {
+  if (!timeString) return "";
+  const [hours, minutes] = timeString.split(":");
+  const date = new Date();
+  date.setHours(parseInt(hours, 10));
+  date.setMinutes(parseInt(minutes, 10));
+  return date.toLocaleTimeString(locale, {
+    hour: "numeric",
+    minute: "numeric",
+  });
 };
 
-const formatTimes = (startTimeString: string | undefined, endTimeString: string | undefined, locale: string = "en-US") => {
-    if (!startTimeString || !endTimeString) return t("task:unset_time_range");
-    return t("task:time_range", {
-        startTime: formatTime(startTimeString, locale),
-        endTime: formatTime(endTimeString, locale)
-    });
+const formatTimes = (
+  startTimeString: string | undefined,
+  endTimeString: string | undefined,
+  locale: string = "en-US",
+  t: any
+) => {
+  if (!startTimeString || !endTimeString) return t("task:unset_time_range");
+  return t("task:time_range", {
+    startTime: formatTime(startTimeString, locale),
+    endTime: formatTime(endTimeString, locale),
+  });
 };
 
-function ModalContent(
-    {
-        index,
-        dateRef,
-        startTimeRef,
-        endTimeRef,
-        onClosePressed,
-        setIsThisSlotToWorkModalOpen,
-        setDate,
-        setStartTime,
-        setEndTime
-    }: {
-        index: number,
-        dateRef: React.MutableRefObject<string | undefined>,
-        startTimeRef: React.MutableRefObject<string | undefined>,
-        endTimeRef: React.MutableRefObject<string | undefined>,
-        onClosePressed: (slot: SlotToWorkDto | undefined) => void,
-        setIsThisSlotToWorkModalOpen: (open: boolean) => void,
-        setDate: (date: string) => void,
-        setStartTime: (time: string) => void,
-        setEndTime: (time: string) => void
+function ModalContent({
+  index,
+  initialDate,
+  initialStartTime,
+  initialEndTime,
+  onConfirm,
+  onCancel,
+}: {
+  index: number;
+  initialDate: string | undefined;
+  initialStartTime: string | undefined;
+  initialEndTime: string | undefined;
+  onConfirm: (data: { date: string; start: string; end: string }) => void;
+  onCancel: () => void;
+}) {
+  const { t } = useTranslation(["task"]);
+
+  const [tempDate, setTempDate] = useState<string>(initialDate || "");
+  const [tempStartTime, setTempStartTime] = useState<string>(
+    initialStartTime || ""
+  );
+  const [tempEndTime, setTempEndTime] = useState<string>(initialEndTime || "");
+
+  const [showError, setShowError] = useState(false);
+
+  const handleSave = (closeDialog: () => void) => {
+    if (!tempDate || !tempStartTime || !tempEndTime) {
+      setShowError(true);
+      return;
     }
-) {
-    const { t } = useTranslation(["task"]);
 
-    return (
-        <Dialog id={`secondModal-slotWork-${index}`} aria-labelledby={`slotToWork-button-${index}`}>
-            {({ close }) => (
-                <div className={styles.modalContainer}>
-                    <Button
-                        className={classNames(styles.closeButton)}
-                        onPress={() => {
-                            const createValidDate = (date: string | undefined, time: string | undefined) => {
-                                if (!date || !time) return undefined;
+    onConfirm({
+      date: tempDate,
+      start: tempStartTime,
+      end: tempEndTime,
+    });
 
-                                const [year, month, day] = date.split("-").map(Number);
-                                const [hours, minutes] = time.split(":").map(Number);
-                                const newDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
-                                return isNaN(newDate.getTime()) ? undefined : newDate;
-                            };
+    closeDialog();
+  };
 
-                            const start = createValidDate(dateRef.current, startTimeRef.current);
-                            const end = createValidDate(dateRef.current, endTimeRef.current);
+  const handleCancel = (closeDialog: () => void) => {
+    onCancel();
+    closeDialog();
+  };
 
-                            if (start && end) {
-                                onClosePressed({ start, end });
-                            } else {
-                                onClosePressed(undefined);
-                            }
+  const isInvalid = (value: string | undefined) => showError && !value;
 
-                            setIsThisSlotToWorkModalOpen(false);
-                            close();
-                        }}
-                    >
-                        {t("task:close")}
-                    </Button>
-                    <h1 className={styles.mainFormModalTitleText}>{t("task:slot_to_work", { number: index + 1 })}</h1>
-                    <div className={styles.slotFormContainer}>
-                        <TextField autoFocus>
-                            <Label className={styles.formSectionTitle}>{t("task:slot_date_to_work")}</Label>
-                            <Input
-                                type="date"
-                                value={dateRef.current}
-                                onChange={(e) => setDate(e.target.value)}
-                                className={classNames(styles.dateInput)}
-                            />
-                        </TextField>
-                        <TextField>
-                            <Label className={styles.formSectionTitle}>{t("task:slot_starting_time")}</Label>
-                            <Input
-                                type="time"
-                                value={startTimeRef.current}
-                                onChange={(e) => setStartTime(e.target.value)}
-                                className={classNames(styles.timeInput)}
-                            />
-                        </TextField>
-                        <TextField>
-                            <Label className={styles.formSectionTitle}>{t("task:slot_ending_time")}</Label>
-                            <Input
-                                type="time"
-                                value={endTimeRef.current}
-                                onChange={(e) => setEndTime(e.target.value)}
-                                className={classNames(styles.timeInput)}
-                            />
-                        </TextField>
-                    </div>
-                </div>
-            )}
-        </Dialog>
-    );
+  return (
+    <Dialog
+      id={`secondModal-slotWork-${index}`}
+      aria-labelledby={`slotToWork-button-${index}`}
+    >
+      {({ close }) => (
+        <div className={styles.modalContainer}>
+          <Button
+            className={classNames(styles.closeButton)}
+            onPress={() => handleCancel(close)}
+          >
+            {t("task:cancel", "Cancelar")}
+          </Button>
+
+          <h1 className={styles.mainFormModalTitleText}>
+            {t("task:slot_to_work", { number: index + 1 })}
+          </h1>
+
+          {showError && (
+            <p className={styles.errorText}>
+              {t(
+                "task:fill_all_fields",
+                "Preencha todos os campos obrigatórios."
+              )}
+            </p>
+          )}
+
+          <div className={styles.slotFormContainer}>
+            <TextField autoFocus>
+              <Label className={styles.formSectionTitle}>
+                {t("task:slot_date_to_work")}
+              </Label>
+              <Input
+                type="date"
+                value={tempDate}
+                onChange={(e) => {
+                  setTempDate(e.target.value);
+                  if (e.target.value) setShowError(false);
+                }}
+                className={classNames(styles.dateInput, {
+                  [styles.inputError]: isInvalid(tempDate),
+                })}
+              />
+            </TextField>
+            <TextField>
+              <Label className={styles.formSectionTitle}>
+                {t("task:slot_starting_time")}
+              </Label>
+              <Input
+                type="time"
+                value={tempStartTime}
+                onChange={(e) => {
+                  setTempStartTime(e.target.value);
+                  if (e.target.value) setShowError(false);
+                }}
+                className={classNames(styles.timeInput, {
+                  [styles.inputError]: isInvalid(tempStartTime),
+                })}
+              />
+            </TextField>
+            <TextField>
+              <Label className={styles.formSectionTitle}>
+                {t("task:slot_ending_time")}
+              </Label>
+              <Input
+                type="time"
+                value={tempEndTime}
+                onChange={(e) => {
+                  setTempEndTime(e.target.value);
+                  if (e.target.value) setShowError(false);
+                }}
+                className={classNames(styles.timeInput, {
+                  [styles.inputError]: isInvalid(tempEndTime),
+                })}
+              />
+            </TextField>
+          </div>
+
+          {/* BOTÃO CONFIRMAR */}
+          <div
+            style={{
+              marginTop: "1.5rem",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              className={styles.confirmButton}
+              onPress={() => handleSave(close)}
+            >
+              {t("task:confirm", "Confirmar")}
+            </Button>
+          </div>
+        </div>
+      )}
+    </Dialog>
+  );
 }
 
-export function SlotToWork({ index, newlyAdded, onClosePressed }: {
-    index: number,
-    newlyAdded: boolean,
-    onClosePressed: (slot: SlotToWorkDto | undefined) => void
+export function SlotToWork({
+  index,
+  newlyAdded,
+  onClosePressed,
+}: {
+  index: number;
+  newlyAdded: boolean;
+  onClosePressed: (slot: SlotToWorkDto | undefined) => void;
 }) {
-    const { t } = useTranslation(["task"]);
+  const { t } = useTranslation(["task"]);
+  const {
+    setIsSecondModalOpen,
+    isSecondModalOpen,
+    setSecondModalContent,
+    setSecondModalClass,
+  } = useContext(SecondModalContext);
 
-    const {
-        setIsSecondModalOpen,
-        isSecondModalOpen,
-        setSecondModalContent,
-        setSecondModalClass
-    } = useContext(SecondModalContext);
+  const [date, setDate] = useState<string | undefined>(undefined);
+  const [startTime, setStartTime] = useState<string | undefined>(undefined);
+  const [endTime, setEndTime] = useState<string | undefined>(undefined);
 
-    const [date, setDate] = useState<string | undefined>(undefined);
-    const [startTime, setStartTime] = useState<string | undefined>(undefined);
-    const [endTime, setEndTime] = useState<string | undefined>(undefined);
+  const [userLocale, setUserLocale] = useState<string>("en-US");
+  useEffect(() => {
+    setUserLocale(navigator.language || "en-US");
+  }, []);
 
-    const dateRef = useRef<string | undefined>(undefined);
-    const startTimeRef = useRef<string | undefined>(undefined);
-    const endTimeRef = useRef<string | undefined>(undefined);
+  const handleConfirm = (data: {
+    date: string;
+    start: string;
+    end: string;
+  }) => {
+    setDate(data.date);
+    setStartTime(data.start);
+    setEndTime(data.end);
 
-    const [userLocale, setUserLocale] = useState<string>("en-US");
-    useEffect(() => {
-        setUserLocale(navigator.language || "en-US");
-    }, []);
+    const createValidDate = (dateStr: string, timeStr: string) => {
+      const [year, month, day] = dateStr.split("-").map(Number);
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      const newDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+      return isNaN(newDate.getTime()) ? undefined : newDate;
+    };
 
-    useEffect(() => {
-        dateRef.current = date;
-    }, [date]);
+    const startObj = createValidDate(data.date, data.start);
+    const endObj = createValidDate(data.date, data.end);
 
-    useEffect(() => {
-        startTimeRef.current = startTime;
-    }, [startTime]);
+    if (startObj && endObj) {
+      onClosePressed({ start: startObj, end: endObj });
+    }
+  };
 
-    useEffect(() => {
-        endTimeRef.current = endTime;
-    }, [endTime]);
+  const handleCancel = () => {
+    onClosePressed(undefined);
+    setIsSecondModalOpen(false);
+  };
 
-    const [isThisSlotToWorkModalOpen, setIsThisSlotToWorkModalOpen] = useState<boolean>(false);
-
-    // Trigger the modal update when date, startTime, or endTime changes
-    useEffect(() => {
-        setSecondModalContent(
-            <ModalContent
-                index={index}
-                dateRef={dateRef}
-                startTimeRef={startTimeRef}
-                endTimeRef={endTimeRef}
-                onClosePressed={onClosePressed}
-                setIsThisSlotToWorkModalOpen={setIsThisSlotToWorkModalOpen}
-                setDate={setDate}
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-            />
-        );
-    }, [date, startTime, endTime]); // Re-run when these states change
-
-    const formattedDate = formatDate(date, userLocale);
-    const formattedTimes = formatTimes(startTime, endTime, userLocale);
-
-    return (
-        <Button className={styles.slotToWorkButton}
-                id={`slotToWork-button-${index}`}
-                aria-label={
-                    `${t("task:slot_to_work", { number: index + 1 })} - ${formattedDate}, ${formattedTimes}`}
-                aria-expanded={isSecondModalOpen && isThisSlotToWorkModalOpen}
-                data-newly-added={newlyAdded}
-                onPress={() => {
-                    setIsThisSlotToWorkModalOpen(true);
-                    setIsSecondModalOpen(true);
-                    setSecondModalContent(
-                        <ModalContent
-                            index={index}
-                            dateRef={dateRef}
-                            startTimeRef={startTimeRef}
-                            endTimeRef={endTimeRef}
-                            onClosePressed={onClosePressed}
-                            setIsThisSlotToWorkModalOpen={setIsThisSlotToWorkModalOpen}
-                            setDate={setDate}
-                            setStartTime={setStartTime}
-                            setEndTime={setEndTime}
-                        />);
-                    setSecondModalClass(styles.slotToWorkModal);
-                }}>
-            <div className={styles.slotToWorkText}>
-                <span style={{ textWrap: "nowrap" }}>
-                {
-                    date
-                        ? <span>{formattedDate}</span>
-                        : <span style={{ opacity: "0.7" }}>{t("task:unset_date")}</span>
-                }
-                    {
-                        ", "
-                    }
-                </span>
-                <span style={{ textWrap: "nowrap" }}>
-                    {
-                        startTime && endTime
-                            ? <span>{formattedTimes}</span>
-                            : <span style={{ opacity: "0.7" }}>{t("task:unset_time_range")}</span>
-                    }
-                </span>
-            </div>
-        </Button>
+  const openModal = () => {
+    setIsSecondModalOpen(true);
+    setSecondModalClass(styles.slotToWorkModal);
+    setSecondModalContent(
+      <ModalContent
+        index={index}
+        initialDate={date}
+        initialStartTime={startTime}
+        initialEndTime={endTime}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     );
+  };
+
+  useEffect(() => {
+    if (isSecondModalOpen) {
+    }
+  }, [date, startTime, endTime]);
+
+  const formattedDate = formatDate(date, userLocale, t);
+  const formattedTimes = formatTimes(startTime, endTime, userLocale, t);
+
+  return (
+    <Button
+      className={styles.slotToWorkButton}
+      id={`slotToWork-button-${index}`}
+      aria-label={`${t("task:slot_to_work", {
+        number: index + 1,
+      })} - ${formattedDate}, ${formattedTimes}`}
+      data-newly-added={newlyAdded}
+      onPress={openModal}
+    >
+      <div className={styles.slotToWorkText}>
+        <span style={{ textWrap: "nowrap" }}>
+          {date ? (
+            <span>{formattedDate}</span>
+          ) : (
+            <span style={{ opacity: "0.7" }}>{t("task:unset_date")}</span>
+          )}
+          {", "}
+        </span>
+        <span style={{ textWrap: "nowrap" }}>
+          {startTime && endTime ? (
+            <span>{formattedTimes}</span>
+          ) : (
+            <span style={{ opacity: "0.7" }}>{t("task:unset_time_range")}</span>
+          )}
+        </span>
+      </div>
+    </Button>
+  );
 }

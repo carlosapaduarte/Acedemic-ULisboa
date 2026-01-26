@@ -1,37 +1,36 @@
 {
-    "title": "Statistics",
-    "energy_container_title": "ENERGY",
-    "energy_level": "Energy level:",
-    "energy_question": "How much energy do you have today?",
-    "i_feel": "I feel",
-    "tired": "Tired",
-    "energetic": "Energetic",
+  "title": "Statistics",
+  "energy_container_title": "ENERGY",
+  "energy_level": "Energy level:",
+  "energy_question": "How are you feeling today?",
+  "i_feel": "I feel",
+  "tired": "Tired",
+  "energetic": "Energetic",
 
-    "focus_container_title": "FOCUS",
-    "total_time_study": "Total time study",
-    "average_attention_span": "Average attention span",
-    
-    "workload_distribution_container_title": "WORKLOAD DISTRIBUTION",
+  "focus_container_title": "FOCUS",
+  "total_time_study": "Total time study",
+  "average_attention_span": "Average attention span",
 
-    "progress_container_title": "PROGRESS",
+  "workload_distribution_container_title": "WORKLOAD DISTRIBUTION",
 
-    "save": "Save",
-    "secondary_message": "Your study plan will adapt to it",
-    "skip": "Skip",
-    "saved_level_successfully": "Saved level successfully!",
-    "energy_very_well": "Very Well",
-    "energy_well": "Well",
-    "energy_bad": "Bad",
-    "energy_very_bad": "Very Bad",
+  "progress_container_title": "PROGRESS",
 
-    "no_data_available_yet": "No data available, yet...",
-    
-    "week": "WEEK",
-    "today": "TODAY",
-    "minutes": "minutes",
+  "save": "Save",
+  "skip": "Skip",
+  "saved_level_successfully": "Saved level successfully!",
+  "energy_very_well": "Very Well",
+  "energy_well": "Well",
+  "energy_bad": "Bad",
+  "energy_very_bad": "Very Bad",
 
-    "see_full_history": "See full history",
-    "history": "History",
+  "no_data_available_yet": "No data available, yet...",
 
-    "what_have_you_done_lately": "What have you done lately?"
+  "week": "WEEK",
+  "today": "TODAY",
+  "minutes": "minutes",
+
+  "see_full_history": "See full history",
+  "history": "History",
+
+  "what_have_you_done_lately": "What have you done lately?"
 }

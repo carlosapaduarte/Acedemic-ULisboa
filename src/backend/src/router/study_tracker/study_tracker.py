@@ -1,11 +1,12 @@
 from datetime import datetime
 from http.client import HTTPException
-from typing import Annotated
-from fastapi import APIRouter, Depends, Response
+from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, Response, Query
+
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyEnergyStatus, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus
-from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -22,7 +23,6 @@ def create_task(
     if dto.slotsToWork is not None:
         slots_to_work = dto.slotsToWork
     
-    # This route returns the newly created task!
     task_id = study_tracker_service.create_task(
         user_id, 
         Task.from_create_task_input_dto(dto), 
@@ -41,7 +41,6 @@ def update_task(
     if dto.updated_task.slotsToWork is not None:
         slots_to_work = dto.updated_task.slotsToWork
     
-    # This route returns the newly created task!
     study_tracker_service.update_task(
         user_id,
         task_id,
@@ -56,8 +55,15 @@ def update_task_status(
     task_id: int,
     dto: UpdateTaskStatus
 ):
-    print("Here")
     study_tracker_service.update_task_status(user_id, task_id, dto.newStatus)
+
+@router.delete("/users/me/tasks/{task_id}", status_code=204)
+def delete_task(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    task_id: int
+) -> Response:
+    study_tracker_service.delete_task(user_id, task_id)
+    return Response(status_code=204)
 
 @router.get("/users/me/tasks")
 def get_tasks(
@@ -67,6 +73,14 @@ def get_tasks(
 ) -> list[UserTaskOutputDto]:
     tasks = study_tracker_service.get_user_tasks(user_id, orderByDeadlineAndPriority, filterUncompletedTasks, False)
     return UserTaskOutputDto.from_Tasks(tasks)
+
+@router.get("/users/me/tasks/{task_id}")
+def get_task(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    task_id: int
+) -> UserTaskOutputDto:
+    task = study_tracker_service.get_user_task(user_id, task_id)
+    return UserTaskOutputDto.from_Task(task)
 
 @router.get("/users/me/statistics/daily-tasks-progress")
 def get_daily_tasks_progress(
@@ -80,32 +94,59 @@ def get_daily_tasks_progress(
 @router.get("/users/me/events")
 def get_events(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    today: bool,
-    recurrentEvents: bool,
-) -> list[EventOutputDto]:
-    #print(datetime.fromtimestamp(service.get_user_info(user_id).batches[0].startDate))
-    events = study_tracker_service.get_events(user_id, today, recurrentEvents, False, None)
-    return EventOutputDto.from_events(events)
+    today: bool = False,
+    recurrentEvents: bool = False,
+    studyEvents: bool = False,
+    weekNumber: int | None = Query(None)
+) -> list[EventOutputDto]: 
+    domain_events = study_tracker_service.get_events(
+        user_id, 
+        today, 
+        recurrentEvents, 
+        studyEvents, 
+        weekNumber
+    )
+    
+    return EventOutputDto.from_events(domain_events)
 
 @router.post("/users/me/events")
 def create_event(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateEventInputDto
-) ->  Response:
+) -> Response:
+    rec_start = None 
+    try:
+        if dto.recurrenceStart:
+            rec_start = datetime.fromtimestamp(dto.recurrenceStart)
+    except (OSError, ValueError):
+        print(f"Erro data inicio rec ignorado: {dto.recurrenceStart}")
+        rec_start = None
+
+    rec_end = None
+    try:
+        if dto.recurrenceEnd:
+            rec_end = datetime.fromtimestamp(dto.recurrenceEnd)
+    except (OSError, ValueError):
+        print(f"Erro data fim rec ignorado: {dto.recurrenceEnd}")
+        rec_end = None
+
     study_tracker_service.create_event(
         user_id, 
         Event(
-        id=None,
-        title=dto.title,
-        date=DateInterval(
-            start_date=datetime.fromtimestamp(dto.startDate),
-            end_date=datetime.fromtimestamp(dto.endDate)
-        ),
-        tags=dto.tags,
-        every_week=dto.everyWeek,
-        every_day=dto.everyDay,
-        color=dto.color,
-        notes=dto.notes
+            id=None,
+            title=dto.title,
+            date=DateInterval(
+                start_date=datetime.fromtimestamp(dto.startDate),
+                end_date=datetime.fromtimestamp(dto.endDate)
+            ),
+            tags=dto.tags,
+            every_week=dto.everyWeek,
+            every_day=dto.everyDay,
+            color=dto.color,
+            notes=dto.notes,
+            is_uc=dto.is_uc,
+            recurrence_start=rec_start,
+            recurrence_end=rec_end
         )
     )
     return Response()
@@ -116,6 +157,20 @@ def update_event(
     event_id: int,
     dto: UpdateEventInputDto
 ) -> Response:
+    rec_start = None 
+    try:
+        if dto.recurrenceStart:
+            rec_start = datetime.fromtimestamp(dto.recurrenceStart)
+    except (OSError, ValueError):
+        rec_start = None
+
+    rec_end = None
+    try:
+        if dto.recurrenceEnd:
+            rec_end = datetime.fromtimestamp(dto.recurrenceEnd)
+    except (OSError, ValueError):
+        rec_end = None
+
     study_tracker_service.update_event(
         user_id,
         event_id,
@@ -130,7 +185,10 @@ def update_event(
             every_week=dto.everyWeek,
             every_day=dto.everyDay,
             color=dto.color,
-            notes=dto.notes
+            notes=dto.notes,
+            is_uc=dto.is_uc,
+            recurrence_start=rec_start,
+            recurrence_end=rec_end
         )
     )
     return Response()
@@ -142,7 +200,6 @@ def delete_event(
 ) -> Response:
     study_tracker_service.delete_event(user_id, event_id)
     return Response()
-    
 @router.put("/users/me/use-goals")
 def update_app_use_goals(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -165,9 +222,6 @@ def update_week_planning_day(
     study_tracker_service.update_study_tracker_app_planning_day(user_id, input_dto.day, input_dto.hour)
     
 def fix_weekday_from_javascript(weekday: int) -> int:
-    # Temporary solution to convert javascript Date().getDay() into python datetime.date().weekday
-    # A better solution should be fixing this in the frontend!
-    
     if weekday == 0:
         return 6
     return weekday - 1
@@ -239,6 +293,7 @@ def create_grade(
     dto: CreateGradeInputDto
 ):
     study_tracker_service.create_grade(user_id, curricular_unit, Grade(
+        id=None,
         value=dto.value,
         weight=dto.weight
     ))
@@ -252,13 +307,20 @@ def delete_grade(
     study_tracker_service.delete_grade(user_id, curricular_unit_name, grade_id)
     return Response(status_code=204)
 
-@router.post("/users/me/statistics/daily-energy-status")
-def create_daily_energy_stat(
+@router.post("/users/me/mood-logs")
+def create_mood_log(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    dto: CreateDailyEnergyStatus
+    dto: CreateMoodLogInputDto
 ):
-    study_tracker_service.create_daily_energy_status(user_id, dto.level, dto.timeOfDay)
+    study_tracker_service.create_mood_log(user_id, dto)
 
+@router.get("/users/me/mood-logs")
+def get_mood_logs(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) -> list[MoodLogOutputDto]:
+    
+    mood_logs = study_tracker_service.get_mood_logs(user_id)
+    return MoodLogOutputDto.from_domain(mood_logs)
 @router.post("/users/me/statistics/daily-tags")
 def create_daily_tags(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -272,14 +334,8 @@ def get_daily_tags(
 ) -> list[str]:
     return study_tracker_service.get_daily_tags(user_id)
     
-@router.get("/users/me/statistics/daily-energy-status")
-def get_daily_energy_history(
-    user_id: Annotated[int, Depends(get_current_user_id)]
-) ->  list[DailyEnergyStatusOutputDto]:
-    history = study_tracker_service.get_daily_energy_history(user_id)
-    return DailyEnergyStatusOutputDto.from_domain(history)
 
-# Important: this route is actually fetching data, not from tasks but from events! This is because tasks don't have time associated. They only have a deadline. Events have a time assigned, so it's more proper to use events to compute time waste on each event type (given by it's tag).
+
 @router.get("/users/me/statistics/time-by-event-tag")
 def get_task_time_distribution(
     user_id: Annotated[int, Depends(get_current_user_id)]

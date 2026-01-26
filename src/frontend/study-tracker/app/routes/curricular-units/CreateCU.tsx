@@ -6,7 +6,23 @@ function useCreateCurricularUnit(onCuCreated: () => void) {
   const [name, setName] = useState<string | undefined>(undefined);
 
   function createCurricularUnit(name: string) {
-    service.createCurricularUnit(name).then(onCuCreated);
+    service
+      .createCurricularUnit(name)
+      .then(() => {
+        return service.createTag({
+          name_pt: name,
+          name_en: name,
+          color: "#5DADE2",
+          is_uc: true,
+        } as any);
+      })
+      .then(() => {
+        onCuCreated();
+      })
+      .catch((err) => {
+        console.error("UC criada, mas erro na tag:", err);
+        onCuCreated();
+      });
   }
 
   return { name, setName, createCurricularUnit };
