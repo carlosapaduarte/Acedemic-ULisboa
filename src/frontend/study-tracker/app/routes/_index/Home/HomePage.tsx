@@ -419,7 +419,7 @@ export default function HomePage() {
             style={{ position: "relative", zIndex: 1 }}
           >
             <div className={styles.cardTitle}>
-              <FaListCheck /> Tarefas de Hoje
+              <FaListCheck /> Tarefas com prazo para Hoje
             </div>
           </div>
 

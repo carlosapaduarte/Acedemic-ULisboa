@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "@remix-run/react";
 import { SelectTime } from "./TimeSelection";
 import { Timer } from "./Timer";
@@ -12,6 +12,19 @@ import { useTranslation } from "react-i18next";
 import { useTaskList } from "~/routes/tasks/useTaskList";
 import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
+
+import { TutorialTour } from "~/components/Tutorial/TutorialTour";
+
+const MOTIVATIONAL_MESSAGES = [
+  "Bom trabalho! 🌟",
+  "Pausa merecida! ☕",
+  "Estás no caminho certo! 🚀",
+  "Respira fundo. Relaxa. 🍃",
+  "Foco impecável! Continua assim. 💪",
+  "Hora de recarregar baterias! 🔋",
+  "Excelente sessão! 🏆",
+  "O teu esforço conta. Descansa. ✨",
+];
 
 function isDateToday(date: Date | undefined): boolean {
   if (!date) return false;
@@ -52,19 +65,53 @@ export let handle = {
 function useTimerSetup(onSessionEnd: () => void) {
   const setError = useSetGlobalError();
   const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(
-    undefined
+    undefined,
   );
   const [pauseStopDate, setPauseStopDate] = useState<Date | undefined>(
-    undefined
+    undefined,
   );
   const [timerStopDate, setTimerStopDate] = useState<Date | undefined>(
-    undefined
+    undefined,
   );
+
+  const [motivationalMessage, setMotivationalMessage] = useState<string | null>(
+    null,
+  );
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const cacheBuster = new Date().getTime();
+    audioRef.current = new Audio(`/tracker/sounds/bell.mp3?v=${cacheBuster}`);
+    audioRef.current.load();
+  }, []);
+
+  useEffect(() => {
+    if (motivationalMessage) {
+      const timer = setTimeout(() => {
+        setMotivationalMessage(null);
+      }, 30000); // 30000ms = 30 segundos
+      return () => clearTimeout(timer);
+    }
+  }, [motivationalMessage]);
 
   function onTimeSelected(studyStopDate: Date, pauseStopDate: Date) {
     setStudyStopDate(studyStopDate);
     setPauseStopDate(pauseStopDate);
     setTimerStopDate(studyStopDate);
+    setMotivationalMessage(null);
+
+    // Autoplay Hack
+    if (audioRef.current) {
+      audioRef.current.volume = 0;
+      audioRef.current
+        .play()
+        .then(() => {
+          audioRef.current?.pause();
+          audioRef.current!.volume = 1.0;
+        })
+        .catch((e) => console.log("Aviso de som:", e));
+    }
 
     service.startStudySession().catch((error) => setError(error));
   }
@@ -73,14 +120,34 @@ function useTimerSetup(onSessionEnd: () => void) {
     service.finishStudySession().catch((error) => setError(error));
     onSessionEnd();
     setTimerStopDate(undefined);
+    setMotivationalMessage(null);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
   }
 
   function onTimerFinish() {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 1.0;
+      audioRef.current.play().catch((e) => console.error("Erro ao tocar:", e));
+    }
+
     if (timerStopDate === studyStopDate) {
+      // --- INÍCIO DA PAUSA ---
       onSessionEnd();
       setTimerStopDate(pauseStopDate);
+
+      const randomMsg =
+        MOTIVATIONAL_MESSAGES[
+          Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)
+        ];
+      setMotivationalMessage(randomMsg);
     } else {
+      // --- FIM DA PAUSA ---
       setTimerStopDate(undefined);
+      setMotivationalMessage(null);
     }
   }
 
@@ -95,6 +162,7 @@ function useTimerSetup(onSessionEnd: () => void) {
     onStopClick,
     onTimerFinish,
     markTimerStart,
+    motivationalMessage,
   };
 }
 
@@ -132,7 +200,7 @@ function useAssociatedTasks(showMicroTasks: boolean) {
 
   function completeSelectedTasks(completedTaskIds: number[]) {
     const tasksToComplete = completedTaskIds.map((id) =>
-      service.updateTaskStatus(id, "completed")
+      service.updateTaskStatus(id, "completed"),
     );
 
     return Promise.all(tasksToComplete)
@@ -216,7 +284,7 @@ function AssociatedTaskListView({
   if (isReadOnly) {
     const allTasks = [...tasksForToday, ...otherTasks];
     const selectedTasks = allTasks.filter((t) =>
-      selectedTaskIds.includes(t.id)
+      selectedTaskIds.includes(t.id),
     );
 
     return (
@@ -304,7 +372,7 @@ function ConfirmationModalContent({
     setCheckedIds((prev) =>
       prev.includes(taskId)
         ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+        : [...prev, taskId],
     );
   }
 
@@ -366,7 +434,7 @@ function TodayEventsList({
               (t) =>
                 t.name_pt === tagIdentifier ||
                 t.name_en === tagIdentifier ||
-                t.id === tagIdentifier
+                t.id === tagIdentifier,
             );
 
             const finalColor = tagObj?.color || "var(--color-2)";
@@ -468,6 +536,7 @@ function TimerView({
   onStopClick,
   onTimerFinish,
   markTimerStart,
+  motivationalMessage,
 }: {
   happeningStudyBlock: Event | undefined;
   timerStopDate: Date | undefined;
@@ -475,6 +544,7 @@ function TimerView({
   onStopClick: () => void;
   onTimerFinish: () => void;
   markTimerStart: () => void;
+  motivationalMessage: string | null;
 }) {
   const { t } = useTranslation("study");
 
@@ -493,7 +563,49 @@ function TimerView({
   }
 
   return (
-    <div className={styles.pomodoroContainer}>
+    <div
+      className={styles.pomodoroContainer}
+      style={{ position: "relative", zIndex: 1 }}
+    >
+      {motivationalMessage && (
+        <div
+          style={{
+            position: "absolute",
+            top: "15px",
+            left: "50%",
+            transform: "translateX(-50%)",
+
+            zIndex: 99,
+            backgroundColor: "#ffffff",
+            color: "#5d4037",
+            padding: "8px 20px",
+            borderRadius: "50px",
+            border: "2px solid #5d4037",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+
+            fontWeight: "bold",
+            fontSize: "1rem",
+            whiteSpace: "nowrap",
+
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+
+            animation: "fadeIn 0.3s ease-out",
+          }}
+        >
+          <span style={{ fontSize: "1.2rem" }}>🎉</span>
+          <span>{motivationalMessage}</span>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateX(-50%) scale(0.9); }
+          to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+      `}</style>
+
       <Timer
         title={title}
         stopDate={stopDate!}
@@ -581,6 +693,7 @@ function PomodoroPage() {
     onStopClick,
     onTimerFinish,
     markTimerStart,
+    motivationalMessage,
   } = useTimerSetup(openConfirmationModal);
 
   useEffect(() => {
@@ -595,44 +708,85 @@ function PomodoroPage() {
     return <div>A carregar...</div>;
   }
 
+  const tourSteps = [
+    {
+      target: "body",
+      content: (
+        <div>
+          <h3>Bem-vindo à tua zona de estudo! 👋</h3>
+          <p>
+            Aqui podes gerir o teu tempo e tarefas. Vamos ver como funciona?
+          </p>
+        </div>
+      ),
+      placement: "center" as const,
+    },
+    {
+      target: "#tour-events",
+      content:
+        "Aqui vês os eventos do teu calendário e o que tens planeado para hoje.",
+    },
+    {
+      target: "#tour-timer",
+      content:
+        "Este é o coração do Pomodoro! Escolhe o tempo e inicia o foco. ⏱️",
+    },
+    {
+      target: "#tour-tasks",
+      content:
+        "Seleciona as tarefas que queres completar durante este bloco de estudo.",
+    },
+  ];
+
   return (
     <>
+      <TutorialTour steps={tourSteps} tutorialKey="pomodoro-guide-v2" />
+
       <div className={styles.pomodoroLayout}>
-        <TodayEventsList
-          todayEvents={todayEvents}
-          futureEvents={futureEvents}
-          isLoading={isLoadingEvents}
-          allTags={allUserTags}
-        />
+        <div id="tour-events">
+          <TodayEventsList
+            todayEvents={todayEvents}
+            futureEvents={futureEvents}
+            isLoading={isLoadingEvents}
+            allTags={allUserTags}
+          />
+        </div>
 
         {timerStopDate || happeningStudyBlock ? (
-          <TimerView
-            happeningStudyBlock={happeningStudyBlock}
-            timerStopDate={timerStopDate}
-            studyStopDate={studyStopDate}
-            onStopClick={onStopClick}
-            onTimerFinish={onTimerFinish}
-            markTimerStart={markTimerStart}
-          />
+          <div style={{ position: "relative" }}>
+            <TimerView
+              happeningStudyBlock={happeningStudyBlock}
+              timerStopDate={timerStopDate}
+              studyStopDate={studyStopDate}
+              onStopClick={onStopClick}
+              onTimerFinish={onTimerFinish}
+              markTimerStart={markTimerStart}
+              motivationalMessage={motivationalMessage}
+            />
+          </div>
         ) : (
           <div className={styles.pomodoroContainer}>
-            <SelectTime
-              onTimeSelected={onTimeSelected}
-              initialStudyMinutes={initialWork}
-              initialPauseMinutes={initialBreak}
-            />
+            <div id="tour-timer">
+              <SelectTime
+                onTimeSelected={onTimeSelected}
+                initialStudyMinutes={initialWork}
+                initialPauseMinutes={initialBreak}
+              />
+            </div>
           </div>
         )}
 
-        <AssociatedTaskListView
-          tasksForToday={tasksForToday}
-          otherTasks={otherTasks}
-          selectedTaskIds={selectedTaskIds}
-          onTaskClick={toggleTaskSelection}
-          showMicroTasks={showMicroTasks}
-          onToggleMicroTasks={() => setShowMicroTasks((prev) => !prev)}
-          isReadOnly={!!(timerStopDate || happeningStudyBlock)}
-        />
+        <div id="tour-tasks">
+          <AssociatedTaskListView
+            tasksForToday={tasksForToday}
+            otherTasks={otherTasks}
+            selectedTaskIds={selectedTaskIds}
+            onTaskClick={toggleTaskSelection}
+            showMicroTasks={showMicroTasks}
+            onToggleMicroTasks={() => setShowMicroTasks((prev) => !prev)}
+            isReadOnly={!!(timerStopDate || happeningStudyBlock)}
+          />
+        </div>
       </div>
 
       <Modal

@@ -69,7 +69,7 @@ async function login(username: string, password: string) {
   const response: Response = await doFetch(request).catch((error) => {
     if (error instanceof NotAuthorizedError) {
       return Promise.reject(
-        new AuthError("INVALID_USERNAME_OR_PASSWORD", "password")
+        new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"),
       );
     }
     return Promise.reject(new AuthError("LOGIN_FAILED", "password"));
@@ -83,7 +83,7 @@ async function login(username: string, password: string) {
       return Promise.reject(new AuthError("INVALID_FORMAT", "password"));
     else if (response.status == 401)
       return Promise.reject(
-        new AuthError("INVALID_USERNAME_OR_PASSWORD", "password")
+        new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"),
       );
     return Promise.reject(new AuthError("LOGIN_FAILED", "password"));
   }
@@ -111,11 +111,11 @@ async function createUser(username: string, password: string) {
   if (!response.ok) {
     if (response.status == 409)
       return Promise.reject(
-        new AuthError("USERNAME_ALREADY_EXISTS", "username")
+        new AuthError("USERNAME_ALREADY_EXISTS", "username"),
       );
     else if (response.status == 400)
       return Promise.reject(
-        new AuthError("INVALID_USERNAME_OR_PASSWORD", "password")
+        new AuthError("INVALID_USERNAME_OR_PASSWORD", "password"),
       );
 
     return Promise.reject(new AuthError("USER_CREATION_FAILED", "password"));
@@ -131,7 +131,7 @@ async function selectShareProgressState(shareProgress: boolean) {
   const response: Response = await doFetch(request);
   if (!response.ok)
     return Promise.reject(
-      new Error("Progress share preference selection failed!")
+      new Error("Progress share preference selection failed!"),
     );
 }
 
@@ -200,14 +200,14 @@ async function updateReceiveNotificationsPreference(answer: BinaryAnswer) {
   const response: Response = await doFetch(request);
   if (!response.ok)
     return Promise.reject(
-      new Error("Receive notifications preference could not be updated!")
+      new Error("Receive notifications preference could not be updated!"),
     );
 }
 
 async function updateWeekPlanningDay(day: number, hour: number) {
   if (day < 0 || day > 6)
     return Promise.reject(
-      new Error("Day " + day + " is not a valid week day!")
+      new Error("Day " + day + " is not a valid week day!"),
     );
 
   const request = {
@@ -266,7 +266,7 @@ async function createNewEvent(newEventInfo: NewEventInfo) {
         console.error("Service: Resposta de erro do backend:", errorText);
       } catch (e) {
         console.error(
-          "Service: Não foi possível ler o texto do erro da resposta."
+          "Service: Não foi possível ler o texto do erro da resposta.",
         );
       }
       throw new Error("New event could not be created!");
@@ -362,7 +362,7 @@ async function deleteEvent(eventId: number) {
 
 async function getUserEvents(
   filterTodayEvents: boolean,
-  filterRecurrentEvents: boolean
+  filterRecurrentEvents: boolean,
 ): Promise<Event[]> {
   const request = {
     path: `study-tracker/users/me/events?today=${filterTodayEvents}&recurrentEvents=${filterRecurrentEvents}`,
@@ -396,7 +396,7 @@ async function getUserEvents(
   } else {
     if (filterTodayEvents)
       return Promise.reject(
-        new Error("User today-events could not be obtained!")
+        new Error("User today-events could not be obtained!"),
       );
     else return Promise.reject(new Error("User events could not be obtained!"));
   }
@@ -425,7 +425,7 @@ async function getStudyBlockHappeningNow(): Promise<Event | undefined> {
     (event: Event) =>
       containsStudyTag(event.tags) &&
       event.startDate < now &&
-      event.endDate > now
+      event.endDate > now,
   );
 }
 
@@ -440,7 +440,7 @@ export type CreateScheduleNotAvailableBlock = {
 };
 
 async function createScheduleNotAvailableBlock(
-  info: CreateScheduleNotAvailableBlock
+  info: CreateScheduleNotAvailableBlock,
 ) {
   const request = {
     path: `study-tracker/users/me/schedule/unavailable`,
@@ -450,7 +450,7 @@ async function createScheduleNotAvailableBlock(
   const response: Response = await doFetch(request);
   if (!response.ok)
     return Promise.reject(
-      new Error("Unavailable Schedule Block creation failed!")
+      new Error("Unavailable Schedule Block creation failed!"),
     );
 }
 
@@ -478,7 +478,7 @@ function requestBody(newTaskInfo: CreateTaskInputDto): any {
     is_micro_task: newTaskInfo.is_micro_task,
     parent_task_id: newTaskInfo.parent_task_id,
     subTasks: newTaskInfo.subTasks.map((subTaskInfo: CreateTaskInputDto) =>
-      requestBody(subTaskInfo)
+      requestBody(subTaskInfo),
     ),
     slotsToWork: newTaskInfo.slotsToWork.map((slot: SlotToWorkDto) => {
       return {
@@ -506,11 +506,11 @@ async function createNewTask(newTaskInfo: CreateTaskInputDto): Promise<Task> {
 async function updateTask(
   taskId: number,
   newTaskInfo: CreateTaskInputDto,
-  previousTaskName: string
+  previousTaskName: string,
 ) {
   function toUpdateTaskInputDto(
     newTaskInfo: CreateTaskInputDto,
-    previousTaskName: string
+    previousTaskName: string,
   ): any {
     return {
       previous_task_name: previousTaskName,
@@ -578,7 +578,7 @@ async function getTasks(filterUncompletedTasks: boolean): Promise<Task[]> {
   if (response.ok) {
     const responseObject: TaskDto[] = await response.json();
     const tasks = responseObject.map((taskDto: TaskDto) =>
-      fromTaskDtoToTask(taskDto)
+      fromTaskDtoToTask(taskDto),
     );
     return tasks;
   } else return Promise.reject(new Error("User tasks could not be obtained!"));
@@ -602,7 +602,7 @@ async function getDailyTasksProgress(): Promise<DailyTasksProgress[]> {
   const now = new Date();
   const request = {
     path: `study-tracker/users/me/statistics/daily-tasks-progress?year=${now.getFullYear()}&week=${utils.getWeekNumber(
-      now
+      now,
     )}`,
     method: "GET",
   };
@@ -685,7 +685,7 @@ async function getArchives(): Promise<Archive[]> {
 async function getArchive(archiveName: string): Promise<Archive> {
   const userArchives = await getArchives();
   const archive = userArchives.find(
-    (archive: Archive) => archive.name == archiveName
+    (archive: Archive) => archive.name == archiveName,
   );
   if (archive == undefined)
     return Promise.reject(new Error("Archive does not exist!"));
@@ -717,7 +717,7 @@ async function getFile(archiveName: string, filename: string): Promise<File> {
 async function updateFileContent(
   archiveName: string,
   name: string,
-  newContent: string
+  newContent: string,
 ) {
   const request = {
     path: `study-tracker/users/me/archives/${archiveName}/files/${name}`,
@@ -756,7 +756,7 @@ async function getCurricularUnits(): Promise<CurricularUnit[]> {
 async function getCurricularUnit(name: string): Promise<CurricularUnit> {
   const curricularUnitList = await getCurricularUnits();
   const curricularUnit = curricularUnitList.find(
-    (cu: CurricularUnit) => cu.name == name
+    (cu: CurricularUnit) => cu.name == name,
   );
 
   if (curricularUnit == undefined)
@@ -773,14 +773,14 @@ async function createCurricularUnit(name: string) {
   const response: Response = await doFetch(request);
   if (!response.ok)
     return Promise.reject(
-      new Error("New Curricular Unit could not be created!")
+      new Error("New Curricular Unit could not be created!"),
     );
 }
 
 async function createGrade(
   curricularUnit: string,
   value: number,
-  weight: number
+  weight: number,
 ) {
   const request = {
     path: `study-tracker/users/me/curricular-units/${curricularUnit}/grades`,
@@ -790,7 +790,7 @@ async function createGrade(
   const response: Response = await doFetch(request);
   if (!response.ok)
     return Promise.reject(
-      new Error("New Curricular Unit could not be created!")
+      new Error("New Curricular Unit could not be created!"),
     );
 }
 
@@ -812,7 +812,7 @@ export enum TimeOfDay {
 
 async function createDailyEnergyStat(
   energyLevel: number,
-  timeOfDay: TimeOfDay
+  timeOfDay: TimeOfDay,
 ) {
   function toStr(timeOfDay: TimeOfDay): string {
     if (timeOfDay == TimeOfDay.MORNING) return "morning";
@@ -833,7 +833,7 @@ async function createDailyEnergyStat(
   const response: Response = await doFetch(request);
   if (!response.ok)
     return Promise.reject(
-      new Error("Energy level daily statistic could not be submitted!")
+      new Error("Energy level daily statistic could not be submitted!"),
     );
 }
 
@@ -859,7 +859,7 @@ async function getDailyTags(): Promise<string[]> {
     return responseObject;
   } else
     return Promise.reject(
-      new Error("Could not obtain task distribution statistics!")
+      new Error("Could not obtain task distribution statistics!"),
     );
 }
 
@@ -870,10 +870,62 @@ export type TaskDistributionPerWeek = {
   time: number;
 };
 
+export type DailyEnergyStatus = {
+  date: Date;
+  level: number;
+};
+type DailyEnergyStatusDto = {
+  date: number;
+  level: number;
+};
+
+async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
+  const request = {
+    path: `study-tracker/users/me/mood-logs`,
+    method: "GET",
+  };
+
+  try {
+    const response: Response = await doFetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+
+      return data.map((item: any) => {
+        const rawDate = item.date_log || item.date;
+        let dateObj: Date;
+
+        if (typeof rawDate === "number") {
+          // Se for menor que 100 mil milhões, são segundos (timestamp Unix normal)
+          // O JS precisa de milissegundos, por isso multiplicamos por 1000
+          const timestamp = rawDate < 100000000000 ? rawDate * 1000 : rawDate;
+          dateObj = new Date(timestamp);
+        } else {
+          dateObj = new Date(rawDate);
+        }
+
+        const val = item.value !== undefined ? item.value : item.level;
+
+        return {
+          date: dateObj,
+          level: val,
+          label: item.label || "",
+          emotions: item.emotions || [],
+          impacts: item.impacts || [],
+        };
+      });
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Erro fetch mood:", error);
+    return [];
+  }
+}
+
 async function getTaskDistributionStats(): Promise<TaskDistributionPerWeek[]> {
   function toDomain(obj: any): TaskDistributionPerWeek[] {
     const stats: TaskDistributionPerWeek[] = [];
-
     for (const [year, weeksObj] of Object.entries<any>(obj)) {
       for (const [week, tagsObj] of Object.entries<any>(weeksObj)) {
         for (const [tag, time] of Object.entries(tagsObj)) {
@@ -893,43 +945,18 @@ async function getTaskDistributionStats(): Promise<TaskDistributionPerWeek[]> {
     path: `study-tracker/users/me/statistics/time-by-event-tag`,
     method: "GET",
   };
-  const response: Response = await doFetch(request);
-  if (response.ok) {
-    const responseObject: CurricularUnit[] = await response.json();
-    return toDomain(responseObject);
-  } else
-    return Promise.reject(
-      new Error("Could not obtain task distribution statistics!")
-    );
-}
 
-export type DailyEnergyStatus = {
-  date: Date;
-  level: number;
-};
-type DailyEnergyStatusDto = {
-  date: number;
-  level: number;
-};
-
-async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
-  function toDomain(value: DailyEnergyStatusDto): DailyEnergyStatus {
-    return {
-      date: new Date(value.date * 1000),
-      level: value.level,
-    };
+  try {
+    const response: Response = await doFetch(request);
+    if (response.ok) {
+      const responseObject = await response.json();
+      return toDomain(responseObject);
+    }
+    throw new Error("Failed to fetch");
+  } catch (error) {
+    console.warn("⚠️ API Task Distribution falhou. A usar dados Mock.", error);
+    return MOCK_TASK_DISTRIBUTION;
   }
-
-  const request = {
-    path: `study-tracker/users/me/statistics/daily-energy-status`,
-    method: "GET",
-  };
-  const response: Response = await doFetch(request);
-  if (response.ok) {
-    const responseObject: DailyEnergyStatusDto[] = await response.json();
-    return responseObject.map((value) => toDomain(value));
-  } else
-    return Promise.reject(new Error("Could not obtain user energy history!"));
 }
 
 export type WeekTimeStudy = {
@@ -951,7 +978,7 @@ async function getStudyTimeByWeek(): Promise<WeekTimeStudy[]> {
     return responseObject;
   } else
     return Promise.reject(
-      new Error("Could not obtain total time study this week!")
+      new Error("Could not obtain total time study this week!"),
     );
 }
 
@@ -1055,7 +1082,7 @@ export const service = {
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Failed to fetch user tags: ${response.status} ${response.statusText} - ${errorText}`
+          `Failed to fetch user tags: ${response.status} ${response.statusText} - ${errorText}`,
         );
       }
       return response.json();
@@ -1090,7 +1117,7 @@ export const service = {
         throw new Error(errorData.message || "Dados inválidos para criar tag.");
       } else {
         throw new Error(
-          errorData.message || `Erro do servidor: ${response.status}`
+          errorData.message || `Erro do servidor: ${response.status}`,
         );
       }
     }
@@ -1099,7 +1126,7 @@ export const service = {
 
   async updateTag(
     tagId: string | number,
-    tagData: { name: string; color: string; description?: string }
+    tagData: { name: string; color: string; description?: string },
   ): Promise<Tag> {
     const request = {
       path: `commons/users/me/tags/${tagId}`,

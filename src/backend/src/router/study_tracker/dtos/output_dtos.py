@@ -213,3 +213,27 @@ class WeekTimeStudyOutputDto(BaseModel):
                 )
             )
         return dtos
+    
+class MoodLogOutputDto(BaseModel):
+    id: int
+    value: int
+    label: str
+    emotions: list[str]
+    impacts: list[str]
+    date: int
+
+    @staticmethod
+    def from_domain(logs: list[Any]) -> list['MoodLogOutputDto']:
+        output = []
+        for log in logs:
+            ts = get_datetime_utc(log.date_log)
+            
+            output.append(MoodLogOutputDto(
+                id=log.id,
+                value=log.value,
+                label=log.label,
+                emotions=log.emotions if log.emotions else [],
+                impacts=log.impacts if log.impacts else [],
+                date=ts
+            ))
+        return output

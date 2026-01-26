@@ -337,3 +337,22 @@ class WeekTimeStudy():
 def verify_time_of_day(time_of_day: str) -> bool:
     print(time_of_day)
     return time_of_day.lower() == "morning" or time_of_day.lower() == "afternoon" or time_of_day.lower() == "night"
+
+class MoodLog:
+    def __init__(
+        self, 
+        id: int, 
+        user_id: int, 
+        value: int, 
+        label: str, 
+        emotions: list[str], 
+        impacts: list[str], 
+        date_log: datetime
+    ):
+        self.id = id
+        self.user_id = user_id
+        self.value = value
+        self.label = label
+        self.emotions = emotions
+        self.impacts = impacts
+        self.date_log = date_log

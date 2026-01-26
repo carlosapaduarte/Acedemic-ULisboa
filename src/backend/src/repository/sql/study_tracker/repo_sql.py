@@ -1,11 +1,11 @@
 import random
 from sqlmodel import Session, select, or_
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, SlotToWork, DateInterval
+from domain.study_tracker import Archive, MoodLog, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, SlotToWork, DateInterval
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STMoodLogModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
-from datetime import datetime, date, timezone
+from repository.sql.models.models import STMoodLogModel, STMoodLogModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
+from datetime import datetime, date, timedelta, timezone
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from sqlalchemy.orm import selectinload
 from utils import get_datetime_utc
@@ -792,39 +792,64 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     def get_time_spent_by_tag(self, user_id: int) -> dict[int, dict[int, dict[str, int]]]:
         with Session(engine) as session:
             statement = (
-            select(STEventModel)
-            .where(STEventModel.user_id == user_id)
-            .options(
-                selectinload(STEventModel.tags_associations).selectinload(STEventTagModel.tag_ref)
+                select(STEventModel)
+                .where(STEventModel.user_id == user_id)
+                .options(
+                    selectinload(STEventModel.tags_associations).selectinload(STEventTagModel.tag_ref)
+                )
             )
-        )
-            
-            result = session.exec(statement)
-            events: list[STEventModel] = list(result.all())
+            events: list[STEventModel] = list(session.exec(statement).all())
             stats: dict[int, dict[int, dict[str, int]]] = {}
 
+            # Definir janela de análise (Ano Atual)
+            now = datetime.now()
+            start_of_year = datetime(now.year, 1, 1)
+            end_of_year = datetime(now.year, 12, 31)
+
             for event in events:
-                start_date = event.start_date
-                elapsed_minutes = StudyTrackerSqlRepo.compute_elapsed_minutes(event.end_date, start_date)
-                year = start_date.year
-                week = event.start_date.isocalendar().week
-                            
-                tags = event.tags
-
-                for tag in tags:
-                    tag_name = tag.name_pt or tag.name_en
-                    if not tag_name:
-                        tag_name = "Sem nome"
-
-                    if stats.get(year) is None:
-                        stats[year] = {}
-
-                    if stats[year].get(week) is None:
-                        stats[year][week] = {}
-                    if stats[year][week].get(tag_name) is None:
-                        stats[year][week][tag_name] = 0 
-                    stats[year][week][tag_name] += elapsed_minutes
+                duration_minutes = StudyTrackerSqlRepo.compute_elapsed_minutes(event.end_date, event.start_date)
+                
+                # Se não tiver tags, conta como "Sem Tag"
+                tags_to_process = event.tags if event.tags else []
+                
+                # Função auxiliar para adicionar aos stats
+                def add_to_stats(date_ref: datetime):
+                    y = date_ref.year
+                    w = date_ref.isocalendar().week
+                    if y not in stats: stats[y] = {}
+                    if w not in stats[y]: stats[y][w] = {}
                     
+                    if not tags_to_process:
+                         current_val = stats[y][w].get("Sem Tag", 0)
+                         stats[y][w]["Sem Tag"] = current_val + duration_minutes
+                    else:
+                        for tag in tags_to_process:
+                            name = tag.name_pt or tag.name_en or "Sem Nome"
+                            current_val = stats[y][w].get(name, 0)
+                            stats[y][w][name] = current_val + duration_minutes
+
+                if not event.every_week and not event.every_day:
+                    add_to_stats(event.start_date)
+                else:
+                    current_sim_date = event.start_date
+                    if current_sim_date < start_of_year:
+                        current_sim_date = current_sim_date.replace(year=now.year, month=1, day=1)
+
+                    while current_sim_date <= end_of_year:
+                        if event.recurrence_start and current_sim_date < event.recurrence_start:
+                            current_sim_date += timedelta(days=1)
+                            continue
+                        if event.recurrence_end and current_sim_date > event.recurrence_end:
+                            break
+
+                        if event.every_week:
+                            if current_sim_date.weekday() == event.start_date.weekday():
+                                add_to_stats(current_sim_date)
+                        elif event.every_day:
+                            add_to_stats(current_sim_date)
+
+                        current_sim_date += timedelta(days=1)
+
             return stats
         
     def get_total_time_study_per_week(self, user_id: int) -> list[WeekTimeStudy]:
@@ -963,3 +988,40 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
         session.delete(tag)
         session.commit()
         return True
+    
+    def get_mood_logs(self, user_id: int) -> list[MoodLog]:
+        with Session(engine) as session:
+            # Faz a query à tabela mood_logs
+            logs_models = session.exec(
+                select(STMoodLogModel).where(STMoodLogModel.user_id == user_id)
+            ).all()
+            
+            domain_logs = []
+            for log in logs_models:
+                # Garante que emotions e impacts são listas, mesmo que venham como strings da BD
+                emotions_data = log.emotions
+                if isinstance(emotions_data, str):
+                    try:
+                        emotions_data = json.loads(emotions_data)
+                    except:
+                        emotions_data = []
+
+                impacts_data = log.impacts
+                if isinstance(impacts_data, str):
+                    try:
+                        impacts_data = json.loads(impacts_data)
+                    except:
+                        impacts_data = []
+
+                domain_logs.append(MoodLog(
+                    id=log.id,
+                    user_id=log.user_id,
+                    value=log.value,
+                    label=log.label,
+                    emotions=emotions_data if emotions_data else [],
+                    impacts=impacts_data if impacts_data else [],
+                    date_log=log.date_log
+                ))
+            
+            return domain_logs
+        

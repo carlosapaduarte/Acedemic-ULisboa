@@ -52,6 +52,7 @@
         "react-pdf": "^10.3.0",
         "react-select": "^5.10.2",
         "react-timer-hook": "^3.0.7",
+        "recharts": "^3.6.0",
         "remix": "^2.12.1",
         "remix-i18next": "^6.4.1",
         "tslog": "^4.9.3",

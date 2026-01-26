@@ -1,369 +1,300 @@
+/* --- GERAIS DA PÁGINA --- */
 .pageTitleDiv {
-    display: flex;
-    margin-bottom: 1em;
-    margin-left: 1.5em;
+  display: flex;
+  margin-bottom: 1em;
+  margin-left: 1.5em;
 }
 
 .pageTitle {
-    font-size: x-large;
-    font-weight: bolder;
+  font-size: x-large;
+  font-weight: bolder;
+  color: var(--color-2);
 }
 
-.statsContainer {
-    margin: 0 1rem;
-    @media (min-width: 600px) {
-        margin: 0 5rem;
-    }
-
-    padding: 1rem;
-
-    box-sizing: border-box;
-    border: 3px solid;
-
-    border-color: var(--color-2);
-
-    border-radius: 10px;
-
-    .tagsContainer {
-        display: inline-block;
-        line-height: 1.5em;
-    }
-
-    .energyTag {
-        text-transform: uppercase;
-
-        color: white;
-        font-weight: bold;
-        background-color: green;
-        border-radius: 1em;
-        font-size: 0.7em;
-
-        padding: 0.4em;
-        margin-right: 0.5em;
-        margin-bottom: 1em;
-    }
+/* --- CONTENTORES DOS CARTÕES (Tasks, Energy, Focus) --- */
+.statsContainer,
+.statCardContainer {
+  margin: 0 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+  border: 3px solid var(--color-2);
+  border-radius: 10px;
+  background-color: transparent; /* Mantém o fundo da app visível */
+  margin-bottom: 2rem;
+  position: relative; /* Para o título funcionar */
 }
 
+@media (min-width: 600px) {
+  .statsContainer,
+  .statCardContainer {
+    margin: 0 3rem;
+  }
+}
+
+/* TÍTULOS DOS CARTÕES (Estilo "Etiqueta no topo") */
+.statsContainerTitle,
+.statTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.8rem;
+
+  /* Posicionamento para ficar em cima da borda */
+  position: absolute;
+  top: -20px;
+  left: 20px;
+
+  background-color: var(--color-2);
+  color: white;
+  font-weight: bolder;
+  text-transform: uppercase;
+  font-family: "Chakra Petch", sans-serif;
+  font-size: 1rem;
+
+  /* Corte nos cantos (Clip-path) */
+  --edge-size: 0.5rem;
+  clip-path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+}
+
+.statTitle img,
+.statsContainerTitle .titleImg {
+  height: 1.2em;
+  width: 1.2em;
+  filter: brightness(0) invert(1); /* Torna o ícone branco */
+}
+
+/* --- DATAS E CABEÇALHOS INTERNOS --- */
 .statsContainerTitleAndDateDiv {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.8em;
-}
-
-.historyTitleAndSeeMore {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.8em;
-}
-
-.statsContainerTitle {
-    display: flex;
-    padding: 0.35rem 0.8rem;
-
-    position: relative;
-    top: -25px;
-    left: -17px;
-    background-color: var(--color-2);
-
-    font-weight: bolder;
-    color: white;
-
-    .fix {
-        font-size: smaller;
-    }
-
-
-    --edge-size: .5rem;
-    clip-path: polygon(
-            var(--edge-size) 0,
-            calc(100% - var(--edge-size)) 0,
-            100% var(--edge-size),
-            100% calc(100% - var(--edge-size)),
-            calc(100% - var(--edge-size)) 100%,
-            var(--edge-size) 100%,
-            0 calc(100% - var(--edge-size)),
-            0 var(--edge-size)
-    );
-
-    text-transform: uppercase;
-    font-family: 'Chakra Petch', sans-serif;
-
-    .titleImg {
-        margin-right: 0.3em;
-        height: 1.25em;
-        width: 1.25em;
-    }
-}
-
-.todayEnergyStatusTitle {
-    display: flex;
-    font-weight: bolder;
-    align-items: center;
-
-    .icon {
-        height: 2.5em;
-        width: 2.5em;
-        margin-right: 0.3em;
-    }
-}
-
-.veryWellColor {
-    color: #279A65;
-}
-
-.wellColor {
-    color: #416438;
-}
-
-.badColor {
-    color: #852E5E;
-}
-
-.veryBadColor {
-    color: #821633;
-}
-
-.containerAlignRight {
-    display: flex;
-    justify-content: right;
+  display: flex;
+  justify-content: flex-end; /* Data à direita */
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 .containerHeaderDate {
-    text-align: end;
-    color: var(--color-2);
-    font-size: 0.7em;
-    flex: 0 0 50%;
+  color: var(--color-2);
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: 0.7;
 }
 
-.historyFirstContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-
+/* --- GRID PARA OS GRÁFICOS DE TAREFAS (LADO A LADO) --- */
+.tasksGrid {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile: 1 coluna */
+  gap: 2rem;
+  margin-top: 1rem;
 }
 
-.historyTitle {
-    font-size: larger;
-    font-weight: bolder;
+@media (min-width: 900px) {
+  .tasksGrid {
+    grid-template-columns: 60% 40%; /* Desktop: Barras 60%, Pizza 40% */
+    align-items: start;
+  }
 }
 
-.seeFullHistoryButton {
-    color: var(--color-2);
-    background-color: transparent;
-    font-size: smaller;
-    font-weight: bold;
-
-    display: flex;
-    align-items: center;
-
-    .historyIcon {
-        height: 1em;
-        width: 1em;
-        margin-right: 0.4em;
-    }
+.chartWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.historyStatusAndDate {
-    display: flex;
-
-    text-align: center;
-    color: var(--color-2);
-    font-size: 0.7em;
-
-    .textAndIconContainer {
-        display: flex;
-        flex-direction: column;
-
-        margin-right: 1em;
-        align-items: center;
-    }
-
-    .energyHistoryStatusIcon {
-        height: 2.6em;
-        width: 2.6em;
-    }
+.chartTitleSmall {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--color-2);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  opacity: 0.8;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 4px;
+  width: 100%;
+  text-align: center;
 }
 
-.focusContainerCurWeekStatisticTitle {
-    font-size: large;
-    font-weight: bolder;
-    color: var(--color-2);
+/* --- ENERGIA (MOOD TRACKER) --- */
+.energyScrollContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap; /* Garante scroll horizontal */
+  overflow-x: auto;
+  padding: 1rem 0.5rem;
+  gap: 1.5rem;
+  align-items: flex-end;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-2) transparent;
 }
 
-.focusContainerCurWeekStatisticValue {
-
+.energyItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  min-width: 60px;
 }
 
-.focusWeeksContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.focusWeekContainer {
-    width: 100%;
-    display: flex;
-    gap: 0.5rem;
-}
-
-.focusWeekLabel {
-    flex: 0 0 35%;
-}
-
-.focusWeekProgressBarContainer {
-    flex: 1;
-}
-
-.focusWeekProgressBar {
-    --bar-width: 50%;
-
-    height: 100%;
-
-    background-color: var(--color-4);
-    width: var(--bar-width);
-    border-radius: 1rem;
-}
-
-.spacer {
-    height: 0.7em;
-}
-
-.chartAndLegendContainer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 0.5em;
-
-    .chartContainer {
-        width: 54%;
-    }
-
-    .legendGroupContainer {
-        display: flex;
-        flex-direction: column;
-        width: 41%;
-
-        .legendItemContainer {
-            height: 1.75em;
-            margin-bottom: 0.5em;
-
-            font-weight: bolder;
-            font-size: 0.8em;
-            color: white;
-
-            border-radius: 10px;
-            padding: 0.3em;
-            padding-left: 0.6em;
-        }
-    }
-}
-
-
-.WeekDateAndProgressBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .weekDate {
-        width: 50%;
-        font-size: medium;
-    }
-
-    .progressBarBase {
-        width: 60%;
-        height: 1em;
-        background-color: rgba(180, 142, 121, 255);
-        border-radius: 15px;
-
-        .progressBar {
-            background-color: var(--secondary-color);
-            border-radius: 15px;
-            height: 100%;
-        }
-    }
+.todayItem {
+  transform: scale(1.2);
+  margin: 0 10px;
 }
 
 .noDataAvailableMessage {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 3em;
-    font-weight: bolder;
-    font-size: small;
+  width: 100%;
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
 }
 
-:root {
-    --size: 3em;
-    --background-color: var(--primary-color);
-    --mask-color: var(--secondary-color);
+/* --- INSIGHTS / AUTO-REFLEXÃO --- */
+.insightsContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-* {
-    box-sizing: border-box;
+@media (min-width: 700px) {
+  .insightsContainer {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
-.wrapper {
-    width: var(--size);
-    height: var(--size);
-    margin: 10px auto;
-    position: relative;
-    background: white;
-    background-color: var(--mask-color);
-    border-radius: 100%;
+.historyTitle {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--color-2);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
 }
 
-.pie {
-    width: 50%;
-    height: 100%;
-    transform-origin: 100% 50%;
-    position: absolute;
-    background: var(--background-color);
+.insightCard {
+  background: rgba(255, 255, 255, 0.5); /* Translúcido */
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 5px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.spinner:after {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-
-    .spinner:after {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        background: #fff;
-        border: 1px solid rgba(0, 0, 0, 0.5);
-        box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
-        border-radius: 50%;
-        top: 10px;
-        right: 10px;
-        content: "";
-        display: none;
-    }
-
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.5);
-    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
-    top: 10px;
-    right: 10px;
-    content: "";
-    display: none;
+.insightTitle {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
 }
 
-.filler {
-    border-radius: 0 100% 100% 0 / 0 50% 50% 0;
-    left: 50%;
-    z-index: 100;
-    border-left: none;
-    opacity: 1;
+.insightContent {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #444;
+  line-height: 1.4;
 }
 
-.mask {
-    width: 50%;
-    height: 100%;
-    border-radius: 100% 0 0 100% / 50% 0 0 50%;
-    position: absolute;
-    background: inherit;
-    z-index: 300;
+/* --- GRÁFICO CIRCULAR (CUSTOM LEGEND) --- */
+.customLegend {
+  display: flex;
+  gap: 15px;
+  font-size: 0.75rem;
+  margin-top: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-2);
+  font-weight: 600;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Tooltips do Recharts */
+.customTooltip {
+  background-color: white;
+  border: 2px solid var(--color-2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+  font-size: 0.8rem;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Responsivo */
+  gap: 1rem;
+  margin: 0 1rem 2rem 1rem;
+}
+
+@media (min-width: 600px) {
+  .summaryGrid {
+    margin: 0 3rem 2rem 3rem;
+  }
+}
+
+.summaryCard {
+  background: white;
+  border: 2px solid var(--color-2);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 4px 4px 0px rgba(93, 64, 55, 0.1); /* Sombra subtil castanha */
+  transition: transform 0.2s;
+}
+
+.summaryCard:hover {
+  transform: translateY(-2px);
+}
+
+.summaryIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.summaryValue {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--color-2);
+  font-family: "Chakra Petch", sans-serif;
+  line-height: 1;
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* Ajuste para o Gráfico de Tags (Radar ou Treemap) */
+.tagsChartContainer {
+  height: 250px;
+  width: 100%;
+  font-size: 0.7rem;
 }

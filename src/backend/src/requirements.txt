@@ -5,6 +5,7 @@ sqlmodel==0.0.21
 psycopg2==2.9.9
 pyjwt==2.9.0
 passlib[bcrypt]==1.7.4
+bcrypt==3.2.0
 alembic==1.13.3
 python3-saml==1.16.0
 python-multipart==0.0.17

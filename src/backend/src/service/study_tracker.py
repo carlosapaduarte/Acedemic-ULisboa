@@ -1,10 +1,9 @@
 from datetime import datetime
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
+from domain.study_tracker import Archive, CurricularUnit, MoodLog, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
 from exception import InvalidDate, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
 from datetime import date
-
 from router.study_tracker.dtos.input_dtos import CreateMoodLogInputDto
 study_tracker_repo = StudyTrackerSqlRepo()
 
@@ -273,3 +272,9 @@ def finish_study_session(user_id: int):
 def update_week_time_average_study_time(user_id: int, week_and_year: WeekAndYear, study_session_time: int):
     study_tracker_repo.update_week_time_average_study_time(user_id, week_and_year, study_session_time)
 """
+
+def get_mood_logs(user_id: int) -> list[MoodLog]:
+    """
+    Obtém o histórico de mood logs do repositório.
+    """
+    return study_tracker_repo.get_mood_logs(user_id)

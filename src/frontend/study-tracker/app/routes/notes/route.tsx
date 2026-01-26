@@ -58,7 +58,7 @@ function NotesPage() {
   const { t } = useTranslation();
   const [ucs, setUcs] = useState<CurricularUnit[]>([]);
   const [currentFolder, setCurrentFolder] = useState<CurricularUnit | null>(
-    null
+    null,
   );
   const [folderFiles, setFolderFiles] =
     useState<Record<string, FileItem[]>>(DEMO_FILES);
@@ -141,7 +141,7 @@ function NotesPage() {
     setFolderFiles((prev) => ({
       ...prev,
       [currentFolder.name]: prev[currentFolder.name].filter(
-        (f) => f.id !== fileId
+        (f) => f.id !== fileId,
       ),
     }));
   };
@@ -194,7 +194,7 @@ function NotesPage() {
           <div className={styles.searchBar}>
             <FaMagnifyingGlass className={styles.searchIcon} />
             <input
-              placeholder="Procurar em todas as cadeiras..."
+              placeholder="Procurar em todas as UCs..."
               className={styles.searchInput}
             />
           </div>
