@@ -5,7 +5,7 @@ from typing import List, Optional
 from domain.study_tracker import Event
 from domain.commons.user import User
 from router.academic_challenge.dtos.output_dtos import BatchDto
-
+from router.academic_challenge.dtos.output_dtos import BatchDto
 
 
 class LoginOutputDto(BaseModel):
@@ -32,9 +32,20 @@ class UserOutputDto(BaseModel):
 
         start_date = 0
         if hasattr(user, "study_session_time") and user.study_session_time:
-            start_date = int(user.study_session_time.timestamp())
+             if hasattr(user.study_session_time, 'timestamp'):
+                 start_date = int(user.study_session_time.timestamp())
+             else:
+                 start_date = int(user.study_session_time)
         elif hasattr(user, "start_date") and user.start_date:
-             start_date = int(user.start_date)
+             if hasattr(user.start_date, 'timestamp'):
+                 start_date = int(user.start_date.timestamp())
+             else:
+                 start_date = int(user.start_date)
+
+        batches_dtos = []
+        if hasattr(user, "batches") and user.batches:
+            # Usa o método estático para converter a lista toda
+            batches_dtos = BatchDto.fromBatches(user.batches)
 
         return cls(
             id=user.id,
@@ -44,12 +55,10 @@ class UserOutputDto(BaseModel):
             shareProgress=getattr(user, "share_progress", False) or False,
             
             avatarFilename=getattr(user, "avatar_filename", None),
-            
-            batches=[], 
-
+            batches=batches_dtos,
             custom_colors=colors
         )
-    
+
 class TagOutputDto(BaseModel):
     id: str
     name_pt: Optional[str] = None
