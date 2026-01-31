@@ -10,6 +10,7 @@ from router.gamification.badges import router as gamification_router
 from repository.sql.models import models
 from fastapi.middleware.cors import CORSMiddleware
 from router import tags
+from router.auth import auth as auth_router
 from repository.sql.models.database import create_db_and_tables ,seed_all_data
 from router.study_tracker import study_tracker
 import uvicorn
@@ -17,6 +18,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
+app.include_router(auth_router.router)
 
 @app.on_event("startup")
 def on_startup():

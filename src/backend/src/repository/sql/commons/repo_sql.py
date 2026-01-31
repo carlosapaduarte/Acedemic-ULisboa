@@ -136,4 +136,41 @@ class CommonsSqlRepo(CommonsRepo):
         user_model.share_progress = share_progress
         db.add(user_model)
         db.commit() 
-        db.refresh(user_model) 
+        db.refresh(user_model)
+
+    @staticmethod
+    def get_user_by_fenix_id(db: Session, fenix_id: str) -> User | None:
+        """Procura um utilizador pelo ID único do Fénix."""
+        db.expire_all()
+        # Usamos selectinload para carregar os batches logo, tal como no login normal
+        statement = select(UserModel).where(UserModel.fenix_id == fenix_id).options(
+            selectinload(UserModel.metrics),
+            selectinload(UserModel.user_batches).selectinload(BatchModel.batch_days).selectinload(BatchDayModel.challenges)
+        )
+        result = db.exec(statement)
+        return CommonsSqlRepo.from_user_model_result(result)
+
+    @staticmethod
+    def create_user_from_saml(db: Session, username: str, fenix_id: str, email: str | None) -> UserModel:
+        """Cria um utilizador vindo do SAML (sem password)."""
+        
+        # Gerar ID aleatório (como estava antes na lógica existente)
+        random_generated_id: int = 0
+        while True:
+            random_generated_id = random.randint(1, database.POSTGRES_MAX_INTEGER_VALUE)
+            if not db.exec(select(UserModel).where(UserModel.id == random_generated_id)).first():
+                break
+
+        db_user = UserModel(
+            id=random_generated_id,
+            username=username,
+            hashed_password=None, # SAML users não têm password aqui
+            fenix_id=fenix_id,
+            institutional_email=email,
+            avatar_filename=None,
+            share_progress=False
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user

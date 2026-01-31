@@ -13,8 +13,16 @@ class UserModel(SQLModel, table=True):
     __tablename__ = "user"
 
     id: int = Field(primary_key=True)
-    username: str
-    hashed_password: str
+    
+    username: str = Field(index=True, unique=True)
+    
+    # Agora é opcional, pois utilizadores Fénix não têm password na nossa BD
+    hashed_password: str | None = Field(default=None, nullable=True)
+    
+    fenix_id: str | None = Field(default=None, index=True, unique=True, nullable=True)
+    
+    institutional_email: str | None = Field(default=None, nullable=True)
+
     avatar_filename: str | None
     share_progress: bool | None
     receive_st_app_notifications: bool | None
@@ -44,7 +52,7 @@ class UserModel(SQLModel, table=True):
     earned_badges: List["UserBadge"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
     metrics: Optional["UserMetric"] = Relationship(back_populates="user", sa_relationship_kwargs={"uselist": False})
     league_memberships: List["UserLeague"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-
+    
 class UserTagLink(SQLModel, table=True):
     __tablename__ = "user_tag_link"
 
