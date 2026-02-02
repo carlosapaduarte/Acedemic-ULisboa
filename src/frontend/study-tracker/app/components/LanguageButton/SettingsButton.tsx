@@ -2,7 +2,7 @@ import { useNavigate } from "@remix-run/react";
 import { IconContext } from "react-icons";
 import classNames from "classnames";
 import styles from "./settingsButton.module.css";
-import { RiSettings5Fill } from "react-icons/ri";
+import { RiSettings5Fill, RiEqualizerLine } from "react-icons/ri";
 import React, { useTransition } from "react";
 import { AppBarVariant } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
@@ -12,12 +12,9 @@ import dropdownStyles from "~/components/AppBar/HomeAppBar/dropdown.module.css";
 
 function Dropdown({ trigger }: { trigger: JSX.Element }) {
   const logout = useLogOut();
-
   const [isPending, startTransition] = useTransition();
+  const navigate = useNavigate(); // Hook para navegação
 
-  if (typeof window !== "undefined") {
-    console.log("window.location.origin: ", window?.location.origin);
-  }
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
@@ -32,6 +29,21 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
             >
               Acedemic Home
             </a>
+          </DropdownMenu.Item>
+
+          {/* LINK PARA A PÁGINA DE SETTINGS */}
+          <DropdownMenu.Item
+            className={dropdownStyles.Item}
+            onSelect={() => navigate("/settings")} // Navega para a nova rota
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              gap: "8px",
+              alignItems: "center",
+            }}
+          >
+            <RiEqualizerLine />
+            <span>Definições</span>
           </DropdownMenu.Item>
 
           <DropdownMenu.Item className={dropdownStyles.Item}>
@@ -51,6 +63,11 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
             </a>
           </DropdownMenu.Item>
 
+          <DropdownMenu.Separator
+            className={dropdownStyles.Separator}
+            style={{ height: 1, backgroundColor: "#ccc", margin: "5px 0" }}
+          />
+
           <DropdownMenu.Item
             className={dropdownStyles.Item}
             onClick={() => startTransition(logout)}
@@ -65,10 +82,12 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
   );
 }
 
-export function SettingsButton({ variant = "default" }: { variant?: AppBarVariant }) {
-    const navigate = useNavigate();
-
-    const { t } = useTranslation("appbar");
+export function SettingsButton({
+  variant = "default",
+}: {
+  variant?: AppBarVariant;
+}) {
+  const { t } = useTranslation("appbar");
 
   return (
     <Dropdown

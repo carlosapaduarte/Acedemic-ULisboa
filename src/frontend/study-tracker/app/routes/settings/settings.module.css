@@ -1,0 +1,246 @@
+.pageContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  padding-bottom: 6rem; /* Espaço para o botão fixo */
+  color: var(--text-primary, inherit);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.backButton:hover {
+  opacity: 1;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.5));
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px); /* Efeito vidro */
+}
+
+.section h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Info Row (Username) */
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+.label {
+  font-weight: bold;
+  opacity: 0.7;
+}
+
+.value {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Toggle Switch Styles */
+.toggleRow {
+  display: flex;
+  justify_content: space-between;
+  align-items: center;
+}
+
+.description {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+  background-color: #663399; /* Cor roxa quando ativo */
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* Form Styles */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* Avatar Grid */
+.avatarGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 12px;
+}
+
+.avatarItem {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.avatarItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarItem:hover {
+  transform: scale(1.1);
+}
+
+.avatarSelected {
+  border-color: #663399;
+  box-shadow: 0 4px 10px rgba(102, 51, 153, 0.3);
+  transform: scale(1.15);
+}
+
+/* Buttons */
+.dangerButton {
+  background: transparent;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.dangerButton:hover {
+  background: rgba(229, 62, 62, 0.1);
+}
+
+.actionBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(
+    to top,
+    var(--bg-primary, white) 50%,
+    transparent
+  );
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none; /* Deixa clicar através do gradiente */
+}
+
+.saveButton {
+  pointer-events: auto;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.saveButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.success {
+  background-color: #38a169 !important; /* Verde */
+}

@@ -19,13 +19,13 @@ const COLORS = {
   good: "#4CAF50",
   neutral: "#1565C0",
   text: "#444",
+  danger: "#d32f2f",
 };
 
 // --- FUNÇÃO PARA CALCULAR STREAK (CICLOS SEGUIDOS) ---
 function calculateMaxStreak(events: Event[]) {
   if (events.length === 0) return 0;
 
-  // Ordenar por data
   const sorted = [...events].sort(
     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
   );
@@ -38,7 +38,6 @@ function calculateMaxStreak(events: Event[]) {
     const currStart = new Date(sorted[i].startDate).getTime();
     const gapMinutes = (currStart - prevEnd) / (1000 * 60);
 
-    // Se a pausa entre sessões for menor que 5 min, conta como ciclo seguido
     if (gapMinutes > 0 && gapMinutes <= 5) {
       currentStreak++;
     } else {
@@ -95,27 +94,22 @@ export function FocusStats() {
         min: 0,
         max: 0,
         streak: 0,
-        totalCount: 0,
+        interrupted: 0,
         chartData: [],
       };
     }
 
     // 3. Métricas
     const totalTime = durations.reduce((a, b) => a + b, 0);
-
     // Média (Soma / Quantidade)
     const avg = Math.round(totalTime / durations.length);
-
-    // Min e Max (Duração da sessão mais curta e mais longa)
     const min = Math.min(...durations);
     const max = Math.max(...durations);
-
-    // Total de Sessões (Volume) - Placeholder até termos o "Interrompidos"
-    const totalCount = durations.length;
-
     const streak = calculateMaxStreak(weeklyEvents);
 
-    // 4. Preparar Gráfico Diário
+    // PLACEHOLDER PARA INTERRUPÇÕES (AINDA NÃO VEM DO BACKEND)
+    const interrupted = 0;
+
     const daysMap = { Seg: 0, Ter: 0, Qua: 0, Qui: 0, Sex: 0, Sáb: 0, Dom: 0 };
     const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -140,7 +134,7 @@ export function FocusStats() {
       { day: "Dom", min: daysMap["Dom"] },
     ];
 
-    return { hasData: true, avg, min, max, streak, totalCount, chartData };
+    return { hasData: true, avg, min, max, streak, interrupted, chartData };
   }, [events]);
 
   return (
@@ -156,77 +150,123 @@ export function FocusStats() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "1rem",
+                gridTemplateColumns: "1fr 1fr", // Mantém 2 colunas
+                gap: "0.8rem",
                 width: "100%",
               }}
             >
               {/* Card: Média */}
               <div
                 className={styles.summaryCard}
-                style={{ padding: "0.8rem", border: "1px solid #ddd" }}
+                style={{ padding: "0.5rem 0.8rem", border: "1px solid #ddd" }}
               >
                 <div
                   style={{
-                    fontSize: "1.5rem",
+                    fontSize: "1.3rem",
                     fontWeight: "bold",
                     color: COLORS.neutral,
                   }}
                 >
                   {stats.avg}m
                 </div>
-                <div className={styles.summaryLabel}>Média / Sessão</div>
+                <div
+                  className={styles.summaryLabel}
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  Média / Sessão
+                </div>
               </div>
 
               {/* Card: Streak */}
               <div
                 className={styles.summaryCard}
-                style={{ padding: "0.8rem", border: "1px solid #ddd" }}
+                style={{ padding: "0.5rem 0.8rem", border: "1px solid #ddd" }}
               >
                 <div
                   style={{
-                    fontSize: "1.5rem",
+                    fontSize: "1.3rem",
                     fontWeight: "bold",
                     color: COLORS.good,
                   }}
                 >
                   {stats.streak}
                 </div>
-                <div className={styles.summaryLabel}>Ciclos Seguidos</div>
+                <div
+                  className={styles.summaryLabel}
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  Ciclos Seguidos
+                </div>
               </div>
 
-              {/* Card: Min / Max */}
+              {/* Card: Min */}
               <div
                 className={styles.summaryCard}
-                style={{ padding: "0.8rem", border: "1px solid #ddd" }}
+                style={{ padding: "0.5rem 0.8rem", border: "1px solid #ddd" }}
               >
                 <div
                   style={{
-                    fontSize: "1rem",
+                    fontSize: "1.1rem",
                     fontWeight: "bold",
                     color: COLORS.text,
                   }}
                 >
-                  {stats.min}m - {stats.max}m
+                  {stats.min}m
                 </div>
-                <div className={styles.summaryLabel}>Min - Máx</div>
+                <div
+                  className={styles.summaryLabel}
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  Sessão + Curta
+                </div>
               </div>
 
-              {/* Card: Total (Placeholder para Interrupções Futuras) */}
+              {/* Card: Max */}
               <div
                 className={styles.summaryCard}
-                style={{ padding: "0.8rem", border: "1px solid #ddd" }}
+                style={{ padding: "0.5rem 0.8rem", border: "1px solid #ddd" }}
               >
                 <div
                   style={{
-                    fontSize: "1.5rem",
+                    fontSize: "1.1rem",
                     fontWeight: "bold",
                     color: COLORS.text,
                   }}
                 >
-                  {stats.totalCount}
+                  {stats.max}m
                 </div>
-                <div className={styles.summaryLabel}>Total Sessões</div>
+                <div
+                  className={styles.summaryLabel}
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  Sessão + Longa
+                </div>
+              </div>
+
+              <div
+                className={styles.summaryCard}
+                style={{
+                  gridColumn: "1 / -1",
+                  padding: "0.5rem 0.8rem",
+                  border: "1px solid #ddd",
+                  backgroundColor: "#ffebee",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "1.3rem",
+                    fontWeight: "bold",
+                    color: COLORS.danger,
+                  }}
+                >
+                  {stats.interrupted}
+                </div>
+                <div
+                  className={styles.summaryLabel}
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  Interrupções (Antes do Fim)
+                </div>
               </div>
             </div>
           ) : (
@@ -242,7 +282,7 @@ export function FocusStats() {
         {/* COLUNA 2: Gráfico Diário */}
         <div className={styles.chartWrapper}>
           <div className={styles.chartTitleSmall}>Volume Diário</div>
-          <div style={{ width: "100%", height: 180, fontSize: "0.65rem" }}>
+          <div style={{ width: "100%", height: 200, fontSize: "0.65rem" }}>
             <ResponsiveContainer>
               <BarChart
                 data={stats.chartData}

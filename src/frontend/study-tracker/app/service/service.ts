@@ -155,6 +155,7 @@ export type UserInfo = {
   shareProgress: boolean;
   avatarFilename: string;
   custom_colors?: string[];
+  use_goals?: number[];
 };
 
 async function fetchUserInfo(): Promise<UserInfo> {

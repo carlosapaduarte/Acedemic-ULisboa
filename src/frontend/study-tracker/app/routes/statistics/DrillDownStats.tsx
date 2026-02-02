@@ -192,7 +192,6 @@ export function DrillDownStats() {
     };
   }, [rawEvents, tags, selectedTag]);
 
-  // Tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const min = payload[0].value;
@@ -208,14 +207,28 @@ export function DrillDownStats() {
     return null;
   };
 
-  // --- VISÃO DRILL DOWN ---
-  if (selectedTag) {
-    return (
-      <div className={styles.statCardContainer}>
-        <div className={styles.statTitle}>
-          {"🔍 Detalhe: "}
-          {selectedTag}
-        </div>
+  return (
+    <div className={styles.statCardContainer}>
+      <div className={styles.statTitle}>
+        {selectedTag
+          ? `🔍 Detalhe: ${selectedTag}`
+          : "🏷️ Distribuição de Tempo"}
+      </div>
+
+      {!selectedTag && (
+        <p
+          style={{
+            fontSize: "0.85rem",
+            color: "#666",
+            margin: "-10px 0 15px 0",
+            paddingLeft: "1rem",
+          }}
+        >
+          Onde gastaste o teu tempo esta semana
+        </p>
+      )}
+
+      {selectedTag ? (
         <div style={{ padding: "1rem" }}>
           <div
             style={{
@@ -244,8 +257,8 @@ export function DrillDownStats() {
             <span
               style={{ fontSize: "0.8rem", color: "#666", fontStyle: "italic" }}
             >
-              {"Tags combinadas com "}
-              {selectedTag}
+              {"Co-ocorrências com: "}
+              <b>{selectedTag}</b>
             </span>
           </div>
 
@@ -305,134 +318,125 @@ export function DrillDownStats() {
             )}
           </div>
         </div>
-      </div>
-    );
-  }
-
-  // --- VISÃO GERAL ---
-  return (
-    <div className={styles.statCardContainer}>
-      <div className={styles.statTitle}>{"🏷️ Distribuição de Tempo"}</div>
-
-      <div className={styles.tasksGrid}>
-        {/* GRÁFICO 1: UCs */}
-        <div className={styles.chartWrapper}>
-          <div className={styles.chartTitleSmall}>{"🎓 Académico (UCs)"}</div>
-          {ucData.length > 0 ? (
-            <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
-              <ResponsiveContainer>
-                <BarChart
-                  layout="vertical"
-                  data={ucData}
-                  margin={{ left: 10, right: 30 }}
-                >
-                  <XAxis type="number" hide />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    width={80}
-                    tick={{ fill: "#5d4037", fontWeight: "bold" }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                    content={<CustomTooltip />}
-                  />
-
-                  <Bar
-                    dataKey="value"
-                    radius={[0, 4, 4, 0]}
-                    barSize={20}
-                    fill={UC_COLOR}
-                    style={{ cursor: "pointer" }}
-                    onClick={(entry) => {
-                      setSelectedTag(entry.name);
-                      setSelectedTagType("uc");
-                    }}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-              <div
-                style={{
-                  textAlign: "center",
-                  fontSize: "0.7rem",
-                  color: "#999",
-                  marginTop: "5px",
-                }}
-              >
-                (Clica na barra para ver co-ocorrências)
-              </div>
-            </div>
-          ) : (
-            <div className={styles.noDataAvailableMessage}>
-              Sem dados de UCs.
-            </div>
-          )}
-        </div>
-
-        {/* GRÁFICO 2: Todas as Tags */}
-        <div className={styles.chartWrapper}>
-          <div className={styles.chartTitleSmall}>{"🌟 Geral"}</div>
-          {otherData.length > 0 ? (
-            <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
-              <ResponsiveContainer>
-                <BarChart
-                  layout="vertical"
-                  data={otherData}
-                  margin={{ left: 10, right: 30 }}
-                >
-                  <XAxis type="number" hide />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    width={80}
-                    tick={{ fill: "#5d4037", fontWeight: "bold" }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                    content={<CustomTooltip />}
-                  />
-                  <Bar
-                    dataKey="value"
-                    radius={[0, 4, 4, 0]}
-                    barSize={20}
-                    style={{ cursor: "pointer" }}
-                    onClick={(entry) => {
-                      setSelectedTag(entry.name);
-                      setSelectedTagType("other");
-                    }}
+      ) : (
+        <div className={styles.tasksGrid}>
+          {/* 1. GERAL (MOVIDO PARA A ESQUERDA) */}
+          <div className={styles.chartWrapper}>
+            <div className={styles.chartTitleSmall}>{"🌟 Geral"}</div>
+            {otherData.length > 0 ? (
+              <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
+                <ResponsiveContainer>
+                  <BarChart
+                    layout="vertical"
+                    data={otherData}
+                    margin={{ left: 10, right: 30 }}
                   >
-                    {otherData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={OTHER_COLORS[index % OTHER_COLORS.length]}
-                        style={{ cursor: "pointer" }}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <div
-                style={{
-                  textAlign: "center",
-                  fontSize: "0.7rem",
-                  color: "#999",
-                  marginTop: "5px",
-                }}
-              >
-                (Clica na barra para ver co-ocorrências)
+                    <XAxis type="number" hide />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={80}
+                      tick={{ fill: "#5d4037", fontWeight: "bold" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                      content={<CustomTooltip />}
+                    />
+                    <Bar
+                      dataKey="value"
+                      radius={[0, 4, 4, 0]}
+                      barSize={20}
+                      style={{ cursor: "pointer" }}
+                      onClick={(entry) => {
+                        setSelectedTag(entry.name);
+                        setSelectedTagType("other");
+                      }}
+                    >
+                      {otherData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={OTHER_COLORS[index % OTHER_COLORS.length]}
+                          style={{ cursor: "pointer" }}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+                <div
+                  style={{
+                    textAlign: "center",
+                    fontSize: "0.7rem",
+                    color: "#999",
+                    marginTop: "5px",
+                  }}
+                >
+                  (Clica na barra para ver detalhes)
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className={styles.noDataAvailableMessage}>
-              Sem outros registos.
-            </div>
-          )}
+            ) : (
+              <div className={styles.noDataAvailableMessage}>
+                Sem registos gerais.
+              </div>
+            )}
+          </div>
+
+          <div className={styles.chartWrapper}>
+            <div className={styles.chartTitleSmall}>{"🎓 Académico (UCs)"}</div>
+            {ucData.length > 0 ? (
+              <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
+                <ResponsiveContainer>
+                  <BarChart
+                    layout="vertical"
+                    data={ucData}
+                    margin={{ left: 10, right: 30 }}
+                  >
+                    <XAxis type="number" hide />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={80}
+                      tick={{ fill: "#5d4037", fontWeight: "bold" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                      content={<CustomTooltip />}
+                    />
+                    <Bar
+                      dataKey="value"
+                      radius={[0, 4, 4, 0]}
+                      barSize={20}
+                      fill={UC_COLOR}
+                      style={{ cursor: "pointer" }}
+                      onClick={(entry) => {
+                        setSelectedTag(entry.name);
+                        setSelectedTagType("uc");
+                      }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div
+                  style={{
+                    textAlign: "center",
+                    fontSize: "0.7rem",
+                    color: "#999",
+                    marginTop: "5px",
+                  }}
+                >
+                  (Clica na barra para ver detalhes)
+                </div>
+              </div>
+            ) : (
+              <div className={styles.noDataAvailableMessage}>
+                Sem dados de UCs.
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
