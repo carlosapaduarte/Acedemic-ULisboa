@@ -74,9 +74,11 @@ export function Timer({
         <button className={styles.controlButton} onClick={resume}>
           {t("study:timer_resume")}
         </button>
-        <button className={styles.controlButton} onClick={onStopClickHandler}>
-          {t("study:timer_stop")}
-        </button>
+        <div className="tutorial-target-pomodoro-start">
+          <button className={styles.controlButton} onClick={onStopClickHandler}>
+            {t("study:timer_stop")}
+          </button>
+        </div>
       </div>
     </div>
   );

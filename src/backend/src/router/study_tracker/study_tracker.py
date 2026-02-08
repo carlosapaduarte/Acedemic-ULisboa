@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Response, Query
 
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -240,6 +240,13 @@ def create_schedule_not_available_block(
         )
     )
     return Response()
+
+@router.put("/users/me/tutorial-progress")
+def mark_tutorial_as_seen(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    dto: MarkTutorialAsSeenInputDto
+):
+    study_tracker_service.mark_tutorial_as_seen(user_id, dto.tutorial_key)
 
 @router.post("/users/me/archives")
 def create_archive(

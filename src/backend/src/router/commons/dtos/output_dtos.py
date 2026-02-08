@@ -23,7 +23,8 @@ class UserOutputDto(BaseModel):
     batches: list = []
 
     custom_colors: List[str] = [] 
-
+    tutorial_progress: List[str] = []
+    
     @classmethod
     def fromUser(cls, user):
         colors = getattr(user, "custom_colors", [])

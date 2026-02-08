@@ -67,11 +67,11 @@ export function TaskList({
   };
 
   const completedToday = allCompletedTasks.filter((t) =>
-    isCompletedToday(t.data.completed_at)
+    isCompletedToday(t.data.completed_at),
   );
 
   const completedOld = allCompletedTasks.filter(
-    (t) => !isCompletedToday(t.data.completed_at)
+    (t) => !isCompletedToday(t.data.completed_at),
   );
 
   const renderList = (taskList: Task[]) =>
@@ -89,7 +89,7 @@ export function TaskList({
     ));
 
   return (
-    <div>
+    <div className="tutorial-target-tasks-list">
       <div
         style={{
           display: "flex",

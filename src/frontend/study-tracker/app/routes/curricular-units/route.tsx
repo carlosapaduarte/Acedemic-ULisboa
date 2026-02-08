@@ -229,82 +229,84 @@ function CurricularUnitCard({
   }
 
   return (
-    <div className={styles.cardContainer}>
-      <div className={styles.cardHeader}>
-        <h3 className={styles.cardTitle}>{cu.name}</h3>
-        <span className={styles.ectsBadge}>{displayEcts} ECTS</span>
-      </div>
-
-      <div className={styles.simulatorContainer}>
-        <div className={styles.progressLabels}>
-          <span>
-            Garantido: <strong>{currentPoints.toFixed(2)}</strong> val.
-          </span>
-          <span>
-            Máximo Possível: <strong>{maxPossible.toFixed(2)}</strong> val.
-          </span>
+    <div className={`${styles.cardContainer} tutorial-target-uc-card`}>
+      <div className={styles.cardContainer}>
+        <div className={styles.cardHeader}>
+          <h3 className={styles.cardTitle}>{cu.name}</h3>
+          <span className={styles.ectsBadge}>{displayEcts} ECTS</span>
         </div>
-        <div className={styles.progressBarBg}>
-          <div
-            className={styles.progressBarFill}
-            style={{
-              width: `${(currentPoints / 20) * 100}%`,
-              backgroundColor: getBarColor(),
-            }}
-          ></div>
-          <div
-            className={styles.progressMarker}
-            style={{ left: "47.5%" }}
-            title="Meta 9.5"
-          ></div>
-        </div>
-        <p className={styles.simulationText}>
-          {currentPoints >= 9.5
-            ? "🎉 Parabéns! Aprovação garantida"
-            : maxPossible < 9.5
-            ? "⚠️ Atenção: Já não é possível atingir o 9.5 com os pesos atuais."
-            : `Faltam ${(9.5 - currentPoints).toFixed(
-                2,
-              )} valores absolutos para a aprovação.`}
-        </p>
-      </div>
 
-      {cu.grades.length > 0 && (
-        <div className={styles.gradeList}>
-          {cu.grades.map((g) => (
-            <div key={g.id} className={styles.gradeItem}>
-              <div>
-                <span className={styles.gradeValue}>{g.value}</span>
-                <span className={styles.gradeWeight}>({g.weight}%)</span>
+        <div className={styles.simulatorContainer}>
+          <div className={styles.progressLabels}>
+            <span>
+              Garantido: <strong>{currentPoints.toFixed(2)}</strong> val.
+            </span>
+            <span>
+              Máximo Possível: <strong>{maxPossible.toFixed(2)}</strong> val.
+            </span>
+          </div>
+          <div className={styles.progressBarBg}>
+            <div
+              className={styles.progressBarFill}
+              style={{
+                width: `${(currentPoints / 20) * 100}%`,
+                backgroundColor: getBarColor(),
+              }}
+            ></div>
+            <div
+              className={styles.progressMarker}
+              style={{ left: "47.5%" }}
+              title="Meta 9.5"
+            ></div>
+          </div>
+          <p className={styles.simulationText}>
+            {currentPoints >= 9.5
+              ? "🎉 Parabéns! Aprovação garantida"
+              : maxPossible < 9.5
+              ? "⚠️ Atenção: Já não é possível atingir o 9.5 com os pesos atuais."
+              : `Faltam ${(9.5 - currentPoints).toFixed(
+                  2,
+                )} valores absolutos para a aprovação.`}
+          </p>
+        </div>
+
+        {cu.grades.length > 0 && (
+          <div className={styles.gradeList}>
+            {cu.grades.map((g) => (
+              <div key={g.id} className={styles.gradeItem}>
+                <div>
+                  <span className={styles.gradeValue}>{g.value}</span>
+                  <span className={styles.gradeWeight}>({g.weight}%)</span>
+                </div>
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => handleDelete(g.id)}
+                >
+                  Apagar
+                </button>
               </div>
-              <button
-                className={styles.deleteButton}
-                onClick={() => handleDelete(g.id)}
-              >
-                Apagar
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {cu.grades.length === 0 && (
-        <p
-          style={{
-            color: "rgba(255,255,255,0.5)",
-            fontStyle: "italic",
-            marginBottom: "1.5rem",
-          }}
-        >
-          Ainda sem avaliações lançadas.
-        </p>
-      )}
+        {cu.grades.length === 0 && (
+          <p
+            style={{
+              color: "rgba(255,255,255,0.5)",
+              fontStyle: "italic",
+              marginBottom: "1.5rem",
+            }}
+          >
+            Ainda sem avaliações lançadas.
+          </p>
+        )}
 
-      <CreateGrade
-        curricularUnit={cu.name}
-        onGradeCreated={onRefresh}
-        totalWeight={totalWeight}
-      />
+        <CreateGrade
+          curricularUnit={cu.name}
+          onGradeCreated={onRefresh}
+          totalWeight={totalWeight}
+        />
+      </div>
     </div>
   );
 }
@@ -390,10 +392,12 @@ export default function CurricularUnitsPage() {
         )}
 
         <div className={styles.headerAction}>
-          <h1 className={styles.pageTitle}>As Minhas Unidades Curriculares</h1>
+          <h1 className={`${styles.pageTitle} tutorial-target-uc-header`}>
+            As Minhas Unidades Curriculares
+          </h1>
           {cuList.length > 0 && (
             <button
-              className={styles.topCreateButton}
+              className={`${styles.topCreateButton} tutorial-target-uc-create`}
               onClick={() => setCreateModalOpen(true)}
             >
               <FaPlus /> Nova UC

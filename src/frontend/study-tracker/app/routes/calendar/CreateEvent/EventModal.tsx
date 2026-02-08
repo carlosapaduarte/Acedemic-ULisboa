@@ -51,7 +51,7 @@ const TitleSection = React.memo(({ title, setTitle }: any) => {
       <TextField className={styles.formTextField} autoFocus>
         <Label className={styles.formSectionTitle}>{t("title_label")}</Label>
         <Input
-          className={styles.formInput}
+          className={`${styles.formInput} tutorial-target-event-title`}
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -164,7 +164,7 @@ const IsRecurrentSection = React.memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 const DateSection = React.memo(
@@ -257,45 +257,67 @@ const DateSection = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const EventForm = (props: any) => {
   return (
     <div className={styles.newEventForm}>
       <TitleSection title={props.title} setTitle={props.setTitle} />
-      <DateSection
-        eventStartDate={props.startDate}
-        setEventStartDate={props.setStartDate}
-        eventEndDate={props.endDate}
-        setEventEndDate={props.setEndDate}
-      />
-      <NotesSection notes={props.notes} setNotes={props.setNotes} />
 
-      <IsRecurrentSection
-        recurrenceType={props.recurrenceType}
-        setRecurrenceType={props.setRecurrenceType}
-        recurrenceStart={props.recurrenceStart}
-        setRecurrenceStart={props.setRecurrenceStart}
-        recurrenceEnd={props.recurrenceEnd}
-        setRecurrenceEnd={props.setRecurrenceEnd}
+      <div
+        id="tutorial-scroll-dates"
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      >
+        <DateSection
+          eventStartDate={props.startDate}
+          setEventStartDate={props.setStartDate}
+          eventEndDate={props.endDate}
+          setEventEndDate={props.setEndDate}
+        />
+
+        <NotesSection notes={props.notes} setNotes={props.setNotes} />
+
+        <IsRecurrentSection
+          recurrenceType={props.recurrenceType}
+          setRecurrenceType={props.setRecurrenceType}
+          recurrenceStart={props.recurrenceStart}
+          setRecurrenceStart={props.setRecurrenceStart}
+          recurrenceEnd={props.recurrenceEnd}
+          setRecurrenceEnd={props.setRecurrenceEnd}
+        />
+      </div>
+
+      <hr
+        style={{
+          margin: "10px 0",
+          border: "0",
+          borderTop: "1px solid var(--border-color)",
+        }}
       />
 
-      <ColorPickerInput
-        label={props.label}
-        color={props.color}
-        setColor={props.setColor}
-        clearColor={() => props.setColor(null)}
-      />
+      <div
+        id="tutorial-scroll-customization"
+        className="tutorial-target-event-color"
+      >
+        <ColorPickerInput
+          label={props.label}
+          color={props.color}
+          setColor={props.setColor}
+          clearColor={() => props.setColor(null)}
+        />
+      </div>
 
-      <TagSection
-        selectedTagIds={props.selectedTagIds}
-        setSelectedTagIds={props.setSelectedTagIds}
-        availableTags={props.availableTags}
-        refreshTags={props.refreshTags}
-        onEditTags={() => props.setIsEditTagModalOpen(true)}
-        onAddTag={() => props.setIsCreateTagModalOpen(true)}
-      />
+      <div id="tutorial-scroll-tags" className="tutorial-target-event-tags">
+        <TagSection
+          selectedTagIds={props.selectedTagIds}
+          setSelectedTagIds={props.setSelectedTagIds}
+          availableTags={props.availableTags}
+          refreshTags={props.refreshTags}
+          onEditTags={() => props.setIsEditTagModalOpen(true)}
+          onAddTag={() => props.setIsCreateTagModalOpen(true)}
+        />
+      </div>
     </div>
   );
 };
@@ -317,7 +339,7 @@ export function EventModal({
   const [color, setColor] = useState<string | null>(null);
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
   const [recurrenceStart, setRecurrenceStart] = useState<Date | null>(
-    new Date()
+    new Date(),
   );
   const [recurrenceEnd, setRecurrenceEnd] = useState<Date | null>(null);
 
@@ -367,9 +389,8 @@ export function EventModal({
       setIsUC(eventToEdit.is_uc ?? false);
 
       const loadedTags = eventToEdit.tags || [];
-
       const cleanTagIds = loadedTags.map((t: any) =>
-        typeof t === "object" && t !== null && t.id ? String(t.id) : String(t)
+        typeof t === "object" && t !== null && t.id ? String(t.id) : String(t),
       );
 
       setSelectedTagIds(cleanTagIds);
@@ -379,15 +400,14 @@ export function EventModal({
       if (eventToEdit.recurrenceEnd)
         setRecurrenceEnd(new Date(eventToEdit.recurrenceEnd));
     } else {
-      // RESET FORM
       setTitle("");
       setStartDate(initialStartDate);
       setEndDate(initialEndDate);
       setNotes("");
       setColor(null);
       setRecurrenceType("none");
-      setRecurrenceStart(new Date()); // Default: Hoje
-      setRecurrenceEnd(null); // Default: Infinito
+      setRecurrenceStart(new Date());
+      setRecurrenceEnd(null);
       setSelectedTagIds([]);
       setIsUC(false);
     }
@@ -458,21 +478,18 @@ export function EventModal({
       <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>
         <Dialog aria-label="Event Modal">
           {() => (
-            <div className={styles.newEventModalContainer}>
-              <Button
-                className={classNames(styles.roundButton, styles.closeButton)}
-                onPress={clearFormAndClose}
-                isDisabled={saving}
-              >
-                {t("close_button")}
-              </Button>
+            // TARGET DO MODAL (JANELA INTEIRA)
+            <div
+              className={`${styles.newEventModalContainer} tutorial-target-event-modal-window`}
+            >
               <h1 className={styles.newEventTitleText}>
                 {t(
                   isEditMode
                     ? "edit_event_modal_title"
-                    : "new_event_modal_title"
+                    : "new_event_modal_title",
                 )}
               </h1>
+
               <div className={styles.newEventFormContainer}>
                 <EventForm
                   title={title}
@@ -503,11 +520,13 @@ export function EventModal({
                   t={t}
                 />
               </div>
+
               {error && (
                 <div className={styles.errorMessageContainer}>
                   <p>{error}</p>
                 </div>
               )}
+
               <div className={styles.finishCreatingEventButtonContainer}>
                 {isEditMode && (
                   <Button
@@ -518,8 +537,12 @@ export function EventModal({
                     {t("delete_button")}
                   </Button>
                 )}
+
                 <Button
-                  className={classNames(styles.finishCreatingEventButton)}
+                  className={classNames(
+                    styles.finishCreatingEventButton,
+                    "tutorial-target-event-save",
+                  )}
                   isDisabled={!title || saving}
                   onPress={handleSave}
                 >
@@ -538,7 +561,6 @@ export function EventModal({
         setIsOpen={setIsEditTagModalOpen}
         onTagsUpdate={refreshTags}
       />
-
       <Modal
         isOpen={isCreateTagModalOpen}
         onOpenChange={setIsCreateTagModalOpen}

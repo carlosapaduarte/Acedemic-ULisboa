@@ -156,6 +156,7 @@ export type UserInfo = {
   avatarFilename: string;
   custom_colors?: string[];
   use_goals?: number[];
+  tutorial_progress?: string[];
 };
 
 async function fetchUserInfo(): Promise<UserInfo> {
@@ -1028,6 +1029,18 @@ async function finishStudySession() {
     return Promise.reject(new Error("Could not finish study session!"));
 }
 
+async function markTutorialAsSeen(tutorialKey: string) {
+  const request = {
+    path: `study-tracker/users/me/tutorial-progress`,
+    method: "PUT",
+    body: toJsonBody({ tutorial_key: tutorialKey }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    console.warn("Could not save tutorial progress");
+  }
+}
+
 export const service = {
   login,
   testTokenValidity,
@@ -1072,6 +1085,7 @@ export const service = {
   getStudyTimeByWeek,
   startStudySession,
   finishStudySession,
+  markTutorialAsSeen,
 
   async fetchUserTags(): Promise<Tag[]> {
     try {

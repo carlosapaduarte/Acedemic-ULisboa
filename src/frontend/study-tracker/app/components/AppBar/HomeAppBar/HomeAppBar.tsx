@@ -67,7 +67,9 @@ export function GreetingsContainer() {
           <span>Loading...</span>
         )}
       </h4>
-      <div className={`${styles.avatarAndDropdownContainer}`}>
+      <div
+        className={`${styles.avatarAndDropdownContainer} tutorial-target-avatar`}
+      >
         <div className={`${styles.avatarContainer}`}>
           <img
             src={`./avatars/${avatarFilename}`}

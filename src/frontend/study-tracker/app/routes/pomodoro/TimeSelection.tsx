@@ -5,7 +5,7 @@ import styles from "./pomodoroPage.module.css";
 function useSelectTime(
   onTimeSelected: (studyStopDate: Date, pauseStopDate: Date) => void,
   initialStudy: number,
-  initialPause: number
+  initialPause: number,
 ) {
   const [studyMinutes, setStudyMinutes] = useState(initialStudy);
   const [pauseMinutes, setPauseMinutes] = useState(initialPause);
@@ -52,7 +52,9 @@ export function SelectTime({
 
   return (
     <div className={styles.pomodoroContainer}>
-      <form className={styles.timeSelectionForm}>
+      <form
+        className={`${styles.timeSelectionForm} tutorial-target-pomodoro-settings`}
+      >
         <div className={styles.timeInputGroup}>
           <label className={styles.timeLabel}>
             {t("study:select_study_minutes", "Minutos de Estudo")}
@@ -65,7 +67,6 @@ export function SelectTime({
             onChange={(e) => setStudyMinutes(Number(e.target.value))}
           />
         </div>
-
         <div className={styles.timeInputGroup}>
           <label className={styles.timeLabel}>
             {t("study:select_pause_minutes", "Minutos de Pausa")}
@@ -78,7 +79,6 @@ export function SelectTime({
             onChange={(e) => setPauseMinutes(Number(e.target.value))}
           />
         </div>
-
         <button
           type="button"
           className={styles.confirmButton}

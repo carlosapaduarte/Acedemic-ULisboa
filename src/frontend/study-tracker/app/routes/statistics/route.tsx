@@ -48,7 +48,6 @@ export default function Statistics() {
       </div>
 
       {/* 2. CARTÕES DE RESUMO (TOPO) */}
-      {/* Passamos os dados corretos que carregámos no estado */}
       <SummaryCards
         tasks={tasks}
         moodHistory={moodHistory}
@@ -57,18 +56,21 @@ export default function Statistics() {
 
       <div className={styles.statsContainerPage}>
         {/* 1. PAINEL DE ENERGIA */}
-        <EnergyStats />
+        <div className="tutorial-target-stats-energy" style={{ width: "100%" }}>
+          <EnergyStats />
+        </div>
 
         {/* 2. PAINEL DE TAREFAS */}
-        {/* Este componente já tem altura fixa e largura total */}
-        <TasksStats tasks={tasks} />
+        <div className="tutorial-target-stats-tasks" style={{ width: "100%" }}>
+          <TasksStats tasks={tasks} />
+        </div>
 
         {/* 3. FOCUS STATS (Pomodoro) */}
-        {/* Remover a div envolvente. O componente já tem margens e bordas próprias */}
-        <FocusStats />
+        <div className="tutorial-target-stats-focus" style={{ width: "100%" }}>
+          <FocusStats />
+        </div>
 
-        {/* 4. DRILL DOWN (Tags UCs vs Lifestyle) */}
-        {/* Remover a div envolvente para ter espaço para os dois gráficos */}
+        {/* 4. DRILL DOWN */}
         <DrillDownStats />
       </div>
     </RequireAuthn>

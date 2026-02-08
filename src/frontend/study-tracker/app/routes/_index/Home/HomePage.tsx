@@ -331,7 +331,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className={styles.homePage}>
+    <div className={`${styles.homePage} tutorial-target-dashboard-container`}>
       <div className={styles.headerSection}>
         <div className={styles.dateBadge}>
           {new Date().toLocaleDateString("pt-PT", {
@@ -345,7 +345,7 @@ export default function HomePage() {
       <div className={styles.bentoGrid}>
         {/* 1. MOOD TRACKER */}
         <div
-          className={`${styles.card} ${styles.moodSection}`}
+          className={`${styles.card} ${styles.moodSection} tutorial-target-mood-tracker`}
           onClick={(e) => !isMoodLogged && handleOpenMoodTracker(e)}
           style={{ cursor: isMoodLogged ? "default" : "pointer" }}
         >

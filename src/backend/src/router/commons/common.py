@@ -144,6 +144,7 @@ def create_user_route(
             detail={"type": "USER_CREATION_FAILED", "field": "general"}
 )
 
+
 @router.get("/users/me", response_model=UserOutputDto)
 def get_user_info( 
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -152,11 +153,16 @@ def get_user_info(
     user_domain = common_service.get_user_info(db, user_id)
     if user_domain is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+    
     dto = UserOutputDto.fromUser(user_domain)
     user_db = db.get(UserModel, user_id)
     
-    if user_db and user_db.custom_colors:
-        dto.custom_colors = user_db.custom_colors
+    if user_db:
+        if user_db.custom_colors:
+            dto.custom_colors = user_db.custom_colors
+        
+        if user_db.tutorial_progress:
+            dto.tutorial_progress = user_db.tutorial_progress
         
     return dto
 

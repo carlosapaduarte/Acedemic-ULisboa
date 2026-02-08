@@ -895,7 +895,7 @@ function MyCalendar() {
         <MenuTrigger>
           <Button
             aria-label={t("filter_events", "Filtrar Eventos")}
-            className={styles.filterButton}
+            className={`${styles.filterButton} tutorial-target-calendar-filter`}
           >
             <FaFilter size={18} />
           </Button>
@@ -917,7 +917,7 @@ function MyCalendar() {
         </MenuTrigger>
 
         <button
-          className={styles.toggleButton}
+          className={`${styles.toggleButton} tutorial-target-calendar-create`}
           onClick={handleCreateEventClick}
         >
           {t("create_event_button")}

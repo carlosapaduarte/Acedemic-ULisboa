@@ -1025,3 +1025,16 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             return domain_logs
         
+    def mark_tutorial_as_seen(self, user_id: int, tutorial_key: str):
+        with Session(engine) as session:
+            user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session, user_id)
+            
+            current_progress = list(user_model.tutorial_progress) if user_model.tutorial_progress else []
+            
+            if tutorial_key not in current_progress:
+                current_progress.append(tutorial_key)
+                user_model.tutorial_progress = current_progress
+                
+                session.add(user_model)
+                session.commit()
+                session.refresh(user_model)

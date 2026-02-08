@@ -13,7 +13,6 @@ class UserModel(SQLModel, table=True):
     __tablename__ = "user"
 
     id: int = Field(primary_key=True)
-    
     username: str = Field(index=True, unique=True)
     
     # Agora é opcional, pois utilizadores Fénix não têm password na nossa BD
@@ -26,7 +25,7 @@ class UserModel(SQLModel, table=True):
     avatar_filename: str | None
     share_progress: bool | None
     receive_st_app_notifications: bool | None
-
+    tutorial_progress: List[str] = Field(default=[], sa_column=SAColumn(JSON, nullable=False))
     study_session_time: datetime | None
 
     user_batches: list["BatchModel"] = Relationship(back_populates="user")

@@ -13,8 +13,6 @@ import { useTaskList } from "~/routes/tasks/useTaskList";
 import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
 
-import { TutorialTour } from "~/components/Tutorial/TutorialTour";
-
 const MOTIVATIONAL_MESSAGES = [
   "Bom trabalho! 🌟",
   "Pausa merecida! ☕",
@@ -288,7 +286,7 @@ function AssociatedTaskListView({
     );
 
     return (
-      <div className={styles.taskListContainer}>
+      <div className={`${styles.taskListContainer} tutorial-target-tasks-list`}>
         <h2 className={styles.taskListTitle}>
           {t("task:tasks_in_progress", "Tarefas em Curso")}
         </h2>
@@ -708,40 +706,8 @@ function PomodoroPage() {
     return <div>A carregar...</div>;
   }
 
-  const tourSteps = [
-    {
-      target: "body",
-      content: (
-        <div>
-          <h3>Bem-vindo à tua zona de estudo! 👋</h3>
-          <p>
-            Aqui podes gerir o teu tempo e tarefas. Vamos ver como funciona?
-          </p>
-        </div>
-      ),
-      placement: "center" as const,
-    },
-    {
-      target: "#tour-events",
-      content:
-        "Aqui vês os eventos do teu calendário e o que tens planeado para hoje.",
-    },
-    {
-      target: "#tour-timer",
-      content:
-        "Este é o coração do Pomodoro! Escolhe o tempo e inicia o foco. ⏱️",
-    },
-    {
-      target: "#tour-tasks",
-      content:
-        "Seleciona as tarefas que queres completar durante este bloco de estudo.",
-    },
-  ];
-
   return (
     <>
-      <TutorialTour steps={tourSteps} tutorialKey="pomodoro-guide-v2" />
-
       <div className={styles.pomodoroLayout}>
         <div id="tour-events">
           <TodayEventsList
@@ -766,7 +732,7 @@ function PomodoroPage() {
           </div>
         ) : (
           <div className={styles.pomodoroContainer}>
-            <div id="tour-timer">
+            <div id="tour-timer" className="tutorial-target-pomodoro-timer">
               <SelectTime
                 onTimeSelected={onTimeSelected}
                 initialStudyMinutes={initialWork}
@@ -776,7 +742,7 @@ function PomodoroPage() {
           </div>
         )}
 
-        <div id="tour-tasks">
+        <div id="tour-tasks" className="tutorial-target-pomodoro-tasks">
           <AssociatedTaskListView
             tasksForToday={tasksForToday}
             otherTasks={otherTasks}

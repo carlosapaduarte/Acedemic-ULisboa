@@ -129,3 +129,6 @@ class UpdateTagInputDto(BaseModel):
         if not data.get('name_pt') and not data.get('name_en'):
             raise ValueError('É necessário fornecer pelo menos um nome para a etiqueta (name_pt ou name_en).')
         return data
+
+class MarkTutorialAsSeenInputDto(BaseModel):
+    tutorial_key: str

@@ -191,7 +191,7 @@ function NotesPage() {
             <FaArrowLeft /> {t("common:back", "Voltar")}
           </button>
         ) : (
-          <div className={styles.searchBar}>
+          <div className={`${styles.searchBar} tutorial-target-notes-search`}>
             <FaMagnifyingGlass className={styles.searchIcon} />
             <input
               placeholder="Procurar em todas as UCs..."
@@ -205,7 +205,9 @@ function NotesPage() {
         {currentFolder && (
           <div className={styles.actions}>
             <DialogTrigger isOpen={isUploadOpen} onOpenChange={setIsUploadOpen}>
-              <Button className={styles.primaryButton}>
+              <Button
+                className={`${styles.primaryButton} tutorial-target-notes-create`}
+              >
                 <FaCloudArrowUp /> Carregar Ficheiro
               </Button>
               <Modal className={styles.modalOverlay}>
@@ -274,7 +276,7 @@ function NotesPage() {
             </div>
           </div>
         ) : (
-          <div className={styles.fileList}>
+          <div className={`${styles.fileList} tutorial-target-notes-list`}>
             <div className={styles.fileListHeader}>
               <span
                 onClick={() => handleSort("name")}
@@ -302,7 +304,6 @@ function NotesPage() {
               </span>
               <span style={{ width: "40px" }}></span>
             </div>
-
             {getSortedFiles.map((file) => (
               <div
                 key={file.id}
@@ -371,7 +372,6 @@ function NotesPage() {
                 </div>
               </div>
             ))}
-
             {getSortedFiles.length === 0 && (
               <div className={styles.emptyState}>
                 <p>Pasta vazia. Carrega o teu primeiro documento!</p>

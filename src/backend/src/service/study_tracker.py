@@ -278,3 +278,6 @@ def get_mood_logs(user_id: int) -> list[MoodLog]:
     Obtém o histórico de mood logs do repositório.
     """
     return study_tracker_repo.get_mood_logs(user_id)
+
+def mark_tutorial_as_seen(user_id: int, tutorial_key: str):
+    study_tracker_repo.mark_tutorial_as_seen(user_id, tutorial_key)

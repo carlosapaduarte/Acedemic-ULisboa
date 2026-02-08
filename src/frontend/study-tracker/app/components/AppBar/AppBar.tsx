@@ -26,6 +26,8 @@ function SideBarNavButton({
 }) {
   const navigate = useNavigate();
 
+  const tutorialClass = `tutorial-target-nav-${url.replace("/", "")}`;
+
   return (
     <div className={`${styles.sideBarNavButtonContainer}`}>
       <a
@@ -35,7 +37,7 @@ function SideBarNavButton({
           setIsSideBarOpen(false);
           navigate(url);
         }}
-        className={`${styles.roundButton} ${styles.sideBarNavButton}`}
+        className={`${styles.roundButton} ${styles.sideBarNavButton} ${tutorialClass}`}
       >
         <div className={styles.sideBarButtonIconContainer} aria-hidden={true}>
           {iconUrl ? (
@@ -107,14 +109,14 @@ function SideBar() {
       data-expanded={isSideBarOpen}
       className={classNames(
         appBarVariant === "default" && styles.sideBar,
-        appBarVariant === "home" && homeAppBarStyles.sideBar
+        appBarVariant === "home" && homeAppBarStyles.sideBar,
       )}
     >
       <div className={styles.sideBarIconContainer}>
         <button
-          className={styles.sideBarIconButton}
+          className={`${styles.sideBarIconButton} tutorial-target-hamburger`}
           onClick={() => setIsSideBarOpen(!isSideBarOpen)}
-          aria-expanded={isSideBarOpen}
+          aria-expanded={isSideBarOpen ? "true" : "false"}
           aria-controls={"sidebar-content"}
           aria-label={"Toggle sidebar"}
         >
@@ -155,7 +157,7 @@ export function AppBar({
       className={classNames(
         appBarVariant === "default" && styles.appBarContainer,
         appBarVariant === "home" && homeAppBarStyles.appBarContainer,
-        appBarVariant === "clean" && cleanAppBarStyles.appBarContainer
+        appBarVariant === "clean" && cleanAppBarStyles.appBarContainer,
       )}
       aria-hidden={ariaHidden}
     >
@@ -163,7 +165,7 @@ export function AppBar({
         className={classNames(
           appBarVariant === "default" && styles.appBar,
           appBarVariant === "home" && homeAppBarStyles.appBar,
-          appBarVariant === "clean" && cleanAppBarStyles.appBar
+          appBarVariant === "clean" && cleanAppBarStyles.appBar,
         )}
       >
         {appBarVariant !== "clean" && (
