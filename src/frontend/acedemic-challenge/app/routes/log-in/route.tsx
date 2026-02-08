@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import AuthenticationPage, { AuthAction } from "~/routes/log-in/AuthenticationPage/AuthenticationPage";
+import AuthenticationPage, {
+    AuthAction,
+} from "~/routes/log-in/AuthenticationPage/AuthenticationPage";
 import ShareProgressPage from "~/routes/log-in/ShareProgressPage/ShareProgressPage";
 import QuizPage from "~/routes/log-in/QuizPage/QuizPage";
 import SelectLevelPage from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelectionPage";
-import { useNavigate } from "@remix-run/react";
 import styles from "./login.module.css";
 import classNames from "classnames";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useIsLoggedIn } from "~/components/auth/Authn";
+import { useNavigate, useSearchParams } from "@remix-run/react";
+// import { useUser } from "~/components/auth/UserProvider"; (Exemplo)
 
 type Views =
     | "initial"
@@ -23,21 +26,28 @@ function CurrentView() {
     const navigate = useNavigate();
     const isLoggedIn = useIsLoggedIn();
 
-    const [userId, setUserId] = useState<number | undefined>(undefined);
+    // Ler o parâmetro ?setup=true
+    const [searchParams] = useSearchParams();
+    const isSetupRequested = searchParams.get("setup") === "true";
+
+    const userId = "temp-id"; // CORREÇÃO TEMPORÁRIA para não dar erro de compilação no QuizPage
 
     useEffect(() => {
         if (isLoggedIn == undefined) {
             return;
         }
 
+        // SE for pedido setup -> Iniciar Seleção de Avatar
+        if (isLoggedIn && isSetupRequested && currentView == "initial") {
+            setCurrentView("selectAvatar");
+            return;
+        }
+
+        // Lógica Normal
         if (isLoggedIn && currentView == "initial") {
             navigate(`/`);
         }
-
-        if (!isLoggedIn && currentView == "initial") {
-            setCurrentView("authentication");
-        }
-    }, [isLoggedIn]);
+    }, [isLoggedIn, isSetupRequested]);
 
     switch (currentView) {
         case "initial":
@@ -48,8 +58,7 @@ function CurrentView() {
                     onAuthDone={(action: AuthAction) => {
                         if (action == AuthAction.CREATE_USER)
                             setCurrentView("chooseLevel");
-                        else
-                            navigate(`/`);
+                        else navigate(`/`);
                     }}
                 />
             );
@@ -74,28 +83,18 @@ function CurrentView() {
                 />
             );
         case "selectAvatar":
-            return (
-                <AvatarSelectionPage
-                    onComplete={() => navigate(`/`)}
-                />
-            );
+            return <AvatarSelectionPage onComplete={() => navigate(`/`)} />;
         default:
             return <h1>Should not have arrived here!</h1>;
     }
 }
 
-/**
- * This React component:
- * - shows a dialogue to simulate authentication;
- * - asks user if can share progress;
- * - lists possible levels:
- *  - User might choose to start quiz
- * - redirects for calendar component.
- */
 export default function LoginPage() {
     useAppBar("clean");
 
-    return <div className={classNames(styles.loginPage)}>
-        <CurrentView />
-    </div>;
+    return (
+        <div className={classNames(styles.loginPage)}>
+            <CurrentView />
+        </div>
+    );
 }

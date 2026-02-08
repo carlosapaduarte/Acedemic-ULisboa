@@ -3,7 +3,7 @@ import json
 from fastapi import Request
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 
-SAML_PATH = os.path.join(os.path.dirname(__file__), "../../config/saml")
+SAML_PATH = os.path.join(os.path.dirname(__file__), "../../certs")
 
 def load_saml_settings():
     """Carrega as configurações do ficheiro settings.json e injeta os certificados."""
