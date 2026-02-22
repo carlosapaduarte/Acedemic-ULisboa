@@ -137,65 +137,140 @@ const TUTORIAL_STEPS = {
 
   pomodoro_page: [
     {
-      target: ".tutorial-target-pomodoro-timer",
-      content:
-        "Este é o teu temporizador. O método Pomodoro ajuda-te a estudar em blocos de foco intenso.",
+      target: "body",
+      placement: "center" as const,
+      content: (
+        <div style={{ textAlign: "center", maxWidth: "500px" }}>
+          <strong>O Método Pomodoro 🍅</strong>
+          <p>
+            Esta página foi desenhada para te ajudar a manter o foco! O método
+            Pomodoro consiste em estudar intensamente por um período de tempo,
+            seguido de uma pausa curta.
+          </p>
+        </div>
+      ),
       disableBeacon: true,
     },
     {
-      target: ".tutorial-target-pomodoro-settings",
-      content: "Podes personalizar os tempos de Foco e Pausa aqui.",
+      target: ".tutorial-target-pomodoro-timer",
+      placement: "bottom" as const,
+      content:
+        "Aqui podes personalizar os teus tempos de Foco e de Pausa para a sessão que vais iniciar.",
     },
     {
+      target: ".tutorial-target-pomodoro-events",
+      placement: "right" as const,
+      content: (
+        <div style={{ textAlign: "left" }}>
+          <strong>A tua Agenda 📅</strong>
+          <p>
+            Este painel é de visualização. Serve para teres a certeza que não
+            inicias um bloco de estudo longo em cima de uma Aula ou Reunião
+            iminente!
+          </p>
+        </div>
+      ),
+    },
+    // Passo 4: Tarefas
+    {
       target: ".tutorial-target-pomodoro-tasks",
+      placement: "left" as const,
       content:
-        "Seleciona uma tarefa da lista para te focares nela durante este bloco.",
+        "Seleciona as tarefas da tua lista nas quais te queres focar durante este bloco. Quando terminares, podes marcá-las como concluídas!",
     },
     {
       target: ".tutorial-target-pomodoro-start",
-      content: "Quando estiveres pronto, carrega em Iniciar!",
+      placement: "bottom" as const,
+      content:
+        "Tudo pronto? Clica em Confirmar para o teu cronómetro começar a contar. Bom estudo! 🚀",
     },
   ],
 
   notes_page: [
     {
-      target: ".tutorial-target-notes-create",
-      content: "Clica aqui para carregar um novo documento ou criar uma nota.",
+      target: "body",
+      placement: "center" as const,
+      content: (
+        <div>
+          <strong>Repositório Académico 📂</strong>
+          <p>
+            Organiza os teus materiais de estudo. Cada UC que criares terá a sua
+            própria pasta automática aqui.
+          </p>
+        </div>
+      ),
       disableBeacon: true,
     },
     {
-      target: ".tutorial-target-notes-list",
-      content: "Aqui ficam guardados todos os teus ficheiros.",
+      target: ".tutorial-target-notes-storage",
+      placement: "bottom" as const,
+      content:
+        "Gere o teu espaço: oferecemos 5GB de armazenamento na nuvem para os teus PDFs e resumos.",
     },
     {
       target: ".tutorial-target-notes-search",
-      content: "Usa a pesquisa para encontrares rapidamente matérias antigas.",
+      placement: "bottom" as const,
+      content: "Procura ficheiros pelo nome em todas as pastas de uma só vez.",
+    },
+    {
+      target: ".tutorial-target-notes-list",
+      placement: "top" as const,
+      content:
+        "Clica numa pasta para gerir os ficheiros dessa disciplina ou carregar novos documentos.",
     },
   ],
 
   curricular_units_page: [
     {
-      target: ".tutorial-target-uc-header",
-      content:
-        "Aqui geres as tuas Cadeiras/Disciplinas e simulas as tuas notas.",
+      target: "body",
+      placement: "center" as const,
+      content: (
+        <div>
+          <strong>Gestão Académica 🎓</strong>
+          <p>
+            Aqui podes gerir as tuas Unidades Curriculares, acompanhar as tuas
+            notas e simular o que precisas para atingir a tua meta!
+          </p>
+        </div>
+      ),
       disableBeacon: true,
     },
     {
-      target: ".tutorial-target-uc-create",
-      content: "Adiciona uma nova Unidade Curricular e define os seus ECTS.",
+      target: ".tutorial-target-uc-empty-form",
+      placement: "top" as const,
+      content:
+        "Começa por aqui! Introduz o nome e os ECTS da tua primeira disciplina. Podes escrever agora mesmo!",
+      spotlightClicks: true,
+      disableOverlayClose: true,
     },
     {
-      target: ".tutorial-target-uc-card",
+      target: ".tutorial-target-uc-stats",
+      placement: "bottom" as const,
+      content:
+        "Boa! Agora que tens a tua primeira UC, aqui podes ver o resumo do teu desempenho: média e créditos.",
+      disableBeacon: true,
+    },
+    {
+      target: ".tutorial-target-uc-create-more",
+      placement: "left" as const,
+      content:
+        "Precisas de adicionar mais disciplinas? Usa este botão sempre que quiseres.",
+      disableBeacon: true,
+    },
+    {
+      target: ".tutorial-target-uc-simulator-first",
+      placement: "top" as const,
+      disableBeacon: true,
       content: (
         <div>
-          <strong>Simulador de Notas 📊</strong>
+          <strong>A Mecânica da Simulação 🚀</strong>
+          <p>1. Adiciona as tuas notas e o peso (%) de cada avaliação.</p>
           <p>
-            Dentro de cada cartão, podes adicionar as avaliações (testes,
-            trabalhos) e os seus pesos.
+            2. A barra <strong>Garantido</strong> mostra o que já tens.
           </p>
           <p>
-            A barra mostra-te quanto já garantiste e quanto ainda podes
-            alcançar.
+            3. O <strong>Máximo</strong> diz-te até onde podes chegar se tirares
+            20 no resto!
           </p>
         </div>
       ),
@@ -364,10 +439,34 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
     }
   }, [stepIndex, run, tutorialKey]);
 
+  // Watcher para Avanço Automático após criar UC
+  useEffect(() => {
+    if (run && tutorialKey === "page_curricular_units" && stepIndex === 1) {
+      const checkUCreated = setInterval(() => {
+        // Verifica se o elemento de estatísticas (que só aparece quando há UCs) já existe
+        const statsExists = document.querySelector(".tutorial-target-uc-stats");
+
+        if (statsExists) {
+          clearInterval(checkUCreated);
+          // Força o avanço para o próximo passo (Estatísticas)
+          setStepIndex(2);
+        }
+      }, 500);
+      return () => clearInterval(checkUCreated);
+    }
+  }, [stepIndex, run, tutorialKey]);
+
   const handleJoyrideCallback = async (data: CallBackProps) => {
     const { status, action, type, index } = data;
 
-    if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
+    // Se o alvo desapareceu (porque a UI mudou após criar a UC)
+    if (type === EVENTS.TARGET_NOT_FOUND) {
+      if (tutorialKey === "page_curricular_units") {
+        setStepIndex(index + 1);
+      }
+    }
+
+    if (type === EVENTS.STEP_AFTER) {
       setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
     }
 

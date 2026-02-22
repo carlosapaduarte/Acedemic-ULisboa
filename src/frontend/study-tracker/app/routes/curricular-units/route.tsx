@@ -370,7 +370,7 @@ export default function CurricularUnitsPage() {
       <div className={styles.pageContainer}>
         {/* DASHBOARD */}
         {cuList.length > 0 && (
-          <div className={styles.dashboardGrid}>
+          <div className={`${styles.dashboardGrid} tutorial-target-uc-stats`}>
             <div className={styles.statCard}>
               <span className={styles.statLabel}>Média Prevista</span>
               <span className={styles.statValue}>{stats.globalAvg}</span>
@@ -397,7 +397,7 @@ export default function CurricularUnitsPage() {
           </h1>
           {cuList.length > 0 && (
             <button
-              className={`${styles.topCreateButton} tutorial-target-uc-create`}
+              className={`${styles.topCreateButton} tutorial-target-uc-create-more`}
               onClick={() => setCreateModalOpen(true)}
             >
               <FaPlus /> Nova UC
@@ -406,7 +406,9 @@ export default function CurricularUnitsPage() {
         </div>
 
         {cuList.length === 0 ? (
-          <div className={styles.emptyStateWrapper}>
+          <div
+            className={`${styles.emptyStateWrapper} tutorial-target-uc-empty-form`}
+          >
             <h2 className={styles.emptyStateTitle}>Percurso Académico</h2>
             <p className={styles.emptyStateText}>
               Ainda não tens unidades curriculares registadas.
@@ -420,7 +422,14 @@ export default function CurricularUnitsPage() {
         ) : (
           <div className={styles.ucGrid}>
             {cuList.map((cu, idx) => (
-              <CurricularUnitCard key={idx} cu={cu} onRefresh={refresh} />
+              <div
+                key={idx}
+                className={
+                  idx === 0 ? "tutorial-target-uc-simulator-first" : ""
+                }
+              >
+                <CurricularUnitCard key={idx} cu={cu} onRefresh={refresh} />
+              </div>
             ))}
           </div>
         )}

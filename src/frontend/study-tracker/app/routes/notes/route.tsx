@@ -168,7 +168,9 @@ function NotesPage() {
           </p>
         </div>
 
-        <div className={styles.storageWidget}>
+        <div
+          className={`${styles.storageWidget} tutorial-target-notes-storage`}
+        >
           <div className={styles.storageInfo}>
             <span>Armazenamento</span>
             <span>2.1 GB / 5 GB</span>

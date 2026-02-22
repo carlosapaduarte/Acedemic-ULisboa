@@ -709,7 +709,7 @@ function PomodoroPage() {
   return (
     <>
       <div className={styles.pomodoroLayout}>
-        <div id="tour-events">
+        <div id="tour-events" className="tutorial-target-pomodoro-events">
           <TodayEventsList
             todayEvents={todayEvents}
             futureEvents={futureEvents}
