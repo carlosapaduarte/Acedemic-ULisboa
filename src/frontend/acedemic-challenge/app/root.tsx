@@ -7,10 +7,10 @@ import {
     Scripts,
     ScrollRestoration,
     useLoaderData,
-    useRouteError
+    useRouteError,
 } from "@remix-run/react";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { AuthnContainer } from "~/components/auth/Authn";
+import { AuthnContainer, useAuthn } from "~/components/auth/Authn";
 import { NotFoundPage } from "./Pages/NotFoundPage";
 import { Footer } from "~/components/Footer/Footer";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
@@ -19,7 +19,12 @@ import "./global.css";
 import "./themes.css";
 import { AppBar } from "./components/AppBar/AppBar";
 import React, { useEffect, useState } from "react";
-import { AppTheme, getAppThemeClassNames, getLocalStorageTheme, ThemeProvider } from "~/components/Theme/ThemeProvider";
+import {
+    AppTheme,
+    getAppThemeClassNames,
+    getLocalStorageTheme,
+    ThemeProvider,
+} from "~/components/Theme/ThemeProvider";
 import i18next from "~/i18next.server";
 import { useChangeLanguage } from "remix-i18next/react";
 import { useTranslation } from "react-i18next";
@@ -27,6 +32,8 @@ import { GlobalErrorContainer } from "~/components/error/GlobalErrorContainer";
 import { GlobalErrorController } from "~/components/error/GlobalErrorController";
 import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
 import { AppBarProvider } from "~/components/AppBar/AppBarProvider";
+import { ChallengeTutorial } from "~/components/Tutorial/ChallengeTutorial";
+import { t } from "i18next";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     let locale = await i18next.getLocale(request);
@@ -37,27 +44,29 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export let handle = {
-    // In the handle export, we can add a i18n key with namespaces our route
-    // will need to load. This key can be a single string or an array of strings.
-    // TIP: In most cases, you should set this to your defaultNS from your i18n config
-    // or if you did not set one, set it to the i18next default namespace "translation"
-    i18n: ["common", "error"]
+    i18n: ["common", "error"],
 };
 
 // @ts-ignore
-export const meta: MetaFunction = ({ data }: { data: { locale: string, metaDescription: string } }) => {
+export const meta: MetaFunction = ({
+    data,
+}: {
+    data: { locale: string; metaDescription: string };
+}) => {
+    const description = data?.metaDescription || "Academic Challenge";
     return [
-        { title: "Acedemic Challenge" },
+        { title: "Academic Challenge" },
         {
             name: "description",
-            content: data.metaDescription
-        }
+            content: description,
+        },
     ];
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    // Get the locale from the loader
-    let { locale } = useLoaderData<typeof loader>();
+    const data = useLoaderData<typeof loader>();
+
+    const locale = data?.locale ?? "pt";
 
     let { i18n } = useTranslation();
 
@@ -65,20 +74,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
     return (
         <html lang={locale} dir={i18n.dir()}>
-        <head>
-            <meta charSet="utf-8" />
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1"
-            />
-            <Meta />
-            <Links />
-        </head>
-        <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-        </body>
+            <head>
+                <meta charSet="utf-8" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1"
+                />
+                <Meta />
+                <Links />
+            </head>
+            <body>
+                {children}
+                <ScrollRestoration />
+                <Scripts />
+            </body>
         </html>
     );
 }
@@ -88,7 +97,6 @@ export default function Root() {
 
     useEffect(() => {
         const storedTheme = getLocalStorageTheme();
-
         setTheme(storedTheme);
     }, []);
 
@@ -108,12 +116,14 @@ export default function Root() {
 }
 
 export function App() {
-    const { t } = useTranslation(["error"]);
-
+    const authData = useAuthn();
     const [loading, setLoading] = useState(true);
-
+    const user = authData?.user || null;
+    const refreshUser = authData?.refreshUser || (() => {});
     useEffect(() => {
-        const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 1000));
+        const minLoadingTime = new Promise((resolve) =>
+            setTimeout(resolve, 1000),
+        );
 
         Promise.all([minLoadingTime]).then(() => {
             setLoading(false);
@@ -122,6 +132,10 @@ export function App() {
 
     return (
         <AppBarProvider>
+            {user && (
+                <ChallengeTutorial user={user} refreshUser={refreshUser} />
+            )}
+
             <div className="app">
                 <AppBar aria-hidden={loading ? true : undefined} />
                 <main className="mainContentContainer" aria-hidden={loading}>
@@ -140,14 +154,11 @@ export function App() {
 
 export function ErrorBoundary() {
     const error = useRouteError();
-
     const { t } = useTranslation(["error"]);
 
     if (isRouteErrorResponse(error)) {
         if (error.status === 404) {
-            return (
-                <NotFoundPage />
-            );
+            return <NotFoundPage />;
         }
         return (
             <div>

@@ -55,7 +55,7 @@ const TitleSection = React.memo(({ title, setTitle }: any) => {
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder={t("title_label")}
+          placeholder={t("title_placeholder") || ""}
         />
       </TextField>
     </div>
@@ -210,50 +210,57 @@ const DateSection = React.memo(
     return (
       <div className={styles.dateSectionContainer}>
         <div className={styles.deadlineInputsContainer}>
-          <TextField className={styles.formTextField}>
-            <Label className={styles.formSectionTitle}>
-              {t("start_date_label")}
-            </Label>
-            <Input
-              type="date"
-              className={classNames(styles.dateInput)}
-              value={formatDate(eventStartDate)}
-              onChange={handleStartDateChange}
-            />
-          </TextField>
-          <TextField className={styles.formTextField}>
-            <Label className={styles.formSectionTitle}>
-              {t("start_time_label")}
-            </Label>
-            <Input
-              type="time"
-              className={classNames(styles.timeInput)}
-              value={formatTime(eventStartDate)}
-              onChange={handleStartTimeChange}
-            />
-          </TextField>
-          <TextField className={styles.formTextField}>
-            <Label className={styles.formSectionTitle}>
-              {t("end_date_label")}
-            </Label>
-            <Input
-              type="date"
-              className={classNames(styles.dateInput)}
-              value={formatDate(eventEndDate)}
-              onChange={handleEndDateChange}
-            />
-          </TextField>
-          <TextField className={styles.formTextField}>
-            <Label className={styles.formSectionTitle}>
-              {t("end_time_label")}
-            </Label>
-            <Input
-              type="time"
-              className={classNames(styles.timeInput)}
-              value={formatTime(eventEndDate)}
-              onChange={handleEndTimeChange}
-            />
-          </TextField>
+          {/* --- LINHA 1: DATA E HORA DE INÍCIO --- */}
+          <div className={styles.dateTimeRow}>
+            <TextField className={styles.formTextField}>
+              <Label className={styles.formSectionTitle}>
+                {t("start_date_label")}
+              </Label>
+              <Input
+                type="date"
+                className={classNames(styles.dateInput)}
+                value={formatDate(eventStartDate)}
+                onChange={handleStartDateChange}
+              />
+            </TextField>
+            <TextField className={styles.formTextField}>
+              <Label className={styles.formSectionTitle}>
+                {t("start_time_label")}
+              </Label>
+              <Input
+                type="time"
+                className={classNames(styles.timeInput)}
+                value={formatTime(eventStartDate)}
+                onChange={handleStartTimeChange}
+              />
+            </TextField>
+          </div>
+
+          {/* --- LINHA 2: DATA E HORA DE FIM --- */}
+          <div className={styles.dateTimeRow}>
+            <TextField className={styles.formTextField}>
+              <Label className={styles.formSectionTitle}>
+                {t("end_date_label")}
+              </Label>
+              <Input
+                type="date"
+                className={classNames(styles.dateInput)}
+                value={formatDate(eventEndDate)}
+                onChange={handleEndDateChange}
+              />
+            </TextField>
+            <TextField className={styles.formTextField}>
+              <Label className={styles.formSectionTitle}>
+                {t("end_time_label")}
+              </Label>
+              <Input
+                type="time"
+                className={classNames(styles.timeInput)}
+                value={formatTime(eventEndDate)}
+                onChange={handleEndTimeChange}
+              />
+            </TextField>
+          </div>
         </div>
       </div>
     );
@@ -482,6 +489,13 @@ export function EventModal({
             <div
               className={`${styles.newEventModalContainer} tutorial-target-event-modal-window`}
             >
+              <Button
+                className={styles.closeButton}
+                onPress={clearFormAndClose}
+              >
+                {t("close_button")}
+              </Button>
+
               <h1 className={styles.newEventTitleText}>
                 {t(
                   isEditMode

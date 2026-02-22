@@ -76,11 +76,7 @@
   width: 2rem;
 }
 .closeButton {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  height: 2rem;
-  width: 5rem;
+  composes: roundButton formCloseButton;
 }
 
 /*dropdown recorrencia*/
@@ -335,7 +331,6 @@
   display: block;
 }
 
-
 .createTagModal [data-overlay] {
   background: transparent;
 }
@@ -346,4 +341,22 @@
   box-shadow: none;
   width: auto;
   max-width: none;
+}
+
+.dateTimeRow {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.dateTimeRow > * {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 400px) {
+  .dateTimeRow {
+    gap: 0.5rem;
+  }
 }

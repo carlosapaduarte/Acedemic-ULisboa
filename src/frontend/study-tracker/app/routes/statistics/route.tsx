@@ -47,31 +47,38 @@ export default function Statistics() {
         <span className={styles.pageTitle}>{t("statistics:title")}</span>
       </div>
 
-      {/* 2. CARTÕES DE RESUMO (TOPO) */}
-      <SummaryCards
-        tasks={tasks}
-        moodHistory={moodHistory}
-        focusStats={distStats}
-      />
+      {/* 2. CARTÕES DE RESUMO (TOPO) - ADICIONÁMOS A CLASSE AQUI */}
+      <div className="tutorial-target-stats-summary" style={{ width: "100%" }}>
+        <SummaryCards
+          tasks={tasks}
+          moodHistory={moodHistory}
+          focusStats={distStats}
+        />
+      </div>
 
       <div className={styles.statsContainerPage}>
-        {/* 1. PAINEL DE ENERGIA */}
+        {/* 1. PAINEL DE ENERGIA (Já estava certo) */}
         <div className="tutorial-target-stats-energy" style={{ width: "100%" }}>
           <EnergyStats />
         </div>
 
-        {/* 2. PAINEL DE TAREFAS */}
+        {/* 2. PAINEL DE TAREFAS (Já estava certo) */}
         <div className="tutorial-target-stats-tasks" style={{ width: "100%" }}>
           <TasksStats tasks={tasks} />
         </div>
 
-        {/* 3. FOCUS STATS (Pomodoro) */}
+        {/* 3. FOCUS STATS (Pomodoro) (Já estava certo) */}
         <div className="tutorial-target-stats-focus" style={{ width: "100%" }}>
           <FocusStats />
         </div>
 
-        {/* 4. DRILL DOWN */}
-        <DrillDownStats />
+        {/* 4. DRILL DOWN - ADICIONÁMOS A CLASSE AQUI */}
+        <div
+          className="tutorial-target-stats-drilldown"
+          style={{ width: "100%" }}
+        >
+          <DrillDownStats />
+        </div>
       </div>
     </RequireAuthn>
   );

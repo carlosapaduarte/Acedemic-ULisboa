@@ -341,7 +341,7 @@ export default function CurricularUnitsPage() {
     let completedEcts = 0;
 
     cuList.forEach((cu) => {
-      // Usa os ECTS da cadeira ou 6 se não estiver definido
+      // Usa os ECTS da UC ou 6 se não estiver definido
       const ects = cu.ects || 6;
       totalEcts += ects;
 

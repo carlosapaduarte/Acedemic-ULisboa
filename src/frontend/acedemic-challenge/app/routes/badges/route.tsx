@@ -80,11 +80,12 @@ export default function BadgesPage() {
     } | null>(null);
     const levelRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-        useEffect(() => {
+    useEffect(() => {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
-                const data: GamificationProfile = await service.fetchGamificationProfile();
+                const data: GamificationProfile =
+                    await service.fetchGamificationProfile();
 
                 setBadges(data.badges_status);
                 setCurrentUserChallengeLevel(data.current_challenge_level);
@@ -94,11 +95,13 @@ export default function BadgesPage() {
                     setExpandedLevels(new Set([data.current_challenge_level]));
                 }
             } catch (err: any) {
-                if (err.name === 'NotAuthorizedError') {
+                if (err.name === "NotAuthorizedError") {
                     navigate("/log-in");
                     return;
                 }
-                setError(err.message || "Falha ao carregar o perfil de gamificação.");
+                setError(
+                    err.message || "Falha ao carregar o perfil de gamificação.",
+                );
             } finally {
                 setLoading(false);
             }
@@ -174,7 +177,8 @@ export default function BadgesPage() {
     if (error) return <p className="p-4 text-red-400">Erro: {error}</p>;
 
     return (
-        <div className="p-4 min-h-screen bg-purple-900 text-gray-100 relative">
+        <div className="p-4 min-h-screen bg-purple-900 text-gray-100 relative tutorial-target-badges-header">
+            {" "}
             {animatingLevel !== null && confettiSource && (
                 <Confetti
                     width={width}
@@ -188,9 +192,8 @@ export default function BadgesPage() {
                     confettiSource={confettiSource}
                 />
             )}
-
             {groupedAndSortedBadgesByLevel.map(
-                ({ league, badges: levelBadges }) => {
+                ({ league, badges: levelBadges }, index) => {
                     const earnedCount = levelBadges.filter(
                         (b) => b.has_earned,
                     ).length;
@@ -228,6 +231,7 @@ export default function BadgesPage() {
                             ref={(el) => (levelRefs.current[league.rank] = el)}
                             className={classNames(styles.levelContainer, {
                                 [styles.levelLocked]: !isAccessible,
+                                "tutorial-target-level-container": index === 0,
                             })}
                         >
                             <div
@@ -292,7 +296,10 @@ export default function BadgesPage() {
                                     )}
                                     <ul className={styles.badgesGrid}>
                                         {levelBadges.map(
-                                            (badge: CombinedBadgeStatus) => (
+                                            (
+                                                badge: CombinedBadgeStatus,
+                                                badgeIndex,
+                                            ) => (
                                                 <li
                                                     key={badge.id}
                                                     className={classNames(
@@ -302,6 +309,10 @@ export default function BadgesPage() {
                                                                 badge.has_earned,
                                                             [styles.badgeLocked]:
                                                                 !badge.has_earned,
+                                                            "tutorial-target-badge-item":
+                                                                index === 0 &&
+                                                                badgeIndex ===
+                                                                    0,
                                                         },
                                                     )}
                                                 >

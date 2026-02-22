@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Joyride from "react-joyride";
 import { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
 import { useLocation } from "@remix-run/react";
+import { useTranslation } from "react-i18next";
 import { service, UserInfo } from "~/service/service";
 
 const TUTORIAL_STEPS = {
@@ -58,7 +59,7 @@ const TUTORIAL_STEPS = {
     {
       target: ".tutorial-target-nav-study",
       content:
-        "Esta é a tua Zona de Foco. Aqui ativas o cronómetro Pomodoro e geres os teus apontamentos.",
+        "Esta é a tua Zona de Estudo. Aqui ativas o cronómetro Pomodoro, geres os teus apontamentos e Unidades Curriculares.",
       placement: "right" as const,
     },
     {
@@ -71,94 +72,6 @@ const TUTORIAL_STEPS = {
       target: "body",
       placement: "center" as const,
       content: "Estás pronto! Explora a app ao teu ritmo.",
-    },
-  ],
-
-  calendar_page: [
-    {
-      target: ".rbc-calendar",
-      content: (
-        <div>
-          <strong>Calendário 📅</strong>
-          <p>
-            Para criares um evento, podes clicar no botão "Criar" ou arrastar
-            diretamente na grelha.
-          </p>
-        </div>
-      ),
-      placement: "auto" as const,
-      disableBeacon: true,
-    },
-    {
-      target: ".tutorial-target-calendar-create",
-      content: "Vamos criar um evento. Clica aqui!",
-      spotlightClicks: true,
-      hideFooter: true,
-      disableOverlayClose: true,
-      placement: "bottom" as const,
-    },
-    // DENTRO DO MODAL
-    {
-      target: ".tutorial-target-event-modal-window",
-      content: (
-        <div style={{ textAlign: "center" }}>
-          <strong>Passo 1: Título 📝</strong>
-          <p>Escreve um nome para o teu evento.</p>
-          <p>
-            <i>(O tutorial avança quando escreveres...)</i>
-          </p>
-        </div>
-      ),
-      disableOverlay: true,
-      placement: "right" as const,
-      hideFooter: true,
-    },
-    {
-      target: ".tutorial-target-event-modal-window",
-      content: (
-        <div style={{ textAlign: "left" }}>
-          <strong>Detalhes do Evento ⚙️</strong>
-          <p>
-            Aqui podes editar os <b>dias, horários</b>, adicionar <b>notas</b> e
-            definir a <b>recorrência</b>.
-          </p>
-        </div>
-      ),
-      placement: "right" as const,
-    },
-    {
-      target: ".tutorial-target-event-modal-window",
-      content: (
-        <div style={{ textAlign: "left" }}>
-          <strong>Personalização 🎨</strong>
-          <p>
-            Escolhe uma cor. Carrega no <b>+</b> para guardar favoritas!
-          </p>
-        </div>
-      ),
-      placement: "right" as const,
-    },
-    {
-      target: ".tutorial-target-event-modal-window",
-      content: (
-        <div style={{ textAlign: "left" }}>
-          <strong>Etiquetas (Tags) 🏷️</strong>
-          <p>Organiza o evento por categorias (Gerais ou UCs).</p>
-        </div>
-      ),
-      placement: "right" as const,
-    },
-    {
-      target: ".tutorial-target-event-save",
-      content: "Grava o teu evento!",
-      disableOverlay: true,
-      hideFooter: true,
-      placement: "top" as const,
-    },
-    {
-      target: ".rbc-event",
-      content: "Feito! Clica no evento para veres detalhes.",
-      placement: "auto" as const,
     },
   ],
 
@@ -178,16 +91,47 @@ const TUTORIAL_STEPS = {
 
   statistics_page: [
     {
-      target: ".tutorial-target-stats-energy",
-      content:
-        "O Gráfico de Energia mostra a tua evolução baseada nos registos do Mood Tracker.",
-      title: "Vitalidade",
+      target: "body",
+      placement: "center" as const,
+      content: (
+        <div style={{ textAlign: "center" }}>
+          <strong>As tuas Estatísticas 📊</strong>
+          <p>
+            Vamos fazer uma visita rápida para entenderes os teus resultados.
+          </p>
+        </div>
+      ),
       disableBeacon: true,
     },
     {
+      target: ".tutorial-target-stats-summary",
+      placement: "bottom" as const,
+      content:
+        "Aqui no topo tens um resumo rápido da semana: tempo de foco total, tarefas concluídas e apontamentos.",
+    },
+    {
+      target: ".tutorial-target-stats-energy",
+      placement: "top" as const,
+      content:
+        "A tua Vitalidade ⚡: Vê como a tua energia flutua ao longo dos dias, baseado no teu Mood Tracker.",
+    },
+    {
+      target: ".tutorial-target-stats-tasks",
+      placement: "top" as const,
+      content:
+        "O teu Trabalho ✅: Analisa rapidamente o volume de tarefas feitas em comparação com as que ainda faltam.",
+    },
+    {
       target: ".tutorial-target-stats-focus",
-      content: "Aqui vês quantos minutos de Foco (Pomodoro) fizeste por dia.",
-      title: "Produtividade",
+      placement: "top" as const,
+      content:
+        "Performance Pomodoro ⏱️: Descobre os teus padrões de foco, a tua média de tempo e as interrupções.",
+    },
+    {
+      target: ".tutorial-target-stats-drilldown",
+      placement: "top" as const,
+      content:
+        "Análise Detalhada 🔍: Por fim, usa esta zona para explorares dados mais específicos do teu histórico. Estás pronto!",
     },
   ],
 
@@ -241,7 +185,7 @@ const TUTORIAL_STEPS = {
       content: "Adiciona uma nova Unidade Curricular e define os seus ECTS.",
     },
     {
-      target: ".tutorial-target-uc-card", // Aponta para o primeiro cartão se existir
+      target: ".tutorial-target-uc-card",
       content: (
         <div>
           <strong>Simulador de Notas 📊</strong>
@@ -271,12 +215,91 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const location = useLocation();
 
+  // 1. Hook chamado de forma correta (apenas uma vez e fora do useEffect)
+  const { i18n } = useTranslation();
+
   useEffect(() => {
     if (!user) return;
     const seen = user.tutorial_progress || [];
     let stepsToRun: Step[] = [];
     let key = "";
 
+    const isPT = i18n.language ? i18n.language.startsWith("pt") : true;
+
+    const image1 = isPT
+      ? "/tracker/tutorial/tutorial-evento-1-pt.png"
+      : "/tracker/tutorial/tutorial-evento-1-en.png";
+    const image2 = isPT
+      ? "/tracker/tutorial/tutorial-evento-2-pt.png"
+      : "/tracker/tutorial/tutorial-evento-2-en.png";
+
+    const dynamicCalendarSteps: Step[] = [
+      {
+        target: ".rbc-calendar",
+        content: (
+          <div>
+            <strong>Calendário 📅</strong>
+            <p>
+              Para criares um evento, podes clicar no botão "Criar" ou arrastar
+              diretamente na grelha.
+            </p>
+          </div>
+        ),
+        placement: "auto",
+        disableBeacon: true,
+      },
+      {
+        target: "body",
+        placement: "center",
+        content: (
+          <div style={{ textAlign: "center", maxWidth: "800px" }}>
+            <strong>O Formulário: Datas e Detalhes 📝</strong>
+            <img
+              src={image1}
+              alt="Topo do Formulário"
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                margin: "15px 0",
+              }}
+            />
+          </div>
+        ),
+      },
+      {
+        target: "body",
+        placement: "center",
+        content: (
+          <div style={{ textAlign: "center", maxWidth: "800px" }}>
+            <strong>O Formulário: Personalização e Etiquetas 🎨</strong>
+            <img
+              src={image2}
+              alt="Fundo do Formulário"
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                margin: "15px 0",
+              }}
+            />
+          </div>
+        ),
+      },
+      {
+        target: ".tutorial-target-calendar-create",
+        content: (
+          <div>
+            <strong>Agora é a tua vez! 🚀</strong>
+            <p>
+              Clica em "Criar" (ou arrasta no calendário) e faz um evento de
+              teste. O tutorial fica por aqui, explora à vontade!
+            </p>
+          </div>
+        ),
+        placement: "bottom",
+      },
+    ];
+
+    // 5. Lógica de Roteamento
     if (location.pathname === "/" && !seen.includes("onboarding_general")) {
       stepsToRun = TUTORIAL_STEPS.general;
       key = "onboarding_general";
@@ -284,7 +307,7 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
       location.pathname.includes("/calendar") &&
       !seen.includes("page_calendar")
     ) {
-      stepsToRun = TUTORIAL_STEPS.calendar_page;
+      stepsToRun = dynamicCalendarSteps;
       key = "page_calendar";
     } else if (
       location.pathname.includes("/statistics") &&
@@ -324,41 +347,7 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
       setStepIndex(0);
       setTimeout(() => setRun(true), 500);
     }
-  }, [user, location.pathname]);
-
-  // Watcher Modal Open (Calendar)
-  useEffect(() => {
-    if (!run || tutorialKey !== "page_calendar") return;
-    if (stepIndex === 1) {
-      const check = setInterval(() => {
-        const modal = document.querySelector(
-          ".tutorial-target-event-modal-window",
-        );
-        if (modal) {
-          clearInterval(check);
-          setStepIndex((p) => p + 1);
-        }
-      }, 200);
-      return () => clearInterval(check);
-    }
-  }, [stepIndex, run, tutorialKey]);
-
-  // Watcher Modal Close (Calendar)
-  useEffect(() => {
-    if (!run || tutorialKey !== "page_calendar") return;
-    if (stepIndex === 6) {
-      const check = setInterval(() => {
-        const modal = document.querySelector(
-          ".tutorial-target-event-modal-window",
-        );
-        if (!modal) {
-          clearInterval(check);
-          setStepIndex((p) => p + 1);
-        }
-      }, 200);
-      return () => clearInterval(check);
-    }
-  }, [stepIndex, run, tutorialKey]);
+  }, [user, location.pathname, i18n.language, tutorialKey]);
 
   // Watcher Hamburguer (General)
   useEffect(() => {
@@ -375,49 +364,8 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
     }
   }, [stepIndex, run, tutorialKey]);
 
-  // Watcher Title Input (Calendar)
-  useEffect(() => {
-    if (!run || tutorialKey !== "page_calendar") return;
-    if (stepIndex === 2) {
-      const check = setInterval(() => {
-        const titleInput = document.querySelector(
-          ".tutorial-target-event-title",
-        ) as HTMLInputElement;
-        if (titleInput && titleInput.value && titleInput.value.length > 2) {
-          clearInterval(check);
-          setTimeout(() => setStepIndex((p) => p + 1), 1000);
-        }
-      }, 500);
-      return () => clearInterval(check);
-    }
-  }, [stepIndex, run, tutorialKey]);
-
   const handleJoyrideCallback = async (data: CallBackProps) => {
     const { status, action, type, index } = data;
-
-    // Scroll Logic para o Calendário
-    if (
-      tutorialKey === "page_calendar" &&
-      type === EVENTS.STEP_AFTER &&
-      action === ACTIONS.NEXT
-    ) {
-      if (index === 2)
-        document
-          .getElementById("tutorial-scroll-dates")
-          ?.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (index === 3)
-        document
-          .getElementById("tutorial-scroll-customization")
-          ?.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (index === 4)
-        document
-          .getElementById("tutorial-scroll-tags")
-          ?.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (index === 5)
-        document
-          .querySelector(".tutorial-target-event-save")
-          ?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
 
     if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
@@ -447,6 +395,7 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
         options: {
           primaryColor: "#0066cc",
           zIndex: 100000,
+          width: "min(70vw, 650px)",
         },
         spotlight: {
           borderRadius: 16,

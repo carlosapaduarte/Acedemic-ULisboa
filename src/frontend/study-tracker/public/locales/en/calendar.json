@@ -13,6 +13,7 @@
   "no_events_in_range": "No events in this range",
   "allDay": "All Day",
   "title_label": "Title",
+  "title_placeholder": "Ex. Study for Math Exam",
   "date_section_label": "Date",
   "start_date_label": "Start Date",
   "start_time_label": "Start Time",

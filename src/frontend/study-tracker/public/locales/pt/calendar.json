@@ -13,6 +13,7 @@
   "no_events_in_range": "Nenhum evento neste intervalo",
   "allDay": "Todo o Dia",
   "title_label": "Título",
+  "title_placeholder": "Ex: Frequência de Matemática",
   "date_section_label": "Data",
   "start_date_label": "Data de Início",
   "start_time_label": "Hora de Início",

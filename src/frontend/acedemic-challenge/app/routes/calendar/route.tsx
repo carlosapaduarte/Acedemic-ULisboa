@@ -22,7 +22,9 @@ function DayContent({
 }) {
     return (
         <div className={`${styles.challengesContainerWrapper}`}>
-            <div className={`${styles.challengesContainer}`}>
+            <div
+                className={`${styles.challengesContainer} tutorial-target-day-info`}
+            >
                 <SelectedDayChallengeInfo
                     reachedBatchDays={reachedBatchDays}
                     unreachedBatchDays={unreachedBatchDays}
@@ -55,12 +57,22 @@ function MainContent() {
                 </h1>
             ) : (
                 <>
-                    <MyCalendar
-                        reachedBatchDays={reachedBatchDays}
-                        unreachedBatchDays={unreachedBatchDays}
-                        onDayClickHandler={handleDateClick}
-                        badgeHistory={badgeHistory}
-                    />
+                    <div
+                        className="tutorial-target-calendar-grid"
+                        style={{
+                            flex: 1,
+                            width: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                        }}
+                    >
+                        <MyCalendar
+                            reachedBatchDays={reachedBatchDays}
+                            unreachedBatchDays={unreachedBatchDays}
+                            onDayClickHandler={handleDateClick}
+                            badgeHistory={badgeHistory}
+                        />
+                    </div>
                     <DayContent
                         reachedBatchDays={reachedBatchDays}
                         unreachedBatchDays={unreachedBatchDays}

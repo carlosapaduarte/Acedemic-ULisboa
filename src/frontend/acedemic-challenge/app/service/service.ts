@@ -1,13 +1,7 @@
-// This component could be used to define functions that interact with the Backend and other external services.
-
 import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
-import { doFetch, toJsonBody } from "./fetch";
+import { doFetch, Request, toJsonBody } from "./fetch";
 import { NotAuthorizedError } from "~/service/error";
 import type { Badge } from "~/types/Badge";
-
-// For now, all of these functions will return the expected response.
-// If the API reply is not OK, a Promise.reject(error) is returned/throwned instead!
-// In my opinion, this eases error handling in the caller.
 
 export type LoginResult = {
     access_token: string;
@@ -47,14 +41,7 @@ export class AuthError extends Error {
     }
 }
 
-/**
- * Makes an API request, using credentials, to create a JWT token, which
- * should be used on sub-sequenced calls, as an authorization mechanism.
- */
 async function login(username: string, password: string) {
-    // NOTE: for now, this function will store the JWT in cache, for simplicity.
-    // TODO: think if there is another place to store the token.
-
     const formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
@@ -145,7 +132,6 @@ async function selectShareProgressState(shareProgress: boolean) {
         body: toJsonBody({ shareProgress }),
     };
     const response: Response = await doFetch(request);
-    //console.log(response)
     if (!response.ok)
         return Promise.reject(
             new Error("Progress share preference selection failed!"),
@@ -159,7 +145,6 @@ async function selectAvatar(avatarFilename: string) {
         body: toJsonBody({ avatarFilename }),
     };
     const response: Response = await doFetch(request);
-    //console.log(response)
     if (!response.ok)
         return Promise.reject(new Error("Avatar selection failed!"));
 }
@@ -194,9 +179,10 @@ export type UserInfo = {
     id: number;
     username: string;
     shareProgress: boolean;
-    avatarFilename: string; // TODO: this could be undefined
+    avatarFilename: string;
     batches: Batch[];
     currentChallengeLevel: number | null; //1, 2, 3 or null if no level selected
+    tutorial_progress?: string[];
 };
 
 async function fetchBadgeHistory(): Promise<AwardedBadgeHistoryItem[]> {
@@ -271,6 +257,20 @@ async function fetchGamificationProfile() {
     return response.json();
 }
 
+async function markTutorialAsSeen(tutorialKey: string) {
+    const request: Request = {
+        path: `commons/users/me/tutorial`,
+        method: "PUT",
+        body: toJsonBody({ tutorial_key: tutorialKey }),
+    };
+
+    const response = await doFetch(request);
+
+    if (!response.ok) {
+        console.error("Falha ao gravar progresso do tutorial");
+    }
+}
+
 export const service = {
     login,
     testTokenValidity,
@@ -279,8 +279,10 @@ export const service = {
     selectShareProgressState,
     selectAvatar,
     fetchUserInfoFromApi,
+    fetchUserInfo: fetchUserInfoFromApi,
     editDayNote,
-    markChallengeAsCompleted: markChallengeAsCompleted,
+    markChallengeAsCompleted,
     fetchBadgeHistory,
     fetchGamificationProfile,
+    markTutorialAsSeen,
 };
