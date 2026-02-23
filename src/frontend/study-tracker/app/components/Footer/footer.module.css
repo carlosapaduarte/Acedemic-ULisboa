@@ -1,20 +1,32 @@
-
 .footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-height: max(50px, 10%);
-    flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-height: max(50px, 10%);
+  flex-shrink: 0;
 }
 
 .leftSide {
-    max-width: 50%;
-    max-height: 100%;
-    object-fit: contain;
+  max-width: 50%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 .rightSide {
-    max-width: 50%;
-    max-height: 100%;
-    object-fit: contain;
+  max-width: 50%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.middleSide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.middleSide img {
+  max-height: 55px;
+  width: auto;
+  object-fit: contain;
 }

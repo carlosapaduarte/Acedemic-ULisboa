@@ -108,7 +108,7 @@ def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tu
     progress_by_day: list[tuple[date, float]] = []
     for task_date, tasks in tasks_by_day.items():
         number_of_daily_tasks = len(tasks)
-        if number_of_daily_tasks is 0:
+        if number_of_daily_tasks == 0:
             progress_by_day.append((task_date, 0))
         else:
             completed = 0    
