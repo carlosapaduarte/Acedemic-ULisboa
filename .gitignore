@@ -31,3 +31,4 @@ src/backend/.venv/
 src/frontend/acedemic-challenge/app/service/config.ts
 src/frontend/study-tracker/app/service/config.ts
 *.pem
+whitelist.py

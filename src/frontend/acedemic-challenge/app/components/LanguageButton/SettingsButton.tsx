@@ -3,15 +3,29 @@ import { IconContext } from "react-icons";
 import classNames from "classnames";
 import styles from "./settingsButton.module.css";
 import { RiSettings5Fill } from "react-icons/ri";
-import React, { useTransition } from "react";
+import React, { useTransition, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLogOut } from "~/components/auth/Authn";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import dropdownStyles from "~/components/AppBar/HomeAppBar/dropdown.module.css";
+import { service } from "~/service/service";
 
 function Dropdown({ trigger }: { trigger: JSX.Element }) {
     const logout = useLogOut();
     const [isPending, startTransition] = useTransition();
+    const navigate = useNavigate();
+
+    // ESTADO PARA SABER SE O UTILIZADOR ESTÁ LOGADO
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        service
+            .fetchUserInfoFromApi()
+            .then((info) => {
+                if (info) setIsLoggedIn(true);
+            })
+            .catch(() => setIsLoggedIn(false));
+    }, []);
 
     return (
         <DropdownMenu.Root>
@@ -22,17 +36,18 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                     className={dropdownStyles.Content}
                     sideOffset={5}
                 >
-                    {/*<DropdownMenu.Item className={dropdownStyles.Item}>
-                        <a href="/settings"
-                           aria-label={t("appbar:settings")}
-                           className={classNames(styles.settingsButton)}
-                           onClick={(e) => {
-                               e.preventDefault();
-                               navigate("/settings");
-                           }}>
-                            Settings
+                    <DropdownMenu.Item className={dropdownStyles.Item}>
+                        <a
+                            href="/settings"
+                            className={classNames(styles.settingsButton)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate("/settings");
+                            }}
+                        >
+                            Definições
                         </a>
-                    </DropdownMenu.Item>*/}
+                    </DropdownMenu.Item>
 
                     <DropdownMenu.Item className={dropdownStyles.Item}>
                         <a
@@ -63,12 +78,15 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                         </a>
                     </DropdownMenu.Item>
 
-                    <DropdownMenu.Item
-                        className={dropdownStyles.Item}
-                        onClick={() => startTransition(logout)}
-                    >
-                        Logout
-                    </DropdownMenu.Item>
+                    {/* SÓ MOSTRA O LOGOUT SE O UTILIZADOR ESTIVER LOGADO */}
+                    {isLoggedIn && (
+                        <DropdownMenu.Item
+                            className={dropdownStyles.Item}
+                            onClick={() => startTransition(logout)}
+                        >
+                            Logout
+                        </DropdownMenu.Item>
+                    )}
 
                     <DropdownMenu.Arrow className={dropdownStyles.Arrow} />
                 </DropdownMenu.Content>
@@ -78,20 +96,19 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
 }
 
 export function SettingsButton() {
-    const navigate = useNavigate();
-
     const { t } = useTranslation("appbar");
 
     return (
         <Dropdown
             trigger={
-                <a
-                    href="/settings"
+                <button
                     aria-label={t("appbar:settings")}
                     className={classNames(styles.settingsButton)}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        navigate("/settings");
+                    style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
                     }}
                 >
                     <IconContext.Provider
@@ -101,7 +118,7 @@ export function SettingsButton() {
                     >
                         <RiSettings5Fill />
                     </IconContext.Provider>
-                </a>
+                </button>
             }
         />
     );

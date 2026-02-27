@@ -3,17 +3,28 @@ import { IconContext } from "react-icons";
 import classNames from "classnames";
 import styles from "./settingsButton.module.css";
 import { RiSettings5Fill, RiEqualizerLine } from "react-icons/ri";
-import React, { useTransition } from "react";
+import React, { useTransition, useState, useEffect } from "react";
 import { AppBarVariant } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
 import { useLogOut } from "~/components/auth/Authn";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import dropdownStyles from "~/components/AppBar/HomeAppBar/dropdown.module.css";
+import { service } from "~/service/service";
 
 function Dropdown({ trigger }: { trigger: JSX.Element }) {
   const logout = useLogOut();
   const [isPending, startTransition] = useTransition();
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    service
+      .fetchUserInfoFromApi()
+      .then((info) => {
+        if (info) setIsLoggedIn(true);
+      })
+      .catch(() => setIsLoggedIn(false));
+  }, []);
 
   return (
     <DropdownMenu.Root>
@@ -31,10 +42,9 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
             </a>
           </DropdownMenu.Item>
 
-          {/* LINK PARA A PÁGINA DE SETTINGS */}
           <DropdownMenu.Item
             className={dropdownStyles.Item}
-            onSelect={() => navigate("/settings")} // Navega para a nova rota
+            onSelect={() => navigate("/settings")}
             style={{
               cursor: "pointer",
               display: "flex",
@@ -63,17 +73,20 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
             </a>
           </DropdownMenu.Item>
 
-          <DropdownMenu.Separator
-            className={dropdownStyles.Separator}
-            style={{ height: 1, backgroundColor: "#ccc", margin: "5px 0" }}
-          />
-
-          <DropdownMenu.Item
-            className={dropdownStyles.Item}
-            onClick={() => startTransition(logout)}
-          >
-            Logout
-          </DropdownMenu.Item>
+          {isLoggedIn && (
+            <>
+              <DropdownMenu.Separator
+                className={dropdownStyles.Separator}
+                style={{ height: 1, backgroundColor: "#ccc", margin: "5px 0" }}
+              />
+              <DropdownMenu.Item
+                className={dropdownStyles.Item}
+                onClick={() => startTransition(logout)}
+              >
+                Logout
+              </DropdownMenu.Item>
+            </>
+          )}
 
           <DropdownMenu.Arrow className={dropdownStyles.Arrow} />
         </DropdownMenu.Content>

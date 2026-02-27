@@ -1,5 +1,4 @@
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
-import React, { useContext, useState } from "react";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
 import styles from "./appBar.module.css";
 import cleanAppBarStyles from "./cleanAppBar.module.css";
@@ -8,6 +7,7 @@ import { useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 import { GreetingsContainer } from "./HomeAppBar/HomeAppBar";
 import classNames from "classnames";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IconContext } from "react-icons";
 import { AppBarContext } from "./AppBarProvider";
@@ -101,11 +101,25 @@ function SideBarNavigationMenu({
 
 function SideBar() {
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
-
   const { appBarVariant } = useContext(AppBarContext);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // detetor de cliques fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsSideBarOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div
+      ref={menuRef}
       data-expanded={isSideBarOpen}
       className={classNames(
         appBarVariant === "default" && styles.sideBar,
@@ -219,7 +233,6 @@ export function AppBar({
         {appBarVariant === "home" && (
           <>
             <GreetingsContainer />
-            {/*<NavBar />*/}
           </>
         )}
       </div>
