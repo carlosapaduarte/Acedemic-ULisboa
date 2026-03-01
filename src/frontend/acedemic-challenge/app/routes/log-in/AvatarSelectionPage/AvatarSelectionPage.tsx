@@ -12,17 +12,17 @@ function createAvatars(): string[] {
     return avatars;
 }
 
-function useAvatarSelection(
-    {
-        onComplete
-    }: {
-        onComplete: () => void;
-    }) {
+function useAvatarSelection({ onComplete }: { onComplete: () => void }) {
     const setGlobalError = useSetGlobalError();
     const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
     const [avatars, setAvatars] = React.useState<string[]>([]);
 
     async function onConfirmClickHandler(avatarFilename: string) {
+        if (!avatarFilename) {
+            alert("Por favor, seleciona um avatar primeiro!");
+            return;
+        }
+
         await service
             .selectAvatar(avatarFilename)
             .then(() => onComplete())
@@ -37,7 +37,7 @@ function useAvatarSelection(
         onConfirmClick: onConfirmClickHandler,
         selectedAvatar,
         setSelectedAvatar,
-        avatars
+        avatars,
     };
 }
 
@@ -53,16 +53,15 @@ function Title() {
     );
 }
 
-function AvatarList(
-    {
-        selectedAvatar,
-        setSelectedAvatar,
-        avatars
-    }: {
-        selectedAvatar: number;
-        setSelectedAvatar: (index: number) => void;
-        avatars: string[];
-    }) {
+function AvatarList({
+    selectedAvatar,
+    setSelectedAvatar,
+    avatars,
+}: {
+    selectedAvatar: number;
+    setSelectedAvatar: (index: number) => void;
+    avatars: string[];
+}) {
     return (
         <div className={styles.avatarListContainer}>
             <div className={styles.avatarGrid}>
@@ -72,10 +71,7 @@ function AvatarList(
                         className={`${styles.avatarContainer} ${selectedAvatar === index ? styles.selected : ""}`}
                         onClick={() => setSelectedAvatar(index)}
                     >
-                        <img
-                            src={avatar}
-                            alt={`Avatar ${index}`}
-                        />
+                        <img src={avatar} alt={`Avatar ${index}`} />
                     </div>
                 ))}
             </div>
@@ -83,15 +79,14 @@ function AvatarList(
     );
 }
 
-export default function AvatarSelectionPage(
-    {
-        onComplete
-    }: {
-        onComplete: () => void;
-    }) {
+export default function AvatarSelectionPage({
+    onComplete,
+}: {
+    onComplete: () => void;
+}) {
     const { onConfirmClick, selectedAvatar, setSelectedAvatar, avatars } =
         useAvatarSelection({
-            onComplete: onComplete
+            onComplete: onComplete,
         });
     const { t } = useTranslation(["login"]);
 
@@ -105,10 +100,29 @@ export default function AvatarSelectionPage(
                     avatars={avatars}
                 />
                 <div className={styles.confirmButtonContainer}>
-                    <button className={styles.confirmAvatarButton} onClick={() => {
-                        if (selectedAvatar !== null)
-                            onConfirmClick(avatars[selectedAvatar]);
-                    }}>
+                    <button
+                        className={styles.confirmAvatarButton}
+                        style={{
+                            opacity: selectedAvatar === -1 ? 0.5 : 1,
+                            cursor:
+                                selectedAvatar === -1
+                                    ? "not-allowed"
+                                    : "pointer",
+                        }}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (
+                                selectedAvatar !== -1 &&
+                                avatars[selectedAvatar]
+                            ) {
+                                onConfirmClick(avatars[selectedAvatar]);
+                            } else {
+                                alert(
+                                    "Por favor, clica numa das imagens para escolheres o teu avatar!",
+                                );
+                            }
+                        }}
+                    >
                         {t("login:confirm_level")}
                     </button>
                 </div>

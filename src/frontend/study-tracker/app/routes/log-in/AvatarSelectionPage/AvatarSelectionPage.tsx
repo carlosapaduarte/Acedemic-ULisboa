@@ -6,115 +6,124 @@ import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
 function createAvatars(): string[] {
-    const avatars: string[] = [];
-    for (let u = 0; u < 30; u++) {
-        avatars.push(`./avatars/avatar${u % 12}.png`); // filename
-    }
-    return avatars;
+  const avatars: string[] = [];
+  for (let u = 0; u < 30; u++) {
+    avatars.push(`./avatars/avatar${u % 12}.png`); // filename
+  }
+  return avatars;
 }
 
-function useAvatarSelection(
-    {
-        onComplete
-    }: {
-        onComplete: () => void;
-    }) {
-    const setGlobalError = useSetGlobalError();
-    const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
-    const [avatars, setAvatars] = React.useState<string[]>([]);
+function useAvatarSelection({ onComplete }: { onComplete: () => void }) {
+  const setGlobalError = useSetGlobalError();
+  const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
+  const [avatars, setAvatars] = React.useState<string[]>([]);
 
-    async function onConfirmClickHandler(avatarFilename: string) {
-        await service
-            .selectAvatar(avatarFilename)
-            .then(() => onComplete())
-            .catch((error) => setGlobalError(error));
+  async function onConfirmClickHandler(avatarFilename: string) {
+    if (!avatarFilename) {
+      alert("Por favor, seleciona um avatar primeiro!");
+      return;
     }
 
-    useEffect(() => {
-        setAvatars(createAvatars());
-    }, []);
+    await service
+      .selectAvatar(avatarFilename)
+      .then(() => onComplete())
+      .catch((error) => setGlobalError(error));
+  }
 
-    return {
-        onConfirmClick: onConfirmClickHandler,
-        selectedAvatar,
-        setSelectedAvatar,
-        avatars
-    };
+  useEffect(() => {
+    setAvatars(createAvatars());
+  }, []);
+
+  return {
+    onConfirmClick: onConfirmClickHandler,
+    selectedAvatar,
+    setSelectedAvatar,
+    avatars,
+  };
 }
 
 function Title() {
-    const { t } = useTranslation(["login"]);
+  const { t } = useTranslation(["login"]);
 
-    return (
-        <div className={styles.titleContainer}>
-            <h1 className={styles.titleHeading}>
-                {t("login:select_avatar_initial_question")}
-            </h1>
-        </div>
-    );
+  return (
+    <div className={styles.titleContainer}>
+      <h1 className={styles.titleHeading}>
+        {t("login:select_avatar_initial_question")}
+      </h1>
+    </div>
+  );
 }
 
-function AvatarList(
-    {
-        selectedAvatar,
-        setSelectedAvatar,
-        avatars
-    }: {
-        selectedAvatar: number;
-        setSelectedAvatar: (index: number) => void;
-        avatars: string[];
-    }) {
-    return (
-        <div className={styles.avatarListContainer}>
-            <div className={styles.avatarGrid}>
-                {avatars.map((avatar: string, index: number) => (
-                    <div
-                        key={index}
-                        className={`${styles.avatarContainer} ${selectedAvatar === index ? styles.selected : ""}`}
-                        onClick={() => setSelectedAvatar(index)}
-                    >
-                        <img
-                            src={avatar}
-                            alt={`Avatar ${index}`}
-                        />
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+function AvatarList({
+  selectedAvatar,
+  setSelectedAvatar,
+  avatars,
+}: {
+  selectedAvatar: number;
+  setSelectedAvatar: (index: number) => void;
+  avatars: string[];
+}) {
+  return (
+    <div className={styles.avatarListContainer}>
+      <div className={styles.avatarGrid}>
+        {avatars.map((avatar: string, index: number) => (
+          <div
+            key={index}
+            className={`${styles.avatarContainer} ${
+              selectedAvatar === index ? styles.selected : ""
+            }`}
+            onClick={() => setSelectedAvatar(index)}
+          >
+            <img src={avatar} alt={`Avatar ${index}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-export default function AvatarSelectionPage(
-    {
-        onComplete
-    }: {
-        onComplete: () => void;
-    }) {
-    const { onConfirmClick, selectedAvatar, setSelectedAvatar, avatars } =
-        useAvatarSelection({
-            onComplete: onComplete
-        });
-    const { t } = useTranslation(["common"]);
+export default function AvatarSelectionPage({
+  onComplete,
+}: {
+  onComplete: () => void;
+}) {
+  const { onConfirmClick, selectedAvatar, setSelectedAvatar, avatars } =
+    useAvatarSelection({
+      onComplete: onComplete,
+    });
+  const { t } = useTranslation(["common"]);
 
-    return (
-        <div className={styles.avatarSelectionPageContainer}>
-            <div className={styles.avatarSelectionPageInnerContainer}>
-                <Title />
-                <AvatarList
-                    selectedAvatar={selectedAvatar}
-                    setSelectedAvatar={setSelectedAvatar}
-                    avatars={avatars}
-                />
-                <div className={styles.confirmButtonContainer}>
-                    <button className={classNames(styles.cutButton, styles.confirmAvatarButton)}
-                            onClick={() => {
-                                if (selectedAvatar !== null)
-                                    onConfirmClick(avatars[selectedAvatar]);
-                            }}>
-                        {t("common:confirm_button_text")}
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className={styles.avatarSelectionPageContainer}>
+      <div className={styles.avatarSelectionPageInnerContainer}>
+        <Title />
+        <AvatarList
+          selectedAvatar={selectedAvatar}
+          setSelectedAvatar={setSelectedAvatar}
+          avatars={avatars}
+        />
+        <div className={styles.confirmButtonContainer}>
+          <button
+            className={classNames(styles.cutButton, styles.confirmAvatarButton)}
+            style={{
+              opacity: selectedAvatar === -1 ? 0.5 : 1,
+              cursor: selectedAvatar === -1 ? "not-allowed" : "pointer",
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              if (selectedAvatar !== -1 && avatars[selectedAvatar]) {
+                onConfirmClick(avatars[selectedAvatar]);
+              } else {
+                alert(
+                  "Por favor, clica numa das imagens para escolheres o teu avatar!",
+                );
+              }
+            }}
+          >
+            {t("common:confirm_button_text")}
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

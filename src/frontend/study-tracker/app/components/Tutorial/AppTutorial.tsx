@@ -202,12 +202,6 @@ const TUTORIAL_STEPS = {
       disableBeacon: true,
     },
     {
-      target: ".tutorial-target-notes-storage",
-      placement: "bottom" as const,
-      content:
-        "Gere o teu espaço: oferecemos 5GB de armazenamento na nuvem para os teus PDFs e resumos.",
-    },
-    {
       target: ".tutorial-target-notes-search",
       placement: "bottom" as const,
       content: "Procura ficheiros pelo nome em todas as pastas de uma só vez.",

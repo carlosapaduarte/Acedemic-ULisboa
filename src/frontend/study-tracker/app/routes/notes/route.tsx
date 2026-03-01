@@ -167,21 +167,6 @@ function NotesPage() {
             {currentFolder ? ` / ${currentFolder.name}` : " / Visão Geral"}
           </p>
         </div>
-
-        <div
-          className={`${styles.storageWidget} tutorial-target-notes-storage`}
-        >
-          <div className={styles.storageInfo}>
-            <span>Armazenamento</span>
-            <span>2.1 GB / 5 GB</span>
-          </div>
-          <div className={styles.progressBarBg}>
-            <div
-              className={styles.progressBarFill}
-              style={{ width: "42%" }}
-            ></div>
-          </div>
-        </div>
       </header>
 
       <div className={styles.toolbar}>

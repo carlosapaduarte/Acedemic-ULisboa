@@ -103,12 +103,15 @@ export function GreetingsContainer() {
             </div>
             <div className={`${styles.avatarAndDropdownContainer}`}>
                 <div className={`${styles.avatarContainer}`}>
-                    <img
-                        width={92}
-                        height={92}
-                        src={`${userInfo?.avatarFilename || ""}`}
-                        alt={`User's Avatar`}
-                    />
+                    {userInfo?.avatarFilename && (
+                        <img
+                            src={`./avatars/${userInfo.avatarFilename.split("/").pop()}`}
+                            width={92}
+                            height={92}
+                            alt="User Avatar"
+                            style={{ objectFit: "cover", borderRadius: "50%" }}
+                        />
+                    )}
                 </div>
             </div>
         </div>

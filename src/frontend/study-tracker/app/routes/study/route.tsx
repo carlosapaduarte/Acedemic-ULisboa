@@ -16,7 +16,7 @@ const MENU_ITEMS = [
     icon: "icons/notes_icon.png",
   },
   {
-    name: "school_grades",
+    name: "curricular_units_title",
     path: "/curricular-units",
     icon: "icons/tasks_icon.png",
   },
