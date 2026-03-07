@@ -84,10 +84,22 @@ class UpdateFileInputDto(BaseModel):
     
 class CreateCurricularUnitInputDto(BaseModel):
     name: str
-    
+    ects: float = 6.0
+    min_grade: float = 9.5
+
+class UpdateCurricularUnitInputDto(BaseModel):
+    name: str
+    ects: float
+    min_grade: float
+    target_grade: Optional[float] = None
+     
 class CreateGradeInputDto(BaseModel):
+    name: str
     value: float
     weight: float
+
+class UpdateGradeValueDto(BaseModel):
+    value: float
     
 class CreateMoodLogInputDto(BaseModel):
     value: int          # Painel 1 (1-5)

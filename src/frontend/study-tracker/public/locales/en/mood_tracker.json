@@ -1,0 +1,52 @@
+{
+  "log_state_of_mind": "Log State of Mind",
+  "back": "Back",
+  "cancel": "Cancel",
+  "next": "Next",
+  "done": "Done",
+  "saving": "Saving...",
+
+  "mood_question": "How are you feeling today?",
+  "very_unpleasant": "Very Unpleasant",
+  "very_pleasant": "Very Pleasant",
+
+  "mood_level_1": "Very Unpleasant",
+  "mood_level_2": "Unpleasant",
+  "mood_level_3": "Neutral",
+  "mood_level_4": "Pleasant",
+  "mood_level_5": "Very Pleasant",
+
+  "emotions_question": "What best describes this feeling?",
+  "show_all_emotions": "Show all",
+
+  "emotion_ansioso": "Anxious",
+  "emotion_stressado": "Stressed",
+  "emotion_cansado": "Tired",
+  "emotion_frustrado": "Frustrated",
+  "emotion_triste": "Sad",
+  "emotion_calmo": "Calm",
+  "emotion_focado": "Focused",
+  "emotion_confiante": "Confident",
+  "emotion_entusiasmado": "Excited",
+  "emotion_feliz": "Happy",
+  "emotion_indiferente": "Indifferent",
+  "emotion_aborrecido": "Bored",
+  "emotion_grato": "Grateful",
+  "emotion_orgulhoso": "Proud",
+
+  "impact_question": "What's having the biggest impact on you?",
+  "impact_estudo": "Studies",
+  "impact_trabalho": "Work",
+  "impact_família": "Family",
+  "impact_amigos": "Friends",
+  "impact_saúde": "Health",
+  "impact_sono": "Sleep",
+  "impact_dinheiro": "Money",
+  "impact_tempo": "Time",
+  "impact_auto_estima": "Self-esteem",
+  "impact_acontecimentos_atuais": "Current Events",
+  "impact_outro": "Other",
+
+  "mood_registered": "Mood registered!",
+  "go_dashboard": "Go to Dashboard"
+}

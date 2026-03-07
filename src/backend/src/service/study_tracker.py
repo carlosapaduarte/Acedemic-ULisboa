@@ -171,12 +171,21 @@ def update_file_content(user_id: int, archive_name: str, filename: str, new_cont
 def get_curricular_units(user_id: int) -> list[CurricularUnit]:
     return study_tracker_repo.get_curricular_units(user_id)
 
-def create_curricular_unit(user_id: int, name: str):
-    return study_tracker_repo.create_curricular_unit(user_id, name)
+def create_curricular_unit(user_id: int, name: str, ects: float, min_grade: float):
+    return study_tracker_repo.create_curricular_unit(user_id, name, ects, min_grade)
 
+def delete_curricular_unit(user_id: int, name: str):
+    study_tracker_repo.delete_curricular_unit(user_id, name)
+
+def update_curricular_unit(user_id: int, old_name: str, new_name: str, ects: float, min_grade: float, target_grade: float | None):
+    study_tracker_repo.update_curricular_unit(user_id, old_name, new_name, ects, min_grade, target_grade)
+    
 def create_grade(user_id: int, curricular_unit: str, grade: Grade):
     return study_tracker_repo.create_grade(user_id, curricular_unit, grade)
 
+def update_grade_value(user_id: int, grade_id: int, new_value: float):
+    study_tracker_repo.update_grade_value(user_id, grade_id, new_value)
+    
 def delete_grade(user_id: int, curricular_unit_name: str, grade_id: int):
     return study_tracker_repo.delete_grade(user_id, curricular_unit_name, grade_id)
 

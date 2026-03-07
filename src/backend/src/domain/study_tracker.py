@@ -242,14 +242,16 @@ class Archive():
         return archives
 
 class Grade():
-    id: int | None #TODO: tirar o none
+    id: int | None
+    name: str
     value: float
     weight: float
 
-    def __init__(self,id:int | None, value: float, weight: float) -> None:
-        self.id=id
-        self.value=value
-        self.weight=weight
+    def __init__(self, id: int | None, name: str, value: float, weight: float) -> None:
+        self.id = id
+        self.name = name
+        self.value = value
+        self.weight = weight
 
     @staticmethod
     def from_STGradeModel(grade_models: list[STGradeModel]) -> list['Grade']:
@@ -257,31 +259,43 @@ class Grade():
         for grade_model in grade_models:
             grades.append(Grade(
                 id=grade_model.id,
+                name=grade_model.name or "Avaliação",
                 value=grade_model.value,
                 weight=grade_model.weight
             ))
-
         return grades
-
+    
 class CurricularUnit():
+    id: int | None
     name: str
     grades: list[Grade]
+    ects: float = 6.0
+    min_grade: float = 9.5
+    target_grade: float | None = None
 
-    def __init__(self, name: str, grades: list[Grade]) -> None:
+    def __init__(self, name: str, grades: list[Grade], ects: float = 6.0, min_grade: float = 9.5, target_grade: float | None = None, id: int | None = None) -> None:
+        self.id = id
         self.name=name
         self.grades=grades
+        self.ects=ects
+        self.min_grade=min_grade
+        self.target_grade=target_grade
 
     @staticmethod
     def from_STCurricularUnitModel(cu_models: list[STCurricularUnitModel]) -> list['CurricularUnit']:
         curricular_units: list[CurricularUnit] = []
         for cu_model in cu_models:
             curricular_units.append(CurricularUnit(
+                id=cu_model.id if hasattr(cu_model, 'id') else None,
                 name=cu_model.name,
-                grades=Grade.from_STGradeModel(cu_model.grades)
+                grades=Grade.from_STGradeModel(cu_model.grades),
+                ects=cu_model.ects,
+                min_grade=cu_model.min_grade,
+                target_grade=cu_model.target_grade
             ))
 
         return curricular_units
-
+    
 class DailyEnergyStatus():
     date_: date
     time_of_day: str

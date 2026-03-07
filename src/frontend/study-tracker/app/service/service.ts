@@ -733,12 +733,17 @@ async function updateFileContent(
 
 export type Grade = {
   id: number;
+  name: string;
   value: number;
   weight: number;
 };
 
 export type CurricularUnit = {
+  id: number;
   name: string;
+  ects?: number;
+  min_grade?: number;
+  target_grade?: number | null;
   grades: Grade[];
 };
 
@@ -766,34 +771,91 @@ async function getCurricularUnit(name: string): Promise<CurricularUnit> {
   return curricularUnit;
 }
 
-async function createCurricularUnit(name: string) {
+async function createCurricularUnit(
+  name: string,
+  ects: number = 6,
+  min_grade: number = 9.5,
+) {
   const request = {
     path: `study-tracker/users/me/curricular-units`,
     method: "POST",
-    body: toJsonBody({ name }),
+    body: toJsonBody({ name, ects, min_grade }),
   };
   const response: Response = await doFetch(request);
   if (!response.ok)
-    return Promise.reject(
-      new Error("New Curricular Unit could not be created!"),
-    );
+    return Promise.reject(new Error("Curricular Unit could not be created!"));
+}
+
+async function deleteCurricularUnit(name: string) {
+  const safeName = encodeURIComponent(name || "undefined");
+  const request = {
+    path: `study-tracker/users/me/curricular-units/${safeName}`,
+    method: "DELETE",
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok)
+    return Promise.reject(new Error("Curricular Unit could not be deleted!"));
+}
+
+async function updateCurricularUnit(
+  oldName: string,
+  newName: string,
+  ects: number,
+  minGrade: number,
+  targetGrade: number | null,
+) {
+  const safeOldName = encodeURIComponent(oldName || "undefined");
+
+  const request = {
+    path: `study-tracker/users/me/curricular-units/${safeOldName}`,
+    method: "PUT",
+    body: toJsonBody({
+      name: newName,
+      ects: ects,
+      min_grade: minGrade,
+      target_grade: targetGrade,
+    }),
+  };
+
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    return Promise.reject(new Error("Curricular Unit could not be updated!"));
+  }
 }
 
 async function createGrade(
   curricularUnit: string,
+  name: string,
   value: number,
   weight: number,
 ) {
   const request = {
-    path: `study-tracker/users/me/curricular-units/${curricularUnit}/grades`,
+    path: `study-tracker/users/me/curricular-units/${encodeURIComponent(
+      curricularUnit,
+    )}/grades`,
     method: "POST",
-    body: toJsonBody({ value, weight }),
+    body: toJsonBody({ name, value, weight }),
   };
   const response: Response = await doFetch(request);
   if (!response.ok)
-    return Promise.reject(
-      new Error("New Curricular Unit could not be created!"),
-    );
+    return Promise.reject(new Error("New Grade could not be created!"));
+}
+
+async function updateGradeValue(
+  curricularUnitName: string,
+  gradeId: number,
+  newValue: number,
+) {
+  const request = {
+    path: `study-tracker/users/me/curricular-units/${encodeURIComponent(
+      curricularUnitName,
+    )}/grades/${gradeId}`,
+    method: "PUT",
+    body: toJsonBody({ value: newValue }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok)
+    return Promise.reject(new Error("Grade value could not be updated!"));
 }
 
 async function deleteGrade(curricularUnitName: string, gradeId: number) {
@@ -957,7 +1019,7 @@ async function getTaskDistributionStats(): Promise<TaskDistributionPerWeek[]> {
     throw new Error("Failed to fetch");
   } catch (error) {
     console.warn("⚠️ API Task Distribution falhou. A usar dados Mock.", error);
-    return MOCK_TASK_DISTRIBUTION;
+    return [];
   }
 }
 
@@ -1074,8 +1136,11 @@ export const service = {
   getCurricularUnits,
   getCurricularUnit,
   createCurricularUnit,
+  deleteCurricularUnit,
+  updateCurricularUnit,
   createGrade,
   deleteGrade,
+  updateGradeValue,
   createDailyEnergyStat,
   submitDailyTags,
   getDailyTags,

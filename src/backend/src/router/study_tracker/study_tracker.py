@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Response, Query
 
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -291,8 +291,32 @@ def create_curricular_unit(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateCurricularUnitInputDto
 ):
-    study_tracker_service.create_curricular_unit(user_id, dto.name)
-    
+    study_tracker_service.create_curricular_unit(user_id, dto.name, dto.ects, dto.min_grade)
+
+@router.delete("/users/me/curricular-units/{curricular_unit_name}")
+def delete_curricular_unit(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    curricular_unit_name: str
+) -> Response:
+    study_tracker_service.delete_curricular_unit(user_id, curricular_unit_name)
+    return Response(status_code=204)
+
+@router.put("/users/me/curricular-units/{curricular_unit_name}")
+def update_curricular_unit(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    curricular_unit_name: str,
+    dto: UpdateCurricularUnitInputDto
+) -> Response:
+    study_tracker_service.update_curricular_unit(
+        user_id=user_id,
+        old_name=curricular_unit_name,
+        new_name=dto.name,
+        ects=dto.ects,
+        min_grade=dto.min_grade,
+        target_grade=dto.target_grade
+    )
+    return Response(status_code=200)
+
 @router.post("/users/me/curricular-units/{curricular_unit}/grades")
 def create_grade(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -301,9 +325,20 @@ def create_grade(
 ):
     study_tracker_service.create_grade(user_id, curricular_unit, Grade(
         id=None,
+        name=dto.name,
         value=dto.value,
         weight=dto.weight
     ))
+
+@router.put("/users/me/curricular-units/{curricular_unit_name}/grades/{grade_id}")
+def update_grade_value(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    curricular_unit_name: str,
+    grade_id: int,
+    dto: UpdateGradeValueDto
+) -> Response:
+    study_tracker_service.update_grade_value(user_id, grade_id, dto.value)
+    return Response(status_code=200)
 
 @router.delete("/users/me/curricular-units/{curricular_unit_name}/grades/{grade_id}")
 def delete_grade(

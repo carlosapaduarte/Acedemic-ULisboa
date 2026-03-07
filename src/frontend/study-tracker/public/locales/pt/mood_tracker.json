@@ -1,0 +1,52 @@
+{
+  "log_state_of_mind": "Registo de Estado de Espírito",
+  "back": "Voltar",
+  "cancel": "Cancelar",
+  "next": "Seguinte",
+  "done": "Concluir",
+  "saving": "A guardar...",
+
+  "mood_question": "Como te estás a sentir hoje?",
+  "very_unpleasant": "Muito Desagradável",
+  "very_pleasant": "Muito Agradável",
+
+  "mood_level_1": "Muito Desagradável",
+  "mood_level_2": "Desagradável",
+  "mood_level_3": "Neutro",
+  "mood_level_4": "Agradável",
+  "mood_level_5": "Muito Agradável",
+
+  "emotions_question": "O que descreve melhor este sentimento?",
+  "show_all_emotions": "Mostrar todos",
+
+  "emotion_ansioso": "Ansioso",
+  "emotion_stressado": "Stressado",
+  "emotion_cansado": "Cansado",
+  "emotion_frustrado": "Frustrado",
+  "emotion_triste": "Triste",
+  "emotion_calmo": "Calmo",
+  "emotion_focado": "Focado",
+  "emotion_confiante": "Confiante",
+  "emotion_entusiasmado": "Entusiasmado",
+  "emotion_feliz": "Feliz",
+  "emotion_indiferente": "Indiferente",
+  "emotion_aborrecido": "Aborrecido",
+  "emotion_grato": "Grato",
+  "emotion_orgulhoso": "Orgulhoso",
+
+  "impact_question": "O que está a ter maior impacto em ti?",
+  "impact_estudo": "Estudo",
+  "impact_trabalho": "Trabalho",
+  "impact_família": "Família",
+  "impact_amigos": "Amigos",
+  "impact_saúde": "Saúde",
+  "impact_sono": "Sono",
+  "impact_dinheiro": "Dinheiro",
+  "impact_tempo": "Tempo",
+  "impact_auto_estima": "Auto-estima",
+  "impact_acontecimentos_atuais": "Acontecimentos Atuais",
+  "impact_outro": "Outro",
+
+  "mood_registered": "Estado de espírito registado!",
+  "go_dashboard": "Ir para o Painel"
+}

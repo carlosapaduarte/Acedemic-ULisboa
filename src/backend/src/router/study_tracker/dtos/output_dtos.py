@@ -142,6 +142,7 @@ class ArchiveOutputDto(BaseModel):
     
 class GradeOutputDto(BaseModel):
     id: int
+    name: str
     value: float
     weight: float
     
@@ -152,6 +153,7 @@ class GradeOutputDto(BaseModel):
         for grade in grades:
             grade_output_dtos.append(GradeOutputDto(
                 id=grade.id,
+                name=grade.name,
                 value=grade.value,
                 weight=grade.weight
             ))
@@ -159,8 +161,12 @@ class GradeOutputDto(BaseModel):
         return grade_output_dtos
     
 class CurricularUnitOutputDto(BaseModel):
+    id: int | None = None
     name: str
     grades: list[GradeOutputDto]
+    ects: float = 6.0
+    min_grade: float = 9.5
+    target_grade: float | None = None
     
     @staticmethod
     def from_curricular_units(curricular_units: list[CurricularUnit]) -> list['CurricularUnitOutputDto']:
@@ -168,8 +174,12 @@ class CurricularUnitOutputDto(BaseModel):
         
         for cu in curricular_units:
             cu_output_dtos.append(CurricularUnitOutputDto(
+                id=cu.id,
                 name=cu.name,
-                grades=GradeOutputDto.from_grades(cu.grades)
+                grades=GradeOutputDto.from_grades(cu.grades),
+                ects=cu.ects,
+                min_grade=cu.min_grade,
+                target_grade=cu.target_grade
             ))
             
         return cu_output_dtos

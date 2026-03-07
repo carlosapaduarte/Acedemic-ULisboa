@@ -661,43 +661,99 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             return CurricularUnit.from_STCurricularUnitModel(cu_models)
         
-    def create_curricular_unit(self, user_id: int, name: str):
+    def create_curricular_unit(self, user_id: int, name: str, ects: float, min_grade: float):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)
+            
+            statement = select(STCurricularUnitModel).where(
+                STCurricularUnitModel.user_id == user_id, 
+                STCurricularUnitModel.name == name
+            )
+            if session.exec(statement).first():
+                raise ValueError("UC already exists")
+                
             user_model.st_curricular_units.append(STCurricularUnitModel(
                 user_id=user_id,
                 name=name,
+                ects=ects,
+                min_grade=min_grade,
                 grades=[]
             ))
             session.add(user_model)
             session.commit()
+
+    def delete_curricular_unit(self, user_id: int, name: str):
+        with Session(engine) as session:
+            statement = select(STCurricularUnitModel).where(
+                STCurricularUnitModel.user_id == user_id,
+                STCurricularUnitModel.name == name
+            )
+            uc_to_delete = session.exec(statement).first()
             
-    def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
+            if uc_to_delete:
+                session.delete(uc_to_delete)
+                session.commit()
+
+    def update_curricular_unit(self, user_id: int, old_name: str, new_name: str, ects: float, min_grade: float, target_grade: float | None):
+        with Session(engine) as session:
+            try:
+                statement = select(STCurricularUnitModel).where(
+                    STCurricularUnitModel.user_id == user_id,
+                    STCurricularUnitModel.name == old_name
+                )
+                uc = session.exec(statement).first()
+                
+                if uc:
+                    uc.name = new_name
+                    uc.ects = ects
+                    uc.min_grade = min_grade
+                    uc.target_grade = target_grade
+                    
+                    session.add(uc)
+                    session.commit()
+            except Exception as e:
+                print("\n\n❌ ERRO GRAVE AO ATUALIZAR A UC:", str(e), "\n\n")
+                session.rollback()
+                raise e
+            
+    def create_grade(self, user_id: int, curricular_unit_name: str, grade: Grade):
         with Session(engine) as session:
             statement = select(STCurricularUnitModel)\
                 .where(STCurricularUnitModel.user_id == user_id)\
-                .where(STCurricularUnitModel.name == curricular_unit)
-            
+                .where(STCurricularUnitModel.name == curricular_unit_name)
             result = session.exec(statement)
-            
             curricular_unit_model: STCurricularUnitModel = result.one()
+            
             curricular_unit_model.grades.append(STGradeModel(
                 id=random.randint(1, 999999999), 
+                name=grade.name,
                 value=grade.value,
                 weight=grade.weight,
-                curricular_unit_name=curricular_unit,
+                curricular_unit_id=curricular_unit_model.id,
                 user_id=user_id
             ))
-            
             session.add(curricular_unit_model)
             session.commit()
-    
+
+    def update_grade_value(self, user_id: int, grade_id: int, new_value: float):
+        with Session(engine) as session:
+            statement = select(STGradeModel).where(
+                STGradeModel.id == grade_id,
+                STGradeModel.user_id == user_id
+            )
+            grade_model = session.exec(statement).first()
+            if not grade_model:
+                raise NotFoundException(f"Grade with id {grade_id} not found")
+            
+            grade_model.value = new_value
+            session.add(grade_model)
+            session.commit()
+
     def delete_grade(self, user_id: int, curricular_unit_name: str, grade_id: int):
         with Session(engine) as session:
             statement = select(STGradeModel).where(
                 STGradeModel.id == grade_id,
-                STGradeModel.user_id == user_id,
-                STGradeModel.curricular_unit_name == curricular_unit_name
+                STGradeModel.user_id == user_id
             )
             
             result = session.exec(statement)
@@ -708,7 +764,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             session.delete(grade_model_to_delete)
             session.commit()
-
+            
     def create_mood_log(self, user_id: int, value: int, label: str, emotions: list[str], impacts: list[str], date_log: datetime):
         with Session(engine) as session:
             # 1. Definir o intervalo do dia (00:00:00 até 23:59:59)

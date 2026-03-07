@@ -1,0 +1,58 @@
+{
+  "page_title": "My Curricular Units",
+  "btn_new_uc": "New Course",
+  "modal_new_uc": "New Course",
+
+  "stat_avg_title": "Current Average",
+  "stat_avg_sub": "Weighted by ECTS",
+  "stat_ects_title": "Total ECTS",
+  "stat_ects_sub": "{{count}} Enrolled Courses",
+  "stat_semester_title": "Current Semester",
+
+  "empty_title": "Academic Path",
+  "empty_desc_1": "You don't have any curricular units registered yet.",
+  "empty_desc_2": "Add your first course to start simulating your grades.",
+
+  "label_uc_name": "Course Name",
+  "placeholder_uc_name": "Ex: Mathematical Analysis II",
+  "btn_create": "Create",
+  "btn_cancel": "Cancel",
+  "btn_create_first": "Create First Course",
+
+  "label_current": "Current:",
+  "label_target": "Target:",
+  "label_target_short": "Target",
+  "label_min_grade": "Min Grade",
+
+  "insight_impossible": "With current weights, you can no longer reach your target.",
+  "insight_guaranteed": "Your target grade is already guaranteed!",
+  "insight_needed_single": "You need to score {{needed}} in the remaining component to reach your target of {{target}}.",
+  "insight_needed_general": "You need to score {{needed}} in the remaining {{weight}}% to reach your target.",
+  "insight_achieved": "You reached your target of {{target}}!",
+  "insight_failed": "Evaluations complete. You didn't reach your target.",
+  "insight_impossible_generic": "Warning: It is no longer possible to reach {{target}} with the current weights.",
+  "insight_missing_absolute": "You need {{missing}} absolute points to reach the target of {{target}}.",
+
+  "scenarios_title": "Scenarios for the remaining component ({{weight}}%):",
+  "scenario_item": "If you score {{needed}} you finish with {{finalGrade}}",
+  "scenario_impossible": "It is no longer possible to achieve a passing grade.",
+
+  "btn_lock": "Lock grade",
+  "btn_unlock": "Unlock grade",
+  "btn_delete": "Delete Component",
+  "btn_delete_uc": "Delete Course",
+  "confirm_delete_uc": "Are you sure you want to delete this course and all its evaluations?",
+  "empty_grades": "No evaluations added yet.",
+
+  "add_component_title": "Add Evaluation Component",
+  "label_component": "Component",
+  "placeholder_component": "Ex: Exam, Project...",
+  "label_weight": "Weight (%)",
+  "btn_add": "Add",
+  "default_evaluation_name": "Evaluation",
+
+  "evaluations_complete": "Evaluation methods filled",
+  "error_excessive_weight": "Excessive weight. Maximum remaining: {{max}}%",
+  "error_creating_eval": "Error creating evaluation.",
+  "error_duplicate_uc": "A course with this name already exists!"
+}
