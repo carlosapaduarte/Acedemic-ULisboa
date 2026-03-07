@@ -44,6 +44,5 @@
   "personal": "Personal",
   "study": "Study",
   "available_tasks": "Available Tasks",
-  "micro_tasks_list_title": "Lightning Tasks",
-  "show_micro_tasks": "Include lightning tasks"
+  "micro_tasks_list_title": "Lightning Tasks"
 }

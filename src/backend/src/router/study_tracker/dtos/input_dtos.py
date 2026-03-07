@@ -100,7 +100,7 @@ class CreateGradeInputDto(BaseModel):
 
 class UpdateGradeValueDto(BaseModel):
     value: float
-    
+
 class CreateMoodLogInputDto(BaseModel):
     value: int          # Painel 1 (1-5)
     label: str          # Painel 1 (Texto)
@@ -144,3 +144,7 @@ class UpdateTagInputDto(BaseModel):
 
 class MarkTutorialAsSeenInputDto(BaseModel):
     tutorial_key: str
+
+class TrackTimeInputDto(BaseModel):
+    task_ids: list[int]
+    minutes: int

@@ -388,7 +388,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             status=task_model.status,
             is_micro_task=task_model.is_micro_task,
             completed_at=task_model.completed_at,
-            sub_tasks=subtasks
+            sub_tasks=subtasks,
+            planned_minutes=task_model.planned_minutes,
+            tracked_minutes=task_model.tracked_minutes,
         )
         
     def get_tasks(
@@ -469,7 +471,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             user_id=user_id,
             parent_task_id=parent_task_id,
             is_micro_task=task.is_micro_task,
-            parent_user_id=user_id if parent_task_id else None
+            parent_user_id=user_id if parent_task_id else None,
+            planned_minutes=task.planned_minutes,
+            tracked_minutes=task.tracked_minutes
         )
         session.add(new_task_model)
         session.flush()
@@ -594,6 +598,19 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(task_model)
             session.commit()
             
+    def increment_task_tracked_time(self, user_id: int, task_ids: list[int], minutes: int):
+        with Session(engine) as session:
+            for tid in task_ids:
+                statement = select(STTaskModel).where(
+                    STTaskModel.id == tid, 
+                    STTaskModel.user_id == user_id
+                )
+                task = session.exec(statement).first()
+                if task:
+                    task.tracked_minutes += minutes
+                    session.add(task)
+            session.commit()
+
     def create_archive(self, user_id: int, name: str):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)

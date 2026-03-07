@@ -465,6 +465,8 @@ export type TaskData = {
   status: string;
   is_micro_task: boolean;
   completed_at?: string;
+  planned_minutes: number;
+  tracked_minutes: number;
 };
 
 function requestBody(newTaskInfo: CreateTaskInputDto): any {
@@ -549,6 +551,8 @@ export type TaskDto = {
   is_micro_task: boolean;
   completed_at: number | undefined | null;
   subTasks: TaskDto[];
+  planned_minutes: number;
+  tracked_minutes: number;
 };
 
 function fromTaskDtoToTask(dto: TaskDto): Task {
@@ -566,6 +570,8 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
       completed_at: dto.completed_at
         ? new Date(dto.completed_at * 1000).toISOString()
         : undefined,
+      planned_minutes: dto.planned_minutes || 0,
+      tracked_minutes: dto.tracked_minutes || 0,
     },
     subTasks,
   };
@@ -1151,6 +1157,7 @@ export const service = {
   startStudySession,
   finishStudySession,
   markTutorialAsSeen,
+  addTrackedTime,
 
   async fetchUserTags(): Promise<Tag[]> {
     try {
@@ -1252,3 +1259,21 @@ export const service = {
 
   saveMood,
 };
+
+async function addTrackedTime(taskIds: number[], minutes: number) {
+  console.log("🕵️ FRONTEND A ENVIAR:", { task_ids: taskIds, minutes: minutes });
+
+  const request = {
+    path: `study-tracker/users/me/tasks/track-time`,
+    method: "PUT",
+    body: toJsonBody({ task_ids: taskIds, minutes: minutes }),
+  };
+
+  const response: Response = await doFetch(request);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("❌ O BACKEND REJEITOU O PEDIDO:", errorText);
+    return Promise.reject(new Error("Could not add tracked time"));
+  }
+}

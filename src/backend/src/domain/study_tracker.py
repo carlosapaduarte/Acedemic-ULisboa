@@ -51,8 +51,9 @@ class Task():
             is_micro_task: bool = False,
             status: str="not_completed",
             completed_at: datetime | None = None,
-            parent_task_id: int | None = None
-
+            parent_task_id: int | None = None,
+            planned_minutes: int = 0,
+            tracked_minutes: int = 0 
     ) -> None:
         self.id=id
         self.title=title
@@ -65,12 +66,20 @@ class Task():
         self.is_micro_task = is_micro_task
         self.completed_at = completed_at
         self.parent_task_id = parent_task_id
+        self.planned_minutes = planned_minutes
+        self.tracked_minutes = tracked_minutes
 
     @staticmethod
     def from_create_task_input_dto(task_dto: CreateTaskInputDto) -> 'Task':
         sub_tasks: list['Task'] = []
         for sub_task in task_dto.subTasks:
             sub_tasks.append(Task.from_create_task_input_dto(sub_task))
+            
+        planned = 0
+        if task_dto.slotsToWork:
+            for slot in task_dto.slotsToWork:
+                planned += int((slot.endTime - slot.startTime) / 60)
+
         return Task(
             id=None,
             title=task_dto.title,
@@ -81,9 +90,11 @@ class Task():
             status=task_dto.status,
             sub_tasks=sub_tasks,
             is_micro_task=task_dto.is_micro_task,
-            parent_task_id=task_dto.parent_task_id
+            parent_task_id=task_dto.parent_task_id,
+            planned_minutes=planned,
+            tracked_minutes=0
         )
-
+    
 class UnavailableScheduleBlock():
     def __init__(self, week_day: int, start_hour: int, duration: int):
         self.week_day=week_day

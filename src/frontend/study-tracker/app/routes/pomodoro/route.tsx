@@ -60,7 +60,11 @@ export let handle = {
   i18n: ["task", "study"],
 };
 
-function useTimerSetup(onSessionEnd: () => void) {
+function useTimerSetup(
+  onSessionEnd: (mins: number) => void,
+  activeBlock: Event | undefined,
+  onDismissBlock: () => void,
+) {
   const setError = useSetGlobalError();
   const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(
     undefined,
@@ -71,10 +75,19 @@ function useTimerSetup(onSessionEnd: () => void) {
   const [timerStopDate, setTimerStopDate] = useState<Date | undefined>(
     undefined,
   );
-
   const [motivationalMessage, setMotivationalMessage] = useState<string | null>(
     null,
   );
+
+  // 1. Guardar a hora exata em que o utilizador começou a estudar (Cronómetro Inteligente)
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+
+  // Se houver um Evento do Calendário a acontecer, começa logo a contar!
+  useEffect(() => {
+    if (activeBlock && !sessionStartTime) {
+      setSessionStartTime(new Date());
+    }
+  }, [activeBlock]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -88,7 +101,7 @@ function useTimerSetup(onSessionEnd: () => void) {
     if (motivationalMessage) {
       const timer = setTimeout(() => {
         setMotivationalMessage(null);
-      }, 30000); // 30000ms = 30 segundos
+      }, 30000);
       return () => clearTimeout(timer);
     }
   }, [motivationalMessage]);
@@ -97,9 +110,9 @@ function useTimerSetup(onSessionEnd: () => void) {
     setStudyStopDate(studyStopDate);
     setPauseStopDate(pauseStopDate);
     setTimerStopDate(studyStopDate);
+    setSessionStartTime(new Date()); // Começa o relógio!
     setMotivationalMessage(null);
 
-    // Autoplay Hack
     if (audioRef.current) {
       audioRef.current.volume = 0;
       audioRef.current
@@ -114,11 +127,26 @@ function useTimerSetup(onSessionEnd: () => void) {
     service.startStudySession().catch((error) => setError(error));
   }
 
+  function getElapsedMinutes() {
+    if (!sessionStartTime) return 0;
+    const diffMs = new Date().getTime() - sessionStartTime.getTime();
+    const mins = Math.round(diffMs / 60000);
+    return Math.max(1, mins);
+  }
+
   function onStopClick() {
+    const elapsed = getElapsedMinutes();
     service.finishStudySession().catch((error) => setError(error));
-    onSessionEnd();
+
+    onSessionEnd(elapsed);
+
     setTimerStopDate(undefined);
+    setSessionStartTime(null);
     setMotivationalMessage(null);
+
+    if (activeBlock) {
+      onDismissBlock();
+    }
 
     if (audioRef.current) {
       audioRef.current.pause();
@@ -133,9 +161,11 @@ function useTimerSetup(onSessionEnd: () => void) {
     }
 
     if (timerStopDate === studyStopDate) {
-      // --- INÍCIO DA PAUSA ---
-      onSessionEnd();
+      const elapsed = getElapsedMinutes();
+      onSessionEnd(elapsed);
+
       setTimerStopDate(pauseStopDate);
+      setSessionStartTime(null); // Pausa não conta
 
       const randomMsg =
         MOTIVATIONAL_MESSAGES[
@@ -145,11 +175,14 @@ function useTimerSetup(onSessionEnd: () => void) {
     } else {
       // --- FIM DA PAUSA ---
       setTimerStopDate(undefined);
+      setSessionStartTime(null);
       setMotivationalMessage(null);
+      if (activeBlock) onDismissBlock();
     }
   }
 
   function markTimerStart() {
+    if (!sessionStartTime) setSessionStartTime(new Date());
     service.startStudySession().catch((error) => setError(error));
   }
 
@@ -165,7 +198,7 @@ function useTimerSetup(onSessionEnd: () => void) {
 }
 
 function useAssociatedTasks(showMicroTasks: boolean) {
-  const { t } = useTranslation("task");
+  const { t } = useTranslation("study");
   const { tasks: availableTasks, refreshTasks } = useTaskList(true);
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
 
@@ -201,14 +234,7 @@ function useAssociatedTasks(showMicroTasks: boolean) {
       service.updateTaskStatus(id, "completed"),
     );
 
-    return Promise.all(tasksToComplete)
-      .then(() => {
-        refreshTasks();
-        setSelectedTaskIds([]);
-      })
-      .catch((err) => {
-        console.error("Erro ao completar tarefas", err);
-      });
+    return Promise.all(tasksToComplete);
   }
 
   return {
@@ -277,7 +303,7 @@ function AssociatedTaskListView({
   onToggleMicroTasks: () => void;
   isReadOnly?: boolean;
 }) {
-  const { t } = useTranslation(["task"]);
+  const { t } = useTranslation(["study"]);
 
   if (isReadOnly) {
     const allTasks = [...tasksForToday, ...otherTasks];
@@ -288,7 +314,7 @@ function AssociatedTaskListView({
     return (
       <div className={`${styles.taskListContainer} tutorial-target-tasks-list`}>
         <h2 className={styles.taskListTitle}>
-          {t("task:tasks_in_progress", "Tarefas em Curso")}
+          {t("study:tasks_in_progress", "Tarefas em Curso")}
         </h2>
         {selectedTasks.length > 0 ? (
           <TaskList
@@ -301,7 +327,7 @@ function AssociatedTaskListView({
           />
         ) : (
           <p className={styles.noEventsText}>
-            {t("task:no_task_selected", "Nenhuma tarefa selecionada.")}
+            {t("study:no_task_selected", "Nenhuma tarefa selecionada.")}
           </p>
         )}
       </div>
@@ -316,7 +342,7 @@ function AssociatedTaskListView({
           onClick={onToggleMicroTasks}
           className={styles.modalCheckbox}
         />
-        {t("task:show_micro_tasks", "Incluir tarefas relâmpago")}
+        {t("study:show_micro_tasks", "Incluir tarefas relâmpago")}
       </label>
 
       <h3 className={styles.instructionTitle}>
@@ -324,7 +350,7 @@ function AssociatedTaskListView({
       </h3>
 
       <h2 className={styles.taskListTitle}>
-        {t("task:tasks_for_today", "Prazo para Hoje")}
+        {t("study:tasks_for_today", "Prazo para Hoje")}
       </h2>
       <TaskList
         tasks={tasksForToday}
@@ -336,7 +362,7 @@ function AssociatedTaskListView({
       />
 
       <h2 className={classNames(styles.taskListTitle, styles.otherTasksTitle)}>
-        {t("task:other_tasks", "Outras Tarefas")}
+        {t("study:other_tasks", "Outras Tarefas")}
       </h2>
       <TaskList
         tasks={otherTasks}
@@ -350,6 +376,13 @@ function AssociatedTaskListView({
   );
 }
 
+function formatTime(minutes: number) {
+  if (minutes < 60) return `${minutes}m`;
+  const h = Math.floor(minutes / 60);
+  const m = Math.round(minutes % 60);
+  return m > 0 ? `${h}h${m}m` : `${h}h`;
+}
+
 function ConfirmationModalContent({
   tasks,
   onCancel,
@@ -359,11 +392,19 @@ function ConfirmationModalContent({
   onCancel: () => void;
   onConfirm: (completedTaskIds: number[]) => void;
 }) {
-  const { t } = useTranslation(["task"]);
+  const { t } = useTranslation(["study", "task"]);
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
 
   useEffect(() => {
-    setCheckedIds(tasks.map((task) => task.id));
+    const preChecked = tasks
+      .filter((t) => {
+        const planned = t.data.planned_minutes || 0;
+        const tracked = t.data.tracked_minutes || 0;
+        return planned === 0 || tracked >= planned;
+      })
+      .map((t) => t.id);
+
+    setCheckedIds(preChecked);
   }, [tasks]);
 
   function handleToggle(taskId: number) {
@@ -377,33 +418,76 @@ function ConfirmationModalContent({
   return (
     <Dialog className={styles.pomodoroDialog}>
       <h3 className={styles.modalTitle}>
-        {t("task:pomodoro_complete_title", "Sessão Terminada")}
+        {t("study:pomodoro_complete_title", "Sessão Terminada")}
       </h3>
       <p>
-        {t("task:pomodoro_multi_q", "Quais das seguintes tarefas concluíste?")}
+        {t("study:pomodoro_multi_q", "Quais das seguintes tarefas concluíste?")}
       </p>
+
       <div className={styles.modalTaskList}>
-        {tasks.map((task) => (
-          <label key={task.id} className={styles.modalTaskItem}>
-            <TaskCheckbox
-              checked={checkedIds.includes(task.id)}
-              onClick={() => handleToggle(task.id)}
-              className={styles.modalCheckbox}
-            />
-            {task.data.title}
-          </label>
-        ))}
+        {tasks.map((task) => {
+          const planned = task.data.planned_minutes || 0;
+          const tracked = task.data.tracked_minutes || 0;
+
+          let subtitle = "";
+          let isExhausted = false;
+
+          if (planned > 0) {
+            if (tracked >= planned) {
+              subtitle = `⚠️ ${t(
+                "study:task_time_exhausted",
+                "Tempo esgotado! Já terminaste?",
+              )}`;
+              isExhausted = true;
+            } else {
+              subtitle = `⏱️ ${t("study:task_time_progress", {
+                tracked: formatTime(tracked),
+                planned: formatTime(planned),
+              })}`;
+            }
+          }
+
+          return (
+            <label
+              key={task.id}
+              className={styles.modalTaskItem}
+              style={{ alignItems: "flex-start" }}
+            >
+              <TaskCheckbox
+                checked={checkedIds.includes(task.id)}
+                onClick={() => handleToggle(task.id)}
+                className={styles.modalCheckbox}
+              />
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span style={{ fontWeight: isExhausted ? "bold" : "normal" }}>
+                  {task.data.title}
+                </span>
+                {subtitle && (
+                  <span
+                    style={{
+                      fontSize: "0.85rem",
+                      color: isExhausted ? "#EF5350" : "var(--color-3)",
+                      opacity: 0.8,
+                    }}
+                  >
+                    {subtitle}
+                  </span>
+                )}
+              </div>
+            </label>
+          );
+        })}
       </div>
+
       <div className={styles.modalButtonContainer}>
         <Button className={styles.modalButtonSecondary} onPress={onCancel}>
-          {t("task:cancel", "Cancelar")}
+          {t("study:cancel", "Cancelar")}
         </Button>
         <Button
           className={styles.modalButtonPrimary}
-          style={{ color: "var(--text-color-2)" }}
           onPress={() => onConfirm(checkedIds)}
         >
-          {t("task:confirm", "Confirmar")}
+          {t("study:confirm", "Confirmar")}
         </Button>
       </div>
     </Dialog>
@@ -508,7 +592,7 @@ function TodayEventsList({
       </h2>
       {isLoading ? (
         <p className={styles.noEventsText}>
-          {t("task:loading", "A carregar...")}
+          {t("study:loading", "A carregar...")}
         </p>
       ) : (
         renderList(todayEvents)
@@ -518,7 +602,7 @@ function TodayEventsList({
       </h2>
       {isLoading ? (
         <p className={styles.noEventsText}>
-          {t("task:loading", "A carregar...")}
+          {t("study:loading", "A carregar...")}
         </p>
       ) : (
         renderList(futureEvents)
@@ -653,6 +737,15 @@ function PomodoroPage() {
   >();
   const [isLoadingBlock, setIsLoadingBlock] = useState(true);
 
+  // NOVO: Permite ao utilizador ignorar um bloco de estudo de calendário se carregar em "Parar"
+  const [dismissedBlockId, setDismissedBlockId] = useState<number | null>(null);
+
+  // O bloco que domina o ecrã, desde que não tenha sido "dispensado"
+  const activeBlock =
+    happeningStudyBlock?.id === dismissedBlockId
+      ? undefined
+      : happeningStudyBlock;
+
   useEffect(() => {
     service
       .fetchUserTags()
@@ -660,23 +753,46 @@ function PomodoroPage() {
       .catch((err) => console.error("Erro ao carregar tags para cores:", err));
   }, []);
 
-  const openConfirmationModal = () => {
-    if (selectedTaskIds.length > 0) {
+  const openConfirmationModal = (minutesCompleted: number) => {
+    if (selectedTaskIds.length > 0 && minutesCompleted > 0) {
+      service
+        .addTrackedTime(selectedTaskIds, minutesCompleted)
+        .then(() => console.log("✅ Serviço respondeu com sucesso!"))
+        .catch((e) => console.error("❌ Erro no serviço:", e));
+
       const allTasks = [...tasksForToday, ...otherTasks];
-      const selected = allTasks.filter((t) => selectedTaskIds.includes(t.id));
+      const selected = allTasks
+        .filter((t) => selectedTaskIds.includes(t.id))
+        .map((t) => ({
+          ...t,
+          data: {
+            ...t.data,
+            tracked_minutes: (t.data.tracked_minutes || 0) + minutesCompleted,
+          },
+        }));
+
       setTasksToConfirm(selected);
       setIsConfirmModalOpen(true);
+    } else {
+      console.log(
+        "⚠️ Modal não vai guardar tempo porque as tarefas estão vazias ou o tempo é 0.",
+      );
     }
   };
 
   const handleConfirmCompletion = (completedTaskIds: number[]) => {
     setIsConfirmModalOpen(false);
     if (completedTaskIds.length === 0) {
+      refreshTasks();
       setSelectedTaskIds([]);
       return;
     }
+
     completeSelectedTasks(completedTaskIds)
-      .then(() => {})
+      .then(() => {
+        refreshTasks();
+        setSelectedTaskIds([]);
+      })
       .catch((err) => {
         console.error("Erro ao completar tarefas", err);
         refreshTasks();
@@ -692,7 +808,11 @@ function PomodoroPage() {
     onTimerFinish,
     markTimerStart,
     motivationalMessage,
-  } = useTimerSetup(openConfirmationModal);
+  } = useTimerSetup(
+    openConfirmationModal,
+    activeBlock,
+    () => happeningStudyBlock && setDismissedBlockId(happeningStudyBlock.id),
+  );
 
   useEffect(() => {
     service
@@ -718,10 +838,10 @@ function PomodoroPage() {
           />
         </div>
 
-        {timerStopDate || happeningStudyBlock ? (
+        {timerStopDate || activeBlock ? (
           <div style={{ position: "relative" }}>
             <TimerView
-              happeningStudyBlock={happeningStudyBlock}
+              happeningStudyBlock={activeBlock}
               timerStopDate={timerStopDate}
               studyStopDate={studyStopDate}
               onStopClick={onStopClick}
@@ -750,7 +870,7 @@ function PomodoroPage() {
             onTaskClick={toggleTaskSelection}
             showMicroTasks={showMicroTasks}
             onToggleMicroTasks={() => setShowMicroTasks((prev) => !prev)}
-            isReadOnly={!!(timerStopDate || happeningStudyBlock)}
+            isReadOnly={!!(timerStopDate || activeBlock)}
           />
         </div>
       </div>
@@ -763,7 +883,11 @@ function PomodoroPage() {
       >
         <ConfirmationModalContent
           tasks={tasksToConfirm}
-          onCancel={() => setIsConfirmModalOpen(false)}
+          onCancel={() => {
+            setIsConfirmModalOpen(false);
+            refreshTasks();
+            setSelectedTaskIds([]);
+          }}
           onConfirm={handleConfirmCompletion}
         />
       </Modal>

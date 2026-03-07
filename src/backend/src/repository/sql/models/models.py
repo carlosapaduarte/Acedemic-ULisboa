@@ -185,6 +185,8 @@ class STTaskModel(SQLModel, table=True):
     status: str
     is_micro_task: bool = Field(default=False, nullable=False)
     completed_at: datetime | None = Field(default=None, nullable=True)
+    planned_minutes: int = Field(default=0, nullable=False)
+    tracked_minutes: int = Field(default=0, nullable=False)
 
     user: "UserModel" = Relationship(back_populates="st_tasks")
 

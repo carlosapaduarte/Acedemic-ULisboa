@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Response, Query
 
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, TrackTimeInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -30,6 +30,18 @@ def create_task(
     )
     task = study_tracker_service.get_user_task(user_id, task_id)
     return UserTaskOutputDto.from_Task(task)
+
+@router.put("/users/me/tasks/track-time")
+def track_task_time(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    dto: TrackTimeInputDto
+) -> Response:
+    study_tracker_service.study_tracker_repo.increment_task_tracked_time(
+        user_id, 
+        dto.task_ids, 
+        dto.minutes
+    )
+    return Response(status_code=200)
 
 @router.put("/users/me/tasks/{task_id}")
 def update_task(
@@ -363,6 +375,7 @@ def get_mood_logs(
     
     mood_logs = study_tracker_service.get_mood_logs(user_id)
     return MoodLogOutputDto.from_domain(mood_logs)
+
 @router.post("/users/me/statistics/daily-tags")
 def create_daily_tags(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -375,9 +388,6 @@ def get_daily_tags(
     user_id: Annotated[int, Depends(get_current_user_id)]
 ) -> list[str]:
     return study_tracker_service.get_daily_tags(user_id)
-    
-
-
 @router.get("/users/me/statistics/time-by-event-tag")
 def get_task_time_distribution(
     user_id: Annotated[int, Depends(get_current_user_id)]

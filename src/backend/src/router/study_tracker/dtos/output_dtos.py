@@ -32,6 +32,8 @@ class UserTaskOutputDto(BaseModel):
     is_micro_task: bool
     completed_at: float | None = None
     subTasks: list['UserTaskOutputDto']
+    planned_minutes: int = 0
+    tracked_minutes: int = 0
     
     @staticmethod
     def from_Tasks(tasks: list[Task]) -> list['UserTaskOutputDto']:
@@ -61,6 +63,8 @@ class UserTaskOutputDto(BaseModel):
             is_micro_task=task.is_micro_task,
             completed_at=get_datetime_utc(task.completed_at) if hasattr(task, 'completed_at') and task.completed_at is not None else None,
             subTasks=sub_tasks_output_dto,
+            planned_minutes=task.planned_minutes,
+            tracked_minutes=task.tracked_minutes
         )
 
 UserTaskOutputDto.update_forward_refs()
