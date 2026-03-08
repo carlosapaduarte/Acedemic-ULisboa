@@ -10,11 +10,36 @@ interface MoodStepProps {
 }
 
 const MOOD_LEVELS = [
-  { value: 1, label: "Muito Desagradável", color: "#6e67cf", icon: "😫" },
-  { value: 2, label: "Desagradável", color: "#8a84e2", icon: "🙁" },
-  { value: 3, label: "Neutro", color: "#aeb3be", icon: "😐" },
-  { value: 4, label: "Agradável", color: "#66cdaa", icon: "🙂" },
-  { value: 5, label: "Muito Agradável", color: "#ffa500", icon: "😄" },
+  {
+    value: 1,
+    label: "Muito Desagradável",
+    color: "#6e67cf",
+    icon: "./icons/MoodTracker/energy_very_bad_icon.png",
+  },
+  {
+    value: 2,
+    label: "Desagradável",
+    color: "#8a84e2",
+    icon: "./icons/MoodTracker/energy_bad_icon.png",
+  },
+  {
+    value: 3,
+    label: "Neutro",
+    color: "#aeb3be",
+    icon: "./icons/MoodTracker/energy_container_title_icon.png",
+  },
+  {
+    value: 4,
+    label: "Agradável",
+    color: "#66cdaa",
+    icon: "./icons/MoodTracker/energy_well_icon.png",
+  },
+  {
+    value: 5,
+    label: "Muito Agradável",
+    color: "#ffa500",
+    icon: "./icons/MoodTracker/energy_very_well_icon.png",
+  },
 ];
 
 const EMOTIONS_LIST = [
@@ -45,6 +70,7 @@ const IMPACT_LIST = [
   "Tempo",
   "Auto-estima",
   "Acontecimentos Atuais",
+  "Outro",
 ];
 
 const QUOTES = [
@@ -65,7 +91,7 @@ const QUOTES = [
 ];
 
 export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
-  const { t } = useTranslation(["home"]);
+  const { t } = useTranslation(["mood_tracker"]);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
   const [moodValue, setMoodValue] = useState(3);
@@ -73,12 +99,43 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
   const [selectedImpacts, setSelectedImpacts] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
+  const [showAllEmotions, setShowAllEmotions] = useState(false);
+
   const randomQuote = useMemo(() => {
     return QUOTES[Math.floor(Math.random() * QUOTES.length)];
   }, []);
 
   const currentMood =
     MOOD_LEVELS.find((m) => m.value === moodValue) || MOOD_LEVELS[2];
+
+  const filteredEmotions = useMemo(() => {
+    if (showAllEmotions || moodValue === 3) return EMOTIONS_LIST;
+
+    const isPositive = moodValue > 3;
+    const positiveEmotions = [
+      "Calmo",
+      "Focado",
+      "Confiante",
+      "Entusiasmado",
+      "Feliz",
+      "Grato",
+      "Orgulhoso",
+    ];
+    const negativeEmotions = [
+      "Ansioso",
+      "Stressado",
+      "Cansado",
+      "Frustrado",
+      "Triste",
+      "Aborrecido",
+    ];
+
+    return EMOTIONS_LIST.filter((emotion) => {
+      if (isPositive)
+        return positiveEmotions.includes(emotion) || emotion === "Indiferente";
+      return negativeEmotions.includes(emotion) || emotion === "Indiferente";
+    });
+  }, [moodValue, showAllEmotions]);
 
   const handleNext = async () => {
     if (step < 3) {
@@ -101,7 +158,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
   const toggleSelection = (
     item: string,
     list: string[],
-    setList: React.Dispatch<React.SetStateAction<string[]>>
+    setList: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     if (list.includes(item)) setList(list.filter((i) => i !== item));
     else setList([...list, item]);
@@ -117,9 +174,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
         impacts: selectedImpacts,
         date: new Date(),
       };
-
       await service.saveMood(payload);
-
       setStep(4);
     } catch (error) {
       console.error("Erro ao guardar mood:", error);
@@ -135,25 +190,27 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
         <div style={{ width: 80 }}>
           {step > 1 && (
             <button className={styles.navButton} onClick={handleBack}>
-              <FaChevronLeft /> {t("home:back", "Voltar")}
+              <FaChevronLeft /> {t("mood_tracker:back")}
             </button>
           )}
         </div>
-        <span className={styles.navTitle}>Log State of Mind</span>
+        <span className={styles.navTitle}>
+          {t("mood_tracker:log_state_of_mind")}
+        </span>
         <div style={{ width: 80, display: "flex", justifyContent: "flex-end" }}>
           <button
             className={styles.navButton}
             onClick={onClose}
             style={{ fontWeight: 600 }}
           >
-            {t("home:cancel", "Cancelar")}
+            {t("mood_tracker:cancel")}
           </button>
         </div>
       </div>
     );
   };
 
-  // --- 1: SLIDER ---
+  const formatKey = (str: string) => str.toLowerCase().replace(/[\s-]/g, "_");
 
   if (step === 1) {
     return (
@@ -161,26 +218,34 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
         <div className={styles.sheetContainer}>
           {renderNavBar()}
           <div className={styles.content}>
-            <h2 className={styles.title}>
-              {t("home:mood_question", "Como te estás a sentir hoje?")}
-            </h2>
+            <h2 className={styles.title}>{t("mood_tracker:mood_question")}</h2>
             <div
               className={styles.moodVisual}
               style={{
                 backgroundColor: currentMood.color,
                 boxShadow: `0 0 40px ${currentMood.color}60`,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "15px",
               }}
             >
-              {currentMood.icon}
+              <img
+                src={currentMood.icon}
+                alt={t(`mood_tracker:mood_level_${currentMood.value}`)}
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
             </div>
-            <h3 className={styles.subtitle}>{currentMood.label}</h3>
+            <h3 className={styles.subtitle}>
+              {t(`mood_tracker:mood_level_${currentMood.value}`)}
+            </h3>
             <div className={styles.sliderContainer}>
               <div
                 className={styles.sliderLabels}
                 style={{ marginBottom: "10px" }}
               >
-                <span>{t("home:very_unpleasant", "Muito Desagradável")}</span>
-                <span>{t("home:very_pleasant", "Muito Agradável")}</span>
+                <span>{t("mood_tracker:very_unpleasant")}</span>
+                <span>{t("mood_tracker:very_pleasant")}</span>
               </div>
               <input
                 type="range"
@@ -195,7 +260,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
             </div>
             <div className={styles.footer}>
               <button className={styles.primaryButton} onClick={handleNext}>
-                {t("home:next", "Seguinte")}
+                {t("mood_tracker:next")}
               </button>
             </div>
           </div>
@@ -204,7 +269,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
     );
   }
 
-  // --- 2: EMOTIONS ---
   if (step === 2) {
     return (
       <div className={styles.overlay}>
@@ -217,28 +281,36 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 style={{
                   width: 60,
                   height: 60,
-                  fontSize: "1.5rem",
                   margin: "0 auto 1rem",
                   backgroundColor: currentMood.color,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "8px",
                 }}
               >
-                {currentMood.icon}
+                <img
+                  src={currentMood.icon}
+                  alt={t(`mood_tracker:mood_level_${currentMood.value}`)}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                />
               </div>
               <h3
                 className={styles.subtitle}
                 style={{ marginBottom: "0.5rem" }}
               >
-                {currentMood.label}
+                {t(`mood_tracker:mood_level_${currentMood.value}`)}
               </h3>
               <p style={{ fontWeight: 600, color: "#555" }}>
-                {t(
-                  "home:emotions_question",
-                  "O que descreve melhor este sentimento?"
-                )}
+                {t("mood_tracker:emotions_question")}
               </p>
             </div>
             <div className={styles.tagsGrid}>
-              {EMOTIONS_LIST.map((emotion) => (
+              {filteredEmotions.map((emotion) => (
                 <button
                   key={emotion}
                   className={styles.tagButton}
@@ -247,17 +319,36 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                     toggleSelection(
                       emotion,
                       selectedEmotions,
-                      setSelectedEmotions
+                      setSelectedEmotions,
                     )
                   }
                 >
-                  {emotion}
+                  {t(`mood_tracker:emotion_${formatKey(emotion)}`)}
                 </button>
               ))}
             </div>
+
+            {!showAllEmotions && moodValue !== 3 && (
+              <div style={{ textAlign: "center", marginTop: "1rem" }}>
+                <button
+                  onClick={() => setShowAllEmotions(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--color-2)",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                  }}
+                >
+                  {t("mood_tracker:show_all_emotions")}
+                </button>
+              </div>
+            )}
+
             <div className={styles.footer}>
               <button className={styles.primaryButton} onClick={handleNext}>
-                {t("home:next", "Seguinte")}
+                {t("mood_tracker:next")}
               </button>
             </div>
           </div>
@@ -266,7 +357,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
     );
   }
 
-  // --- 3: IMPACTS ---
   if (step === 3) {
     return (
       <div className={styles.overlay}>
@@ -279,24 +369,32 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 style={{
                   width: 60,
                   height: 60,
-                  fontSize: "1.5rem",
                   margin: "0 auto 1rem",
                   backgroundColor: currentMood.color,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "8px",
                 }}
               >
-                {currentMood.icon}
+                <img
+                  src={currentMood.icon}
+                  alt={t(`mood_tracker:mood_level_${currentMood.value}`)}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                />
               </div>
               <h3
                 className={styles.subtitle}
                 style={{ marginBottom: "0.5rem" }}
               >
-                {currentMood.label}
+                {t(`mood_tracker:mood_level_${currentMood.value}`)}
               </h3>
               <p style={{ fontWeight: 600, color: "#555" }}>
-                {t(
-                  "home:impact_question",
-                  "O que está a ter maior impacto em ti?"
-                )}
+                {t("mood_tracker:impact_question")}
               </p>
             </div>
             <div className={styles.tagsGrid}>
@@ -309,7 +407,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                     toggleSelection(impact, selectedImpacts, setSelectedImpacts)
                   }
                 >
-                  {impact}
+                  {t(`mood_tracker:impact_${formatKey(impact)}`)}
                 </button>
               ))}
             </div>
@@ -319,7 +417,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 onClick={handleNext}
                 disabled={saving}
               >
-                {saving ? "A guardar..." : t("home:done", "Concluir")}
+                {saving ? t("mood_tracker:saving") : t("mood_tracker:done")}
               </button>
             </div>
           </div>
@@ -328,7 +426,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
     );
   }
 
-  // --- 4: SUCCESS ---
   if (step === 4) {
     return (
       <div className={styles.overlay}>
@@ -344,7 +441,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
               className={styles.title}
               style={{ fontSize: "1.5rem", marginBottom: "2rem" }}
             >
-              {t("home:mood_registered", "Mood de hoje registado!")}
+              {t("mood_tracker:mood_registered")}
             </h2>
 
             <div className={styles.quoteContainer}>
@@ -354,7 +451,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
 
             <div className={styles.footer} style={{ marginTop: "3rem" }}>
               <button className={styles.primaryButton} onClick={onComplete}>
-                {t("home:go_dashboard", "Ir para a Dashboard")}
+                {t("mood_tracker:go_dashboard")}
               </button>
             </div>
           </div>

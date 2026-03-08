@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Response, Query
 
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, TrackTimeInputDto, UpdateArchiveInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -30,6 +30,18 @@ def create_task(
     )
     task = study_tracker_service.get_user_task(user_id, task_id)
     return UserTaskOutputDto.from_Task(task)
+
+@router.put("/users/me/tasks/track-time")
+def track_task_time(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    dto: TrackTimeInputDto
+) -> Response:
+    study_tracker_service.study_tracker_repo.increment_task_tracked_time(
+        user_id, 
+        dto.task_ids, 
+        dto.minutes
+    )
+    return Response(status_code=200)
 
 @router.put("/users/me/tasks/{task_id}")
 def update_task(
@@ -248,37 +260,72 @@ def mark_tutorial_as_seen(
 ):
     study_tracker_service.mark_tutorial_as_seen(user_id, dto.tutorial_key)
 
+@router.get("/users/me/archives")
+def get_archives(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) -> list[ArchiveOutputDto]:
+    archives = study_tracker_service.get_archives(user_id)
+    return ArchiveOutputDto.from_archives(archives)
+
 @router.post("/users/me/archives")
 def create_archive(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateArchiveInputDto
 ):
-    study_tracker_service.create_archive(user_id, dto.name)
+    try:
+        study_tracker_service.create_archive(user_id, dto.name, dto.parent_archive_id)
+        return Response(status_code=201)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     
-@router.get("/users/me/archives")
-def get_archives(
-    user_id: Annotated[int, Depends(get_current_user_id)]
-) ->  list[ArchiveOutputDto]:
-    archives = study_tracker_service.get_archives(user_id)
-    return ArchiveOutputDto.from_archives(archives)
+@router.put("/users/me/archives/{archive_id}")
+def update_archive(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    archive_id: int,
+    dto: UpdateArchiveInputDto
+):
+    study_tracker_service.update_archive(user_id, archive_id, dto.name)
+    return Response(status_code=200)
 
-@router.post("/users/me/archives/{archive_name}")
+@router.delete("/users/me/archives/{archive_id}")
+def delete_archive(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    archive_id: int
+):
+    study_tracker_service.delete_archive(user_id, archive_id)
+    return Response(status_code=204)
+
+@router.post("/users/me/files")
 def create_file(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    archive_name: str,
     dto: CreateFileInputDto
 ):
-    study_tracker_service.create_file(user_id, archive_name, dto.name)
+    study_tracker_service.create_file(
+        user_id=user_id, 
+        archive_id=dto.archive_id, 
+        name=dto.name, 
+        file_type=dto.file_type, 
+        text_content=dto.text_content
+    )
+    return Response(status_code=201)
     
-@router.put("/users/me/archives/{archive_name}/files/{filename}")
+@router.put("/users/me/files/{file_id}")
 def update_file_content(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    archive_name: str,
-    filename: str,
+    file_id: int,
     dto: UpdateFileInputDto
 ):
-    study_tracker_service.update_file_content(user_id, archive_name, filename, dto.content)
-    
+    study_tracker_service.update_file(user_id, file_id, dto.name, dto.content)
+    return Response(status_code=200)
+
+@router.delete("/users/me/files/{file_id}")
+def delete_file(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    file_id: int
+):
+    study_tracker_service.delete_file(user_id, file_id)
+    return Response(status_code=204)
+
 @router.get("/users/me/curricular-units")
 def get_curricular_units(
     user_id: Annotated[int, Depends(get_current_user_id)]
@@ -291,8 +338,32 @@ def create_curricular_unit(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateCurricularUnitInputDto
 ):
-    study_tracker_service.create_curricular_unit(user_id, dto.name)
-    
+    study_tracker_service.create_curricular_unit(user_id, dto.name, dto.ects, dto.min_grade)
+
+@router.delete("/users/me/curricular-units/{curricular_unit_name}")
+def delete_curricular_unit(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    curricular_unit_name: str
+) -> Response:
+    study_tracker_service.delete_curricular_unit(user_id, curricular_unit_name)
+    return Response(status_code=204)
+
+@router.put("/users/me/curricular-units/{curricular_unit_name}")
+def update_curricular_unit(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    curricular_unit_name: str,
+    dto: UpdateCurricularUnitInputDto
+) -> Response:
+    study_tracker_service.update_curricular_unit(
+        user_id=user_id,
+        old_name=curricular_unit_name,
+        new_name=dto.name,
+        ects=dto.ects,
+        min_grade=dto.min_grade,
+        target_grade=dto.target_grade
+    )
+    return Response(status_code=200)
+
 @router.post("/users/me/curricular-units/{curricular_unit}/grades")
 def create_grade(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -301,9 +372,20 @@ def create_grade(
 ):
     study_tracker_service.create_grade(user_id, curricular_unit, Grade(
         id=None,
+        name=dto.name,
         value=dto.value,
         weight=dto.weight
     ))
+
+@router.put("/users/me/curricular-units/{curricular_unit_name}/grades/{grade_id}")
+def update_grade_value(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    curricular_unit_name: str,
+    grade_id: int,
+    dto: UpdateGradeValueDto
+) -> Response:
+    study_tracker_service.update_grade_value(user_id, grade_id, dto.value)
+    return Response(status_code=200)
 
 @router.delete("/users/me/curricular-units/{curricular_unit_name}/grades/{grade_id}")
 def delete_grade(
@@ -328,6 +410,7 @@ def get_mood_logs(
     
     mood_logs = study_tracker_service.get_mood_logs(user_id)
     return MoodLogOutputDto.from_domain(mood_logs)
+
 @router.post("/users/me/statistics/daily-tags")
 def create_daily_tags(
     user_id: Annotated[int, Depends(get_current_user_id)],
@@ -340,9 +423,6 @@ def get_daily_tags(
     user_id: Annotated[int, Depends(get_current_user_id)]
 ) -> list[str]:
     return study_tracker_service.get_daily_tags(user_id)
-    
-
-
 @router.get("/users/me/statistics/time-by-event-tag")
 def get_task_time_distribution(
     user_id: Annotated[int, Depends(get_current_user_id)]

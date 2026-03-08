@@ -36,18 +36,24 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                     className={dropdownStyles.Content}
                     sideOffset={5}
                 >
-                    <DropdownMenu.Item className={dropdownStyles.Item}>
-                        <a
-                            href="/settings"
-                            className={classNames(styles.settingsButton)}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                navigate("/settings");
-                            }}
-                        >
-                            Definições
-                        </a>
-                    </DropdownMenu.Item>
+                    {isLoggedIn && (
+                        <DropdownMenu.Item className={dropdownStyles.Item}>
+                            <a
+                                href="/settings"
+                                className={classNames(styles.settingsButton)}
+                                style={{
+                                    textDecoration: "none",
+                                    color: "inherit",
+                                }}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate("/settings");
+                                }}
+                            >
+                                Definições
+                            </a>
+                        </DropdownMenu.Item>
+                    )}
 
                     <DropdownMenu.Item className={dropdownStyles.Item}>
                         <a
@@ -63,7 +69,7 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
 
                     <DropdownMenu.Item className={dropdownStyles.Item}>
                         <a
-                            href="mailto:fc58620@alunos.ciencias.ulisboa.pt?subject=Suporte%20Acedemic%20Challenge"
+                            href="mailto:ateixeira@lasige.di.fc.ul.pt?subject=Suporte%20Acedemic%20Challenge"
                             style={{
                                 display: "flex",
                                 alignItems: "center",

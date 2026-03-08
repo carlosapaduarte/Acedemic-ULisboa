@@ -24,38 +24,6 @@
   margin: 0;
 }
 
-/* WIDGET DE ARMAZENAMENTO */
-.storageWidget {
-  background: white;
-  padding: 0.8rem 1.2rem;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  width: 220px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
-}
-
-.storageInfo {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 6px;
-}
-
-.progressBarBg {
-  height: 6px;
-  background: #eee;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progressBarFill {
-  height: 100%;
-  background: linear-gradient(90deg, #3399ff, #66b3ff);
-  border-radius: 3px;
-}
-
 .searchBar {
   background: white;
   padding: 0.4rem 1rem;
@@ -367,4 +335,40 @@
   padding: 3rem;
   text-align: center;
   color: #aaa;
+}
+
+/* Ajustes para ecrãs pequenos (Telemóveis) */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 1rem;
+  }
+
+  .gridContainer {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+
+  .folderCard {
+    padding: 1rem;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .searchBar {
+    width: 100%;
+  }
+
+  .modalContent {
+    width: 95% !important;
+    padding: 1rem !important;
+  }
+
+  .fileSizeCell {
+    display: none;
+  }
 }

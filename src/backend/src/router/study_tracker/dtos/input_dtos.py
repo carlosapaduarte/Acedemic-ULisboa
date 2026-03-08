@@ -75,20 +75,40 @@ class UpdateTaskStatus(BaseModel):
     
 class CreateArchiveInputDto(BaseModel):
     name: str
+    parent_archive_id: Optional[int] = None
+
+class UpdateArchiveInputDto(BaseModel):
+    name: str
     
 class CreateFileInputDto(BaseModel):
     name: str
+    archive_id: int
+    file_type: str = "txt"
+    text_content: str = ""
     
 class UpdateFileInputDto(BaseModel):
-    content: str
-    
+    name: Optional[str] = None
+    content: Optional[str] = None
+
 class CreateCurricularUnitInputDto(BaseModel):
     name: str
-    
+    ects: float = 6.0
+    min_grade: float = 9.5
+
+class UpdateCurricularUnitInputDto(BaseModel):
+    name: str
+    ects: float
+    min_grade: float
+    target_grade: Optional[float] = None
+     
 class CreateGradeInputDto(BaseModel):
+    name: str
     value: float
     weight: float
-    
+
+class UpdateGradeValueDto(BaseModel):
+    value: float
+
 class CreateMoodLogInputDto(BaseModel):
     value: int          # Painel 1 (1-5)
     label: str          # Painel 1 (Texto)
@@ -132,3 +152,7 @@ class UpdateTagInputDto(BaseModel):
 
 class MarkTutorialAsSeenInputDto(BaseModel):
     tutorial_key: str
+
+class TrackTimeInputDto(BaseModel):
+    task_ids: list[int]
+    minutes: int

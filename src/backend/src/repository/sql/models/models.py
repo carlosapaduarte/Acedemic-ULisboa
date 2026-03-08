@@ -185,6 +185,8 @@ class STTaskModel(SQLModel, table=True):
     status: str
     is_micro_task: bool = Field(default=False, nullable=False)
     completed_at: datetime | None = Field(default=None, nullable=True)
+    planned_minutes: int = Field(default=0, nullable=False)
+    tracked_minutes: int = Field(default=0, nullable=False)
 
     user: "UserModel" = Relationship(back_populates="st_tasks")
 
@@ -284,45 +286,88 @@ class STScheduleBlockNotAvailableModel(SQLModel, table=True):
 
 class STArchiveModel(SQLModel, table=True):
     __tablename__ = "st_archive"
-    name: str = Field(primary_key=True, default=None)
-    files: list["STFileModel"] = Relationship(back_populates="archive")
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    
+    user_id: int = Field(foreign_key="user.id", index=True)
     user: UserModel = Relationship(back_populates="st_archives")
+    
+    # Referência para a pasta pai
+    parent_archive_id: Optional[int] = Field(default=None, foreign_key="st_archive.id")
+    
+    # Relação: Uma pasta pode ter várias subpastas
+    sub_archives: List["STArchiveModel"] = Relationship(
+        back_populates="parent_archive",
+        sa_relationship_kwargs=dict(cascade="all, delete-orphan")
+    )
+    
+    # Relação: Quem é a pasta pai desta pasta?
+    parent_archive: Optional["STArchiveModel"] = Relationship(
+        back_populates="sub_archives",
+        sa_relationship_kwargs=dict(remote_side="STArchiveModel.id")
+    )
+    
+    files: List["STFileModel"] = Relationship(
+        back_populates="archive",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    
+    __table_args__ = (
+        # Um utilizador não pode ter duas pastas com o mesmo nome DENTRO da mesma pasta
+        UniqueConstraint('name', 'user_id', 'parent_archive_id', name='uq_archive_name_per_folder'),
+    )
+
 
 class STFileModel(SQLModel, table=True):
     __tablename__ = "st_file"
-    name: str = Field(primary_key=True)
-    text: dict = Field(default={}, sa_column=SAColumn(JSONB))
-    archive_name: str = Field(primary_key=True)
-    user_id: int = Field(primary_key=True)
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['archive_name', 'user_id'],
-            ['st_archive.name', 'st_archive.user_id']
-        ),
-    )
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    
+    text: str = Field(default="")
+    file_type: str = Field(default="txt") # Pode ser 'txt', 'pdf', etc.
+    
+    archive_id: int = Field(foreign_key="st_archive.id", index=True)
+    user_id: int = Field(foreign_key="user.id")
+
     archive: "STArchiveModel" = Relationship(back_populates="files")
+    
+    __table_args__ = (
+        UniqueConstraint('name', 'archive_id', name='uq_file_name_per_folder'),
+    )
 
 class STCurricularUnitModel(SQLModel, table=True):
     __tablename__ = "st_curricular_unit"
-    name: str = Field(primary_key=True, default=None)
-    grades: list["STGradeModel"] = Relationship(back_populates="curricular_unit")
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    ects: float = Field(default=6.0)
+    min_grade: float = Field(default=9.5)
+    target_grade: Optional[float] = Field(default=None)
+    
+    user_id: int = Field(foreign_key="user.id")
     user: UserModel = Relationship(back_populates="st_curricular_units")
+    
+    grades: list["STGradeModel"] = Relationship(
+        back_populates="curricular_unit",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"} # Apaga nota se apagar a UC
+    )
+
+    # Garante que um utilizador não pode ter duas UCs com o mesmo nome
+    __table_args__ = (
+        UniqueConstraint('name', 'user_id', name='uq_uc_name_per_user'),
+    )
 
 class STGradeModel(SQLModel, table=True):
     __tablename__ = "st_grade"
-    id: int = Field(primary_key=True)
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: Optional[str] = Field(default="Avaliação") 
     value: float
     weight: float
-    curricular_unit_name: str = Field(primary_key=True)
-    user_id: int = Field(primary_key=True)
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['curricular_unit_name', 'user_id'],
-            ['st_curricular_unit.name', 'st_curricular_unit.user_id']
-        ),
-    )
+    user_id: int = Field(foreign_key="user.id")
+    
+    curricular_unit_id: int = Field(foreign_key="st_curricular_unit.id")
     curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")
 
 class WeekStudyTimeModel(SQLModel, table=True):

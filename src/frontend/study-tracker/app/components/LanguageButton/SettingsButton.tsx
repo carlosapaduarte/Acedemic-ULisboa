@@ -42,23 +42,25 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
             </a>
           </DropdownMenu.Item>
 
-          <DropdownMenu.Item
-            className={dropdownStyles.Item}
-            onSelect={() => navigate("/settings")}
-            style={{
-              cursor: "pointer",
-              display: "flex",
-              gap: "8px",
-              alignItems: "center",
-            }}
-          >
-            <RiEqualizerLine />
-            <span>Definições</span>
-          </DropdownMenu.Item>
+          {isLoggedIn && (
+            <DropdownMenu.Item className={dropdownStyles.Item}>
+              <a
+                href="/settings"
+                className={classNames(styles.settingsButton)}
+                style={{ textDecoration: "none", color: "inherit" }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/settings");
+                }}
+              >
+                Definições
+              </a>
+            </DropdownMenu.Item>
+          )}
 
           <DropdownMenu.Item className={dropdownStyles.Item}>
             <a
-              href="mailto:fc58620@alunos.ciencias.ulisboa.pt?subject=Suporte%20Study%20Tracker"
+              href="mailto:ateixeira@lasige.di.fc.ul.pt?subject=Suporte%20Study%20Tracker"
               style={{
                 display: "flex",
                 alignItems: "center",

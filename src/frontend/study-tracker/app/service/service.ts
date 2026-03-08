@@ -17,6 +17,22 @@ export interface Tag {
   is_uc: boolean;
 }
 
+export type FileItem = {
+  id: number;
+  name: string;
+  text: string;
+  file_type: string;
+  archive_id: number;
+};
+
+export type ArchiveItem = {
+  id: number;
+  name: string;
+  parent_archive_id: number | null;
+  files: FileItem[];
+  sub_archives: ArchiveItem[];
+};
+
 export type AuthErrorType =
   | "USERNAME_ALREADY_EXISTS"
   | "INVALID_USERNAME_OR_PASSWORD"
@@ -51,10 +67,6 @@ export class AuthError extends Error {
   }
 }
 
-/**
- * Makes an API request, using credentials, to create a JWT token, which
- * should be used on sub-sequenced calls, as an authorization mechanism.
- */
 async function login(username: string, password: string) {
   const formData = new FormData();
   formData.append("username", username);
@@ -146,7 +158,6 @@ async function selectAvatar(avatarFilename: string) {
     return Promise.reject(new Error("Avatar selection failed!"));
 }
 
-// User info
 export type UserInfo = {
   id: number;
   username: string;
@@ -465,6 +476,8 @@ export type TaskData = {
   status: string;
   is_micro_task: boolean;
   completed_at?: string;
+  planned_minutes: number;
+  tracked_minutes: number;
 };
 
 function requestBody(newTaskInfo: CreateTaskInputDto): any {
@@ -549,6 +562,8 @@ export type TaskDto = {
   is_micro_task: boolean;
   completed_at: number | undefined | null;
   subTasks: TaskDto[];
+  planned_minutes: number;
+  tracked_minutes: number;
 };
 
 function fromTaskDtoToTask(dto: TaskDto): Task {
@@ -566,6 +581,8 @@ function fromTaskDtoToTask(dto: TaskDto): Task {
       completed_at: dto.completed_at
         ? new Date(dto.completed_at * 1000).toISOString()
         : undefined,
+      planned_minutes: dto.planned_minutes || 0,
+      tracked_minutes: dto.tracked_minutes || 0,
     },
     subTasks,
   };
@@ -651,94 +668,116 @@ async function deleteTask(taskId: number): Promise<void> {
   }
 }
 
-async function createArchive(name: string) {
-  const request = {
-    path: `study-tracker/users/me/archives`,
-    method: "POST",
-    body: toJsonBody({ name }),
-  };
+async function getArchives(): Promise<ArchiveItem[]> {
+  const request = { path: `study-tracker/users/me/archives`, method: "GET" };
   const response: Response = await doFetch(request);
-  if (!response.ok)
-    return Promise.reject(new Error("New archive could not be created!"));
+  if (response.ok) return await response.json();
+  return Promise.reject(new Error("Could not fetch archives"));
 }
 
-export type File = {
-  name: string;
-  text: any;
-};
-
-export type Archive = {
-  name: string;
-  files: File[];
-};
-
-async function getArchives(): Promise<Archive[]> {
-  const request = {
-    path: `study-tracker/users/me/archives`,
-    method: "GET",
-  };
-  const response: Response = await doFetch(request);
-  if (response.ok) {
-    const responseObject: Archive[] = await response.json();
-    return responseObject;
-  } else return Promise.reject(new Error("Archives could not be obtained!"));
-}
-
-async function getArchive(archiveName: string): Promise<Archive> {
-  const userArchives = await getArchives();
-  const archive = userArchives.find(
-    (archive: Archive) => archive.name == archiveName,
-  );
-  if (archive == undefined)
-    return Promise.reject(new Error("Archive does not exist!"));
-  return archive;
-}
-
-async function createFile(archiveName: string, name: string) {
-  const request = {
-    path: `study-tracker/users/me/archives/${archiveName}`,
-    method: "POST",
-    body: toJsonBody({ name }),
-  };
-  const response: Response = await doFetch(request);
-  if (!response.ok)
-    return Promise.reject(new Error("New file could not be created!"));
-}
-
-async function getFile(archiveName: string, filename: string): Promise<File> {
-  const userArchives = await getArchives();
-  const file = userArchives
-    .find((archive: Archive) => archive.name == archiveName)
-    ?.files.find((file: File) => file.name == filename);
-
-  if (file == undefined)
-    return Promise.reject(new Error("File does not exist!"));
-  return file;
-}
-
-async function updateFileContent(
-  archiveName: string,
+async function createArchive(
   name: string,
-  newContent: string,
-) {
+  parent_archive_id: number | null,
+): Promise<void> {
   const request = {
-    path: `study-tracker/users/me/archives/${archiveName}/files/${name}`,
+    path: `study-tracker/users/me/archives`,
+    method: "POST",
+    body: toJsonBody({ name, parent_archive_id }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    if (response.status === 409) {
+      return Promise.reject(
+        new Error(
+          errData.detail || "Já existe uma pasta com este nome neste local.",
+        ),
+      );
+    }
+    return Promise.reject(new Error(errData.detail || "Erro ao criar pasta."));
+  }
+}
+
+async function createFile(
+  archive_id: number,
+  name: string,
+  file_type: string,
+  text_content: string = "",
+): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/files`,
+    method: "POST",
+    body: toJsonBody({ archive_id, name, file_type, text_content }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    return Promise.reject(
+      new Error(errData.detail || "Erro ao criar ficheiro."),
+    );
+  }
+}
+
+async function updateFileText(file_id: number, content: string): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/files/${file_id}`,
     method: "PUT",
-    body: toJsonBody({ content: newContent }),
+    body: toJsonBody({ content }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) return Promise.reject(new Error("Could not update file"));
+}
+
+async function renameArchive(archive_id: number, name: string): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/archives/${archive_id}`,
+    method: "PUT",
+    body: toJsonBody({ name }),
   };
   const response: Response = await doFetch(request);
   if (!response.ok)
-    return Promise.reject(new Error("New file could not be created!"));
+    return Promise.reject(new Error("Could not rename archive"));
+}
+
+async function renameFile(file_id: number, name: string): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/files/${file_id}`,
+    method: "PUT",
+    body: toJsonBody({ name }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) return Promise.reject(new Error("Could not rename file"));
+}
+
+async function deleteArchive(archive_id: number): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/archives/${archive_id}`,
+    method: "DELETE",
+  };
+  await doFetch(request);
+}
+
+async function deleteFile(file_id: number): Promise<void> {
+  const request = {
+    path: `study-tracker/users/me/files/${file_id}`,
+    method: "DELETE",
+  };
+  await doFetch(request);
 }
 
 export type Grade = {
   id: number;
+  name: string;
   value: number;
   weight: number;
 };
 
 export type CurricularUnit = {
+  id: number;
   name: string;
+  ects?: number;
+  min_grade?: number;
+  target_grade?: number | null;
   grades: Grade[];
 };
 
@@ -766,34 +805,91 @@ async function getCurricularUnit(name: string): Promise<CurricularUnit> {
   return curricularUnit;
 }
 
-async function createCurricularUnit(name: string) {
+async function createCurricularUnit(
+  name: string,
+  ects: number = 6,
+  min_grade: number = 9.5,
+) {
   const request = {
     path: `study-tracker/users/me/curricular-units`,
     method: "POST",
-    body: toJsonBody({ name }),
+    body: toJsonBody({ name, ects, min_grade }),
   };
   const response: Response = await doFetch(request);
   if (!response.ok)
-    return Promise.reject(
-      new Error("New Curricular Unit could not be created!"),
-    );
+    return Promise.reject(new Error("Curricular Unit could not be created!"));
+}
+
+async function deleteCurricularUnit(name: string) {
+  const safeName = encodeURIComponent(name || "undefined");
+  const request = {
+    path: `study-tracker/users/me/curricular-units/${safeName}`,
+    method: "DELETE",
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok)
+    return Promise.reject(new Error("Curricular Unit could not be deleted!"));
+}
+
+async function updateCurricularUnit(
+  oldName: string,
+  newName: string,
+  ects: number,
+  minGrade: number,
+  targetGrade: number | null,
+) {
+  const safeOldName = encodeURIComponent(oldName || "undefined");
+
+  const request = {
+    path: `study-tracker/users/me/curricular-units/${safeOldName}`,
+    method: "PUT",
+    body: toJsonBody({
+      name: newName,
+      ects: ects,
+      min_grade: minGrade,
+      target_grade: targetGrade,
+    }),
+  };
+
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    return Promise.reject(new Error("Curricular Unit could not be updated!"));
+  }
 }
 
 async function createGrade(
   curricularUnit: string,
+  name: string,
   value: number,
   weight: number,
 ) {
   const request = {
-    path: `study-tracker/users/me/curricular-units/${curricularUnit}/grades`,
+    path: `study-tracker/users/me/curricular-units/${encodeURIComponent(
+      curricularUnit,
+    )}/grades`,
     method: "POST",
-    body: toJsonBody({ value, weight }),
+    body: toJsonBody({ name, value, weight }),
   };
   const response: Response = await doFetch(request);
   if (!response.ok)
-    return Promise.reject(
-      new Error("New Curricular Unit could not be created!"),
-    );
+    return Promise.reject(new Error("New Grade could not be created!"));
+}
+
+async function updateGradeValue(
+  curricularUnitName: string,
+  gradeId: number,
+  newValue: number,
+) {
+  const request = {
+    path: `study-tracker/users/me/curricular-units/${encodeURIComponent(
+      curricularUnitName,
+    )}/grades/${gradeId}`,
+    method: "PUT",
+    body: toJsonBody({ value: newValue }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok)
+    return Promise.reject(new Error("Grade value could not be updated!"));
 }
 
 async function deleteGrade(curricularUnitName: string, gradeId: number) {
@@ -957,7 +1053,7 @@ async function getTaskDistributionStats(): Promise<TaskDistributionPerWeek[]> {
     throw new Error("Failed to fetch");
   } catch (error) {
     console.warn("⚠️ API Task Distribution falhou. A usar dados Mock.", error);
-    return MOCK_TASK_DISTRIBUTION;
+    return [];
   }
 }
 
@@ -1041,6 +1137,22 @@ async function markTutorialAsSeen(tutorialKey: string) {
   }
 }
 
+async function addTrackedTime(taskIds: number[], minutes: number) {
+
+  const request = {
+    path: `study-tracker/users/me/tasks/track-time`,
+    method: "PUT",
+    body: toJsonBody({ task_ids: taskIds, minutes: minutes }),
+  };
+
+  const response: Response = await doFetch(request);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return Promise.reject(new Error("Could not add tracked time"));
+  }
+}
+
 export const service = {
   login,
   testTokenValidity,
@@ -1067,15 +1179,18 @@ export const service = {
   deleteTask,
   createArchive,
   getArchives,
-  getArchive,
   createFile,
-  getFile,
-  updateFileContent,
+  updateFileText,
+  deleteArchive,
+  deleteFile,
   getCurricularUnits,
   getCurricularUnit,
   createCurricularUnit,
+  deleteCurricularUnit,
+  updateCurricularUnit,
   createGrade,
   deleteGrade,
+  updateGradeValue,
   createDailyEnergyStat,
   submitDailyTags,
   getDailyTags,
@@ -1086,6 +1201,9 @@ export const service = {
   startStudySession,
   finishStudySession,
   markTutorialAsSeen,
+  addTrackedTime,
+  renameArchive,
+  renameFile,
 
   async fetchUserTags(): Promise<Tag[]> {
     try {

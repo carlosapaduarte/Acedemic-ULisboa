@@ -1,0 +1,58 @@
+{
+  "page_title": "As Minhas Unidades Curriculares",
+  "btn_new_uc": "Nova UC",
+  "modal_new_uc": "Nova UC",
+
+  "stat_avg_title": "Média Atual",
+  "stat_avg_sub": "Ponderada por ECTS",
+  "stat_ects_title": "Total ECTS",
+  "stat_ects_sub": "{{count}} UCs Inscritas",
+  "stat_semester_title": "Semestre Atual",
+
+  "empty_title": "Percurso Académico",
+  "empty_desc_1": "Ainda não tens unidades curriculares registadas.",
+  "empty_desc_2": "Adiciona a tua primeira UC para começares a simular as tuas notas.",
+
+  "label_uc_name": "Nome da Unidade Curricular",
+  "placeholder_uc_name": "Ex: Análise Matemática II",
+  "btn_create": "Criar",
+  "btn_cancel": "Cancelar",
+  "btn_create_first": "Criar Primeira UC",
+
+  "label_current": "Atual:",
+  "label_target": "Meta:",
+  "label_target_short": "Meta",
+  "label_min_grade": "Nota Mínima",
+
+  "insight_impossible": "Com os pesos atuais, já não é possível atingir a tua meta.",
+  "insight_guaranteed": "A tua meta já está garantida!",
+  "insight_needed_single": "Precisas de tirar {{needed}} na componente restante para atingir a tua meta de {{target}}.",
+  "insight_needed_general": "Precisas de tirar {{needed}} nos restantes {{weight}}% para atingir a meta.",
+  "insight_achieved": "Atingiste a tua meta de {{target}}!",
+  "insight_failed": "Avaliação concluída. Não atingiste a meta.",
+  "insight_impossible_generic": "Atenção: Já não é possível atingir {{target}} com os pesos atuais.",
+  "insight_missing_absolute": "Faltam {{missing}} valores absolutos para a meta de {{target}}.",
+
+  "scenarios_title": "Cenários para exame ({{weight}}%):",
+  "scenario_item": "Se tirares {{needed}} acabas com {{finalGrade}}",
+  "scenario_impossible": "Já não é possível atingir uma nota positiva.",
+
+  "btn_lock": "Trancar nota",
+  "btn_unlock": "Desbloquear nota",
+  "btn_delete": "Apagar Componente",
+  "btn_delete_uc": "Apagar UC",
+  "confirm_delete_uc": "Tem a certeza que deseja apagar esta UC e todas as suas avaliações?",
+  "empty_grades": "Ainda sem avaliações lançadas.",
+
+  "add_component_title": "Adicionar Componente de Avaliação",
+  "label_component": "Componente",
+  "placeholder_component": "Ex: Exame, Projeto...",
+  "label_weight": "Peso (%)",
+  "btn_add": "Adicionar",
+  "default_evaluation_name": "Avaliação",
+
+  "evaluations_complete": "Métodos de avaliação preenchidos",
+  "error_excessive_weight": "Peso excessivo. Máximo restante: {{max}}%",
+  "error_creating_eval": "Erro ao criar avaliação.",
+  "error_duplicate_uc": "Já existe uma UC com este nome!"
+}

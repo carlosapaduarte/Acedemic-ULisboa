@@ -32,6 +32,8 @@ class UserTaskOutputDto(BaseModel):
     is_micro_task: bool
     completed_at: float | None = None
     subTasks: list['UserTaskOutputDto']
+    planned_minutes: int = 0
+    tracked_minutes: int = 0
     
     @staticmethod
     def from_Tasks(tasks: list[Task]) -> list['UserTaskOutputDto']:
@@ -61,6 +63,8 @@ class UserTaskOutputDto(BaseModel):
             is_micro_task=task.is_micro_task,
             completed_at=get_datetime_utc(task.completed_at) if hasattr(task, 'completed_at') and task.completed_at is not None else None,
             subTasks=sub_tasks_output_dto,
+            planned_minutes=task.planned_minutes,
+            tracked_minutes=task.tracked_minutes
         )
 
 UserTaskOutputDto.update_forward_refs()
@@ -109,24 +113,31 @@ class EventOutputDto(BaseModel):
         return output_dtos_events
     
 class FileOutputDto(BaseModel):
+    id: int
     name: str
     text: str
+    file_type: str
+    archive_id: int
     
     @staticmethod
     def from_files(files: list[File]) -> list['FileOutputDto']:
         file_output_dtos: list['FileOutputDto'] = []
-        
         for file in files:
             file_output_dtos.append(FileOutputDto(
+                id=file.id,
                 name=file.name,
-                text=file.text
+                text=file.text,
+                file_type=file.file_type,
+                archive_id=file.archive_id
             ))
-            
         return file_output_dtos
     
 class ArchiveOutputDto(BaseModel):
+    id: int
     name: str
+    parent_archive_id: Optional[int]
     files: list[FileOutputDto]
+    sub_archives: list['ArchiveOutputDto']
     
     @staticmethod
     def from_archives(archives: list[Archive]) -> list['ArchiveOutputDto']:
@@ -134,14 +145,18 @@ class ArchiveOutputDto(BaseModel):
         
         for archive in archives:
             archive_output_dtos.append(ArchiveOutputDto(
+                id=archive.id,
                 name=archive.name,
-                files=FileOutputDto.from_files(archive.files)
+                parent_archive_id=archive.parent_archive_id,
+                files=FileOutputDto.from_files(archive.files),
+                sub_archives=ArchiveOutputDto.from_archives(archive.sub_archives)
             ))
             
         return archive_output_dtos
     
 class GradeOutputDto(BaseModel):
     id: int
+    name: str
     value: float
     weight: float
     
@@ -152,6 +167,7 @@ class GradeOutputDto(BaseModel):
         for grade in grades:
             grade_output_dtos.append(GradeOutputDto(
                 id=grade.id,
+                name=grade.name,
                 value=grade.value,
                 weight=grade.weight
             ))
@@ -159,8 +175,12 @@ class GradeOutputDto(BaseModel):
         return grade_output_dtos
     
 class CurricularUnitOutputDto(BaseModel):
+    id: int | None = None
     name: str
     grades: list[GradeOutputDto]
+    ects: float = 6.0
+    min_grade: float = 9.5
+    target_grade: float | None = None
     
     @staticmethod
     def from_curricular_units(curricular_units: list[CurricularUnit]) -> list['CurricularUnitOutputDto']:
@@ -168,8 +188,12 @@ class CurricularUnitOutputDto(BaseModel):
         
         for cu in curricular_units:
             cu_output_dtos.append(CurricularUnitOutputDto(
+                id=cu.id,
                 name=cu.name,
-                grades=GradeOutputDto.from_grades(cu.grades)
+                grades=GradeOutputDto.from_grades(cu.grades),
+                ects=cu.ects,
+                min_grade=cu.min_grade,
+                target_grade=cu.target_grade
             ))
             
         return cu_output_dtos

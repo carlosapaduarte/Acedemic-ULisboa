@@ -42,28 +42,6 @@ const QUOTES = [
   { text: "Foca-te no progresso, não na perfeição.", author: "Bill Phillips" },
 ];
 
-// --- DADOS FALSOS PARA A DEMO (MOCK DATA) ---
-const DEMO_RECENT_NOTES = [
-  {
-    id: 101,
-    uc: "Gestão de Projetos",
-    date: new Date(),
-    title: "Resumo Cap. 4 - Planeamento",
-  },
-  {
-    id: 102,
-    uc: "Sistemas Distribuídos",
-    date: new Date(Date.now() - 86400000),
-    title: "Apontamentos Aula Prática",
-  },
-  {
-    id: 103,
-    uc: "Programação Web",
-    date: new Date(Date.now() - 172800000),
-    title: "Estudo para o Exame",
-  },
-];
-
 function useHomePage() {
   const [isMoodLogged, setIsMoodLogged] = useState<boolean>(false);
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
@@ -77,7 +55,7 @@ function useHomePage() {
   const [pomoBreak, setPomoBreak] = useState(5);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // --- FUNÇÃO PARA CALCULAR CONTRASTE (PRETO vs BRANCO) ---
+  // --- FUNÇÃO PARA CALCULAR CONTRASTE ---
   const getContrastColor = (hexColor: string) => {
     if (!hexColor || !hexColor.startsWith("#")) {
       const match = hexColor.match(/#[a-fA-F0-9]{6}/);
@@ -86,15 +64,11 @@ function useHomePage() {
     }
 
     const hex = hexColor.replace("#", "");
-    // Converter para RGB
     const r = parseInt(hex.substr(0, 2), 16);
     const g = parseInt(hex.substr(2, 2), 16);
     const b = parseInt(hex.substr(4, 2), 16);
 
-    // Fórmula de brilho YIQ
     const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-
-    // Se for escuro (< 128), retorna branco. Se for claro, retorna preto/cinza escuro
     return yiq >= 128 ? "#000000" : "#ffffff";
   };
 
@@ -104,12 +78,10 @@ function useHomePage() {
     const eventColorUpper = event.color ? event.color.toUpperCase() : null;
     const fallbackUpper = FALLBACK_COLOR.toUpperCase();
 
-    // 1. Cor Direta
     if (eventColorUpper && eventColorUpper !== fallbackUpper) {
       return { background: event.color };
     }
 
-    // 2. Cor das Tags
     if (event.tags && event.tags.length > 0 && allTags.length > 0) {
       const tagColors = event.tags
         .map((tagRef: any) => {
@@ -167,7 +139,15 @@ function useHomePage() {
           service.fetchUserTags().catch(() => []),
         ]);
 
-        setRecentNotes(DEMO_RECENT_NOTES);
+        // --- LÓGICA DAS NOTAS RECENTES (ÚLTIMOS 3 ABERTOS) ---
+        try {
+          const stored = localStorage.getItem("recent_notes");
+          if (stored) {
+            setRecentNotes(JSON.parse(stored));
+          }
+        } catch (e) {
+          console.error("Erro ao carregar notas recentes:", e);
+        }
 
         const now = new Date();
 
@@ -515,10 +495,7 @@ export default function HomePage() {
                   className={styles.agendaItem}
                   style={{
                     ...ev.eventStyle,
-
-                    // Cor do Texto Geral (Titulo)
                     color: ev.textColor,
-
                     borderLeft: "none",
                     marginBottom: "8px",
                     flexShrink: 0,
@@ -611,7 +588,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 5. APONTAMENTOS */}
         <div
           className={styles.card}
           onClick={() => navigate("/notes")}
@@ -632,7 +608,8 @@ export default function HomePage() {
                   style={{ justifyContent: "space-between", cursor: "pointer" }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate("/notes");
+                    // Redireciona para as notas passando o ID do ficheiro no URL
+                    navigate(`/notes?openFile=${note.id}`);
                   }}
                 >
                   <div
@@ -651,7 +628,7 @@ export default function HomePage() {
                         overflow: "hidden",
                       }}
                     >
-                      {note.uc}
+                      📝 {note.fileName}
                     </span>
                     <span
                       style={{
@@ -662,7 +639,7 @@ export default function HomePage() {
                         overflow: "hidden",
                       }}
                     >
-                      {note.title}
+                      Pasta: {note.folderName}
                     </span>
                   </div>
                 </div>
@@ -677,7 +654,7 @@ export default function HomePage() {
                   color: "#888",
                 }}
               >
-                Sem apontamentos recentes.
+                Ainda não abriste nenhum apontamento.
               </div>
             )}
           </div>

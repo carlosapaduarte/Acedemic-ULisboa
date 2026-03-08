@@ -51,8 +51,9 @@ class Task():
             is_micro_task: bool = False,
             status: str="not_completed",
             completed_at: datetime | None = None,
-            parent_task_id: int | None = None
-
+            parent_task_id: int | None = None,
+            planned_minutes: int = 0,
+            tracked_minutes: int = 0 
     ) -> None:
         self.id=id
         self.title=title
@@ -65,12 +66,20 @@ class Task():
         self.is_micro_task = is_micro_task
         self.completed_at = completed_at
         self.parent_task_id = parent_task_id
+        self.planned_minutes = planned_minutes
+        self.tracked_minutes = tracked_minutes
 
     @staticmethod
     def from_create_task_input_dto(task_dto: CreateTaskInputDto) -> 'Task':
         sub_tasks: list['Task'] = []
         for sub_task in task_dto.subTasks:
             sub_tasks.append(Task.from_create_task_input_dto(sub_task))
+            
+        planned = 0
+        if task_dto.slotsToWork:
+            for slot in task_dto.slotsToWork:
+                planned += int((slot.endTime - slot.startTime) / 60)
+
         return Task(
             id=None,
             title=task_dto.title,
@@ -81,9 +90,11 @@ class Task():
             status=task_dto.status,
             sub_tasks=sub_tasks,
             is_micro_task=task_dto.is_micro_task,
-            parent_task_id=task_dto.parent_task_id
+            parent_task_id=task_dto.parent_task_id,
+            planned_minutes=planned,
+            tracked_minutes=0
         )
-
+    
 class UnavailableScheduleBlock():
     def __init__(self, week_day: int, start_hour: int, duration: int):
         self.week_day=week_day
@@ -210,46 +221,60 @@ class Event():
         return domain_events
 
 class File():
-    def __init__(self, name: str, text: str):
-        self.name=name
-        self.text=text
+    def __init__(self, id: int | None, name: str, text: str, file_type: str, archive_id: int):
+        self.id = id
+        self.name = name
+        self.text = text
+        self.file_type = file_type
+        self.archive_id = archive_id
 
     @staticmethod
     def from_STFileModel(file_models: list[STFileModel]) -> list['File']:
         files: list[File] = []
         for file_model in file_models:
             files.append(File(
+                id=file_model.id,
                 name=file_model.name,
-                text=file_model.text
+                text=file_model.text,
+                file_type=file_model.file_type,
+                archive_id=file_model.archive_id
             ))
-
         return files
 
+
 class Archive():
-    def __init__(self, name: str, files: list[File]):
-        self.name=name
-        self.files=files
+    def __init__(self, id: int | None, name: str, files: list[File], sub_archives: list['Archive'], parent_archive_id: int | None):
+        self.id = id
+        self.name = name
+        self.files = files
+        self.sub_archives = sub_archives
+        self.parent_archive_id = parent_archive_id
 
     @staticmethod
     def from_STArchiveModel(archive_models: list[STArchiveModel]) -> list['Archive']:
         archives: list[Archive] = []
         for archive_model in archive_models:
             archives.append(Archive(
+                id=archive_model.id,
                 name=archive_model.name,
-                files=File.from_STFileModel(archive_model.files)
+                files=File.from_STFileModel(archive_model.files),
+                # A função chama-se a si mesma para ler as subpastas infinitamente
+                sub_archives=Archive.from_STArchiveModel(archive_model.sub_archives),
+                parent_archive_id=archive_model.parent_archive_id
             ))
-
         return archives
-
+    
 class Grade():
-    id: int | None #TODO: tirar o none
+    id: int | None
+    name: str
     value: float
     weight: float
 
-    def __init__(self,id:int | None, value: float, weight: float) -> None:
-        self.id=id
-        self.value=value
-        self.weight=weight
+    def __init__(self, id: int | None, name: str, value: float, weight: float) -> None:
+        self.id = id
+        self.name = name
+        self.value = value
+        self.weight = weight
 
     @staticmethod
     def from_STGradeModel(grade_models: list[STGradeModel]) -> list['Grade']:
@@ -257,31 +282,43 @@ class Grade():
         for grade_model in grade_models:
             grades.append(Grade(
                 id=grade_model.id,
+                name=grade_model.name or "Avaliação",
                 value=grade_model.value,
                 weight=grade_model.weight
             ))
-
         return grades
-
+    
 class CurricularUnit():
+    id: int | None
     name: str
     grades: list[Grade]
+    ects: float = 6.0
+    min_grade: float = 9.5
+    target_grade: float | None = None
 
-    def __init__(self, name: str, grades: list[Grade]) -> None:
+    def __init__(self, name: str, grades: list[Grade], ects: float = 6.0, min_grade: float = 9.5, target_grade: float | None = None, id: int | None = None) -> None:
+        self.id = id
         self.name=name
         self.grades=grades
+        self.ects=ects
+        self.min_grade=min_grade
+        self.target_grade=target_grade
 
     @staticmethod
     def from_STCurricularUnitModel(cu_models: list[STCurricularUnitModel]) -> list['CurricularUnit']:
         curricular_units: list[CurricularUnit] = []
         for cu_model in cu_models:
             curricular_units.append(CurricularUnit(
+                id=cu_model.id if hasattr(cu_model, 'id') else None,
                 name=cu_model.name,
-                grades=Grade.from_STGradeModel(cu_model.grades)
+                grades=Grade.from_STGradeModel(cu_model.grades),
+                ects=cu_model.ects,
+                min_grade=cu_model.min_grade,
+                target_grade=cu_model.target_grade
             ))
 
         return curricular_units
-
+    
 class DailyEnergyStatus():
     date_: date
     time_of_day: str

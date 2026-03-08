@@ -1,10 +1,11 @@
 import random
+import json
 from sqlmodel import Session, select, or_
 from domain.study_tracker import Archive, MoodLog, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, SlotToWork, DateInterval
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STMoodLogModel, STMoodLogModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
+from repository.sql.models.models import STMoodLogModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
 from datetime import datetime, date, timedelta, timezone
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from sqlalchemy.orm import selectinload
@@ -201,7 +202,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             statement = select(STEventModel)\
                 .where(STEventModel.user_id == user_id)\
                 .where(STEventModel.title == title)  
-            print(title)  
             result = session.exec(statement)            
             events_models = result.all()
             for event in events_models:
@@ -266,7 +266,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
             for event in results:
                 should_add = False
-                rejection_reason = ""
                 
                 # 1. Filtro "Hoje" (Dashboard)
                 if filter_today:
@@ -279,13 +278,10 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                         should_add = True
                     elif is_today:
                         should_add = True
-                    else:
-                        rejection_reason = "Não é hoje nem dia da recorrência"
 
                     if should_add and event.recurrence_end:
                         if event.recurrence_end < now:
                              should_add = False
-                             rejection_reason = f"Recorrência expirou em {event.recurrence_end}"
 
                 # 2. Filtro por Semana (Calendário)
                 elif week_number is not None:
@@ -303,8 +299,6 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                         
                         if started_already and not_ended:
                             should_add = True
-                        else:
-                            rejection_reason = f"Recorrente fora do intervalo (StartWeek: {event_start_week}, EndWeek: {event.recurrence_end})"
 
                     # B. Evento Recorrente (Diário)
                     elif event.every_day:
@@ -315,22 +309,15 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     else:
                         if event_start_week == week_number:
                             should_add = True
-                        else:
-                            rejection_reason = f"Semana incorreta (Evento: {event_start_week} vs Pedido: {week_number})"
                 
                 else:
                     should_add = True
 
                 if should_add:
                     events_to_return.append(event)
-                else:
-                    pass
 
             if study_events:
-                count_before = len(events_to_return)
                 events_to_return = [e for e in events_to_return if StudyTrackerSqlRepo.is_study_event(e)]
-                if len(events_to_return) < count_before:
-                    print(f"2. Filtro Study Events removeu {count_before - len(events_to_return)} eventos.")
 
             return Event.from_STEventModel(events_to_return)
 
@@ -388,7 +375,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             status=task_model.status,
             is_micro_task=task_model.is_micro_task,
             completed_at=task_model.completed_at,
-            sub_tasks=subtasks
+            sub_tasks=subtasks,
+            planned_minutes=task_model.planned_minutes,
+            tracked_minutes=task_model.tracked_minutes,
         )
         
     def get_tasks(
@@ -469,7 +458,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             user_id=user_id,
             parent_task_id=parent_task_id,
             is_micro_task=task.is_micro_task,
-            parent_user_id=user_id if parent_task_id else None
+            parent_user_id=user_id if parent_task_id else None,
+            planned_minutes=task.planned_minutes,
+            tracked_minutes=task.tracked_minutes
         )
         session.add(new_task_model)
         session.flush()
@@ -594,63 +585,118 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(task_model)
             session.commit()
             
-    def create_archive(self, user_id: int, name: str):
+    def increment_task_tracked_time(self, user_id: int, task_ids: list[int], minutes: int):
         with Session(engine) as session:
-            user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)
-            user_model.st_archives.append(STArchiveModel(
-                name=name,
-                user_id=user_id
-            ))
+            for tid in task_ids:
+                statement = select(STTaskModel).where(
+                    STTaskModel.id == tid, 
+                    STTaskModel.user_id == user_id
+                )
+                task = session.exec(statement).first()
+                if task:
+                    task.tracked_minutes += minutes
+                    session.add(task)
+            session.commit()
 
-            session.add(user_model)
+    def create_archive(self, user_id: int, name: str, parent_archive_id: int | None = None):
+        with Session(engine) as session:
+            user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session, user_id)
+            
+            statement = select(STArchiveModel).where(
+                STArchiveModel.user_id == user_id,
+                STArchiveModel.name == name,
+                STArchiveModel.parent_archive_id == parent_archive_id
+            )
+            if session.exec(statement).first():
+                raise ValueError("Já existe uma pasta com este nome neste local.")
+
+            new_archive = STArchiveModel(
+                name=name,
+                user_id=user_id,
+                parent_archive_id=parent_archive_id
+            )
+            session.add(new_archive)
             session.commit()
             
+    def update_archive(self, user_id: int, archive_id: int, new_name: str):
+        with Session(engine) as session:
+            statement = select(STArchiveModel).where(STArchiveModel.id == archive_id, STArchiveModel.user_id == user_id)
+            archive = session.exec(statement).first()
+            if not archive:
+                raise NotFoundException("Pasta não encontrada.")
+            archive.name = new_name
+            session.add(archive)
+            session.commit()
+
+    def delete_archive(self, user_id: int, archive_id: int):
+        with Session(engine) as session:
+            statement = select(STArchiveModel).where(STArchiveModel.id == archive_id, STArchiveModel.user_id == user_id)
+            archive = session.exec(statement).first()
+            if archive:
+                session.delete(archive)
+                session.commit()
+
     def get_archives(self, user_id: int) -> list[Archive]:
         with Session(engine) as session:
-            statement = select(STArchiveModel)\
-                .where(STArchiveModel.user_id == user_id)
+            statement = select(STArchiveModel).where(
+                STArchiveModel.user_id == user_id,
+                STArchiveModel.parent_archive_id == None
+            )
             result = session.exec(statement)
             archive_models: list[STArchiveModel] = list(result.all())
             return Archive.from_STArchiveModel(archive_models)
         
-    def create_file(self, user_id: int, archive_name: str, name: str, text_content: str = ""):
+    def create_file(self, user_id: int, archive_id: int, name: str, file_type: str = "txt", text_content: str = ""):
         from service.gamification import core as gamification_service
-        
         with Session(engine) as session:
-            statement = select(STArchiveModel)\
-                .where(STArchiveModel.user_id == user_id)\
-                .where(STArchiveModel.name == archive_name)
-            result = session.exec(statement)
-            archive_model = result.one()            
+            statement = select(STArchiveModel).where(
+                STArchiveModel.user_id == user_id,
+                STArchiveModel.id == archive_id
+            )
+            archive_model = session.exec(statement).first()
+            if not archive_model:
+                raise NotFoundException("Pasta destino não encontrada.")
             
             new_file = STFileModel(
                 name=name,
                 text=text_content,
-                archive_name=archive_name,
+                file_type=file_type,
+                archive_id=archive_id,
                 user_id=user_id
             )
-            archive_model.files.append(new_file)
-
-            session.add(archive_model)
+            session.add(new_file)
             session.commit()
             session.refresh(new_file)
-            
-            gamification_service.add_notepad_entry(session, user_id)
-            
-    def update_file_content(self, user_id: int, archive_name: str, filename: str, new_content: str):
+                        
+    def update_file(self, user_id: int, file_id: int, new_name: str | None = None, new_content: str | None = None):
         with Session(engine) as session:
-            statement = select(STFileModel)\
-                .where(STFileModel.user_id == user_id)\
-                .where(STFileModel.archive_name == archive_name)\
-                .where(STFileModel.name == filename)
+            statement = select(STFileModel).where(
+                STFileModel.user_id == user_id,
+                STFileModel.id == file_id
+            )
+            file_model = session.exec(statement).first()
+            if not file_model:
+                raise NotFoundException("Ficheiro não encontrado.")
+            
+            if new_name is not None:
+                file_model.name = new_name
+            if new_content is not None:
+                file_model.text = new_content
                 
-            result = session.exec(statement)
-            file_model: STFileModel = result.one()
-            file_model.text = new_content
             session.add(file_model)
             session.commit()
-            session.refresh(file_model)
-            
+
+    def delete_file(self, user_id: int, file_id: int):
+        with Session(engine) as session:
+            statement = select(STFileModel).where(
+                STFileModel.user_id == user_id,
+                STFileModel.id == file_id
+            )
+            file_model = session.exec(statement).first()
+            if file_model:
+                session.delete(file_model)
+                session.commit()
+
     def get_curricular_units(self, user_id: int) -> list[CurricularUnit]:
         with Session(engine) as session:
             statement = select(STCurricularUnitModel)\
@@ -661,43 +707,99 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             return CurricularUnit.from_STCurricularUnitModel(cu_models)
         
-    def create_curricular_unit(self, user_id: int, name: str):
+    def create_curricular_unit(self, user_id: int, name: str, ects: float, min_grade: float):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)
+            
+            statement = select(STCurricularUnitModel).where(
+                STCurricularUnitModel.user_id == user_id, 
+                STCurricularUnitModel.name == name
+            )
+            if session.exec(statement).first():
+                raise ValueError("UC already exists")
+                
             user_model.st_curricular_units.append(STCurricularUnitModel(
                 user_id=user_id,
                 name=name,
+                ects=ects,
+                min_grade=min_grade,
                 grades=[]
             ))
             session.add(user_model)
             session.commit()
+
+    def delete_curricular_unit(self, user_id: int, name: str):
+        with Session(engine) as session:
+            statement = select(STCurricularUnitModel).where(
+                STCurricularUnitModel.user_id == user_id,
+                STCurricularUnitModel.name == name
+            )
+            uc_to_delete = session.exec(statement).first()
             
-    def create_grade(self, user_id: int, curricular_unit: str, grade: Grade):
+            if uc_to_delete:
+                session.delete(uc_to_delete)
+                session.commit()
+
+    def update_curricular_unit(self, user_id: int, old_name: str, new_name: str, ects: float, min_grade: float, target_grade: float | None):
+        with Session(engine) as session:
+            try:
+                statement = select(STCurricularUnitModel).where(
+                    STCurricularUnitModel.user_id == user_id,
+                    STCurricularUnitModel.name == old_name
+                )
+                uc = session.exec(statement).first()
+                
+                if uc:
+                    uc.name = new_name
+                    uc.ects = ects
+                    uc.min_grade = min_grade
+                    uc.target_grade = target_grade
+                    
+                    session.add(uc)
+                    session.commit()
+            except Exception as e:
+                print("\n\n❌ ERRO GRAVE AO ATUALIZAR A UC:", str(e), "\n\n")
+                session.rollback()
+                raise e
+            
+    def create_grade(self, user_id: int, curricular_unit_name: str, grade: Grade):
         with Session(engine) as session:
             statement = select(STCurricularUnitModel)\
                 .where(STCurricularUnitModel.user_id == user_id)\
-                .where(STCurricularUnitModel.name == curricular_unit)
-            
+                .where(STCurricularUnitModel.name == curricular_unit_name)
             result = session.exec(statement)
-            
             curricular_unit_model: STCurricularUnitModel = result.one()
+            
             curricular_unit_model.grades.append(STGradeModel(
                 id=random.randint(1, 999999999), 
+                name=grade.name,
                 value=grade.value,
                 weight=grade.weight,
-                curricular_unit_name=curricular_unit,
+                curricular_unit_id=curricular_unit_model.id,
                 user_id=user_id
             ))
-            
             session.add(curricular_unit_model)
             session.commit()
-    
+
+    def update_grade_value(self, user_id: int, grade_id: int, new_value: float):
+        with Session(engine) as session:
+            statement = select(STGradeModel).where(
+                STGradeModel.id == grade_id,
+                STGradeModel.user_id == user_id
+            )
+            grade_model = session.exec(statement).first()
+            if not grade_model:
+                raise NotFoundException(f"Grade with id {grade_id} not found")
+            
+            grade_model.value = new_value
+            session.add(grade_model)
+            session.commit()
+
     def delete_grade(self, user_id: int, curricular_unit_name: str, grade_id: int):
         with Session(engine) as session:
             statement = select(STGradeModel).where(
                 STGradeModel.id == grade_id,
-                STGradeModel.user_id == user_id,
-                STGradeModel.curricular_unit_name == curricular_unit_name
+                STGradeModel.user_id == user_id
             )
             
             result = session.exec(statement)
@@ -708,7 +810,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             session.delete(grade_model_to_delete)
             session.commit()
-
+            
     def create_mood_log(self, user_id: int, value: int, label: str, emotions: list[str], impacts: list[str], date_log: datetime):
         with Session(engine) as session:
             # 1. Definir o intervalo do dia (00:00:00 até 23:59:59)
@@ -729,7 +831,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 existing_log.label = label
                 existing_log.emotions = emotions
                 existing_log.impacts = impacts
-                existing_log.date_log = date_log # Atualiza para a hora da nova edição
+                existing_log.date_log = date_log 
                 
                 session.add(existing_log)
                 mood_log = existing_log
