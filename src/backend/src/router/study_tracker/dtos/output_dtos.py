@@ -113,24 +113,31 @@ class EventOutputDto(BaseModel):
         return output_dtos_events
     
 class FileOutputDto(BaseModel):
+    id: int
     name: str
     text: str
+    file_type: str
+    archive_id: int
     
     @staticmethod
     def from_files(files: list[File]) -> list['FileOutputDto']:
         file_output_dtos: list['FileOutputDto'] = []
-        
         for file in files:
             file_output_dtos.append(FileOutputDto(
+                id=file.id,
                 name=file.name,
-                text=file.text
+                text=file.text,
+                file_type=file.file_type,
+                archive_id=file.archive_id
             ))
-            
         return file_output_dtos
     
 class ArchiveOutputDto(BaseModel):
+    id: int
     name: str
+    parent_archive_id: Optional[int]
     files: list[FileOutputDto]
+    sub_archives: list['ArchiveOutputDto']
     
     @staticmethod
     def from_archives(archives: list[Archive]) -> list['ArchiveOutputDto']:
@@ -138,8 +145,11 @@ class ArchiveOutputDto(BaseModel):
         
         for archive in archives:
             archive_output_dtos.append(ArchiveOutputDto(
+                id=archive.id,
                 name=archive.name,
-                files=FileOutputDto.from_files(archive.files)
+                parent_archive_id=archive.parent_archive_id,
+                files=FileOutputDto.from_files(archive.files),
+                sub_archives=ArchiveOutputDto.from_archives(archive.sub_archives)
             ))
             
         return archive_output_dtos

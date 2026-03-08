@@ -156,18 +156,29 @@ def delete_task(user_id: int, task_id: int):
 def delete_future_slots_for_task(user_id: int, task_id: int):
     study_tracker_repo.delete_future_slots_for_task(user_id, task_id) 
 
-def create_archive(user_id: int, name: str):
-    study_tracker_repo.create_archive(user_id, name)
+def create_archive(user_id: int, name: str, parent_archive_id: int | None = None):
+    # Alterámos para receber também o parent_archive_id
+    study_tracker_repo.create_archive(user_id, name, parent_archive_id)
+
+def update_archive(user_id: int, archive_id: int, new_name: str):
+    study_tracker_repo.update_archive(user_id, archive_id, new_name)
     
+def delete_archive(user_id: int, archive_id: int):
+    study_tracker_repo.delete_archive(user_id, archive_id)
+
 def get_archives(user_id: int) -> list[Archive]:
     return study_tracker_repo.get_archives(user_id)
 
-def create_file(user_id: int, archive_name: str, name: str):
-    study_tracker_repo.create_file(user_id, archive_name, name)
+def create_file(user_id: int, archive_id: int, name: str, file_type: str = "txt", text_content: str = ""):
+    # Agora usa archive_id em vez de name
+    study_tracker_repo.create_file(user_id, archive_id, name, file_type, text_content)
 
-def update_file_content(user_id: int, archive_name: str, filename: str, new_content: str):
-    study_tracker_repo.update_file_content(user_id, archive_name, filename, new_content)
+def update_file(user_id: int, file_id: int, new_name: str | None = None, new_content: str | None = None):
+    study_tracker_repo.update_file(user_id, file_id, new_name, new_content)
     
+def delete_file(user_id: int, file_id: int):
+    study_tracker_repo.delete_file(user_id, file_id)
+
 def get_curricular_units(user_id: int) -> list[CurricularUnit]:
     return study_tracker_repo.get_curricular_units(user_id)
 

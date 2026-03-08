@@ -89,19 +89,31 @@ class StudyTrackerRepo(ABC):
         pass
     
     @abstractmethod
-    def create_archive(self, user_id: int, name: str):
+    def create_archive(self, user_id: int, name: str, parent_archive_id: int | None = None):
         pass
-    
+
+    @abstractmethod
+    def update_archive(self, user_id: int, archive_id: int, new_name: str):
+        pass
+
+    @abstractmethod
+    def delete_archive(self, user_id: int, archive_id: int):
+        pass
+
     @abstractmethod
     def get_archives(self, user_id: int) -> list[Archive]:
         pass
     
     @abstractmethod
-    def create_file(self, user_id: int, archive_name: str, name: str, text_content: str = ""):
+    def create_file(self, user_id: int, archive_id: int, name: str, file_type: str = "txt", text_content: str = ""):
         pass
     
     @abstractmethod
-    def update_file_content(self, user_id: int, archive_name: str, filename: str, new_content: str):
+    def update_file(self, user_id: int, file_id: int, new_name: str | None = None, new_content: str | None = None):
+        pass
+
+    @abstractmethod
+    def delete_file(self, user_id: int, file_id: int):
         pass
     
     @abstractmethod

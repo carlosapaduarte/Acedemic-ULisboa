@@ -75,13 +75,21 @@ class UpdateTaskStatus(BaseModel):
     
 class CreateArchiveInputDto(BaseModel):
     name: str
+    parent_archive_id: Optional[int] = None
+
+class UpdateArchiveInputDto(BaseModel):
+    name: str
     
 class CreateFileInputDto(BaseModel):
     name: str
+    archive_id: int
+    file_type: str = "txt"
+    text_content: str = ""
     
 class UpdateFileInputDto(BaseModel):
-    content: str
-    
+    name: Optional[str] = None
+    content: Optional[str] = None
+
 class CreateCurricularUnitInputDto(BaseModel):
     name: str
     ects: float = 6.0

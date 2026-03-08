@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Response, Query
 
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, TrackTimeInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, TrackTimeInputDto, UpdateArchiveInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -260,37 +260,72 @@ def mark_tutorial_as_seen(
 ):
     study_tracker_service.mark_tutorial_as_seen(user_id, dto.tutorial_key)
 
+@router.get("/users/me/archives")
+def get_archives(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) -> list[ArchiveOutputDto]:
+    archives = study_tracker_service.get_archives(user_id)
+    return ArchiveOutputDto.from_archives(archives)
+
 @router.post("/users/me/archives")
 def create_archive(
     user_id: Annotated[int, Depends(get_current_user_id)],
     dto: CreateArchiveInputDto
 ):
-    study_tracker_service.create_archive(user_id, dto.name)
+    try:
+        study_tracker_service.create_archive(user_id, dto.name, dto.parent_archive_id)
+        return Response(status_code=201)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     
-@router.get("/users/me/archives")
-def get_archives(
-    user_id: Annotated[int, Depends(get_current_user_id)]
-) ->  list[ArchiveOutputDto]:
-    archives = study_tracker_service.get_archives(user_id)
-    return ArchiveOutputDto.from_archives(archives)
+@router.put("/users/me/archives/{archive_id}")
+def update_archive(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    archive_id: int,
+    dto: UpdateArchiveInputDto
+):
+    study_tracker_service.update_archive(user_id, archive_id, dto.name)
+    return Response(status_code=200)
 
-@router.post("/users/me/archives/{archive_name}")
+@router.delete("/users/me/archives/{archive_id}")
+def delete_archive(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    archive_id: int
+):
+    study_tracker_service.delete_archive(user_id, archive_id)
+    return Response(status_code=204)
+
+@router.post("/users/me/files")
 def create_file(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    archive_name: str,
     dto: CreateFileInputDto
 ):
-    study_tracker_service.create_file(user_id, archive_name, dto.name)
+    study_tracker_service.create_file(
+        user_id=user_id, 
+        archive_id=dto.archive_id, 
+        name=dto.name, 
+        file_type=dto.file_type, 
+        text_content=dto.text_content
+    )
+    return Response(status_code=201)
     
-@router.put("/users/me/archives/{archive_name}/files/{filename}")
+@router.put("/users/me/files/{file_id}")
 def update_file_content(
     user_id: Annotated[int, Depends(get_current_user_id)],
-    archive_name: str,
-    filename: str,
+    file_id: int,
     dto: UpdateFileInputDto
 ):
-    study_tracker_service.update_file_content(user_id, archive_name, filename, dto.content)
-    
+    study_tracker_service.update_file(user_id, file_id, dto.name, dto.content)
+    return Response(status_code=200)
+
+@router.delete("/users/me/files/{file_id}")
+def delete_file(
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    file_id: int
+):
+    study_tracker_service.delete_file(user_id, file_id)
+    return Response(status_code=204)
+
 @router.get("/users/me/curricular-units")
 def get_curricular_units(
     user_id: Annotated[int, Depends(get_current_user_id)]

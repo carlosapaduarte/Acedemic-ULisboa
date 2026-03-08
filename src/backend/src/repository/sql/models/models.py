@@ -286,24 +286,56 @@ class STScheduleBlockNotAvailableModel(SQLModel, table=True):
 
 class STArchiveModel(SQLModel, table=True):
     __tablename__ = "st_archive"
-    name: str = Field(primary_key=True, default=None)
-    files: list["STFileModel"] = Relationship(back_populates="archive")
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    
+    user_id: int = Field(foreign_key="user.id", index=True)
     user: UserModel = Relationship(back_populates="st_archives")
+    
+    # Referência para a pasta pai
+    parent_archive_id: Optional[int] = Field(default=None, foreign_key="st_archive.id")
+    
+    # Relação: Uma pasta pode ter várias subpastas
+    sub_archives: List["STArchiveModel"] = Relationship(
+        back_populates="parent_archive",
+        sa_relationship_kwargs=dict(cascade="all, delete-orphan")
+    )
+    
+    # Relação: Quem é a pasta pai desta pasta?
+    parent_archive: Optional["STArchiveModel"] = Relationship(
+        back_populates="sub_archives",
+        sa_relationship_kwargs=dict(remote_side="STArchiveModel.id")
+    )
+    
+    files: List["STFileModel"] = Relationship(
+        back_populates="archive",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    
+    __table_args__ = (
+        # Um utilizador não pode ter duas pastas com o mesmo nome DENTRO da mesma pasta
+        UniqueConstraint('name', 'user_id', 'parent_archive_id', name='uq_archive_name_per_folder'),
+    )
+
 
 class STFileModel(SQLModel, table=True):
     __tablename__ = "st_file"
-    name: str = Field(primary_key=True)
-    text: dict = Field(default={}, sa_column=SAColumn(JSONB))
-    archive_name: str = Field(primary_key=True)
-    user_id: int = Field(primary_key=True)
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['archive_name', 'user_id'],
-            ['st_archive.name', 'st_archive.user_id']
-        ),
-    )
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    
+    text: str = Field(default="")
+    file_type: str = Field(default="txt") # Pode ser 'txt', 'pdf', etc.
+    
+    archive_id: int = Field(foreign_key="st_archive.id", index=True)
+    user_id: int = Field(foreign_key="user.id")
+
     archive: "STArchiveModel" = Relationship(back_populates="files")
+    
+    __table_args__ = (
+        UniqueConstraint('name', 'archive_id', name='uq_file_name_per_folder'),
+    )
 
 class STCurricularUnitModel(SQLModel, table=True):
     __tablename__ = "st_curricular_unit"

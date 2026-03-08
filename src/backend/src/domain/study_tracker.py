@@ -221,37 +221,49 @@ class Event():
         return domain_events
 
 class File():
-    def __init__(self, name: str, text: str):
-        self.name=name
-        self.text=text
+    def __init__(self, id: int | None, name: str, text: str, file_type: str, archive_id: int):
+        self.id = id
+        self.name = name
+        self.text = text
+        self.file_type = file_type
+        self.archive_id = archive_id
 
     @staticmethod
     def from_STFileModel(file_models: list[STFileModel]) -> list['File']:
         files: list[File] = []
         for file_model in file_models:
             files.append(File(
+                id=file_model.id,
                 name=file_model.name,
-                text=file_model.text
+                text=file_model.text,
+                file_type=file_model.file_type,
+                archive_id=file_model.archive_id
             ))
-
         return files
 
+
 class Archive():
-    def __init__(self, name: str, files: list[File]):
-        self.name=name
-        self.files=files
+    def __init__(self, id: int | None, name: str, files: list[File], sub_archives: list['Archive'], parent_archive_id: int | None):
+        self.id = id
+        self.name = name
+        self.files = files
+        self.sub_archives = sub_archives
+        self.parent_archive_id = parent_archive_id
 
     @staticmethod
     def from_STArchiveModel(archive_models: list[STArchiveModel]) -> list['Archive']:
         archives: list[Archive] = []
         for archive_model in archive_models:
             archives.append(Archive(
+                id=archive_model.id,
                 name=archive_model.name,
-                files=File.from_STFileModel(archive_model.files)
+                files=File.from_STFileModel(archive_model.files),
+                # A função chama-se a si mesma para ler as subpastas infinitamente
+                sub_archives=Archive.from_STArchiveModel(archive_model.sub_archives),
+                parent_archive_id=archive_model.parent_archive_id
             ))
-
         return archives
-
+    
 class Grade():
     id: int | None
     name: str
