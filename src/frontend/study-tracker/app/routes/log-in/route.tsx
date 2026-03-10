@@ -47,14 +47,26 @@ function CurrentView() {
             return null;
         case "authentication":
             return (
-                <AuthenticationPage
-                    onAuthDone={(action: AuthAction) => {
-                        if (action == AuthAction.CREATE_USER)
-                            setCurrentView("appUsagesSelection");
-                        else
-                            navigate(`/`);
-                    }}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: 'center' }}>
+                    <h2>Bem-vindo ao Acedemic Tracker</h2>
+                    <p style={{ marginBottom: '30px' }}>Para aceder, inicie sessão com as suas credenciais da faculdade.</p>
+                    <button 
+                        onClick={() => window.location.href = "https://acedemic.studentlife.ulisboa.pt/api/auth/ulisboa/login?target=tracker"}
+                        style={{
+                            padding: '14px 28px',
+                            backgroundColor: '#005baa',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                        }}
+                    >
+                        Entrar com a Conta ULisboa
+                    </button>
+                </div>
             );
         case "appUsagesSelection":
             return (
