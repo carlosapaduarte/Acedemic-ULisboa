@@ -1,5 +1,5 @@
 {
-  "strict": true,
+  "strict": false,
   "debug": true,
   "sp": {
     "entityId": "https://acedemic.studentlife.ulisboa.pt/api/auth/ulisboa/metadata",
