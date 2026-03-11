@@ -93,8 +93,8 @@ async def saml_callback(request: Request, db: Session = Depends(get_session)):
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         
-        frontend_url = os.getenv("FRONTEND_URL", "https://acedemic.studentlife.ulisboa.pt")
-        redirect_url = f"{frontend_url}/sso-callback?token={access_token}&username={user.username}&target={target_app}&new={str(is_new_user).lower()}"
+        frontend_url = os.getenv("FRONTEND_URL", "https://acedemic.studentlife.ulisboa.pt").rstrip('/')
+        redirect_url = f"{frontend_url}/{target_app}/sso-callback?token={access_token}&username={user.username}&target={target_app}&new={str(is_new_user).lower()}"
         
         return RedirectResponse(url=redirect_url, status_code=303)
 
@@ -122,3 +122,60 @@ async def metadata(request: Request):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+# ==========================================================
+# 🛠️ ROTA EXCLUSIVA PARA DESENVOLVIMENTO LOCAL (login)
+# ==========================================================
+@router.get("/dev-login", summary="Login Falso para Desenvolvimento Local")
+async def dev_login(request: Request, target: str = "tracker", db: Session = Depends(get_session)):
+    
+    # ==========================================================
+    # 🚨 PROTEÇÃO CONTRA ACESSO EM PRODUÇÃO
+    # ==========================================================
+    
+    # Lemos a variável. Se não existir, assumimos "production" por segurança máxima.
+    env = os.getenv("ENVIRONMENT", "production").lower()
+    
+    # Se NÃO estivermos expressamente em modo de desenvolvimento, bloqueamos logo!
+    if env != "development":
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    # ==========================================================
+    # LÓGICA DE LOGIN (Simula o que o SAML faria)
+    # ==========================================================
+    
+    # Usa o meu email que já está na whitelist
+    test_email = "fc58620@alunos.ciencias.ulisboa.pt" 
+    test_fenix_id = "fc58620"
+    
+    user = CommonsSqlRepo.get_user_by_fenix_id(db, test_fenix_id)
+    is_new_user = False
+
+        is_new_user = True
+        username = test_email.split('@')[0]
+        if CommonsSqlRepo.exists_user_by_username(db, username):
+            username = f"{username}_sso"
+        new_user_model = CommonsSqlRepo.create_user_from_saml(db, username, test_fenix_id, test_email)
+        gamification_service._get_or_create_user_metrics(db, new_user_model.id)
+        user = CommonsSqlRepo.get_user_by_id(db, new_user_model.id)
+
+    # Gera o Token de Acesso
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    
+    # ==========================================================
+    # REDIRECIONAMENTO INTELIGENTE PARA PORTAS LOCAIS
+    # ==========================================================
+    
+    if target == "tracker":
+        frontend_url = "http://localhost:5273/tracker"
+    elif target == "challenge":
+        frontend_url = "http://localhost:5173/challenge"
+    else:
+        frontend_url = "http://localhost:5273/tracker"
+        
+    redirect_url = f"{frontend_url}/sso-callback?token={access_token}&username={user.username}&target={target}&new={str(is_new_user).lower()}"
+    
+    return RedirectResponse(url=redirect_url, status_code=303)

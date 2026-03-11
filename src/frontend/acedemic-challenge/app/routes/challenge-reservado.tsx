@@ -1,6 +1,11 @@
 import { Link } from "@remix-run/react";
+import { useTranslation } from "react-i18next";
+import { useAppBar } from "~/components/AppBar/AppBarProvider";
 
 export default function ChallengeReservado() {
+    useAppBar("clean"); // Esconde a NavBar
+    const { t } = useTranslation("restricted");
+
     return (
         <div
             style={{
@@ -26,7 +31,7 @@ export default function ChallengeReservado() {
                     color: "var(--color-2)",
                 }}
             >
-                Em Desenvolvimento
+                {t("restricted:title")}
             </h1>
 
             <p
@@ -37,8 +42,7 @@ export default function ChallengeReservado() {
                     marginBottom: "1.5rem",
                 }}
             >
-                Olá! Esta plataforma encontra-se atualmente em fase de
-                construção.
+                {t("restricted:msg1")}
             </p>
 
             <p
@@ -50,7 +54,7 @@ export default function ChallengeReservado() {
                     color: "var(--color-2)",
                 }}
             >
-                Brevemente estará disponível. Prepara-te para as novidades!
+                {t("restricted:msg2")}
             </p>
 
             <div
@@ -69,8 +73,8 @@ export default function ChallengeReservado() {
                         color: "var(--color-4)",
                     }}
                 >
-                    💡 <b>Dica:</b> Certifica-te de que iniciaste sessão com o
-                    teu Email Institucional
+                    <b>{t("restricted:tip_prefix")}</b>
+                    {t("restricted:tip")}
                 </p>
             </div>
 
@@ -87,7 +91,7 @@ export default function ChallengeReservado() {
                     letterSpacing: "0.05em",
                 }}
             >
-                Voltar ao Login
+                {t("restricted:back_to_login")}
             </Link>
         </div>
     );

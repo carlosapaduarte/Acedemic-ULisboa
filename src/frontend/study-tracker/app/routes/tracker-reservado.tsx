@@ -1,6 +1,11 @@
 import { Link } from "@remix-run/react";
+import { useTranslation } from "react-i18next";
+import { useAppBar } from "~/components/AppBar/AppBarProvider";
 
 export default function TrackerReservado() {
+  useAppBar("clean"); // Esconde a NavBar
+  const { t } = useTranslation("restricted"); // Chama o novo ficheiro
+
   return (
     <div
       style={{
@@ -26,7 +31,7 @@ export default function TrackerReservado() {
           color: "var(--color-2)",
         }}
       >
-        Em Desenvolvimento
+        {t("restricted:title")}
       </h1>
 
       <p
@@ -37,7 +42,7 @@ export default function TrackerReservado() {
           marginBottom: "1.5rem",
         }}
       >
-        Olá! Esta plataforma encontra-se atualmente em fase de construção.
+        {t("restricted:msg1")}
       </p>
 
       <p
@@ -49,7 +54,7 @@ export default function TrackerReservado() {
           color: "var(--color-3)",
         }}
       >
-        Brevemente estará disponível. Prepara-te para as novidades!
+        {t("restricted:msg2")}
       </p>
 
       <div
@@ -62,8 +67,8 @@ export default function TrackerReservado() {
         }}
       >
         <p style={{ margin: 0, fontSize: "0.95rem", color: "var(--color-3)" }}>
-          💡 <b>Dica:</b> Certifica-te de que iniciaste sessão com o teu Email
-          Institucional
+          <b>{t("restricted:tip_prefix")}</b>
+          {t("restricted:tip")}
         </p>
       </div>
 
@@ -80,7 +85,7 @@ export default function TrackerReservado() {
           letterSpacing: "0.05em",
         }}
       >
-        Voltar ao Login
+        {t("restricted:back_to_login")}
       </Link>
     </div>
   );
