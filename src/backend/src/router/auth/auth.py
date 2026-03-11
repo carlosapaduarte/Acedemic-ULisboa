@@ -151,6 +151,7 @@ async def dev_login(request: Request, target: str = "tracker", db: Session = Dep
     user = CommonsSqlRepo.get_user_by_fenix_id(db, test_fenix_id)
     is_new_user = False
 
+    if not user:
         is_new_user = True
         username = test_email.split('@')[0]
         if CommonsSqlRepo.exists_user_by_username(db, username):
