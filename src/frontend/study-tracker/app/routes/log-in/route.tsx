@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { PlanDaySelectionPage } from "~/routes/log-in/PlanDaySelectionPage/PlanDaySelectionPage";
 import { ShareProgressPage } from "./ShareProgressPage/ShareProgressPage";
-import { useNavigate } from "@remix-run/react";
-import AuthenticationPage, { AuthAction } from "~/routes/log-in/AuthenticationPage/AuthenticationPage";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelectionPage";
 import { AppUsagesSelectionPage } from "~/routes/log-in/AppUsagesSelectionPage/AppUsagesSelectionPage";
-import {
-    ReceiveNotificationsSelectionPage
-} from "~/routes/log-in/ReceiveNotificationsSelectionPage/ReceiveNotificationsSelectionPage";
+import { ReceiveNotificationsSelectionPage } from "~/routes/log-in/ReceiveNotificationsSelectionPage/ReceiveNotificationsSelectionPage";
 
 import styles from "./login.module.css";
 import classNames from "classnames";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useIsLoggedIn } from "~/components/auth/Authn";
+import { Button } from "react-aria-components";
 
 type Views =
     | "initial"
@@ -27,20 +25,32 @@ function CurrentView() {
     const [currentView, setCurrentView] = useState<Views>("initial");
     const navigate = useNavigate();
     const isLoggedIn = useIsLoggedIn();
+    const [searchParams] = useSearchParams();
+
+    // Vê se é um utilizador novo a entrar pela primeira vez
+    const isSetup = searchParams.get("setup") === "true";
 
     useEffect(() => {
         if (isLoggedIn == undefined) {
-            return;
+            return; // Espera que a verificação de sessão termine
         }
 
-        if (isLoggedIn && currentView == "initial") {
-            navigate(`/`);
+        if (isLoggedIn) {
+            if (currentView === "initial" || currentView === "authentication") {
+                if (isSetup) {
+                    // Utilizador novo: Inicia o processo de Onboarding!
+                    setCurrentView("appUsagesSelection");
+                } else {
+                    // Utilizador antigo: Vai direto para o Dashboard
+                    navigate(`/`);
+                }
+            }
+        } else {
+            if (currentView === "initial") {
+                setCurrentView("authentication");
+            }
         }
-
-        if (!isLoggedIn && currentView == "initial") {
-            setCurrentView("authentication");
-        }
-    }, [isLoggedIn]);
+    }, [isLoggedIn, currentView, isSetup, navigate]);
 
     switch (currentView) {
         case "initial":
@@ -48,10 +58,10 @@ function CurrentView() {
         case "authentication":
             return (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: 'center' }}>
-                    <h2>Bem-vindo ao Acedemic Tracker</h2>
-                    <p style={{ marginBottom: '30px' }}>Para aceder, inicie sessão com as suas credenciais da faculdade.</p>
-                    <button 
-                        onClick={() => window.location.href = "https://acedemic.studentlife.ulisboa.pt/api/auth/ulisboa/login?target=tracker"}
+                    <h2 style={{ marginBottom: '1rem', fontSize: '2rem', color: '#333' }}>Bem-vindo ao ACEdemic Tracker</h2>
+                    <p style={{ marginBottom: '30px', color: '#666', fontSize: '1.1rem' }}>Para aceder, inicie sessão com as suas credenciais da faculdade.</p>
+                    <Button 
+                        onPress={() => window.location.href = "/api/auth/ulisboa/login?target=tracker"}
                         style={{
                             padding: '14px 28px',
                             backgroundColor: '#005baa',
@@ -64,14 +74,15 @@ function CurrentView() {
                             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                         }}
                     >
-                        Entrar com a Conta ULisboa
-                    </button>
+                        Log in ULisboa
+                    </Button>
                 </div>
             );
         case "appUsagesSelection":
+            // Corrigido: Agora vai para as notificações em vez de saltar direto para o Avatar!
             return (
                 <AppUsagesSelectionPage
-                    onProceed={() => setCurrentView("avatarSelection")}
+                    onProceed={() => setCurrentView("receiveNotificationsSelection")}
                 />
             );
         case "receiveNotificationsSelection":
@@ -106,7 +117,9 @@ function CurrentView() {
 export default function LoginPage() {
     useAppBar("clean");
 
-    return <div className={classNames(styles.loginPage)}>
-        <CurrentView />
-    </div>;
+    return (
+        <div className={classNames(styles.loginPage)}>
+            <CurrentView />
+        </div>
+    );
 }

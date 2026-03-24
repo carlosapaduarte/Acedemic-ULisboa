@@ -52,11 +52,9 @@ export async function doFetch(request: Request): Promise<Response> {
       headers["Content-Type"] = contentType;
     }
 
-    // Add JWT token if is stored in local cache
-    const jwt = localStorage["jwt"];
+    const jwt = localStorage.getItem("tracker_jwt") || localStorage.getItem("tracker_token");
     if (jwt) {
-      const auth = jwt ? `bearer ${localStorage["jwt"]}` : undefined;
-      headers["Authorization"] = auth;
+      headers["Authorization"] = `Bearer ${jwt}`;
     }
 
     // If body is JSON, format with {}

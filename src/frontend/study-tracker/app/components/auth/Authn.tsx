@@ -12,10 +12,8 @@ type ContextType = {
 };
 const LoggedInContext = createContext<ContextType>({
     isLoggedIn: false,
-    logIn: () => {
-    },
-    logOut: () => {
-    }
+    logIn: () => {},
+    logOut: () => {}
 });
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
@@ -27,21 +25,30 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
 
     function logOut() {
         console.log("Logging out...");
-        localStorage.removeItem("jwt");
+        // LIMPA AS GAVETAS CERTAS DO TRACKER
+        localStorage.removeItem("tracker_jwt");
+        localStorage.removeItem("tracker_token");
+        localStorage.removeItem("tracker_user");
+
+        // apagar cookies do tracker (com data no passado para o browser os apagar)
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/tracker/;";
+        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/tracker/;";
+
         setIsLoggedIn(false);
     }
 
     useEffect(() => {
         async function fetchUser() {
-            const jtw = localStorage["jwt"];
+            // LÊ DA GAVETA CERTA DO TRACKER
+            const jwt = localStorage.getItem("tracker_jwt") || localStorage.getItem("tracker_token");
 
-            if (jtw == undefined) {
+            if (!jwt) {
                 logger.debug("User is not logged in");
                 setIsLoggedIn(false);
                 return;
             }
 
-            logger.debug("User has jtw stored");
+            logger.debug("User has tracker_jwt stored");
 
             service.testTokenValidity()
                 .then(() => {

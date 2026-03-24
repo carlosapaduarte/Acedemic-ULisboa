@@ -1,0 +1,119 @@
+.tagsSectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tagsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-color-2);
+  margin-bottom: 0.25rem;
+}
+
+.formSectionTitle {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.headerButton {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-1);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.headerButton:hover {
+  transform: rotate(90deg);
+}
+
+/* --- CAIXA PRINCIPAL--- */
+.tagsBox {
+  border: 3px solid var(--color-2);
+  border-radius: 5px;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  min-height: 54px;
+}
+
+.tagItem {
+  color: var(--text-color-2);
+  background-color: var(--color-2);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.addTagButtonRound {
+  width: 35px;
+  height: 35px;
+  border-radius: 5px;
+  background-color: #5ba563;
+  color: var(--text-color-2);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: background-color 0.2s;
+}
+
+.addTagButtonRound:hover {
+  background-color: #4a8c50;
+}
+
+.ucTagsContainer {
+  margin-top: 0.5rem;
+  padding: 12px;
+  background-color: transparent;
+  border: 3px solid var(--color-2);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ucTagsLabel {
+  font-size: 0.75rem;
+  color: var(--text-color-2);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ucTagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emptyUcText {
+  font-size: 0.85rem;
+  color: var(--text-color-2);
+  font-style: italic;
+  margin: 0;
+}
+
+.emptyUcLink {
+  color: var(--text-color-2);
+  text-decoration: underline;
+  cursor: pointer;
+}
