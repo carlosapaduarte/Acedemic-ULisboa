@@ -67,6 +67,28 @@ export class AuthError extends Error {
   }
 }
 
+async function logUserAction(
+  app_targeted: string,
+  action_type: string,
+  action_detail: string,
+) {
+  const request = {
+    path: `commons/logs/action`,
+    method: "POST",
+    body: toJsonBody({
+      app_targeted,
+      action_type,
+      action_detail,
+    }),
+  };
+
+  try {
+    await doFetch(request);
+  } catch (error) {
+    console.warn("Log tracking failed (silent error):", error);
+  }
+}
+
 async function login(username: string, password: string) {
   const formData = new FormData();
   formData.append("username", username);
@@ -1138,7 +1160,6 @@ async function markTutorialAsSeen(tutorialKey: string) {
 }
 
 async function addTrackedTime(taskIds: number[], minutes: number) {
-
   const request = {
     path: `study-tracker/users/me/tasks/track-time`,
     method: "PUT",
@@ -1204,6 +1225,7 @@ export const service = {
   addTrackedTime,
   renameArchive,
   renameFile,
+  logUserAction,
 
   async fetchUserTags(): Promise<Tag[]> {
     try {

@@ -504,3 +504,14 @@ class STMoodLogModel(SQLModel, table=True):
     date_log: datetime
     
     user: UserModel = Relationship(back_populates="mood_logs")
+
+class AccessLog(SQLModel, table=True):
+    __tablename__ = "access_log"
+    
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    app_targeted: str  # Ex: "tracker" ou "challenge"
+    user_agent: str    # Vai guardar a info do browser/telemóvel
+    action_type: str   # Ex: "page_view", "intent", "action"
+    action_detail: str # Ex: "calendar", "open_mood_modal", "save_mood"

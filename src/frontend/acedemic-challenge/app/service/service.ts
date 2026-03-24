@@ -271,6 +271,28 @@ async function markTutorialAsSeen(tutorialKey: string) {
     }
 }
 
+async function logUserAction(
+    app_targeted: string,
+    action_type: string,
+    action_detail: string,
+) {
+    const request = {
+        path: `commons/logs/action`,
+        method: "POST",
+        body: toJsonBody({
+            app_targeted,
+            action_type,
+            action_detail,
+        }),
+    };
+
+    try {
+        await doFetch(request);
+    } catch (error) {
+        console.warn("Log tracking failed (silent error):", error);
+    }
+}
+
 export const service = {
     login,
     testTokenValidity,
@@ -285,4 +307,5 @@ export const service = {
     fetchBadgeHistory,
     fetchGamificationProfile,
     markTutorialAsSeen,
+    logUserAction,
 };

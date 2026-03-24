@@ -21,6 +21,7 @@ from router.study_tracker.dtos.input_dtos import CreateTagInputDto, UpdateTagInp
 from router.commons.dtos.output_dtos import UserOutputDto
 from service.common import common as common_service
 from service.common.security import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, TokenData, create_access_token
+from fastapi import Request
 
 router = APIRouter(
     prefix="/commons",
@@ -380,3 +381,34 @@ def update_user_custom_colors(
     db.commit()
     
     return {"colors": user.custom_colors}
+
+class LogActionDto(BaseModel):
+    app_targeted: str
+    action_type: str
+    action_detail: str
+
+@router.post("/logs/action", summary="Regista uma ação do utilizador silenciosamente")
+def log_user_action(
+    log_data: LogActionDto,
+    request: Request,
+    current_user_id: Annotated[int, Depends(get_current_user_id)],
+    db: Annotated[Session, Depends(get_db_session)]
+):
+    # Vai buscar o browser/dispositivo do utilizador
+    user_agent = request.headers.get("user-agent", "unknown")
+    
+    # evitar referências circulares
+    from repository.sql.models.models import AccessLog 
+    
+    new_log = AccessLog(
+        user_id=current_user_id,
+        app_targeted=log_data.app_targeted,
+        user_agent=user_agent,
+        action_type=log_data.action_type,
+        action_detail=log_data.action_detail
+    )
+    
+    db.add(new_log)
+    db.commit()
+    
+    return {"status": "logged"}
