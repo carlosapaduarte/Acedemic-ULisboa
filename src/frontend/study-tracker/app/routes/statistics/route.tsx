@@ -21,6 +21,11 @@ export default function Statistics() {
   const [distStats, setDistStats] = useState<TaskDistributionPerWeek[]>([]);
   const [moodHistory, setMoodHistory] = useState<DailyEnergyStatus[]>([]);
 
+  // 🕵️‍♀️ Espião: Entrar na página de estatísticas
+  useEffect(() => {
+      service.logUserAction("tracker", "page_view", "statistics");
+  }, []);
+  
   useEffect(() => {
     async function loadData() {
       try {

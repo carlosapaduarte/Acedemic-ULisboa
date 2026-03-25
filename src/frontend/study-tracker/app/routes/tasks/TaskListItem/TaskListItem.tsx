@@ -148,6 +148,8 @@ export function TaskListItem({
         `Tens a certeza que queres apagar a tarefa "${internalTask.data.title}"?`
       )
     ) {
+      // 🕵️‍♀️ Espião: Apagar Tarefa
+      service.logUserAction("tracker", "action", "delete_task");
       try {
         await service.deleteTask(internalTask.id);
         onTaskStatusUpdated(internalTask);
@@ -194,6 +196,12 @@ export function TaskListItem({
                   internalTask.data.status == "completed"
                     ? "not_completed"
                     : "completed";
+
+                // 🕵️‍♀️ Espião: Marcar Tarefa como Concluída (só loga se o novo estado for "completed")
+                if (newStatus === "completed") {
+                    service.logUserAction("tracker", "action", "complete_task");
+                }
+                
                 updateTaskStatus(newStatus);
                 if (
                   newStatus === "completed" &&

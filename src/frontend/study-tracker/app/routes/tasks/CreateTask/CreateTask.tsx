@@ -137,8 +137,14 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
         } /*setGlobalError(error)*/
       );
   }
+  // 🕵️‍♀️ Espião: Intenção de criar tarefa (abriu o modal)
+  useEffect(() => {
+      service.logUserAction("tracker", "intent", "open_create_task");
+  }, []);
 
   function onConfirmClick(newTaskInfo: CreateTaskInputDto) {
+    // 🕵️‍♀️ Espião: Efetivamente carregou no botão de Criar
+    service.logUserAction("tracker", "action", "create_task");
     createTask(newTaskInfo, onTaskCreated);
   }
 

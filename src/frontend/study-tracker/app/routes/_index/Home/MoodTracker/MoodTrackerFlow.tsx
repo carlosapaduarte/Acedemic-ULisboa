@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import styles from "./MoodTracker.module.css";
 import { FaCheck, FaChevronLeft } from "react-icons/fa6";
 import { service } from "~/service/service";
+import { useEffect } from "react";
 
 interface MoodStepProps {
   onComplete: () => void;
@@ -164,8 +165,17 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
     else setList([...list, item]);
   };
 
+  // 🕵️‍♀️ Espião: Quando o MoodTracker renderiza, conta como intenção de abrir
+  useEffect(() => {
+      service.logUserAction("tracker", "intent", "open_mood_modal");
+  }, []);
+  
   const saveData = async () => {
     setSaving(true);
+    
+    // 🕵️‍♀️ Espião: Quando efetivamente guardam
+    service.logUserAction("tracker", "action", "save_mood");
+
     try {
       const payload = {
         value: moodValue,

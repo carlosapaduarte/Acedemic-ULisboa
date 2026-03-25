@@ -80,6 +80,11 @@ export default function BadgesPage() {
     } | null>(null);
     const levelRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
+    // 🕵️‍♀️ O espião da Página de Badges
+    useEffect(() => {
+        service.logUserAction("challenge", "page_view", "badges");
+    }, []);
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {

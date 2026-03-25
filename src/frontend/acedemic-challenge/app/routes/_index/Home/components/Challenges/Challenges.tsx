@@ -2,7 +2,7 @@ import { BatchDay, Challenge } from "~/challenges/types";
 import React from "react";
 import { useState } from "react";
 import { ReflectionModal } from "~/routes/_index/Home/components/ReflectionModal/ReflectionModal";
-
+import { service } from "~/service/service";
 import styles from "./challenges.module.css";
 import { useTranslation } from "react-i18next";
 
@@ -25,18 +25,25 @@ export default function Challenges({
 
     const handleCompleteClick = (challenge: Challenge) => {
         console.log("DESAFIO CLICADO:", challenge);
+        
+        // 🕵️‍♀️ Espião: O utilizador tentou completar o desafio (Intenção)
+        service.logUserAction("challenge", "intent", "start_challenge");
+
         // Se o desafio tem uma pergunta, abre o modal
         if (challenge.reflection_prompt) {
             setSelectedChallenge(challenge);
             setIsModalOpen(true);
         } else {
-            // Senão, completa diretamente sem resposta
+            // Senão, completa diretamente sem resposta (Ação concluída)
+            service.logUserAction("challenge", "action", "finish_challenge_no_prompt");
             onMarkComplete(challenge, null);
         }
     };
 
     const handleModalSubmit = (userAnswer: string) => {
         if (selectedChallenge) {
+            // 🕵️‍♀️ Espião: O utilizador submeteu a resposta (Ação)
+            service.logUserAction("challenge", "action", "answer_challenge_prompt");
             onMarkComplete(selectedChallenge, userAnswer);
         }
         setIsModalOpen(false);
@@ -46,6 +53,8 @@ export default function Challenges({
     const handleModalClose = () => {
         // Mesmo que o utilizador feche/salte, marca como completo
         if (selectedChallenge) {
+            // 🕵️‍♀️ Espião: O utilizador saltou a resposta e fechou o modal
+            service.logUserAction("challenge", "action", "skip_challenge_prompt");
             onMarkComplete(selectedChallenge, null);
         }
         setIsModalOpen(false);

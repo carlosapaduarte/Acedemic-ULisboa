@@ -107,6 +107,9 @@ function useTimerSetup(
   }, [motivationalMessage]);
 
   function onTimeSelected(studyStopDate: Date, pauseStopDate: Date) {
+    // 🕵️‍♀️ Espião: Quando carregam no Play
+    service.logUserAction("tracker", "action", "start_pomodoro");
+
     setStudyStopDate(studyStopDate);
     setPauseStopDate(pauseStopDate);
     setTimerStopDate(studyStopDate);
@@ -781,6 +784,9 @@ function PomodoroPage() {
   };
 
   const handleConfirmCompletion = (completedTaskIds: number[]) => {
+    // 🕵️‍♀️ Espião: Submeter tempo/tarefas do Pomodoro
+    service.logUserAction("tracker", "action", "add_manual_time");
+    
     setIsConfirmModalOpen(false);
     if (completedTaskIds.length === 0) {
       refreshTasks();

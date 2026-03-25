@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 import { NotesModal } from "~/components/NotesModal/NotesModal";
 import styles from "./lvl3ChallengesList.module.css";
-
+import { service } from "~/service/service";
 
 function Level3ChallengeListItem(
     {
@@ -134,6 +134,8 @@ export function Level3ChallengesList(
                             challengeTitle={challenge.title}
                             challengeDescription={challenge.description}
                             onMarkComplete={() => {
+                                // 🕵️‍♀️ Espião: Completar desafio de Nível 3
+                                service.logUserAction("challenge", "action", "finish_lvl3_challenge");
                                 onMarkCompleteClickHandler(challenge, listedBatchDays[currentBatchDayNumber - 1], batch);
                             }}
                         />;
