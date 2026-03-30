@@ -10,7 +10,7 @@ export default function IndexPage() {
   useEffect(() => {
     // Só regista o log se o utilizador já estiver com o login concluído
     if (isLoggedIn === true) {
-      service.logUserAction("tracker", "page_view", "calendar_home");
+      service.logUserAction("tracker", "page_view", "dashboard_home");
     }
   }, [isLoggedIn]);
 
