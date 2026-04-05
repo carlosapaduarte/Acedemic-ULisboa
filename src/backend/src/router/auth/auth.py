@@ -41,6 +41,9 @@ async def saml_callback(request: Request, db: Session = Depends(get_session)):
             raise HTTPException(status_code=401, detail="Não autenticado")
 
         attributes = auth.get_attributes()
+        
+        print("💡 Atributos recebidos da ULisboa:", attributes)
+        
         fenix_id = attributes.get('uniqueID', [None])[0]
         email = attributes.get('mail', [None])[0]
         
@@ -79,22 +82,42 @@ async def saml_callback(request: Request, db: Session = Depends(get_session)):
         user = CommonsSqlRepo.get_user_by_fenix_id(db, fenix_id)
         is_new_user = False
 
+        real_name = attributes.get('displayName', [None])[0] or attributes.get('cn', [None])[0] or attributes.get('givenName', [None])[0]
+        if real_name:
+            real_name = real_name.strip()
+
         if not user:
             is_new_user = True
             username = email.split('@')[0] if email else fenix_id
+            
             if CommonsSqlRepo.exists_user_by_username(db, username):
                 username = f"{username}_sso"
+                
             new_user_model = CommonsSqlRepo.create_user_from_saml(db, username, fenix_id, email)
             gamification_service._get_or_create_user_metrics(db, new_user_model.id)
             user = CommonsSqlRepo.get_user_by_id(db, new_user_model.id)
+            
+            # Se a reitoria mandou o nome, guardamos logo no display_name
+            if real_name:
+                user.display_name = real_name
+                db.commit()
+                
+        else:
+            # Se a conta já existe e a Reitoria agora mandou o nome, atualizamos!
+            if real_name and user.display_name != real_name:
+                user.display_name = real_name
+                db.commit()
 
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         
+        # Passamos o display_name se existir, senão passamos o username normal
+        name_to_show = user.display_name if getattr(user, 'display_name', None) else user.username
+        
         frontend_url = os.getenv("FRONTEND_URL", "https://acedemic.studentlife.ulisboa.pt").rstrip('/')
-        redirect_url = f"{frontend_url}/{target_app}/sso-callback?token={access_token}&username={user.username}&target={target_app}&new={str(is_new_user).lower()}"
+        redirect_url = f"{frontend_url}/{target_app}/sso-callback?token={access_token}&username={name_to_show}&target={target_app}&new={str(is_new_user).lower()}"
         
         return RedirectResponse(url=redirect_url, status_code=303)
 
@@ -159,6 +182,14 @@ async def dev_login(request: Request, target: str = "tracker", db: Session = Dep
         new_user_model = CommonsSqlRepo.create_user_from_saml(db, username, test_fenix_id, test_email)
         gamification_service._get_or_create_user_metrics(db, new_user_model.id)
         user = CommonsSqlRepo.get_user_by_id(db, new_user_model.id)
+        
+        # Testar nome localmente
+        user.display_name = "Cláudia (Dev Mode)"
+        db.commit()
+    else:
+        # Atualizar nome localmente se já existir
+        user.display_name = "Cláudia (Dev Mode)"
+        db.commit()
 
     # Gera o Token de Acesso
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -177,6 +208,7 @@ async def dev_login(request: Request, target: str = "tracker", db: Session = Dep
     else:
         frontend_url = "http://localhost:5273/tracker"
         
-    redirect_url = f"{frontend_url}/sso-callback?token={access_token}&username={user.username}&target={target}&new={str(is_new_user).lower()}"
+    name_to_show = user.display_name if getattr(user, 'display_name', None) else user.username
+    redirect_url = f"{frontend_url}/sso-callback?token={access_token}&username={name_to_show}&target={target}&new={str(is_new_user).lower()}"
     
     return RedirectResponse(url=redirect_url, status_code=303)

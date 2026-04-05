@@ -41,7 +41,8 @@ class User:
             avatar_filename: str | None,
             share_progress: bool | None,
             batches: list[Batch], 
-            metrics: Optional[UserMetric] = None
+            metrics: Optional[UserMetric] = None,
+            display_name: str | None = None
     ) -> None:
         self.id = id
         self.username = username
@@ -50,3 +51,4 @@ class User:
         self.share_progress = share_progress
         self.batches = batches
         self.metrics = metrics
+        self.display_name = display_name

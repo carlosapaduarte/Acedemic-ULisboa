@@ -86,7 +86,7 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
       {
         target: "body",
         placement: "center" as const,
-        content: "Estás pronto! Explora a app ao teu ritmo.",
+        content: "Tudo pronto! Explora a app ao teu ritmo.",
       },
     ],
 
@@ -146,7 +146,7 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
         target: ".tutorial-target-stats-drilldown",
         placement: "top" as const,
         content:
-          "Análise Detalhada 🔍: Por fim, usa esta zona para explorares dados mais específicos do teu histórico. Estás pronto!",
+          "Análise Detalhada 🔍: Por fim, usa esta zona para explorares dados mais específicos do teu histórico. Tudo pronto!",
       },
     ],
 
@@ -156,7 +156,7 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
         placement: "center" as const,
         content: (
           <div style={{ textAlign: "center", maxWidth: "500px" }}>
-            <strong>O Método Pomodoro 🍅</strong>
+            <strong>A técnica Pomodoro 🍅</strong>
             <p>
               Esta página foi desenhada para te ajudar a manter o foco! O método
               Pomodoro consiste em estudar intensamente por um período de tempo,
@@ -206,7 +206,7 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
         placement: "center" as const,
         content: (
           <div>
-            <strong>Repositório Académico 📂</strong>
+            <strong>Apontamentos 📂</strong>
             <p>
               Organiza os teus materiais de estudo. Cada UC que criares terá a
               sua própria pasta automática aqui.

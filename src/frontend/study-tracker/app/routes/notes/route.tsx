@@ -305,7 +305,7 @@ function NotesPage() {
     <div className={styles.pageContainer}>
       <header className={styles.header}>
         <h1 className={styles.mainTitle}>
-          {t("notes:repository_title", "Repositório Académico")}
+          {t("notes:repository_title", "Apontamentos")}
         </h1>
         <p className={styles.subTitle}>
           {folderPath.length === 0

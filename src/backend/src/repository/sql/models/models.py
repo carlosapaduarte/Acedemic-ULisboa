@@ -21,6 +21,7 @@ class UserModel(SQLModel, table=True):
     fenix_id: str | None = Field(default=None, index=True, unique=True, nullable=True)
     
     institutional_email: str | None = Field(default=None, nullable=True)
+    display_name: str | None = Field(default=None, nullable=True)
 
     avatar_filename: str | None
     share_progress: bool | None

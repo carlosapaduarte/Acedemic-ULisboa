@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "@remix-run/react";
 import { service, UserInfo } from "~/service/service";
-import { ThemeContext } from "~/components/Theme/ThemeProvider";
+// import { ThemeContext } from "~/components/Theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
 import styles from "./settings.module.css";
 import {
@@ -11,10 +11,20 @@ import {
   RiCheckLine,
 } from "react-icons/ri";
 
+const OBJETIVOS_LIST = [
+  "Melhorar as minhas notas/classificações",
+  "Acompanhar o meu progresso",
+  "Preparar-me para exames específicos",
+  "Personalizar o meu plano de estudo",
+  "Cumprir prazos e entregas",
+  "Gerir os estudos com as outras áreas da minha vida"
+];
+
 function createAvatars(): string[] {
   const avatars: string[] = [];
-  for (let u = 0; u < 30; u++) {
-    avatars.push(`./avatars/avatar${u % 12}.png`);
+  // MUDADO PARA 12: Assim só carrega os 12 únicos e não repete!
+  for (let u = 0; u < 12; u++) {
+    avatars.push(`./avatars/avatar${u}.png`);
   }
   return avatars;
 }
@@ -22,7 +32,7 @@ function createAvatars(): string[] {
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation(["common"]);
-  const { theme, setTheme } = useContext(ThemeContext);
+  // const { theme, setTheme } = useContext(ThemeContext);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -32,28 +42,33 @@ export default function SettingsPage() {
   // Form States
   const [selectedAvatarIndex, setSelectedAvatarIndex] = useState<number>(-1);
   const [avatars, setAvatars] = useState<string[]>([]);
-  const [goalHours, setGoalHours] = useState(0);
+  const [selectedObjetivos, setSelectedObjetivos] = useState<string[]>([]);
 
-  // Dark Mode Logic
+  // Dark Mode Logic - COMENTADO TEMPORARIAMENTE
+  /*
   const isDarkMode = theme === "black";
   const handleThemeToggle = () => {
     setTheme(isDarkMode ? "purple" : "black");
   };
+  */
 
   // Load Data
   useEffect(() => {
     const loadedAvatars = createAvatars();
     setAvatars(loadedAvatars);
 
+    // Carregar os objetivos que a pessoa já tinha escolhido antes
+    const savedObjs = localStorage.getItem("tracker_user_objectives");
+    if (savedObjs) {
+        try {
+            setSelectedObjetivos(JSON.parse(savedObjs));
+        } catch(e) {}
+    }
+
     service
       .fetchUserInfoFromApi()
       .then((data) => {
         setUser(data);
-
-        // Definir meta de horas
-        const currentGoal =
-          data.use_goals && data.use_goals.length > 0 ? data.use_goals[0] : 2;
-        setGoalHours(currentGoal);
 
         // Tentar encontrar o índice do avatar atual
         const currentAvatarIndex = loadedAvatars.findIndex((a) =>
@@ -66,6 +81,19 @@ export default function SettingsPage() {
       .catch((err) => console.error("Erro ao carregar settings:", err))
       .finally(() => setLoading(false));
   }, []);
+
+  // Lógica para marcar/desmarcar a checklist dos Objetivos
+  const handleToggleObjetivo = (obj: string) => {
+      setSelectedObjetivos((prev) => {
+          const newSelection = prev.includes(obj)
+              ? prev.filter((item) => item !== obj)
+              : [...prev, obj];
+          
+          // Grava logo automaticamente!
+          localStorage.setItem("tracker_user_objectives", JSON.stringify(newSelection));
+          return newSelection;
+      });
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -85,13 +113,6 @@ export default function SettingsPage() {
           newAvatarFullString.split("/").pop() || newAvatarFullString;
         promises.push(service.selectAvatar(filename));
       }
-
-      // 2. Update Goals
-      /*
-            const goalsSet = new Set<number>();
-            goalsSet.add(Number(goalHours));
-            promises.push(service.updateAppUseGoals(goalsSet));
-            */
 
       if (promises.length > 0) {
         await Promise.all(promises);
@@ -126,23 +147,37 @@ export default function SettingsPage() {
   if (loading)
     return <div className={styles.container}>A carregar definições...</div>;
 
-  return (
-    <div className={styles.pageContainer}>
+ return (
+    <div className={styles.pageContainer} style={{ paddingBottom: "100px" }}> 
       <div className={styles.header}>
         <h1>Definições</h1>
       </div>
 
       <div className={styles.content}>
-        {/* PERFIL (Read Only) */}
+        {/* PERFIL - MAIS DETALHADO */}
         <section className={styles.section}>
-          <h2>Perfil</h2>
-          <div className={styles.infoRow}>
-            <span className={styles.label}>Nome de Utilizador:</span>
-            <span className={styles.value}>{user?.username}</span>
+          <h2>Perfil do Aluno</h2>
+          <div className={styles.profileCard} style={{ background: "rgba(255,255,255,0.05)", padding: "15px", borderRadius: "8px" }}>
+            <div className={styles.infoRow} style={{ marginBottom: "10px" }}>
+              <span className={styles.label}>Nome de Exibição:</span>
+              <span className={styles.value} style={{ fontWeight: "bold", color: "var(--color-2)" }}>
+                {user?.display_name || "Não definido"}
+              </span>
+            </div>
+            <div className={styles.infoRow} style={{ marginBottom: "10px" }}>
+              <span className={styles.label}>ID Fénix:</span>
+              <span className={styles.value}>{user?.username}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>E-mail:</span>
+              <span className={styles.value} style={{ fontSize: "0.9rem", opacity: 0.8 }}>
+                {user?.institutional_email || "---"}
+              </span>
+            </div>
           </div>
         </section>
 
-        {/* AVATAR SELECTION */}
+        {/* AVATAR SELECTION - (Já com o limite de 12 para não repetir) */}
         <section className={styles.section}>
           <h2>Avatar</h2>
           <div className={styles.avatarGrid}>
@@ -160,74 +195,63 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* APARÊNCIA (Toggle) */}
+        {/* OBJETIVOS DE USO */}
         <section className={styles.section}>
-          <div className={styles.toggleRow}>
-            <div>
-              <h2>Modo Noturno</h2>
-              <p className={styles.description}>
-                Alternar entre tema claro e escuro
-              </p>
-            </div>
-
-            <label className={styles.switch}>
-              <input
-                type="checkbox"
-                checked={isDarkMode}
-                onChange={handleThemeToggle}
-              />
-              <span className={styles.slider}></span>
-            </label>
-          </div>
-        </section>
-
-        {/* OBJETIVOS */}
-        <section className={styles.section}>
-          <h2>Objetivos</h2>
-          <div className={styles.formGroup}>
-            <label>Meta de Estudo Diário (Horas)</label>
-            <input
-              type="number"
-              min="0"
-              max="24"
-              value={goalHours}
-              onChange={(e) => setGoalHours(Number(e.target.value))}
-              className={styles.input}
-              style={{ width: "100px" }}
-            />
+          <h2>Objetivos de Uso</h2>
+          <p className={styles.description} style={{ marginBottom: "1rem" }}>
+            Quais as tuas metas principais ao usar a plataforma?
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {OBJETIVOS_LIST.map((obj) => (
+              <label key={obj} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={selectedObjetivos.includes(obj)}
+                  onChange={() => handleToggleObjetivo(obj)}
+                  style={{ width: "18px", height: "18px", accentColor: "var(--color-2)" }}
+                />
+                <span style={{ fontSize: "0.95rem" }}>{obj}</span>
+              </label>
+            ))}
           </div>
         </section>
 
         {/* SISTEMA */}
-        <section className={styles.section}>
+        <section className={styles.section} style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px" }}>
           <h2>Sistema</h2>
-          <button onClick={handleResetTutorial} className={styles.dangerButton}>
+          <button onClick={handleResetTutorial} className={styles.dangerButton} style={{ opacity: 0.8 }}>
             <RiRestartLine /> Repetir Tutorial Global
           </button>
         </section>
 
-        {/* ACTION BAR */}
-        <div className={styles.actionBar}>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className={`${styles.saveButton} ${
-              saveSuccess ? styles.success : ""
-            }`}
-          >
-            {saving ? (
-              "A guardar..."
-            ) : saveSuccess ? (
-              <>
-                <RiCheckLine /> Guardado!
-              </>
-            ) : (
-              <>
-                <RiSave3Fill /> Guardar Alterações
-              </>
-            )}
-          </button>
-        </div>
+        {/* ESPAÇADOR PARA O BOTÃO NÃO TAPAR O CONTEÚDO */}
+        <div style={{ height: "60px" }}></div>
+      </div>
+
+      {/* ACTION BAR - GARANTIR QUE ESTÁ ACIMA DE TUDO */}
+      <div className={styles.actionBar} style={{ 
+          position: "fixed", 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          padding: "20px", 
+          background: "linear-gradient(transparent, var(--color-1) 30%)",
+          zIndex: 100 
+      }}>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className={`${styles.saveButton} ${saveSuccess ? styles.success : ""}`}
+          style={{ width: "100%", maxWidth: "500px", margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "center" }}
+        >
+          {saving ? (
+            "A guardar..."
+          ) : saveSuccess ? (
+            <><RiCheckLine /> Alterações Guardadas!</>
+          ) : (
+            <><RiSave3Fill /> Guardar Perfil</>
+          )}
+        </button>
       </div>
     </div>
   );
