@@ -7,15 +7,20 @@ function useSelectTime(
   initialStudy: number,
   initialPause: number,
 ) {
-  const [studyMinutes, setStudyMinutes] = useState(initialStudy);
-  const [pauseMinutes, setPauseMinutes] = useState(initialPause);
+  const [studyMinutes, setStudyMinutes] = useState<number | string>(initialStudy);
+  const [pauseMinutes, setPauseMinutes] = useState<number | string>(initialPause);
 
   function onConfirmButtonClick() {
+    if (studyMinutes === "" || pauseMinutes === "") return;
+
+    const safeStudy = Number(studyMinutes);
+    const safePause = Number(pauseMinutes);
+
     const studyStopDate = new Date();
-    studyStopDate.setMinutes(studyStopDate.getMinutes() + studyMinutes);
+    studyStopDate.setMinutes(studyStopDate.getMinutes() + safeStudy);
 
     const pauseStopDate = new Date(studyStopDate);
-    pauseStopDate.setMinutes(pauseStopDate.getMinutes() + pauseMinutes);
+    pauseStopDate.setMinutes(pauseStopDate.getMinutes() + safePause);
 
     onTimeSelected(studyStopDate, pauseStopDate);
   }
@@ -37,8 +42,8 @@ interface SelectTimeProps {
 
 export function SelectTime({
   onTimeSelected,
-  initialStudyMinutes = 25, // Default se não vier nada
-  initialPauseMinutes = 5, // Default se não vier nada
+  initialStudyMinutes = 25,
+  initialPauseMinutes = 5,
 }: SelectTimeProps) {
   const { t } = useTranslation(["study"]);
 
@@ -50,9 +55,19 @@ export function SelectTime({
     onConfirmButtonClick,
   } = useSelectTime(onTimeSelected, initialStudyMinutes, initialPauseMinutes);
 
+  const isFormValid = studyMinutes !== "" && pauseMinutes !== "" && Number(studyMinutes) > 0 && Number(pauseMinutes) > 0;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isFormValid) {
+      onConfirmButtonClick();
+    }
+  };
+
   return (
     <div className={styles.pomodoroContainer}>
       <form
+        onSubmit={handleSubmit}
         className={`${styles.timeSelectionForm} tutorial-target-pomodoro-settings`}
       >
         <div className={styles.timeInputGroup}>
@@ -61,10 +76,14 @@ export function SelectTime({
           </label>
           <input
             className={styles.timeInput}
-            type="number"
+            type="text" 
+            inputMode="numeric"
+            required // Obriga a ter texto
             value={studyMinutes}
-            min="1"
-            onChange={(e) => setStudyMinutes(Number(e.target.value))}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, "");
+              setStudyMinutes(val === "" ? "" : Number(val));
+            }}
           />
         </div>
         <div className={styles.timeInputGroup}>
@@ -73,16 +92,25 @@ export function SelectTime({
           </label>
           <input
             className={styles.timeInput}
-            type="number"
+            type="text" 
+            inputMode="numeric"
+            required // Obriga a ter texto
             value={pauseMinutes}
-            min="1"
-            onChange={(e) => setPauseMinutes(Number(e.target.value))}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, "");
+              setPauseMinutes(val === "" ? "" : Number(val));
+            }}
           />
         </div>
+        
         <button
-          type="button"
+          type="submit"
           className={styles.confirmButton}
-          onClick={onConfirmButtonClick}
+          disabled={!isFormValid}
+          style={{ 
+            opacity: isFormValid ? 1 : 0.5, 
+            cursor: isFormValid ? "pointer" : "not-allowed" 
+          }}
         >
           {t("study:confirm", "Confirmar e Iniciar")}
         </button>

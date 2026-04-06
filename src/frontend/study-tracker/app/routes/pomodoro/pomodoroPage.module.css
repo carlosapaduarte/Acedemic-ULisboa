@@ -282,7 +282,7 @@
   align-items: flex-start;
   gap: 2rem;
   width: 100%;
-  max-width: 1600px; /* Mais largo para 3 colunas */
+  max-width: 1600px;
   margin: 2rem auto;
   padding: 0 1rem;
   box-sizing: border-box;
@@ -414,6 +414,8 @@
 }
 
 /* ==========================================
+  DISPOSITIVOS MÓVEIS
+   ========================================== */
 @media (max-width: 1024px) {
   .pomodoroLayout {
     grid-template-columns: 1fr;

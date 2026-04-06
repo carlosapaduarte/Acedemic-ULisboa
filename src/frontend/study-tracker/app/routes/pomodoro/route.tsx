@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useTaskList } from "~/routes/tasks/useTaskList";
 import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
+import { RiCloseLine } from "react-icons/ri";
 
 const MOTIVATIONAL_MESSAGES = [
   "Bom trabalho! 🌟",
@@ -65,6 +66,7 @@ function useTimerSetup(
   activeBlock: Event | undefined,
   onDismissBlock: () => void,
 ) {
+  const { t } = useTranslation(["study"]);
   const setError = useSetGlobalError();
   const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(
     undefined,
@@ -170,11 +172,11 @@ function useTimerSetup(
       setTimerStopDate(pauseStopDate);
       setSessionStartTime(null); // Pausa não conta
 
-      const randomMsg =
-        MOTIVATIONAL_MESSAGES[
-          Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)
-        ];
+      // 💡 Vai buscar as mensagens traduzidas ao JSON
+      const messages = t("study:motivational_messages", { returnObjects: true }) as string[];
+      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
       setMotivationalMessage(randomMsg);
+      
     } else {
       // --- FIM DA PAUSA ---
       setTimerStopDate(undefined);
@@ -419,12 +421,37 @@ function ConfirmationModalContent({
   }
 
   return (
-    <Dialog className={styles.pomodoroDialog}>
+    <Dialog className={styles.pomodoroDialog} style={{ position: "relative" }}>
+      <button 
+        onClick={onCancel}
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          background: "none",
+          border: "none",
+          fontSize: "1.5rem",
+          cursor: "pointer",
+          color: "var(--text-color-1)"
+        }}
+        aria-label="Fechar"
+      >
+        <RiCloseLine />
+      </button>
+
       <h3 className={styles.modalTitle}>
         {t("study:pomodoro_complete_title", "Sessão Terminada")}
       </h3>
-      <p>
+      <p style={{ marginBottom: "0.5rem" }}>
         {t("study:pomodoro_multi_q", "Quais das seguintes tarefas concluíste?")}
+      </p>
+      <p style={{ 
+          fontSize: "0.85rem", 
+          opacity: 0.8, 
+          fontStyle: "italic", 
+          marginBottom: "1.5rem" 
+      }}>
+        {t("study:pomodoro_no_task_warning", "(Caso não tenhas terminado nenhuma tarefa, não seleciones nenhuma e clica apenas em confirmar.)")}
       </p>
 
       <div className={styles.modalTaskList}>
@@ -483,9 +510,6 @@ function ConfirmationModalContent({
       </div>
 
       <div className={styles.modalButtonContainer}>
-        <Button className={styles.modalButtonSecondary} onPress={onCancel}>
-          {t("study:cancel", "Cancelar")}
-        </Button>
         <Button
           className={styles.modalButtonPrimary}
           onPress={() => onConfirm(checkedIds)}

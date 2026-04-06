@@ -28,5 +28,16 @@
   "study_time": "Tempo de Estudo",
   "pause_time": "Pausa",
   "task_time_exhausted": "Tempo esgotado! Já terminaste?",
-  "task_time_progress": "Fizeste {{tracked}} de {{planned}} planeadas"
+  "task_time_progress": "Fizeste {{tracked}} de {{planned}} planeadas",
+  "pomodoro_no_task_warning": "(Caso não tenhas terminado nenhuma tarefa, não seleciones nenhuma e clica apenas em confirmar.)",
+  "motivational_messages": [
+    "Bom trabalho! 🌟",
+    "Pausa merecida! ☕",
+    "Estás no caminho certo! 🚀",
+    "Respira fundo. Relaxa. 🍃",
+    "Foco impecável! Continua assim. 💪",
+    "Hora de recarregar baterias! 🔋",
+    "Excelente sessão! 🏆",
+    "O teu esforço conta. Descansa. ✨"
+  ]
 }

@@ -48,9 +48,10 @@ export function GreetingsContainer() {
   >(undefined);
 
   useEffect(() => {
-    service.fetchUserInfoFromApi().then((userInfo: UserInfo) => {
+    service.fetchUserInfoFromApi().then((userInfo: any) => {
       setAvatarFilename(userInfo.avatarFilename);
-      setUsername(userInfo.username);
+      const nameToDisplay = userInfo.display_name || userInfo.username;
+      setUsername(nameToDisplay);
     });
   }, []);
 
@@ -64,7 +65,7 @@ export function GreetingsContainer() {
             {helloQuote}, {username}
           </span>
         ) : (
-          <span>Loading...</span>
+          <span>A carregar...</span>
         )}
       </h4>
       <div
