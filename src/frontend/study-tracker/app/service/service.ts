@@ -190,6 +190,8 @@ export type UserInfo = {
   custom_colors?: string[];
   use_goals?: number[];
   tutorial_progress?: string[];
+  display_name?: string;
+  institutional_email?: string;
 };
 
 async function fetchUserInfo(): Promise<UserInfo> {

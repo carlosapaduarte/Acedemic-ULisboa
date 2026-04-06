@@ -25,6 +25,7 @@ class UserOutputDto(BaseModel):
     tutorial_progress: List[str] = []
     use_goals: List[int] = []
     display_name: Optional[str] = None
+    institutional_email: Optional[str] = None
     
     @classmethod
     def fromUser(cls, user):
@@ -59,7 +60,8 @@ class UserOutputDto(BaseModel):
             avatarFilename=getattr(user, "avatar_filename", None),
             batches=batches_dtos,
             custom_colors=colors,
-            display_name=getattr(user, "display_name", None) 
+            display_name=getattr(user, "display_name", None),
+            institutional_email=getattr(user, "institutional_email", None)
         )
 
 class TagOutputDto(BaseModel):
