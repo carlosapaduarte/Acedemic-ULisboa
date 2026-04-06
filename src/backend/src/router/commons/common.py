@@ -164,6 +164,9 @@ def get_user_info(
         
         if user_db.tutorial_progress:
             dto.tutorial_progress = user_db.tutorial_progress
+            
+        if user_db.user_st_app_uses:
+            dto.use_goals = [app_use.goal_id for app_use in user_db.user_st_app_uses]
         
     return dto
 

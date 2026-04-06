@@ -17,20 +17,24 @@ engine = database.get_engine()
 class StudyTrackerSqlRepo(StudyTrackerRepo):    
     def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set[int]):
         with Session(engine) as session:
-            user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)
-            new_user_study_tracker_app_uses: list[STAppUseModel] = []
+            # 1. Buscar todos os objetivos antigos deste utilizador
+            statement = select(STAppUseModel).where(STAppUseModel.user_id == user_id)
+            old_goals = session.exec(statement).all()
+            
+            # 2. Apagar os objetivos antigos explicitamente
+            for old_goal in old_goals:
+                session.delete(old_goal)
+            
+            # 3. Adicionar os novos objetivos
             for use_goal in use_goals:
-                new_user_study_tracker_app_uses.append(
-                    STAppUseModel(
-                        id=use_goal,
-                        user_id=user_id,
-                        user=user_model
-                    )
+                new_goal = STAppUseModel(
+                    goal_id=use_goal,
+                    user_id=user_id
                 )
-            user_model.user_st_app_uses = new_user_study_tracker_app_uses
-            session.add(user_model)
+                session.add(new_goal)
+                
+            # 4. Guardar as alterações na base de dados
             session.commit()
-            session.refresh(user_model)
 
     def update_study_tracker_app_planning_day(self, user_id: int, day: int, hour: int):
         with Session(engine) as session:

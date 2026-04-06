@@ -21,9 +21,10 @@ class UserOutputDto(BaseModel):
     
     avatarFilename: Optional[str] = None 
     batches: list = []
-
     custom_colors: List[str] = [] 
     tutorial_progress: List[str] = []
+    use_goals: List[int] = []
+    display_name: Optional[str] = None
     
     @classmethod
     def fromUser(cls, user):
@@ -57,7 +58,8 @@ class UserOutputDto(BaseModel):
             
             avatarFilename=getattr(user, "avatar_filename", None),
             batches=batches_dtos,
-            custom_colors=colors
+            custom_colors=colors,
+            display_name=getattr(user, "display_name", None) 
         )
 
 class TagOutputDto(BaseModel):

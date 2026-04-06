@@ -266,7 +266,7 @@ class ChallengeModel(SQLModel, table=True):
 
 class STAppUseModel(SQLModel, table=True):
     __tablename__ = "st_app_use_model"
-    id: int = Field(primary_key=True)
+    goal_id: int = Field(primary_key=True)
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     user: UserModel = Relationship(back_populates="user_st_app_uses")
 
