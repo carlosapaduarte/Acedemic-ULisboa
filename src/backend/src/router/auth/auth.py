@@ -82,9 +82,18 @@ async def saml_callback(request: Request, db: Session = Depends(get_session)):
         user = CommonsSqlRepo.get_user_by_fenix_id(db, fenix_id)
         is_new_user = False
 
-        real_name = attributes.get('displayName', [None])[0] or attributes.get('cn', [None])[0] or attributes.get('givenName', [None])[0]
-        if real_name:
-            real_name = real_name.strip()
+        # EXTRAÇÃO DO PRIMEIRO E ÚLTIMO NOME (SAML ULISBOA)
+        raw_full_name = attributes.get('fullName', [None])[0] or attributes.get('displayName', [None])[0] or attributes.get('cn', [None])[0]
+        
+        real_name = None
+        if raw_full_name:
+            name_parts = raw_full_name.strip().split()
+            if len(name_parts) > 1:
+                # Pega no índice 0 (primeiro) e no índice -1 (último)
+                real_name = f"{name_parts[0]} {name_parts[-1]}"
+            elif len(name_parts) == 1:
+                # Se a reitoria mandar só uma palavra, usamos essa
+                real_name = name_parts[0]
 
         if not user:
             is_new_user = True
@@ -108,6 +117,12 @@ async def saml_callback(request: Request, db: Session = Depends(get_session)):
                 user.display_name = real_name
                 db.commit()
 
+        try:
+            gamification_service.update_login_streak(db, user.id)
+        except Exception as e:
+            print(f"⚠️ Erro silencioso ao atribuir medalha de onboarding no login: {e}")
+
+        # (Mantém o código que já tens a partir daqui)
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": user.username}, expires_delta=access_token_expires
@@ -184,12 +199,17 @@ async def dev_login(request: Request, target: str = "tracker", db: Session = Dep
         user = CommonsSqlRepo.get_user_by_id(db, new_user_model.id)
         
         # Testar nome localmente
-        user.display_name = "Cláudia (Dev Mode)"
+        user.display_name = "Alexa (Dev Mode)"
         db.commit()
     else:
         # Atualizar nome localmente se já existir
-        user.display_name = "Cláudia (Dev Mode)"
+        user.display_name = "Alexa (Dev Mode)"
         db.commit()
+
+    try:
+        gamification_service.update_login_streak(db, user.id)
+    except Exception as e:
+        print(f"⚠️ Erro ao atualizar streak no dev-login: {e}")
 
     # Gera o Token de Acesso
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

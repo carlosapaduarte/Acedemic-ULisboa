@@ -779,7 +779,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 name=grade.name,
                 value=grade.value,
                 weight=grade.weight,
-                curricular_unit_id=curricular_unit_model.id,
+                curricular_unit_name=curricular_unit_model.name,
                 user_id=user_id
             ))
             session.add(curricular_unit_model)

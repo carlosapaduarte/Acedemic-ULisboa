@@ -16,7 +16,6 @@ export default function SSOCallback() {
     if (token) {
       console.log("🎟️ Token recebido! A gravar chaves do Challenge...");
 
-      // 1. Gravar com nomes ISOLADOS para o Challenge
       localStorage.setItem("challenge_token", token);
       localStorage.setItem("challenge_jwt", token);
 
@@ -27,12 +26,15 @@ export default function SSOCallback() {
         );
       }
 
-      // 2. A MAGIA DO ISOLAMENTO: Cookies restritas à pasta /challenge/
       document.cookie = `token=${token}; path=/challenge/; max-age=86400; SameSite=Lax`;
       document.cookie = `access_token=${token}; path=/challenge/; max-age=86400; SameSite=Lax`;
 
-      // 3. Redirecionar
+      if (isNewUser) {
+         sessionStorage.setItem("show_novato_badge", "true");
+      }
+
       setTimeout(() => {
+        // Redireciona para o fluxo normal
         const setupParam = isNewUser ? "?setup=true" : "";
         window.location.href = `/challenge/log-in${setupParam}`;
       }, 100);
@@ -41,7 +43,6 @@ export default function SSOCallback() {
       window.location.href = "/challenge/log-in";
     }
   }, [searchParams]);
-
   return (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100vh" }}>
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4" style={{ borderBottomColor: 'transparent', borderRadius: '50%', border: '4px solid #2563eb', borderTopColor: 'transparent', width: '40px', height: '40px', animation: 'spin 1s linear infinite' }}></div>

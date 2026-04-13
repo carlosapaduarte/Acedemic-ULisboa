@@ -340,23 +340,21 @@ class STFileModel(SQLModel, table=True):
 
 class STCurricularUnitModel(SQLModel, table=True):
     __tablename__ = "st_curricular_unit"
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(nullable=False)
+    
+    # Chave Composta: a UC é identificada pelo par Nome + Utilizador
+    name: str = Field(primary_key=True)
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+
     ects: float = Field(default=6.0)
     min_grade: float = Field(default=9.5)
     target_grade: Optional[float] = Field(default=None)
     
-    user_id: int = Field(foreign_key="user.id")
     user: UserModel = Relationship(back_populates="st_curricular_units")
     
+    # O back_populates deve bater certo com a classe Grade
     grades: list["STGradeModel"] = Relationship(
         back_populates="curricular_unit",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"} # Apaga nota se apagar a UC
-    )
-
-    # Garante que um utilizador não pode ter duas UCs com o mesmo nome
-    __table_args__ = (
-        UniqueConstraint('name', 'user_id', name='uq_uc_name_per_user'),
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
 class STGradeModel(SQLModel, table=True):
@@ -368,8 +366,16 @@ class STGradeModel(SQLModel, table=True):
     weight: float
     user_id: int = Field(foreign_key="user.id")
     
-    curricular_unit_id: int = Field(foreign_key="st_curricular_unit.id")
+    curricular_unit_name: str = Field()
     curricular_unit: "STCurricularUnitModel" = Relationship(back_populates="grades")
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["curricular_unit_name", "user_id"],
+            ["st_curricular_unit.name", "st_curricular_unit.user_id"],
+            name="fk_grade_to_uc_composite"
+        ),
+    )
 
 class WeekStudyTimeModel(SQLModel, table=True):
     __tablename__ = "week_study_time"

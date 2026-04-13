@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef, Suspense, lazy } from "react";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { ArchiveItem, FileItem, service } from "~/service/service";
 import styles from "./notesPage.module.css";
 import { useTranslation } from "react-i18next";
+import React, { useEffect, useState, useRef, Suspense, lazy, startTransition } from "react";
 import {
   FaFolder,
   FaFilePdf,
@@ -143,9 +143,11 @@ function NotesPage() {
   }, [textContent]);
 
   const openTextEditor = (file: FileItem) => {
-    setEditingFile(file);
-    setTextContent(file.text || "");
-    setSaveStatus("Guardado");
+    startTransition(() => {
+      setEditingFile(file);
+      setTextContent(file.text || "");
+      setSaveStatus("Guardado");
+    });
 
     try {
       const recent = JSON.parse(localStorage.getItem("recent_notes") || "[]");

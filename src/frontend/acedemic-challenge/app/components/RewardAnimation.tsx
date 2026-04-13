@@ -1,6 +1,6 @@
 import React from "react";
 import Confetti from "react-confetti";
-import type { Badge, League } from "~/types/Badge";
+import type { Badge } from "~/types/Badge";
 import styles from "./RewardAnimation.module.css";
 
 interface RewardAnimationProps {
@@ -8,25 +8,17 @@ interface RewardAnimationProps {
     onClose: () => void;
 }
 
-const APP_BASE_PATH = import.meta.env.BASE_URL || "/";
-
 export default function RewardAnimation({
     awardedBadge,
     onClose,
 }: RewardAnimationProps) {
-    // Verifica se a medalha é uma de "fim de nível" para uma animação maior com a imagem do nivel
+    // Verifica se a medalha é uma de "fim de nível" para uma animação maior
     const isLevelUp =
         awardedBadge.code.includes("iniciante_determinado") ||
         awardedBadge.code.includes("cavaleiro_persistencia") ||
         awardedBadge.code.includes("campeao_autoeficacia");
 
-    const cleanIconUrl = awardedBadge.icon_url?.startsWith("/")
-        ? awardedBadge.icon_url.substring(1)
-        : awardedBadge.icon_url;
-
-    const imageUrl = cleanIconUrl
-        ? `${APP_BASE_PATH}${cleanIconUrl}`
-        : `${APP_BASE_PATH}assets/badgesdefault-badge.png`;
+    const imageUrl = `/challenge/badges/${awardedBadge.code}.png`;
 
     return (
         <div className={styles.overlay}>
@@ -39,14 +31,18 @@ export default function RewardAnimation({
                 className={`${styles.rewardCard} ${isLevelUp ? styles.levelUpCard : ""}`}
             >
                 <h2>
-                    {isLevelUp ? "NÍVEL COMPLETO!" : "TROFÉU DESBLOQUEADO!"}
-                    {/* TODO: Traduzir */}
+                    {isLevelUp ? "NÍVEL CONCLUÍDO!" : "NOVA MEDALHA DESBLOQUEADA!"}
                 </h2>
+                
                 <img
                     src={imageUrl}
                     alt={awardedBadge.title}
                     className={styles.badgeImage}
+                    onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/challenge/avatars/challenge.png';
+                    }}
                 />
+                
                 <h3 className={styles.badgeTitle}>{awardedBadge.title}</h3>
                 <p className={styles.badgeDescription}>
                     {awardedBadge.description}

@@ -1,9 +1,12 @@
 import { service } from "~/service/service";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./selectLevelPage.module.css";
 import { getChallengeIdList } from "~/challenges/getLevels";
 import classNames from "classnames";
+
+import RewardAnimation from "~/components/RewardAnimation"; 
+import type { Badge } from "~/types/Badge";
 
 export default function SelectLevelPage(
     {
@@ -19,27 +22,62 @@ export default function SelectLevelPage(
             onStartQuizClick
         });
     const { t } = useTranslation(["login"]);
+    const [showNovatoBadge, setShowNovatoBadge] = useState(false);
+    
+    // Simulação do objeto badge para passar ao teu popup
+    const novatoBadgeData: Badge = {
+        id: 0, 
+        code: "ac_novato",
+        title: "Novato",
+        description: "Após finalizar a autenticação na app.",
+        icon_url: "/challenge/badges/ac_novato.png",
+        app_scope: "academic_challenge",
+        is_active: true
+    };
+
+    useEffect(() => {
+        if (sessionStorage.getItem("show_novato_badge") === "true") {
+            setShowNovatoBadge(true);
+            sessionStorage.removeItem("show_novato_badge");
+        }
+    }, []);
 
     return (
-        <div className={styles.selectLevelPageContainer}>
-            <div className={styles.selectLevelPageInnerContainer}>
-                <Title />
-                <Levels
-                    selectedLevel={selectedLevel}
-                    onLevelClick={setSelectedLevel}
-                />
-                <div className={styles.confirmButtonContainer}>
-                    <button className={`${styles.confirmLevelButton}`}
-                            onClick={() => {
-                                if (selectedLevel !== null)
-                                    onConfirmClick(selectedLevel);
+        <>
+            {showNovatoBadge && (
+                <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+                    <RewardAnimation 
+                        awardedBadge={novatoBadgeData} 
+                        onClose={() => setShowNovatoBadge(false)} 
+                    />
+                </div>
+            )}
+
+            <div className={styles.selectLevelPageContainer}>
+                <div className={styles.selectLevelPageInnerContainer}>
+                    <Title />
+                    <Levels
+                        selectedLevel={selectedLevel}
+                        onLevelClick={setSelectedLevel}
+                    />
+                    <div className={styles.confirmButtonContainer}>
+                        <button 
+                            className={`${styles.confirmLevelButton}`}
+                            // 💡 MAGIA MOBILE: onTouchEnd forçado
+                            onTouchEnd={(e) => {
+                                e.preventDefault(); // Impede o browser de baralhar o toque com scroll
+                                if (selectedLevel !== null) onConfirmClick(selectedLevel);
                             }}
-                    >
-                        {t("login:confirm_level")}
-                    </button>
+                            onClick={() => {
+                                if (selectedLevel !== null) onConfirmClick(selectedLevel);
+                            }}
+                        >
+                            {t("login:confirm_level")}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 
@@ -116,8 +154,9 @@ function Level({
         <div className={styles.levelContainer}>
             <div className={styles.levelImageContainer}>
                 <img
-                    src={`lvl${levelType.valueOf()}.png`}
+                    src={`/challenge/lvl${levelType.valueOf()}.png`}
                     alt={`Level ${levelType.valueOf()} Image`}
+                    onError={(e) => { (e.target as HTMLImageElement).src = `lvl${levelType.valueOf()}.png`; }}
                 />
             </div>
             <div className={styles.levelContentContainer}>

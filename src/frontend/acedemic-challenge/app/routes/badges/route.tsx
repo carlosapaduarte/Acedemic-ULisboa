@@ -58,29 +58,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function BadgesPage() {
     const navigate = useNavigate();
     const [badges, setBadges] = useState<CombinedBadgeStatus[]>([]);
-    const [currentUserChallengeLevel, setCurrentUserChallengeLevel] = useState<
-        number | null
-    >(null);
-    const [completedLevelRanks, setCompletedLevelRanks] = useState<number[]>(
-        [],
-    );
+    const [currentUserChallengeLevel, setCurrentUserChallengeLevel] = useState<number | null>(null);
+    const [completedLevelRanks, setCompletedLevelRanks] = useState<number[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
-    const [expandedLevels, setExpandedLevels] = useState<Set<number>>(
-        new Set(),
-    );
-    // animação
+    const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set());
     const [animatingLevel, setAnimatingLevel] = useState<number | null>(null);
-    const { width, height } = useWindowSize(); //obter o tamanho da tela
-
-    const [confettiSource, setConfettiSource] = useState<{
-        x: number;
-        y: number;
-    } | null>(null);
+    const { width, height } = useWindowSize(); 
+    const [confettiSource, setConfettiSource] = useState<{ x: number; y: number; } | null>(null);
     const levelRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-    // 🕵️‍♀️ O espião da Página de Badges
     useEffect(() => {
         service.logUserAction("challenge", "page_view", "badges");
     }, []);
@@ -89,13 +76,10 @@ export default function BadgesPage() {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
-                const data: GamificationProfile =
-                    await service.fetchGamificationProfile();
-
+                const data: GamificationProfile = await service.fetchGamificationProfile();
                 setBadges(data.badges_status);
                 setCurrentUserChallengeLevel(data.current_challenge_level);
                 setCompletedLevelRanks(data.completed_level_ranks);
-
                 if (data.current_challenge_level) {
                     setExpandedLevels(new Set([data.current_challenge_level]));
                 }
@@ -104,38 +88,26 @@ export default function BadgesPage() {
                     navigate("/log-in");
                     return;
                 }
-                setError(
-                    err.message || "Falha ao carregar o perfil de gamificação.",
-                );
+                setError(err.message || "Falha ao carregar o perfil de gamificação.");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchProfile();
     }, [navigate]);
 
     useEffect(() => {
-        if (loading || badges.length === 0) {
-            return;
-        }
-
+        if (loading || badges.length === 0) return;
         const completedLevel = sessionStorage.getItem("justCompletedLevel");
         if (completedLevel) {
             const levelRank = parseInt(completedLevel, 10);
             const levelElement = levelRefs.current[levelRank];
-
             if (levelElement) {
                 const rect = levelElement.getBoundingClientRect();
-                setConfettiSource({
-                    x: rect.left + rect.width / 2,
-                    y: rect.top + rect.height / 2,
-                });
+                setConfettiSource({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
             }
-
             setAnimatingLevel(levelRank);
             sessionStorage.removeItem("justCompletedLevel");
-
             const timer = setTimeout(() => {
                 setAnimatingLevel(null);
                 setConfettiSource(null);
@@ -144,221 +116,95 @@ export default function BadgesPage() {
         }
     }, [loading, badges]);
 
-    // Função para abrir/fechar um nível
     const toggleLevelExpansion = (rank: number) => {
         setExpandedLevels((prev) => {
             const newSet = new Set(prev);
-            if (newSet.has(rank)) {
-                newSet.delete(rank);
-            } else {
-                newSet.add(rank);
-            }
+            if (newSet.has(rank)) newSet.delete(rank);
+            else newSet.add(rank);
             return newSet;
         });
     };
 
     const groupedAndSortedBadgesByLevel = useMemo(() => {
-        const grouped = new Map<
-            number,
-            { league: League; badges: CombinedBadgeStatus[] }
-        >();
+        const grouped = new Map<number, { league: League; badges: CombinedBadgeStatus[] }>();
         badges.forEach((badge) => {
             if (badge.league) {
                 const leagueId = badge.league.id;
-                if (!grouped.has(leagueId)) {
-                    grouped.set(leagueId, { league: badge.league, badges: [] });
-                }
+                if (!grouped.has(leagueId)) grouped.set(leagueId, { league: badge.league, badges: [] });
                 grouped.get(leagueId)?.badges.push(badge);
             }
         });
-
-        return Array.from(grouped.values()).sort(
-            (a, b) => a.league.rank - b.league.rank,
-        );
+        return Array.from(grouped.values()).sort((a, b) => a.league.rank - b.league.rank);
     }, [badges]);
 
-    if (loading)
-        return <p className="p-4 text-gray-300">A carregar medalhas...</p>;
+    if (loading) return <p className="p-4 text-gray-300">A carregar medalhas...</p>;
     if (error) return <p className="p-4 text-red-400">Erro: {error}</p>;
 
     return (
         <div className="p-4 min-h-screen bg-purple-900 text-gray-100 relative tutorial-target-badges-header">
-            {" "}
             {animatingLevel !== null && confettiSource && (
-                <Confetti
-                    width={width}
-                    height={height}
-                    recycle={false}
-                    numberOfPieces={500}
-                    gravity={0.15}
-                    // Os confetis agora explodem a partir do centro do nível
-                    initialVelocityX={{ min: -10, max: 10 }}
-                    initialVelocityY={{ min: -15, max: 5 }}
-                    confettiSource={confettiSource}
-                />
+                <Confetti width={width} height={height} recycle={false} numberOfPieces={500} gravity={0.15} initialVelocityX={{ min: -10, max: 10 }} initialVelocityY={{ min: -15, max: 5 }} confettiSource={confettiSource} />
             )}
-            {groupedAndSortedBadgesByLevel.map(
-                ({ league, badges: levelBadges }, index) => {
-                    const earnedCount = levelBadges.filter(
-                        (b) => b.has_earned,
-                    ).length;
-                    const totalCount = levelBadges.length;
-                    const allBadgesInLevelEarned =
-                        totalCount > 0 && earnedCount === totalCount;
-                    const isCompletedByRank = completedLevelRanks.includes(
-                        league.rank,
-                    );
-                    const isCompleted =
-                        isCompletedByRank || allBadgesInLevelEarned;
+            {groupedAndSortedBadgesByLevel.map(({ league, badges: levelBadges }, index) => {
+                const earnedCount = levelBadges.filter((b) => b.has_earned).length;
+                const totalCount = levelBadges.length;
+                const allBadgesInLevelEarned = totalCount > 0 && earnedCount === totalCount;
+                const isCompletedByRank = completedLevelRanks.includes(league.rank);
+                const isCompleted = isCompletedByRank || allBadgesInLevelEarned;
+                const isCurrent = league.rank === currentUserChallengeLevel;
+                const hasProgress = earnedCount > 0;
+                const isAccessible = isCurrent || isCompleted || hasProgress;
+                let statusText = isCompleted ? "NÍVEL COMPLETADO" : isCurrent ? "EM CURSO" : hasProgress ? "EM PROGRESSO" : "NÃO SELECIONADO";
+                const isExpanded = expandedLevels.has(league.rank);
 
-                    const isCurrent = league.rank === currentUserChallengeLevel;
-                    const hasProgress = earnedCount > 0;
-                    const isAccessible =
-                        isCurrent || isCompleted || hasProgress;
-
-                    let statusText = "";
-
-                    if (isCompleted) {
-                        statusText = "NÍVEL COMPLETADO";
-                    } else if (isCurrent) {
-                        statusText = "EM CURSO";
-                    } else if (hasProgress) {
-                        statusText = "EM PROGRESSO";
-                    } else {
-                        statusText = "NÃO SELECIONADO";
-                    }
-
-                    const isExpanded = expandedLevels.has(league.rank);
-
-                    return (
-                        <div
-                            key={league.id}
-                            ref={(el) => (levelRefs.current[league.rank] = el)}
-                            className={classNames(styles.levelContainer, {
-                                [styles.levelLocked]: !isAccessible,
-                                "tutorial-target-level-container": index === 0,
-                            })}
-                        >
-                            <div
-                                className={styles.levelHeaderContainer}
-                                onClick={() =>
-                                    toggleLevelExpansion(league.rank)
-                                }
-                            >
-                                <h2 className={styles.levelHeader}>
-                                    {league.name}
-                                </h2>
-                                <div className={styles.headerRight}>
-                                    <span className={styles.badgeCounter}>
-                                        🏆{" "}
-                                        {
-                                            levelBadges.filter(
-                                                (b) => b.has_earned,
-                                            ).length
-                                        }{" "}
-                                        / {levelBadges.length}
-                                    </span>
-                                    <div
-                                        className={classNames({
-                                            [styles.chipAnimate]:
-                                                animatingLevel === league.rank,
-                                        })}
-                                    >
-                                        <LevelStatusChip status={statusText} />
-                                    </div>
-                                    <span
-                                        className={classNames(
-                                            styles.arrowIcon,
-                                            {
-                                                [styles.arrowExpanded]:
-                                                    isExpanded,
-                                            },
-                                        )}
-                                    >
-                                        ▼
-                                    </span>
-                                </div>
+                return (
+                    <div key={league.id} ref={(el) => (levelRefs.current[league.rank] = el)} className={classNames(styles.levelContainer, { [styles.levelLocked]: !isAccessible, "tutorial-target-level-container": index === 0, })}>
+                        <div className={styles.levelHeaderContainer} onClick={() => toggleLevelExpansion(league.rank)}>
+                            <h2 className={styles.levelHeader}>{league.name}</h2>
+                            <div className={styles.headerRight}>
+                                <span className={styles.badgeCounter}>🏆 {levelBadges.filter((b) => b.has_earned).length} / {levelBadges.length}</span>
+                                <div className={classNames({ [styles.chipAnimate]: animatingLevel === league.rank, })}><LevelStatusChip status={statusText} /></div>
+                                <span className={classNames(styles.arrowIcon, { [styles.arrowExpanded]: isExpanded, })}>▼</span>
                             </div>
-
-                            {isExpanded && (
-                                <div className={styles.levelContent}>
-                                    {!isAccessible && (
-                                        <div className={styles.lockedOverlay}>
-                                            <div
-                                                className={
-                                                    styles.lockIconContainer
-                                                }
-                                            >
-                                                <img
-                                                    src={`/icons/padlock.svg`}
-                                                    alt="Nível Bloqueado"
-                                                    className={
-                                                        styles.lockIconSvg
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-                                    <ul className={styles.badgesGrid}>
-                                        {levelBadges.map(
-                                            (
-                                                badge: CombinedBadgeStatus,
-                                                badgeIndex,
-                                            ) => (
-                                                <li
-                                                    key={badge.id}
-                                                    className={classNames(
-                                                        styles.badgeItem,
-                                                        {
-                                                            [styles.badgeEarned]:
-                                                                badge.has_earned,
-                                                            [styles.badgeLocked]:
-                                                                !badge.has_earned,
-                                                            "tutorial-target-badge-item":
-                                                                index === 0 &&
-                                                                badgeIndex ===
-                                                                    0,
-                                                        },
-                                                    )}
-                                                >
-                                                    <img
-                                                        src={`/badges/${badge.code}.png`}
-                                                        alt={badge.title}
-                                                        className={classNames(
-                                                            styles.badgeImage,
-                                                            {
-                                                                [styles.badgeImageLocked]: !badge.has_earned,
-                                                            },
-                                                        )}
-                                                        onError={(e) => {
-                                                            (e.target as HTMLImageElement).src = '/badges/default_badge.png';
-                                                        }}
-                                                    />
-                                                    <h3
-                                                        className={
-                                                            styles.badgeTitle
-                                                        }
-                                                    >
-                                                        {badge.title}
-                                                    </h3>
-                                                    {/* --- 4. MOSTRAR A DESCRIÇÃO DA MEDALHA --- */}
-                                                    <p
-                                                        className={
-                                                            styles.badgeDescription
-                                                        }
-                                                    >
-                                                        {badge.description}
-                                                    </p>
-                                                </li>
-                                            ),
-                                        )}
-                                    </ul>
-                                </div>
-                            )}
                         </div>
-                    );
-                },
-            )}
+
+                        {isExpanded && (
+                            <div className={styles.levelContent}>
+                                {!isAccessible && (
+                                    <div className={styles.lockedOverlay}>
+                                        <div className={styles.lockIconContainer}>
+                                            <img
+                                                src={`/challenge/icons/padlock.svg`}
+                                                alt="Nível Bloqueado"
+                                                className={styles.lockIconSvg}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                <ul className={styles.badgesGrid}>
+                                    {levelBadges.map((badge: CombinedBadgeStatus, badgeIndex) => (
+                                        <li key={badge.id} className={classNames(styles.badgeItem, { [styles.badgeEarned]: badge.has_earned, [styles.badgeLocked]: !badge.has_earned, "tutorial-target-badge-item": index === 0 && badgeIndex === 0, })}>
+                                            <img
+                                                src={`/challenge/badges/${badge.code}.png`}
+                                                alt={badge.title}
+                                                className={classNames(styles.badgeImage, {
+                                                    [styles.badgeImageLocked]: !badge.has_earned,
+                                                })}
+                                                onError={(e) => {
+                                                    // console.error(`[ERRO BADGE] Falhou ao carregar: /challenge/badges/${badge.code}.png`);
+                                                    (e.target as HTMLImageElement).style.visibility = 'hidden'; 
+                                                }}
+                                            />
+                                            <h3 className={styles.badgeTitle}>{badge.title}</h3>
+                                            <p className={styles.badgeDescription}>{badge.description}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                );
+            },)}
         </div>
     );
 }

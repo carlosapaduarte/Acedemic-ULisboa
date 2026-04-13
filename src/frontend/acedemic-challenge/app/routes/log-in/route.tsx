@@ -65,27 +65,26 @@ function CurrentView() {
             return null;
         case "authentication":
             return (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', padding: '2rem' }}>
-                    <h2 style={{ marginBottom: '1rem', fontSize: '2rem', color: '#333' }}>Bem-vindo(a) ao ACEdemic Challenge</h2>
-                    <p style={{ marginBottom: '3rem', color: '#666', fontSize: '1.1rem' }}>
-                        Acede com a tua conta da Universidade de Lisboa para começares o desafio.
-                    </p>
-                    <Button
-                        style={{ 
-                            backgroundColor: '#003366', 
-                            color: 'white', 
-                            padding: '15px 40px', 
-                            fontSize: '1.2rem', 
-                            border: 'none', 
-                            borderRadius: '8px', 
-                            cursor: 'pointer', 
-                            fontWeight: 'bold',
-                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                        }}
-                        onPress={() => window.location.href = "/api/auth/ulisboa/login?target=challenge"}
-                    >
-                        Log in ULisboa
-                    </Button>
+                <div className={styles.authContainer}>
+                    <div className={styles.authCard}>
+                        <div className={styles.trophyIcon}>🏆</div>
+                        <h2 className={styles.title}>ACEdemic Challenge</h2>
+                        <p className={styles.subtitle}>
+                            Liberta o teu potencial. Entra na arena para desbloqueares conquistas e elevares o teu percurso académico.
+                        </p>
+                        
+                        {/* 💡 O Botão Atualizado para Entrar E Registar */}
+                        <Button
+                            className={styles.actionButton}
+                            onPress={() => window.location.href = "/api/auth/ulisboa/login?target=challenge"}
+                        >
+                            Entrar / Registar com Fénix
+                        </Button>
+                        
+                        <p className={styles.helperText}>
+                            A tua conta ULisboa é tudo o que precisas. Se for o teu primeiro acesso, a conta será criada automaticamente!
+                        </p>
+                    </div>
                 </div>
             );
         case "shareProgress":

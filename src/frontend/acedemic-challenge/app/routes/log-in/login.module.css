@@ -2,8 +2,91 @@
 
 .loginPage {
     width: 100%;
-    height: 100%;
-
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    color: white;
+    font-family: var(--font-family1), sans-serif;
+}
+
+.authContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 2rem;
+    position: relative;
+}
+
+.authCard {
+    padding: 3rem 2rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    max-width: 450px;
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.trophyIcon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #f3e8ff;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #d8b4fe;
+    margin-bottom: 2.5rem;
+    line-height: 1.5;
+}
+
+.actionButton {
+    background: #f59e0b; /* Dourado/Amarelo */
+    color: #78350f; /* Castanho escuro */
+    font-weight: bold;
+    padding: 1.2rem 1rem;
+    border-radius: 9999px;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+    text-transform: uppercase;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: inline-block; /* Para o Button do react-aria-components */
+}
+
+.actionButton:hover {
+    background: #fbbf24;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.helperText {
+    font-size: 0.85rem;
+    color: #e9d5ff;
+    margin-top: 1.5rem;
+    opacity: 0.8;
 }
