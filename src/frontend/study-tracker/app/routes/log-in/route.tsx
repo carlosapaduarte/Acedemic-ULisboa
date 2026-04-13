@@ -79,10 +79,9 @@ function CurrentView() {
                 </div>
             );
         case "appUsagesSelection":
-            // Corrigido: Agora vai para as notificações em vez de saltar direto para o Avatar!
             return (
                 <AppUsagesSelectionPage
-                    onProceed={() => setCurrentView("receiveNotificationsSelection")}
+                    onProceed={() => setCurrentView("avatarSelection")} 
                 />
             );
         case "receiveNotificationsSelection":

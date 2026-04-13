@@ -415,3 +415,25 @@ def log_user_action(
     db.commit()
     
     return {"status": "logged"}
+
+# 1. Cria um DTO para receber o nome
+class UpdateDisplayNameDto(BaseModel):
+    display_name: str
+
+# 2. Cria a rota PUT
+@router.put("/users/me/display-name")
+def update_display_name(
+    data: UpdateDisplayNameDto,
+    user_id: Annotated[int, Depends(get_current_user_id)],
+    db: Annotated[Session, Depends(get_db_session)]
+):
+    user_db = db.get(UserModel, user_id)
+    if not user_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    # Atualiza o nome na BD
+    user_db.display_name = data.display_name
+    db.add(user_db)
+    db.commit()
+    
+    return {"message": "Nome de exibição atualizado com sucesso", "display_name": data.display_name}

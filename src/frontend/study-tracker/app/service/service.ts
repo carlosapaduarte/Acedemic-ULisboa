@@ -1228,6 +1228,7 @@ export const service = {
   renameArchive,
   renameFile,
   logUserAction,
+  updateDisplayName,
 
   async fetchUserTags(): Promise<Tag[]> {
     try {
@@ -1329,3 +1330,18 @@ export const service = {
 
   saveMood,
 };
+
+async function updateDisplayName(displayName: string) {
+  const request = {
+    path: `commons/users/me/display-name`,
+    method: "PUT",
+    body: toJsonBody({ display_name: displayName }),
+  };
+  const response: Response = await doFetch(request);
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Erro ao atualizar nome:", errorText);
+    throw new Error("Não foi possível atualizar o nome de exibição.");
+  }
+  return await response.json();
+}

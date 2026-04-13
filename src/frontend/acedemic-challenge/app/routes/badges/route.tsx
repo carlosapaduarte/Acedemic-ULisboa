@@ -322,19 +322,17 @@ export default function BadgesPage() {
                                                     )}
                                                 >
                                                     <img
-                                                        src={
-                                                            badge.icon_url
-                                                                ? `/${badge.icon_url.substring(1)}`
-                                                                : ""
-                                                        }
+                                                        src={`/badges/${badge.code}.png`}
                                                         alt={badge.title}
                                                         className={classNames(
                                                             styles.badgeImage,
                                                             {
-                                                                [styles.badgeImageLocked]:
-                                                                    !badge.has_earned,
+                                                                [styles.badgeImageLocked]: !badge.has_earned,
                                                             },
                                                         )}
+                                                        onError={(e) => {
+                                                            (e.target as HTMLImageElement).src = '/badges/default_badge.png';
+                                                        }}
                                                     />
                                                     <h3
                                                         className={

@@ -35,6 +35,7 @@ export default function SettingsPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [user, setUser] = useState<UserInfo | null>(null);
 
+  const [displayName, setDisplayName] = useState<string>("");
   // Form States
   const [selectedAvatarIndex, setSelectedAvatarIndex] = useState<number>(-1);
   const [avatars, setAvatars] = useState<string[]>([]);
@@ -50,6 +51,8 @@ export default function SettingsPage() {
       .fetchUserInfoFromApi()
       .then((data) => {
         setUser(data);
+
+        setDisplayName(data.display_name || data.username || "");
 
         if (data.use_goals) {
           setSelectedObjetivos(data.use_goals);
@@ -96,21 +99,21 @@ export default function SettingsPage() {
         promises.push(service.selectAvatar(filename));
       }
 
-      // 2. NOVO: Enviar os objetivos para a Base de Dados!
+      // 2. Enviar Objetivos
       promises.push(service.updateAppUseGoals(new Set(selectedObjetivos)));
 
+      promises.push(service.updateDisplayName(displayName));
       if (promises.length > 0) {
         await Promise.all(promises);
 
         // Atualizar o estado local do user para refletir a mudança
         setUser({
           ...user,
-          avatarFilename:
-            newAvatarFullString.split("/").pop() || user.avatarFilename,
+          avatarFilename: newAvatarFullString.split("/").pop() || user.avatarFilename,
+          display_name: displayName, 
         });
       }
 
-      // Feedback visual de sucesso
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error: any) {
@@ -123,15 +126,12 @@ export default function SettingsPage() {
 
   const handleResetTutorial = () => {
     if (confirm("Tens a certeza que queres repetir os tutoriais? (Isto vai reiniciar todos os guias da aplicação)")) {
-      
-      // Limpa tudo o que seja "tutorial" no browser inteiro
       Object.keys(localStorage).forEach((key) => {
         if (key.toLowerCase().includes("tutorial")) localStorage.removeItem(key);
       });
       Object.keys(sessionStorage).forEach((key) => {
         if (key.toLowerCase().includes("tutorial")) sessionStorage.removeItem(key);
       });
-
       alert("Tutoriais reiniciados! A página vai recarregar.");
       window.location.reload();
     }
@@ -147,22 +147,38 @@ export default function SettingsPage() {
       </div>
 
       <div className={styles.content}>
-        {/* PERFIL (Read Only) */}
+        {/* PERFIL (Agora Editável) */}
         <section className={styles.section}>
           <h2>Perfil do Aluno</h2>
           <div className={styles.profileCard} style={{ background: "rgba(255,255,255,0.05)", padding: "15px", borderRadius: "8px" }}>
-            <div className={styles.infoRow} style={{ marginBottom: "10px" }}>
-              <span className={styles.label}>Nome de Exibição:</span>
-              <span className={styles.value} style={{ fontWeight: "bold", color: "var(--color-2)" }}>
-                {user?.display_name || "Não definido"}
-              </span>
+            
+            {/* 💡 INPUT PARA O NOME DE EXIBIÇÃO */}
+            <div className={styles.infoRow} style={{ marginBottom: "15px", display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+              <span className={styles.label} style={{ minWidth: "140px" }}>Nome de Exibição:</span>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="O teu nome..."
+                style={{
+                  background: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid var(--color-2)",
+                  color: "white",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  outline: "none",
+                  flex: "1",
+                  minWidth: "200px"
+                }}
+              />
             </div>
-            <div className={styles.infoRow} style={{ marginBottom: "10px" }}>
-              <span className={styles.label}>ID Fénix:</span>
+
+            <div className={styles.infoRow} style={{ marginBottom: "10px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              <span className={styles.label} style={{ minWidth: "140px" }}>ID Fénix:</span>
               <span className={styles.value}>{user?.username}</span>
             </div>
-            <div className={styles.infoRow}>
-              <span className={styles.label}>E-mail:</span>
+            <div className={styles.infoRow} style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              <span className={styles.label} style={{ minWidth: "140px" }}>E-mail:</span>
               <span className={styles.value} style={{ fontSize: "0.9rem", opacity: 0.8 }}>
                 {user?.institutional_email || "---"}
               </span>
@@ -188,7 +204,7 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* OBJETIVOS DE USO (Agora com index em vez de strings) */}
+        {/* OBJETIVOS DE USO */}
         <section className={styles.section}>
           <h2>Objetivos de Uso</h2>
           <p className={styles.description} style={{ marginBottom: "1rem" }}>
@@ -217,7 +233,6 @@ export default function SettingsPage() {
           </button>
         </section>
 
-        {/* ESPAÇADOR PARA O BOTÃO NÃO TAPAR O CONTEÚDO */}
         <div style={{ height: "60px" }}></div>
       </div>
 
@@ -235,14 +250,14 @@ export default function SettingsPage() {
           onClick={handleSave}
           disabled={saving}
           className={`${styles.saveButton} ${saveSuccess ? styles.success : ""}`}
-          style={{ width: "100%", maxWidth: "500px", margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "center" }}
+          style={{ width: "100%", maxWidth: "500px", margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px" }}
         >
           {saving ? (
             "A guardar..."
           ) : saveSuccess ? (
-            <><RiCheckLine /> Alterações Guardadas!</>
+            <><RiCheckLine size={20} /> Alterações Guardadas!</>
           ) : (
-            <><RiSave3Fill /> Guardar Perfil</>
+            <><RiSave3Fill size={20} /> Guardar Perfil</>
           )}
         </button>
       </div>
