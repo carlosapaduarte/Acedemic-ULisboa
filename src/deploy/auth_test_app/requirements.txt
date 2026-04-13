@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+python3-saml
+python-dotenv
+python-multipart

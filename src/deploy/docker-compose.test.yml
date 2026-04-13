@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  auth-test-app:
+    build:
+      context: ./auth_test_app
+    # A porta 8001 não precisa de ser exposta publicamente,
+    # pois o Nginx vai comunicar com ela internamente.
+    # Mas mantemo-la para facilitar a depuração, se necessário.
+    env_file:
+      - ./auth_test_app/.env
+
+    ports:
+      - "8001:8001"
+    restart: always
+    networks:
+      - deploy_default # Diz a este serviço para se juntar à rede da aplicação principal
+
+# Declara que vamos usar uma rede que já foi criada por outro ficheiro (externa)
+networks:
+  deploy_default:
+    external: true
+
