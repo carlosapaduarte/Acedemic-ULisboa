@@ -2,8 +2,7 @@ import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
 import styles from "./appBar.module.css";
 import cleanAppBarStyles from "./cleanAppBar.module.css";
-
-import { useNavigate } from "@remix-run/react";
+import { useNavigate, useLocation } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 import { GreetingsContainer } from "./HomeAppBar/HomeAppBar";
 import classNames from "classnames";
@@ -12,6 +11,131 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IconContext } from "react-icons";
 import { AppBarContext } from "./AppBarProvider";
 import { useTranslation } from "react-i18next";
+
+function GlobalStatusWidgets() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [pomodoroTimeLeft, setPomodoroTimeLeft] = useState<string | null>(null);
+  const [streakWarning, setStreakWarning] = useState<string | null>(null);
+  const [currentState, setCurrentState] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
+
+  // 💡 INJETAR O SOM DIRETAMENTE NA APPBAR
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    audioRef.current = new Audio('/tracker/sounds/bell.mp3');
+    audioRef.current.load();
+  }, []);
+
+  useEffect(() => {
+    const handleStorageChange = () => setTick(t => t + 1);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const state = localStorage.getItem("pomodoro_state");
+      const endStr = localStorage.getItem("active_pomodoro_end");
+      
+      setCurrentState(state);
+
+      // 1. MÁQUINA DE ESTADOS DO POMODORO
+      if (state && endStr) {
+        const end = parseInt(endStr, 10);
+        
+        if (now < end) {
+          // AINDA A CONTAR
+          const diff = Math.floor((end - now) / 1000);
+          const m = Math.floor(diff / 60).toString().padStart(2, "0");
+          const s = (diff % 60).toString().padStart(2, "0");
+          setPomodoroTimeLeft(`${m}:${s}`);
+        } else {
+          // 🚨 O TEMPO ACABOU! Tocar som e fazer transição
+          if (audioRef.current) {
+            audioRef.current.currentTime = 1.0;
+            audioRef.current.play().catch(e => console.log("Erro som AppBar:", e));
+          }
+
+          if (state === "study") {
+            // Passar para Pausa
+            const pauseEndStr = localStorage.getItem("active_pause_end");
+            if (pauseEndStr) {
+              localStorage.setItem("active_pomodoro_end", pauseEndStr);
+              localStorage.setItem("pomodoro_state", "pause");
+              setPomodoroTimeLeft("00:00");
+            }
+          } else if (state === "pause") {
+            // Acabou tudo, iniciar a Streak!
+            localStorage.removeItem("active_pomodoro_end");
+            localStorage.removeItem("active_pause_end");
+            localStorage.removeItem("pomodoro_state");
+            localStorage.setItem("streak_deadline", (now + 5 * 60000).toString());
+            setPomodoroTimeLeft(null);
+          }
+        }
+      } else {
+        setPomodoroTimeLeft(null);
+      }
+
+      // 2. ALERTA DE STREAK
+      const streakEndStr = localStorage.getItem("streak_deadline");
+      if (streakEndStr) {
+        const end = parseInt(streakEndStr, 10);
+        const diff = Math.floor((end - now) / 1000);
+        
+        if (diff > 0) {
+          const m = Math.floor(diff / 60).toString().padStart(2, "0");
+          const s = (diff % 60).toString().padStart(2, "0");
+          setStreakWarning(`${m}:${s}`);
+        } else {
+          setStreakWarning(null);
+          localStorage.removeItem("streak_deadline");
+        }
+      } else {
+        setStreakWarning(null);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [tick]);
+
+  const isPomodoroRoute = location.pathname.includes('/pomodoro');
+  const showPomodoroWidget = pomodoroTimeLeft !== null && !isPomodoroRoute;
+
+  // Textos e cores dinâmicas
+  const widgetColor = currentState === "pause" ? "#66BB6A" : "var(--color-2, #3498db)";
+  const widgetText = currentState === "pause" ? "☕ Em Pausa:" : "⏱️ A Estudar:";
+
+  return (
+    <>
+      {streakWarning && (
+        <div style={{ position: "fixed", top: "70px", left: "50%", transform: "translateX(-50%)", zIndex: 9999, backgroundColor: "#FFCA28", color: "#5D4037", padding: "8px 16px", borderRadius: "50px", fontWeight: "bold", boxShadow: "0 4px 10px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: "8px", animation: "pulse 2s infinite", whiteSpace: "nowrap" }}>
+          🔥 Começa em {streakWarning} para manter a Streak!
+        </div>
+      )}
+
+      {showPomodoroWidget && (
+        <div 
+          onClick={() => navigate('/pomodoro')}
+          style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 9999, backgroundColor: widgetColor, color: "white", padding: "10px 20px", borderRadius: "50px", fontWeight: "bold", boxShadow: "0 4px 10px rgba(0,0,0,0.3)", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", transition: "background-color 0.5s" }}
+        >
+          {widgetText} {pomodoroTimeLeft}
+        </div>
+      )}
+      
+      <style>{`
+        @keyframes pulse {
+          0% { transform: translateX(-50%) scale(1); }
+          50% { transform: translateX(-50%) scale(1.05); }
+          100% { transform: translateX(-50%) scale(1); }
+        }
+      `}</style>
+    </>
+  );
+}
 
 function SideBarNavButton({
   text,
@@ -237,6 +361,7 @@ export function AppBar({
         )}
       </div>
       {appBarVariant !== "clean" && <SideBar />}
+      <GlobalStatusWidgets />
     </header>
   );
 }

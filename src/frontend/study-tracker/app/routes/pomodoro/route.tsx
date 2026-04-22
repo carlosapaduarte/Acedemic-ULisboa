@@ -109,13 +109,20 @@ function useTimerSetup(
   }, [motivationalMessage]);
 
   function onTimeSelected(studyStopDate: Date, pauseStopDate: Date) {
-    // 🕵️‍♀️ Espião: Quando carregam no Play
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("active_pomodoro_end", studyStopDate.getTime().toString());
+      window.localStorage.setItem("active_pause_end", pauseStopDate.getTime().toString());
+      window.localStorage.setItem("pomodoro_state", "study");
+      window.localStorage.removeItem("streak_deadline");
+      window.dispatchEvent(new window.Event("storage")); 
+    }
+
     service.logUserAction("tracker", "action", "start_pomodoro");
 
     setStudyStopDate(studyStopDate);
     setPauseStopDate(pauseStopDate);
     setTimerStopDate(studyStopDate);
-    setSessionStartTime(new Date()); // Começa o relógio!
+    setSessionStartTime(new Date()); 
     setMotivationalMessage(null);
 
     if (audioRef.current) {
@@ -149,6 +156,8 @@ function useTimerSetup(
     setSessionStartTime(null);
     setMotivationalMessage(null);
 
+    localStorage.removeItem("active_pomodoro_end");
+
     if (activeBlock) {
       onDismissBlock();
     }
@@ -170,19 +179,28 @@ function useTimerSetup(
       onSessionEnd(elapsed);
 
       setTimerStopDate(pauseStopDate);
-      setSessionStartTime(null); // Pausa não conta
+      setSessionStartTime(null);
 
-      // 💡 Vai buscar as mensagens traduzidas ao JSON
       const messages = t("study:motivational_messages", { returnObjects: true }) as string[];
       const randomMsg = messages[Math.floor(Math.random() * messages.length)];
       setMotivationalMessage(randomMsg);
       
+      if (pauseStopDate && typeof window !== "undefined") {
+        window.localStorage.setItem("active_pomodoro_end", pauseStopDate.getTime().toString());
+        window.dispatchEvent(new window.Event("storage")); 
+      }
+      
     } else {
-      // --- FIM DA PAUSA ---
       setTimerStopDate(undefined);
       setSessionStartTime(null);
       setMotivationalMessage(null);
       if (activeBlock) onDismissBlock();
+      
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("streak_deadline", (Date.now() + 5 * 60000).toString());
+        window.localStorage.removeItem("active_pomodoro_end");
+        window.dispatchEvent(new window.Event("storage")); 
+      }
     }
   }
 

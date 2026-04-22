@@ -76,3 +76,36 @@
   text-transform: uppercase;
   font-weight: 600;
 }
+
+/* ==========================================
+   DISPOSITIVOS MÓVEIS (Página Estudar)
+   ========================================== */
+@media (max-width: 768px) {
+  .pageContainer {
+    height: auto;
+    min-height: 100vh;
+    justify-content: flex-start;
+    padding-top: 4rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .menuGrid {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .menuButton {
+    padding: 1.5rem 1rem;
+  }
+}
