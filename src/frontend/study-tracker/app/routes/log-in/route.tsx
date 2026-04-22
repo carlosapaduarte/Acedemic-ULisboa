@@ -57,25 +57,36 @@ function CurrentView() {
             return null;
         case "authentication":
             return (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: 'center' }}>
-                    <h2 style={{ marginBottom: '1rem', fontSize: '2rem', color: '#333' }}>Bem-vindo ao ACEdemic Tracker</h2>
-                    <p style={{ marginBottom: '30px', color: '#666', fontSize: '1.1rem' }}>Para aceder, inicie sessão com as suas credenciais da faculdade.</p>
-                    <Button 
-                        onPress={() => window.location.href = "/api/auth/ulisboa/login?target=tracker"}
-                        style={{
-                            padding: '14px 28px',
-                            backgroundColor: '#005baa',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                        }}
-                    >
-                        Log in ULisboa
-                    </Button>
+                <div className={styles.authContainer}>
+                    <div className={styles.authCard}>
+                        {/* 💡 O teu logotipo entra aqui! Substitui o src pelo correto */}
+                        <img 
+                            src="/tracker/icons/logo.png" 
+                            alt="Logo Study Tracker" 
+                            className={styles.appLogo} 
+                            onError={(e) => {
+                                // Plano B: Se não encontrar a imagem, mete o alvo!
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                e.currentTarget.insertAdjacentHTML('afterend', '<div style="font-size: 4rem; margin-bottom: 1rem; color: #2563eb;">🎯</div>');
+                            }}
+                        />
+                        <h2 className={styles.title}>Study Tracker</h2>
+                        <p className={styles.subtitle}>
+                            Organiza o teu estudo, acompanha o teu progresso e atinge os teus objetivos.
+                        </p>
+                        
+                        {/* 💡 O Botão Atualizado */}
+                        <Button 
+                            className={styles.actionButton}
+                            onPress={() => window.location.href = "/api/auth/ulisboa/login?target=tracker"}
+                        >
+                            Entrar / Registar com Fénix
+                        </Button>
+                        
+                        <p className={styles.helperText}>
+                            A tua conta ULisboa é tudo o que precisas. O teu espaço será configurado automaticamente.
+                        </p>
+                    </div>
                 </div>
             );
         case "appUsagesSelection":

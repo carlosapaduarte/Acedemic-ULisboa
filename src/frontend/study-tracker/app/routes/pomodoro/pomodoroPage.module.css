@@ -226,6 +226,7 @@
   color: var(--text-color-2);
   transition: background-color 0.2s ease-in-out;
   margin-top: 1rem;
+  width: 100%;
 }
 
 .confirmButton:hover {
@@ -257,6 +258,11 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
+  width: 100%;
+}
+
+.controls > div.tutorial-target-pomodoro-start {
+  flex: 1;
 }
 
 .controlButton {
@@ -269,6 +275,8 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  flex: 1;
+  width: 100%;
 }
 
 .controlButton:hover {
@@ -414,29 +422,71 @@
 }
 
 /* ==========================================
-  DISPOSITIVOS MÓVEIS
+   DISPOSITIVOS MÓVEIS (Ordem e Larguras Corrigidas)
    ========================================== */
 @media (max-width: 1024px) {
   .pomodoroLayout {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important; /* 💡 O SEGREDO MÁGICO: Obriga TODAS as caixas a esticar até às pontas do ecrã! */
     gap: 1.5rem;
-    padding: 0 0.5rem;
+    padding: 0 1rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .pomodoroContainer {
-    grid-column: 1;
-    max-width: 100%;
-    flex-basis: auto;
-    padding: 1.5rem 1rem;
-    margin-bottom: 1rem;
-    order: -1;
+  /* 💡 Reordenar pela posição no HTML */
+  .pomodoroLayout > :nth-child(1) { order: 3 !important; } 
+  .pomodoroLayout > :nth-child(2) { order: 1 !important; } 
+  .pomodoroLayout > :nth-child(3) { order: 2 !important; } 
+
+  /* Garantir que os wrappers invisíveis do tutorial acompanham a largura */
+  #tour-timer,
+  #tour-timer-active,
+  #tour-events,
+  #tour-tasks {
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
+
+  /* 💡 AQUI AS CAIXAS ESTICAM (O ESPAÇO ROSA DESAPARECE) */
+  .pomodoroContainer, 
+  .eventsContainer,
+  .taskListContainer {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-basis: auto !important; /* Remove o bloqueio de 400px do Desktop */
+    box-sizing: border-box !important;
+  }
+
+  /* Limpar margens extra e manter paddings ajustados */
+  .pomodoroContainer {
+    margin: 0 !important;
+    padding: 1.5rem 1rem !important;
+  }
+
   .taskListContainer,
   .eventsContainer {
-    padding: 1rem;
+    padding: 1.5rem 1rem !important;
   }
+
   .timerText {
     font-size: 3rem;
+  }
+
+  /* Botões empilhados (Pausar, Continuar, Parar) */
+  .controls {
+    flex-direction: column !important;
+    gap: 0.8rem !important;
+    width: 100%;
+  }
+
+  .controls > div.tutorial-target-pomodoro-start {
+    width: 100%;
+  }
+
+  .controlButton, .confirmButton {
+    width: 100% !important;
   }
 }
 
@@ -445,17 +495,7 @@
   .timerText {
     font-size: 2.5rem;
   }
-
   .timeInput {
     font-size: 1.2rem;
-  }
-  .controls {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .controlButton {
-    width: 100%;
-    text-align: center;
   }
 }

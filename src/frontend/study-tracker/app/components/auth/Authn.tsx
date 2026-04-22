@@ -24,17 +24,24 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
     }
 
     function logOut() {
-        console.log("Logging out...");
-        // LIMPA AS GAVETAS CERTAS DO TRACKER
-        localStorage.removeItem("tracker_jwt");
-        localStorage.removeItem("tracker_token");
-        localStorage.removeItem("tracker_user");
+        console.log("Logging out Tracker...");
+        
+        // 1. Limpar as chaves do Tracker
+        const keysToRemove = [
+            "jwt", "token", "user",
+            "tracker_jwt", "tracker_token", "tracker_user"
+        ];
+        keysToRemove.forEach(key => localStorage.removeItem(key));
 
-        // apagar cookies do tracker (com data no passado para o browser os apagar)
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/tracker/;";
-        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/tracker/;";
+        sessionStorage.clear();
+
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/tracker/; SameSite=Lax;";
+        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/tracker/; SameSite=Lax;";
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;";
+        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;";
 
         setIsLoggedIn(false);
+        window.location.href = "/tracker/log-in";
     }
 
     useEffect(() => {

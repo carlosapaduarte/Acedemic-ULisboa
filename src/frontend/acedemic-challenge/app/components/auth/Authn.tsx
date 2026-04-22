@@ -52,14 +52,24 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
 
     function logOut() {
         console.log("Logging out...");
-        localStorage.removeItem("jwt");
+        
+        const keysToRemove = [
+            "jwt", "token", "user",
+            "challenge_jwt", "challenge_token", "challenge_user"
+        ];
+        keysToRemove.forEach(key => localStorage.removeItem(key));
 
-        // MATAR OS COOKIES DO CHALLENGE
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/challenge/;";
-        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/challenge/;";
+        sessionStorage.clear();
+
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/challenge/; SameSite=Lax;";
+        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/challenge/; SameSite=Lax;";
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;";
+        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;";
 
         setIsLoggedIn(false);
         setUser(null);
+
+        window.location.href = "/challenge/log-in";
     }
 
     useEffect(() => {

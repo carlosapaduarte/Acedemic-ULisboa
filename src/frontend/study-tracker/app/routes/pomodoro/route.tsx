@@ -657,18 +657,14 @@ function TimerView({
 }) {
   const { t } = useTranslation("study");
 
-  let title = t("study:study_time", "Tempo de Estudo");
+  const isPause = timerStopDate && studyStopDate && timerStopDate.getTime() !== studyStopDate.getTime();
+
+  let title = isPause ? t("study:pause_time", "Tempo de Pausa") : t("study:study_time", "Tempo de Estudo");
   let stopDate = timerStopDate;
 
   if (happeningStudyBlock) {
     stopDate = happeningStudyBlock.endDate;
-    title =
-      happeningStudyBlock.title +
-      (studyStopDate
-        ? t("study:study_time", " (Tempo de Estudo)")
-        : t("study:pause_time", " (Pausa)"));
-  } else if (!studyStopDate) {
-    title = t("study:pause_time", "Pausa");
+    title = happeningStudyBlock.title + (isPause ? " (Tempo de Pausa)" : " (Tempo de Estudo)");
   }
 
   return (

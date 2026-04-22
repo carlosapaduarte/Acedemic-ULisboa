@@ -31,7 +31,7 @@ function StudyPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <h1 className={styles.title}>{t("study")}</h1>
+      <h1 className={styles.title}>{t("study_title")}</h1>
       <p className={styles.subtitle}>{t("study_subtitle")}</p>
       <div className={styles.menuGrid}>
         {MENU_ITEMS.map((item) => (
