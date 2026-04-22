@@ -223,7 +223,7 @@ export function EditTagModal({
             {tagToEdit ? (
               <>
                 <div className={styles.editFormContainer}>
-                  <TextField className={styles.textField} autoFocus>
+                  <TextField className={styles.textField}>
                     <Label>
                       {t("tag_name_pt_label", "Nome da Etiqueta (PT)")}
                     </Label>

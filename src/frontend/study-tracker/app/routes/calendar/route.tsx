@@ -31,6 +31,22 @@ import {
 
 import * as DnDModule from "react-big-calendar/lib/addons/dragAndDrop";
 
+const getContrastColor = (hexColor: string) => {
+  if (!hexColor || !hexColor.startsWith("#")) {
+    const match = hexColor.match(/#[a-fA-F0-9]{6}/);
+    if (match) hexColor = match[0];
+    else return "#ffffff";
+  }
+
+  const hex = hexColor.replace("#", "");
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? "#000000" : "#ffffff";
+};
+
 let DnDCalendar = Calendar;
 try {
   // @ts-ignore
@@ -163,7 +179,7 @@ const EventWithTags = ({
     height: "100%",
     borderRadius: "6px",
     overflow: "hidden",
-    color: "white",
+    color: "inherit",
     display: "flex",
     position: "relative",
     textDecoration: applyPastStyle ? "line-through" : "none",
@@ -1020,17 +1036,22 @@ function MyCalendar() {
 
             const applyCompletedStyle = taskId && isCompletedTaskSlot;
 
-            const baseStyle: React.CSSProperties = {
-              borderRadius: "5px",
-              color: "white",
-              border: "none",
-            };
-
             const colorStyle = getEventStyleProps(
               event.resource,
               userTags,
               applyCompletedStyle,
             );
+
+            // Calcula o contraste com base no backgroundColor resultante
+            const dynamicTextColor = colorStyle.backgroundColor 
+              ? getContrastColor(colorStyle.backgroundColor as string) 
+              : "white";
+
+            const baseStyle: React.CSSProperties = {
+              borderRadius: "5px",
+              color: dynamicTextColor,
+              border: "none",
+            };
 
             const finalStyle = {
               ...baseStyle,

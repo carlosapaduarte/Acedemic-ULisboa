@@ -7,6 +7,7 @@ from sqlalchemy import ForeignKeyConstraint, UniqueConstraint, String
 from sqlmodel import Field, Relationship, SQLModel
 
 from sqlalchemy import Column as SAColumn
+from sqlalchemy import Integer
 from sqlalchemy.dialects.postgresql import JSON, ARRAY as pg_ARRAY 
 
 class UserModel(SQLModel, table=True):
@@ -104,7 +105,7 @@ class STTaskTagModel(SQLModel, table=True):
 class TagModel(SQLModel, table=True):
     __tablename__ = "tags"
     
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[int] = Field(default=None, sa_column=SAColumn(Integer, primary_key=True, autoincrement=True))
     name_pt: Optional[str] = Field(default=None, index=True, nullable=True)
     name_en: Optional[str] = Field(default=None, index=True, nullable=True)
     color: str = Field(nullable=False)

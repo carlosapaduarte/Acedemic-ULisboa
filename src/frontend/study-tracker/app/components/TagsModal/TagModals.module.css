@@ -41,6 +41,10 @@
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   position: relative;
+  width: 90vw;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .createTagTooltip {
@@ -167,8 +171,8 @@
   display: flex;
   gap: 2rem;
   margin-top: 1rem;
-  min-width: 600px;
   min-height: 350px;
+  width: 100%;
 }
 
 /* COLUNA ESQUERDA: Lista de Tags */
@@ -331,4 +335,43 @@
   color: rgba(255, 255, 255, 0.5);
   font-style: italic;
   text-align: center;
+}
+
+/* --- MEDIA QUERY PARA MOBILE --- */
+@media (max-width: 768px) {
+  .editTagModalContainer {
+    padding: 1.5rem;
+    width: 95vw;
+  }
+
+  .mainContentContainer {
+    flex-direction: column; 
+    gap: 1.5rem;
+    min-width: unset;
+  }
+
+  .tagListColumn {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-right: 0;
+    padding-bottom: 1rem;
+    max-height: 150px;
+  }
+
+  .actionButtonsContainer {
+    justify-content: center;
+    flex-direction: column-reverse;
+    gap: 0.8rem;
+  }
+
+  .saveButton, .deleteButton {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .closeButton {
+    padding: 0.4rem 0.8rem;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
 }

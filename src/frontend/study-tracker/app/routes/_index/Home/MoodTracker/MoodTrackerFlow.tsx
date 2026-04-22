@@ -315,7 +315,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
               >
                 {t(`mood_tracker:mood_level_${currentMood.value}`)}
               </h3>
-              <p style={{ fontWeight: 600, color: "#555" }}>
+              <p style={{ fontWeight: 600, color: "#555", marginBottom: "1.5rem" }}>
                 {t("mood_tracker:emotions_question")}
               </p>
             </div>
@@ -338,10 +338,10 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
               ))}
             </div>
 
-            {!showAllEmotions && moodValue !== 3 && (
+            {moodValue !== 3 && (
               <div style={{ textAlign: "center", marginTop: "1rem" }}>
                 <button
-                  onClick={() => setShowAllEmotions(true)}
+                  onClick={() => setShowAllEmotions(!showAllEmotions)}
                   style={{
                     background: "none",
                     border: "none",
@@ -351,7 +351,9 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                     fontWeight: "600",
                   }}
                 >
-                  {t("mood_tracker:show_all_emotions")}
+                  {showAllEmotions 
+                    ? t("mood_tracker:hide_emotions") 
+                    : t("mood_tracker:show_all_emotions")}
                 </button>
               </div>
             )}
@@ -403,7 +405,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
               >
                 {t(`mood_tracker:mood_level_${currentMood.value}`)}
               </h3>
-              <p style={{ fontWeight: 600, color: "#555" }}>
+              <p style={{ fontWeight: 600, color: "#555", marginBottom: "1.5rem" }}>
                 {t("mood_tracker:impact_question")}
               </p>
             </div>

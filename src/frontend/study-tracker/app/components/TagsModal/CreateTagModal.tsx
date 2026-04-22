@@ -86,7 +86,14 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
   };
 
   return (
-    <div className={styles.createTagTooltip}>
+    <div className={styles.createTagTooltip} style={{ position: "relative" }}>
+      <button 
+        onClick={close} 
+        style={{ position: "absolute", top: "10px", right: "10px", background: "none", border: "none", cursor: "pointer", fontSize: "1.2rem", color: "#888" }}
+      >
+        <FaXmark />
+      </button>
+
       {/* 1. NOME PT */}
       <div>
         <label>{t("tag_name_pt_label", "Nome da Etiqueta (PT)")}</label>

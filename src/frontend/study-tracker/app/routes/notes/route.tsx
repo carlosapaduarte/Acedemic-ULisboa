@@ -220,6 +220,33 @@ function NotesPage() {
 
   // PESQUISA
   const isSearching = searchQuery.trim().length > 0;
+  
+  const handleFolderClick = (clickedFolder: ArchiveItem) => {
+    if (isSearching) {
+      // Reconstrói o caminho exato desde a raiz até à pasta clicada
+      const findPath = (targetId: number, list: ArchiveItem[], currentPath: ArchiveItem[] = []): ArchiveItem[] | null => {
+        for (const item of list) {
+          const path = [...currentPath, item];
+          if (item.id === targetId) return path;
+          const found = findPath(targetId, item.sub_archives, path);
+          if (found) return found;
+        }
+        return null;
+      };
+
+      const fullPath = findPath(clickedFolder.id, rootArchives);
+      if (fullPath) {
+        setFolderPath(fullPath);
+      } else {
+        setFolderPath([clickedFolder]);
+      }
+      setSearchQuery(""); 
+    } else {
+      // Se não estiver a pesquisar, faz a navegação normal
+      setFolderPath([...folderPath, clickedFolder]);
+    }
+  };
+  
   const getAllArchives = (list: ArchiveItem[]): ArchiveItem[] => {
     let res: ArchiveItem[] = [];
     list.forEach((a) => {
@@ -364,7 +391,7 @@ function NotesPage() {
               <div
                 key={archive.id}
                 className={styles.folderCard}
-                onClick={() => setFolderPath([...folderPath, archive])}
+                onClick={() => handleFolderClick(archive)}
               >
                 <div
                   style={{ alignSelf: "flex-end", display: "flex", gap: "8px" }}
@@ -406,7 +433,7 @@ function NotesPage() {
                 onClick={() => openTextEditor(file)}
               >
                 <FaNoteSticky
-                  color="#FFCA28"
+                  color="#3399ff"
                   size={20}
                   style={{ marginRight: "10px" }}
                 />
@@ -452,8 +479,14 @@ function NotesPage() {
         onOpenChange={setIsCreateFolderOpen}
         className={styles.modalOverlay}
       >
-        <Dialog className={styles.modalContent}>
-          <h2>Nova Pasta</h2>
+        <Dialog className={styles.modalContent} style={{ position: "relative" }}>
+          <button 
+            onClick={() => setIsCreateFolderOpen(false)} 
+            style={{ position: "absolute", top: "15px", right: "15px", background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#888" }}
+          >
+            <FaXmark />
+          </button>
+          <h2 style={{ marginTop: 0 }}>Nova Pasta</h2>
           <input
             className={styles.searchInput}
             value={newFolderName}
@@ -463,6 +496,7 @@ function NotesPage() {
               padding: "10px",
               width: "100%",
               margin: "10px 0",
+              boxSizing: "border-box"
             }}
           />
           {folderError && <p style={{ color: "red" }}>{folderError}</p>}
@@ -478,8 +512,14 @@ function NotesPage() {
         onOpenChange={setIsCreateFileOpen}
         className={styles.modalOverlay}
       >
-        <Dialog className={styles.modalContent}>
-          <h2>Nova Nota</h2>
+        <Dialog className={styles.modalContent} style={{ position: "relative" }}>
+          <button 
+            onClick={() => setIsCreateFileOpen(false)} 
+            style={{ position: "absolute", top: "15px", right: "15px", background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#888" }}
+          >
+            <FaXmark />
+          </button>
+          <h2 style={{ marginTop: 0 }}>Nova Nota</h2>
           <input
             className={styles.searchInput}
             value={newTextFileName}
@@ -489,6 +529,7 @@ function NotesPage() {
               padding: "10px",
               width: "100%",
               margin: "10px 0",
+              boxSizing: "border-box"
             }}
           />
           <Button className={styles.primaryButton} onPress={handleCreateFile}>
@@ -503,8 +544,14 @@ function NotesPage() {
         onOpenChange={() => setRenameTarget(null)}
         className={styles.modalOverlay}
       >
-        <Dialog className={styles.modalContent}>
-          <h2>Renomear</h2>
+        <Dialog className={styles.modalContent} style={{ position: "relative" }}>
+          <button 
+            onClick={() => setRenameTarget(null)} 
+            style={{ position: "absolute", top: "15px", right: "15px", background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#888" }}
+          >
+            <FaXmark />
+          </button>
+          <h2 style={{ marginTop: 0 }}>Renomear</h2>
           <input
             className={styles.searchInput}
             value={renameValue}
@@ -514,6 +561,7 @@ function NotesPage() {
               padding: "10px",
               width: "100%",
               margin: "10px 0",
+              boxSizing: "border-box"
             }}
           />
           <Button className={styles.primaryButton} onPress={handleRenameSubmit}>

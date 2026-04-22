@@ -346,7 +346,7 @@ function AssociatedTaskListView({
             onTaskStatusUpdated={() => {}}
             selectedTaskIds={selectedTaskIds}
             onSelectionToggle={() => {}}
-            textColor={"var(--text-color-2)"}
+            textColor={"var(--color-3)"}
           />
         ) : (
           <p className={styles.noEventsText}>

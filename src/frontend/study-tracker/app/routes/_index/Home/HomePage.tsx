@@ -51,8 +51,8 @@ function useHomePage() {
   const [taskStats, setTaskStats] = useState({ total: 0, completed: 0 });
 
   const [recentNotes, setRecentNotes] = useState<any[]>([]);
-  const [pomoWork, setPomoWork] = useState(25);
-  const [pomoBreak, setPomoBreak] = useState(5);
+  const [pomoWork, setPomoWork] = useState<number | string>(25);
+  const [pomoBreak, setPomoBreak] = useState<number | string>(5);
   const [showConfetti, setShowConfetti] = useState(false);
 
   // --- FUNÇÃO PARA CALCULAR CONTRASTE ---
@@ -302,7 +302,9 @@ export default function HomePage() {
       : 0;
 
   const handleGoToPomodoro = () => {
-    navigate(`/pomodoro?work=${pomoWork}&break=${pomoBreak}`);
+    const w = pomoWork === "" ? 25 : pomoWork;
+    const b = pomoBreak === "" ? 5 : pomoBreak;
+    navigate(`/pomodoro?work=${w}&break=${b}`);
   };
 
   const handleOpenMoodTracker = (e: React.MouseEvent) => {
@@ -562,7 +564,7 @@ export default function HomePage() {
                   className={styles.timeInput}
                   value={pomoWork}
                   onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => setPomoWork(Number(e.target.value))}
+                  onChange={(e) => setPomoWork(e.target.value === "" ? "" : Number(e.target.value))}
                 />
               </div>
               <div className={styles.inputGroup}>
@@ -572,7 +574,7 @@ export default function HomePage() {
                   className={styles.timeInput}
                   value={pomoBreak}
                   onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => setPomoBreak(Number(e.target.value))}
+                  onChange={(e) => setPomoBreak(e.target.value === "" ? "" : Number(e.target.value))}
                 />
               </div>
             </div>

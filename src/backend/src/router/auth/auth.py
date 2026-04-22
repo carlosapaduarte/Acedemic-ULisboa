@@ -5,12 +5,14 @@ from datetime import timedelta
 import os
 import datetime
 import re
-
+from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
+from repository.sql.models.database import predefined_global_tag_names
 from repository.sql.models.database import get_session
 from service.auth.saml_service import init_saml_auth, prepare_request
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from service.common.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from service.gamification import core as gamification_service
+from repository.sql.models.models import TagModel, UserTagLink
 
 router = APIRouter(
     prefix="/auth/ulisboa",
@@ -110,6 +112,33 @@ async def saml_callback(request: Request, db: Session = Depends(get_session)):
             if real_name:
                 user.display_name = real_name
                 db.commit()
+            
+            # CRIAR TAGS PREDEFINIDAS
+            try:
+                for tag_data in predefined_global_tag_names:
+                    new_tag = TagModel(
+                        name_pt=tag_data.get("name_pt"),
+                        name_en=tag_data.get("name_en"),
+                        color=tag_data.get("color"),
+                        is_uc=False,
+                        is_global=False
+                    )
+                    db.add(new_tag)
+                    db.flush() 
+
+                    # 2. Criar o "Elo" de ligação ao utilizador
+                    link = UserTagLink(
+                        user_id=user.id,
+                        tag_id=new_tag.id,
+                        is_custom=False
+                    )
+                    db.add(link)
+                
+                db.commit()
+                print(f"✅ Tags predefinidas e links criados para o user {user.id}")
+            except Exception as e:
+                db.rollback()
+                print(f"⚠️ Erro ao criar tags/links para o user {user.id}: {e}")
                 
         else:
             # Se a conta já existe e a Reitoria agora mandou o nome, atualizamos!
