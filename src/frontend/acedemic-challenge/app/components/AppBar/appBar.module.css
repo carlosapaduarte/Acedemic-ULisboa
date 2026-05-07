@@ -98,3 +98,38 @@
 .settingsButtons > * {
     flex-shrink: 0;
 }
+
+/* --- ATALHOS APP SWITCHERS --- */
+.appSwitchers {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    padding-right: 15px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    height: 32px;
+}
+
+.switcherLogo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    transition: all 0.2s ease;
+    filter: grayscale(100%) opacity(0.8);
+    cursor: pointer;
+}
+
+.switcherLogo:hover {
+    filter: grayscale(0%) opacity(1);
+    transform: scale(1.15);
+}
+
+@media (max-width: 600px) {
+    .appSwitchers {
+        margin-right: 8px;
+        padding-right: 8px;
+    }
+    .switcherLogo {
+        width: 20px;
+        height: 20px;
+    }
+}

@@ -3,11 +3,8 @@ import { useNavigate } from "@remix-run/react";
 import { service, UserInfo } from "~/service/service";
 import { useTranslation } from "react-i18next";
 import styles from "./settings.module.css";
-import {
-  RiSave3Fill,
-  RiRestartLine,
-  RiCheckLine,
-} from "react-icons/ri";
+import classNames from "classnames";
+import { RiSave3Fill, RiRestartLine, RiCheckLine, RiMoonClearFill } from "react-icons/ri";
 
 const OBJETIVOS_LIST = [
   "Melhorar as minhas notas/classificações",
@@ -19,16 +16,12 @@ const OBJETIVOS_LIST = [
 ];
 
 function createAvatars(): string[] {
-  const avatars: string[] = [];
-  for (let u = 0; u < 12; u++) {
-    avatars.push(`./avatars/avatar${u}.png`);
-  }
-  return avatars;
+  return Array.from({ length: 12 }, (_, i) => `./avatars/avatar${i}.png`);
 }
 
 export default function SettingsPage() {
   const navigate = useNavigate();
-  const { t } = useTranslation(["common"]);
+  const { t } = useTranslation(["common", "settings"]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,152 +29,62 @@ export default function SettingsPage() {
   const [user, setUser] = useState<UserInfo | null>(null);
 
   const [displayName, setDisplayName] = useState<string>("");
-  // Form States
   const [selectedAvatarIndex, setSelectedAvatarIndex] = useState<number>(-1);
   const [avatars, setAvatars] = useState<string[]>([]);
-  // Agora guardamos os NÚMEROS dos objetivos (ex: [0, 2, 4]) para o backend perceber
   const [selectedObjetivos, setSelectedObjetivos] = useState<number[]>([]);
 
-  // Load Data
   useEffect(() => {
     const loadedAvatars = createAvatars();
     setAvatars(loadedAvatars);
 
-    service
-      .fetchUserInfoFromApi()
-      .then((data) => {
-        setUser(data);
-
-        setDisplayName(data.display_name || data.username || "");
-
-        if (data.use_goals) {
-          setSelectedObjetivos(data.use_goals);
-        }
-
-        // Tentar encontrar o índice do avatar atual
-        const currentAvatarIndex = loadedAvatars.findIndex((a) =>
-          a.includes(data.avatarFilename),
-        );
-        setSelectedAvatarIndex(
-          currentAvatarIndex !== -1 ? currentAvatarIndex : 0,
-        );
-      })
-      .catch((err) => console.error("Erro ao carregar settings:", err))
-      .finally(() => setLoading(false));
+    service.fetchUserInfoFromApi().then((data) => {
+      setUser(data);
+      setDisplayName(data.displayName || data.username || "");
+      if (data.use_goals) setSelectedObjetivos(data.use_goals);
+      const currentAvatarIndex = loadedAvatars.findIndex((a) => a.includes(data.avatarFilename));
+      setSelectedAvatarIndex(currentAvatarIndex !== -1 ? currentAvatarIndex : 0);
+    }).finally(() => setLoading(false));
   }, []);
 
-  // Lógica para marcar/desmarcar a checklist usando o índice do Array
   const handleToggleObjetivo = (index: number) => {
-      setSelectedObjetivos((prev) => {
-          const newSelection = prev.includes(index)
-              ? prev.filter((i) => i !== index)
-              : [...prev, index];
-          return newSelection;
-      });
+      setSelectedObjetivos((prev) => prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]);
   };
 
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
-    setSaveSuccess(false);
-
     try {
-      const promises = [];
-
-      // 1. Update Avatar
-      const newAvatarFullString = avatars[selectedAvatarIndex];
-      if (
-        newAvatarFullString &&
-        !newAvatarFullString.includes(user.avatarFilename)
-      ) {
-        const filename =
-          newAvatarFullString.split("/").pop() || newAvatarFullString;
-        promises.push(service.selectAvatar(filename));
-      }
-
-      // 2. Enviar Objetivos
-      promises.push(service.updateAppUseGoals(new Set(selectedObjetivos)));
-
-      promises.push(service.updateDisplayName(displayName));
-      if (promises.length > 0) {
-        await Promise.all(promises);
-
-        // Atualizar o estado local do user para refletir a mudança
-        setUser({
-          ...user,
-          avatarFilename: newAvatarFullString.split("/").pop() || user.avatarFilename,
-          display_name: displayName, 
-        });
-      }
-
+      const filename = avatars[selectedAvatarIndex].split("/").pop() || "";
+      await Promise.all([
+        service.selectAvatar(filename),
+        service.updateAppUseGoals(new Set(selectedObjetivos)),
+        service.updateDisplayName(displayName)
+      ]);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error: any) {
-      alert(`Erro ao guardar: ${error.message || "Verifica a consola."}`);
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
+      alert("Erro ao guardar!");
+    } finally { setSaving(false); }
   };
 
-  const handleResetTutorial = () => {
-    if (confirm("Tens a certeza que queres repetir os tutoriais? (Isto vai reiniciar todos os guias da aplicação)")) {
-      Object.keys(localStorage).forEach((key) => {
-        if (key.toLowerCase().includes("tutorial")) localStorage.removeItem(key);
-      });
-      Object.keys(sessionStorage).forEach((key) => {
-        if (key.toLowerCase().includes("tutorial")) sessionStorage.removeItem(key);
-      });
-      alert("Tutoriais reiniciados! A página vai recarregar.");
-      window.location.reload();
-    }
-  };
-
-  if (loading)
-    return <div className={styles.container}>A carregar definições...</div>;
+  if (loading) return <div className={styles.pageContainer}>A carregar...</div>;
 
   return (
-    <div className={styles.pageContainer} style={{ paddingBottom: "100px" }}>
-      <div className={styles.header}>
-        <h1>Definições</h1>
-      </div>
-
+    <div className={styles.pageContainer}>
+      <div className={styles.header}><h1>Definições</h1></div>
       <div className={styles.content}>
-        {/* PERFIL (Agora Editável) */}
+        
+        {/* PERFIL */}
         <section className={styles.section}>
           <h2>Perfil do Aluno</h2>
-          <div className={styles.profileCard} style={{ background: "rgba(255,255,255,0.05)", padding: "15px", borderRadius: "8px" }}>
-            
-            {/* 💡 INPUT PARA O NOME DE EXIBIÇÃO */}
-            <div className={styles.infoRow} style={{ marginBottom: "15px", display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-              <span className={styles.label} style={{ minWidth: "140px" }}>Nome de Exibição:</span>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="O teu nome..."
-                style={{
-                  background: "rgba(255, 255, 255, 0.1)",
-                  border: "1px solid var(--color-2)",
-                  color: "white",
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  outline: "none",
-                  flex: "1",
-                  minWidth: "200px"
-                }}
-              />
+          <div className={styles.profileCard}>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Nome de Exibição:</span>
+              <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={styles.nameInput} />
             </div>
-
-            <div className={styles.infoRow} style={{ marginBottom: "10px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
-              <span className={styles.label} style={{ minWidth: "140px" }}>ID Fénix:</span>
-              <span className={styles.value}>{user?.username}</span>
-            </div>
-            <div className={styles.infoRow} style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-              <span className={styles.label} style={{ minWidth: "140px" }}>E-mail:</span>
-              <span className={styles.value} style={{ fontSize: "0.9rem", opacity: 0.8 }}>
-                {user?.institutional_email || "---"}
-              </span>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>E-mail:</span>
+              <span className={styles.value_text}>{user?.institutional_email}</span>
             </div>
           </div>
         </section>
@@ -191,14 +94,8 @@ export default function SettingsPage() {
           <h2>Avatar</h2>
           <div className={styles.avatarGrid}>
             {avatars.map((avatar, index) => (
-              <div
-                key={index}
-                className={`${styles.avatarItem} ${
-                  selectedAvatarIndex === index ? styles.avatarSelected : ""
-                }`}
-                onClick={() => setSelectedAvatarIndex(index)}
-              >
-                <img src={avatar} alt={`Avatar ${index}`} />
+              <div key={index} className={classNames(styles.avatarItem, selectedAvatarIndex === index && styles.avatarSelected)} onClick={() => setSelectedAvatarIndex(index)}>
+                <img src={avatar} alt="Avatar" />
               </div>
             ))}
           </div>
@@ -207,10 +104,7 @@ export default function SettingsPage() {
         {/* OBJETIVOS DE USO */}
         <section className={styles.section}>
           <h2>Objetivos de Uso</h2>
-          <p className={styles.description} style={{ marginBottom: "1rem" }}>
-            Quais as tuas metas principais ao usar a plataforma?
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div className={styles.goalsContainer}>
             {OBJETIVOS_LIST.map((obj, index) => (
               <label key={index} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
                 <input
@@ -228,9 +122,11 @@ export default function SettingsPage() {
         {/* SISTEMA */}
         <section className={styles.section} style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px" }}>
           <h2>Sistema</h2>
-          <button onClick={handleResetTutorial} className={styles.dangerButton} style={{ opacity: 0.8 }}>
-            <RiRestartLine /> Repetir Tutorial Global
-          </button>
+          <div className={styles.toggleRow} style={{ opacity: 0.6, marginBottom: "1rem" }}>
+            <span><RiMoonClearFill /> Modo Noturno (Em breve)</span>
+            <label className={styles.switch}><input type="checkbox" disabled /><span className={styles.slider}></span></label>
+          </div>
+          <button onClick={() => window.location.reload()} className={styles.dangerButton}><RiRestartLine /> Repetir Tutorial</button>
         </section>
 
         <div style={{ height: "60px" }}></div>

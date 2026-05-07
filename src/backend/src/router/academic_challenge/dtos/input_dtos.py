@@ -24,3 +24,7 @@ class NewUserNoteDto(BaseModel):
 class ChallengeCompletedDto(BaseModel):
     challengeId: int
     user_answer: Optional[str] = None
+
+# DOCUMENTAÇÃO: Classe para receber o novo nível vindo das definições
+class UpdateChallengeLevelDto(BaseModel):
+    level: int

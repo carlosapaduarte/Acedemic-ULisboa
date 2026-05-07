@@ -3,12 +3,13 @@ from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Response
 from service.gamification import core as gamification_service
-from router.academic_challenge.dtos.input_dtos import CreateBatchInputDto, ChallengeCompletedDto, NewUserNoteDto
+from router.academic_challenge.dtos.input_dtos import CreateBatchInputDto, ChallengeCompletedDto, NewUserNoteDto, UpdateChallengeLevelDto
 from router.commons.common import get_current_user_id
 from router.commons.dtos.gamification_dtos import BadgeResponse, ChallengeCompletionResponse
 from service import academic_challenge as academic_challenge_service
 from sqlmodel import Session
 from repository.sql.models.database import get_session as get_db_session
+
 
 router = APIRouter(
     prefix="/academic-challenge",
@@ -68,3 +69,19 @@ def complete_challenge(
         user_answer=input_dto.user_answer
     )
     return newly_awarded_badges
+
+@router.put("/users/me/level")
+def update_challenge_level(
+        user_id: Annotated[int, Depends(get_current_user_id)],
+        input_dto: UpdateChallengeLevelDto,
+        db: Session = Depends(get_db_session)
+):
+    """
+    DOCUMENTAÇÃO: Rota dedicada para atualizar o nível do desafio a partir da página de Definições.
+    Utiliza o serviço de gamificação para guardar o nível no estado atual do utilizador.
+    """
+    gamification_service.set_user_challenge_level(
+        db=db, user_id=user_id, level=input_dto.level
+    )
+    
+    return {"status": "success", "level_updated_to": input_dto.level}

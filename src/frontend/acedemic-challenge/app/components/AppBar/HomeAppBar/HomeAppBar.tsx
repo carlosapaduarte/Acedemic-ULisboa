@@ -82,7 +82,7 @@ export function GreetingsContainer() {
                     {userInfo ? (
                         <>
                             <span>
-                                {helloQuote}, {userInfo.username}
+                                {helloQuote}, {userInfo.displayName || userInfo.username}                                
                             </span>
                             {typeof userInfo.currentChallengeLevel ===
                                 "number" && (

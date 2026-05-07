@@ -190,7 +190,7 @@ export type UserInfo = {
   custom_colors?: string[];
   use_goals?: number[];
   tutorial_progress?: string[];
-  display_name?: string;
+  displayName: string | null;
   institutional_email?: string;
 };
 

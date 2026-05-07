@@ -78,7 +78,7 @@ function CurrentView() {
                             className={styles.actionButton}
                             onPress={() => window.location.href = "/api/auth/ulisboa/login?target=challenge"}
                         >
-                            Entrar / Registar com Fénix
+                            Autenticação ULisboa
                         </Button>
                         
                         <p className={styles.helperText}>

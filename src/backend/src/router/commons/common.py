@@ -159,6 +159,8 @@ def get_user_info(
     user_db = db.get(UserModel, user_id)
     
     if user_db:
+        dto.displayName = user_db.display_name
+        
         if user_db.custom_colors:
             dto.custom_colors = user_db.custom_colors
         

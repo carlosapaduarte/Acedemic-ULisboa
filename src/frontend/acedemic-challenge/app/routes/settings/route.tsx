@@ -1,130 +1,200 @@
+import React, { useEffect, useState } from "react";
+import { service, UserInfo } from "~/service/service";
+import { useTranslation } from "react-i18next";
 import styles from "./settingsPage.module.css";
-// import { AppTheme, getAppThemeClassNames, ThemeContext } from "~/components/Theme/ThemeProvider";
-import React, { useState, useEffect } from "react";
 import classNames from "classnames";
+import { RiSave3Fill, RiRestartLine, RiCheckLine, RiMoonClearFill } from "react-icons/ri";
 
-const OBJETIVOS = [
-    "Melhorar as minhas notas/classificações",
-    "Acompanhar o meu progresso",
-    "Preparar-me para exames específicos",
-    "Personalizar o meu plano de estudo",
-    "Cumprir prazos e entregas",
-    "Gerir os estudos com as outras áreas da minha vida"
-];
-
-/* ==========================================
-   TEMA COMENTADO POR ENQUANTO
-   ==========================================
-function ThemePalette({ optionTheme }: { optionTheme: AppTheme }) {
-    return (
-        <div className={classNames(styles.themePalette, getAppThemeClassNames(optionTheme))}>
-            <div className={styles.themePaletteItem}></div>
-            <div className={styles.themePaletteItem}></div>
-            <div className={styles.themePaletteItem}></div>
-        </div>
-    );
+/**
+ * DOCUMENTAÇÃO: Gera a lista de caminhos para os avatares disponíveis.
+ */
+function createAvatars(): string[] {
+  const avatars: string[] = [];
+  for (let u = 0; u < 12; u++) {
+    avatars.push(`./avatars/avatar${u}.png`);
+  }
+  return avatars;
 }
-
-function ThemeOption(
-    { optionTheme, currentTheme, setTheme }: { optionTheme: AppTheme, currentTheme: AppTheme, setTheme: (theme: AppTheme) => void }
-) {
-    return (
-        <div className={styles.themeOption}>
-            <input type="radio" name="selectedTheme" id={optionTheme} onClick={() => setTheme(optionTheme)}
-                   checked={optionTheme === currentTheme} onChange={() => {}} />
-            <label className={styles.themeLabel} htmlFor={optionTheme}>
-                {`${optionTheme}${optionTheme === AppTheme.defaultTheme ? " (default)" : ""}`}
-            </label>
-            <ThemePalette optionTheme={optionTheme} />
-        </div>
-    );
-}
-========================================== */
-
 
 export default function SettingsPage() {
-    // const { theme, setTheme } = useContext(ThemeContext);
-    
-    // Estado para guardar os objetivos que o utilizador seleciona
-    const [selectedObjectives, setSelectedObjectives] = useState<string[]>([]);
+  const { t } = useTranslation(["common", "settings"]);
 
-    // Quando a página abre, vai buscar as opções guardadas no browser
-    useEffect(() => {
-        const saved = localStorage.getItem("user_objectives");
-        if (saved) {
-            try {
-                setSelectedObjectives(JSON.parse(saved));
-            } catch (e) {
-                console.error("Erro ao ler objetivos guardados");
-            }
-        }
-    }, []);
+  // ESTADOS DO FORMULÁRIO
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [user, setUser] = useState<UserInfo | null>(null);
 
-    // Função que corre sempre que a pessoa clica numa checkbox
-    const handleToggle = (obj: string) => {
-        setSelectedObjectives((prev) => {
-            const newSelection = prev.includes(obj) 
-                ? prev.filter(item => item !== obj) // Tira se já lá estava
-                : [...prev, obj]; // Adiciona se não estava
-            
-            // Guarda automaticamente sem precisar de botão "Gravar"
-            localStorage.setItem("user_objectives", JSON.stringify(newSelection));
-            return newSelection;
+  const [displayName, setDisplayName] = useState<string>("");
+  const [selectedAvatarIndex, setSelectedAvatarIndex] = useState<number>(-1);
+  const [avatars, setAvatars] = useState<string[]>([]);
+
+  /**
+   * ETAPA: Carregamento inicial de dados da API.
+   */
+  useEffect(() => {
+    const loadedAvatars = createAvatars();
+    setAvatars(loadedAvatars);
+
+    service
+      .fetchUserInfoFromApi()
+      .then((data) => {
+        setUser(data);
+        setDisplayName(data.displayName || data.username || "");
+
+        const currentAvatarIndex = loadedAvatars.findIndex((a) =>
+          a.includes(data.avatarFilename),
+        );
+        setSelectedAvatarIndex(currentAvatarIndex !== -1 ? currentAvatarIndex : 0);
+      })
+      .catch((err) => console.error("Erro ao carregar settings:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  /**
+   * ETAPA: Lógica para persistir as alterações no servidor.
+   */
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    setSaveSuccess(false);
+
+    try {
+      const promises = [];
+      
+      const newAvatarFullString = avatars[selectedAvatarIndex];
+      if (newAvatarFullString && !newAvatarFullString.includes(user.avatarFilename)) {
+        const filename = newAvatarFullString.split("/").pop() || newAvatarFullString;
+        promises.push(service.selectAvatar(filename));
+      }
+
+      promises.push(service.updateDisplayName(displayName));
+      
+      if (promises.length > 0) {
+        await Promise.all(promises);
+        setUser({
+          ...user,
+          avatarFilename: newAvatarFullString?.split("/").pop() || user.avatarFilename,
+          displayName: displayName
         });
-    };
+      }
 
-    return (
-        <div className={styles.settingsPage} style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
-            
-            {/* Secção dos Objetivos igual à tua imagem */}
-            <div style={{ 
-                backgroundColor: "#fbe4c7", // O fundo bege da tua imagem
-                padding: "2rem", 
-                borderRadius: "8px",
-                color: "#000",
-                boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
-            }}>
-                <h2 style={{ 
-                    textAlign: "center", 
-                    marginBottom: "1.5rem", 
-                    fontSize: "2rem", 
-                    fontWeight: "bold",
-                    color: "#000"
-                }}>
-                    Objetivos de Uso
-                </h2>
-                
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px", paddingLeft: "10px" }}>
-                    {OBJETIVOS.map((obj) => (
-                        <label key={obj} style={{ 
-                            display: "flex", 
-                            alignItems: "center", 
-                            gap: "12px", 
-                            cursor: "pointer", 
-                            fontSize: "1.1rem" 
-                        }}>
-                            <input 
-                                type="checkbox" 
-                                checked={selectedObjectives.includes(obj)}
-                                onChange={() => handleToggle(obj)}
-                                style={{ width: "18px", height: "18px", cursor: "pointer" }}
-                            />
-                            {obj}
-                        </label>
-                    ))}
-                </div>
-            </div>
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error: any) {
+      alert(`Erro ao guardar: ${error.message || "Erro desconhecido"}`);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-            {/* ==========================================
-                TEMA COMENTADO POR ENQUANTO
-                ==========================================
-            <h1 className={styles.settingTitle} style={{ marginTop: "3rem" }}>Theme</h1>
-            {
-                AppTheme.values.map((optionTheme) => (
-                    <ThemeOption key={optionTheme} optionTheme={optionTheme} currentTheme={theme} setTheme={setTheme} />
-                ))
-            } 
-            */}
-        </div>
-    );
+  if (loading) return <div className={styles.loadingContainer}>{t("common:loading", "A carregar...")}</div>;
+
+  return (
+    <div className={styles.settingsPage}>
+      <h1 className={styles.settingTitle}>{t("settings:title", "Definições")}</h1>
+
+      <div className={styles.sectionsWrapper}>
+        
+        {/* SECÇÃO: PERFIL DO ALUNO */}
+        <section className={styles.sectionCard}>
+          <h2 className={styles.cardTitle}>{t("settings:profile_title", "Perfil do Aluno")}</h2>
+          
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Nome:</label>
+            <input
+              type="text"
+              className={styles.nameInput}
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <span className={styles.label}>ID:</span>
+            <span className={styles.readOnlyValue}>{user?.username}</span>
+          </div>
+        </section>
+
+        {/* SECÇÃO: NÍVEL DO DESAFIO (FUNCIONALIDADE FUTURA) */}
+        <section className={classNames(styles.sectionCard, styles.disabledSection)}>
+          <div className={styles.cardHeaderWithBadge}>
+            <h2 className={styles.cardTitle}>Nível de Desafio</h2>
+            <span className={styles.comingSoonBadge}>{t("settings:coming_soon", "Em breve...")}</span>
+          </div>
+          <p className={styles.description}>Ajusta a dificuldade dos teus desafios semanais.</p>
+          
+          <div className={styles.levelButtonGroup}>
+            {[
+              { id: 1, label: "Iniciado" },
+              { id: 2, label: "Intermédio" },
+              { id: 3, label: "Avançado" }
+            ].map(level => {
+              const isSelected = user?.currentChallengeLevel === level.id;
+              return (
+                <button
+                  key={level.id}
+                  disabled
+                  className={classNames(styles.levelBtn, isSelected && styles.levelBtnSelected)}
+                >
+                  {level.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* SECÇÃO: SELEÇÃO DE AVATAR */}
+        <section className={styles.sectionCard}>
+          <h2 className={styles.cardTitle}>Avatar</h2>
+          <div className={styles.avatarGrid}>
+            {avatars.map((avatar, index) => (
+              <div
+                key={index}
+                className={classNames(styles.avatarItem, selectedAvatarIndex === index && styles.avatarSelected)}
+                onClick={() => setSelectedAvatarIndex(index)}
+              >
+                <img src={avatar} alt={`avatar-${index}`} className={styles.avatarImg} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SECÇÃO: MODO NOTURNO (VISUAL) */}
+        <section className={styles.sectionCard}>
+          <div className={styles.cardHeaderWithBadge}>
+             <h2 className={styles.cardTitle}><RiMoonClearFill /> Modo Noturno</h2>
+             <span className={styles.comingSoonBadge}>Brevemente</span>
+          </div>
+          <div className={styles.systemRow}>
+             <p className={styles.description}>Ativar interface escura para poupar a vista.</p>
+             <label className={styles.switchDisabled}>
+                <span className={styles.slider}></span>
+             </label>
+          </div>
+        </section>
+
+      </div>
+
+      {/* RODAPÉ DE AÇÕES */}
+      <div className={styles.actionFooter}>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className={classNames(
+            styles.saveButton, 
+            saveSuccess && styles.saveSuccess
+          )}
+        >
+          {saving ? (
+            t("common:saving", "A guardar...")
+          ) : saveSuccess ? (
+            <><RiCheckLine /> Guardado!</>
+          ) : (
+            <><RiSave3Fill /> Guardar Perfil</>
+          )}
+        </button>
+      </div>
+    </div>
+  );
 }

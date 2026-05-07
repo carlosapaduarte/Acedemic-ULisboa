@@ -230,7 +230,7 @@ export function EditTagModal({
                     <Input
                       value={namePt}
                       onChange={(e) => setNamePt(e.target.value)}
-                    />
+                      disabled={PREDEFINED_TAG_NAMES.includes(tagToEdit?.name_pt?.toLowerCase() || "")}                    />
                   </TextField>
 
                   <TextField className={styles.textField}>
@@ -238,6 +238,7 @@ export function EditTagModal({
                     <Input
                       value={nameEn}
                       onChange={(e) => setNameEn(e.target.value)}
+                      disabled={PREDEFINED_TAG_NAMES.includes(tagToEdit?.name_en?.toLowerCase() || "")}
                     />
                   </TextField>
 

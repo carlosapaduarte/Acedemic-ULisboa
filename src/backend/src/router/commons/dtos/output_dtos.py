@@ -18,13 +18,14 @@ class UserOutputDto(BaseModel):
     level: int = 1
     startDate: int = 0
     shareProgress: bool = False
-    
     avatarFilename: Optional[str] = None 
     batches: list = []
     custom_colors: List[str] = [] 
     tutorial_progress: List[str] = []
     use_goals: List[int] = []
-    display_name: Optional[str] = None
+    displayName: str | None = None
+    fullName: str | None = None
+    affiliation: List[str] = []
     institutional_email: Optional[str] = None
     
     @classmethod
@@ -56,11 +57,10 @@ class UserOutputDto(BaseModel):
             level=getattr(user, "level", 1),
             startDate=start_date,
             shareProgress=getattr(user, "share_progress", False) or False,
-            
             avatarFilename=getattr(user, "avatar_filename", None),
             batches=batches_dtos,
             custom_colors=colors,
-            display_name=getattr(user, "display_name", None),
+            displayName=getattr(user, "display_name", None),
             institutional_email=getattr(user, "institutional_email", None)
         )
 

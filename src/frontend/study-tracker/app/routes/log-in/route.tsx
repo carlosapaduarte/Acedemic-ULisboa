@@ -59,7 +59,7 @@ function CurrentView() {
             return (
                 <div className={styles.authContainer}>
                     <div className={styles.authCard}>
-                        {/* 💡 O teu logotipo entra aqui! Substitui o src pelo correto */}
+                        {/* logotipo aqui! Substituir o src pelo correto */}
                         <img 
                             src="/tracker/icons/logo.png" 
                             alt="Logo Study Tracker" 
@@ -80,7 +80,7 @@ function CurrentView() {
                             className={styles.actionButton}
                             onPress={() => window.location.href = "/api/auth/ulisboa/login?target=tracker"}
                         >
-                            Entrar / Registar com Fénix
+                            Autenticação ULisboa
                         </Button>
                         
                         <p className={styles.helperText}>

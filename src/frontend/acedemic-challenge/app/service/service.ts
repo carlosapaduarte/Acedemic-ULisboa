@@ -181,6 +181,7 @@ export type UserInfo = {
     shareProgress: boolean;
     avatarFilename: string;
     batches: Batch[];
+    displayName: string | null;
     currentChallengeLevel: number | null; //1, 2, 3 or null if no level selected
     tutorial_progress?: string[];
 };
@@ -213,6 +214,50 @@ async function fetchUserInfoFromApi(): Promise<UserInfo> {
         return responseObject;
     } else return Promise.reject(new Error("User info could not be obtained!"));
 }
+
+/**
+ * DOCUMENTAÇÃO: Atualiza o nome de exibição.
+ * Utilizamos o toJsonBody para garantir que os dados são formatados
+ * corretamente como JSON antes de serem enviados na Request.
+ */
+async function updateDisplayName(displayName: string) {
+    const request = {
+        path: `commons/users/me/display-name`,
+        method: "PUT",
+        body: toJsonBody({ display_name: displayName }) 
+    };
+    
+    const response: Response = await doFetch(request);
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erro ao atualizar nome:", errorText);
+        throw new Error("Não foi possível atualizar o nome de exibição.");
+    }
+    return await response.json();
+}
+
+/**
+ * DOCUMENTAÇÃO: Envia o novo nível de desafio para a API.
+ * @param level Número correspondente ao nível (1, 2 ou 3)
+ */
+async function updateChallengeLevel(level: number) {
+    const request = {
+        path: `academic-challenge/users/me/level`, 
+        method: "PUT",
+        body: toJsonBody({ level: level })
+    };
+    
+    const response: Response = await doFetch(request);
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erro ao atualizar nível:", errorText);
+        throw new Error("Não foi possível atualizar o nível do desafio.");
+    }
+}
+
+
 
 async function editDayNote(batchId: number, batchDayId: number, notes: string) {
     const request = {
@@ -308,4 +353,6 @@ export const service = {
     fetchGamificationProfile,
     markTutorialAsSeen,
     logUserAction,
+    updateDisplayName,
+    updateChallengeLevel,
 };

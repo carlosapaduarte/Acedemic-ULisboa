@@ -42,16 +42,11 @@ function NavBarButton({ text, url }: { text: string; url: string }) {
 }
 
 export function GreetingsContainer() {
-  const [username, setUsername] = React.useState<string | undefined>(undefined);
-  const [avatarFilename, setAvatarFilename] = React.useState<
-    string | undefined
-  >(undefined);
+  const [userInfo, setUserInfo] = React.useState<UserInfo | null>(null);
 
   useEffect(() => {
-    service.fetchUserInfoFromApi().then((userInfo: any) => {
-      setAvatarFilename(userInfo.avatarFilename);
-      const nameToDisplay = userInfo.display_name || userInfo.username;
-      setUsername(nameToDisplay);
+    service.fetchUserInfoFromApi().then((fetchedUserInfo: UserInfo) => {
+      setUserInfo(fetchedUserInfo);
     });
   }, []);
 
@@ -59,10 +54,12 @@ export function GreetingsContainer() {
 
   return (
     <div className={styles.greetingsContainer}>
+      
       <h4 className={styles.helloQuote}>
-        {username ? (
+        {userInfo ? (
           <span>
-            {helloQuote}, {username}
+            {/* Mostramos o displayName. Se não existir, usamos o username */}
+            {helloQuote}, {userInfo.displayName || userInfo.username}
           </span>
         ) : (
           <span>A carregar...</span>
@@ -72,9 +69,9 @@ export function GreetingsContainer() {
         className={`${styles.avatarAndDropdownContainer} tutorial-target-avatar`}
       >
         <div className={`${styles.avatarContainer}`}>
-          {avatarFilename && (
+          {userInfo?.avatarFilename && (
             <img
-              src={`./avatars/${avatarFilename.split("/").pop()}`}
+              src={`./avatars/${userInfo.avatarFilename.split("/").pop()}`}
               width={92}
               height={92}
               alt="User Avatar"

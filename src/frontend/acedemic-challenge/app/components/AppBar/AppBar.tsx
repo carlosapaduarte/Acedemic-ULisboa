@@ -51,9 +51,20 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
             )}
             <div key="settingsButtons"
                  className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>
-                <SettingsButton />
+                
+                <div className={styles.appSwitchers}>
+                  <a 
+                    href="https://acedemic.studentlife.ulisboa.pt/tracker" 
+                    className={styles.switcherLink}
+                    title="Ir para o Study Tracker"
+                  >
+                    <img src="icons/calendar_icon.png" alt="Tracker" className={styles.switcherLogo} />
+                  </a>
+                </div>
+
                 <LanguageButton language={t("appbar:portugueseLanguage")} languageCode={"pt-PT"} />
                 <LanguageButton language={t("appbar:englishLanguage")} languageCode={"en-GB"} />
+                <SettingsButton />
             </div>
             {appBarVariant === "home" && (
                 <>

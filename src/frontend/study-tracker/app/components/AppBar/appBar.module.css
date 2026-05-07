@@ -229,3 +229,48 @@
 .settingsButtons > * {
     flex-shrink: 0;
 }
+
+.appSwitchers {
+  display: flex;
+  align-items: center;
+  margin-right: 15px; /* Dá o espaço necessário entre o logo e a bandeira PT */
+  padding-right: 15px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2); /* Linha divisória subtil opcional */
+}
+
+.switcherLogo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  transition: all 0.2s ease;
+  filter: grayscale(100%) opacity(0.7);
+  cursor: pointer;
+}
+
+.switcherLogo:hover {
+  filter: grayscale(0%) opacity(1); 
+  transform: scale(1.15);
+}
+
+@media (max-width: 600px) {
+  .appSwitchers {
+    margin-right: 8px;
+    padding-right: 8px;
+  }
+  .switcherLogo {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+@media (max-width: 600px) {
+  .appSwitchers {
+    gap: 8px;
+    margin-right: 8px;
+    padding-right: 8px;
+  }
+  .switcherLogo {
+    width: 22px;
+    height: 22px;
+  }
+}

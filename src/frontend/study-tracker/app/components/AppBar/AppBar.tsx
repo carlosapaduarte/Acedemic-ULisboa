@@ -342,7 +342,17 @@ export function AppBar({
               : styles.settingsButtons
           }
         >
-          <SettingsButton variant={appBarVariant} />
+          {/* LOGO DO CHALLENGE (Atalho para ir para o Challenge) */}
+          <div className={styles.appSwitchers}>
+            <a 
+              href="https://acedemic.studentlife.ulisboa.pt/challenge" 
+              className={styles.switcherLink}
+              title="Ir para o ACEdemic Challenge"
+            >
+              <img src="assets/logos/medal_icon.svg" alt="Challenge" className={styles.switcherLogo} />
+            </a>
+          </div>
+
           <LanguageButton
             language={t("appbar:portugueseLanguage")}
             languageCode={"pt-PT"}
@@ -353,6 +363,7 @@ export function AppBar({
             languageCode={"en-GB"}
             variant={appBarVariant}
           />
+          <SettingsButton variant={appBarVariant} />
         </div>
         {appBarVariant === "home" && (
           <>
