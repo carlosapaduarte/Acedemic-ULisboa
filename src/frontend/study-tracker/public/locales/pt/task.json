@@ -48,5 +48,9 @@
   "personal": "Pessoal",
   "study": "Estudo",
   "available_tasks": "Tarefas Disponíveis",
-  "micro_tasks_list_title": "Tarefas Relâmpago"
+  "micro_tasks_list_title": "Tarefas Relâmpago",
+  "title_micro_task_info": "Tarefas rápidas apenas com título, sem horários ou detalhes.",
+  "micro_task_label": "Tarefa relâmpago",
+  "no_ucs_text": "Nenhuma unidade curricular associada.",
+  "add_ucs_link": "Adicionar unidades curriculares"
 }

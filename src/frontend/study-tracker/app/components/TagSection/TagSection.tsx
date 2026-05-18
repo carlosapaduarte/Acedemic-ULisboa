@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { RiSettings5Fill } from "react-icons/ri";
 import { Link } from "@remix-run/react";
 import { Tag } from "~/service/service";
-import styles from "./TagSection.module.css";
+import styles from "./tagSection.module.css";
 
 interface Props {
   availableTags: Tag[];
@@ -20,11 +20,8 @@ const TagSectionContent = ({
   availableTags,
   onEditTags,
   onAddTag,
-  refreshTags,
 }: Props) => {
-  const { t, i18n, ready } = useTranslation(["task", "calendar"]);
-
-  if (!ready) return null;
+  const { t, i18n } = useTranslation(["tagsection", "task"]);
 
   const validTags = React.useMemo(() => {
     if (!availableTags || !Array.isArray(availableTags)) return [];
@@ -49,8 +46,8 @@ const TagSectionContent = ({
   const getTagName = (tag: Tag) => {
     if (!tag) return "";
 
-    if (tag.name && ["fun", "work", "personal", "study"].includes(tag.name)) {
-      return t(`tags:${tag.name}`, { defaultValue: t(tag.name) });
+    if (tag.name_en?.toLowerCase && ["fun", "work", "personal", "study"].includes(tag.name_en.toLowerCase())) {
+      return t(`tags:${tag.name_en}`);
     }
 
     const lang = i18n?.language ? i18n.language.toLowerCase() : "pt";
@@ -59,7 +56,7 @@ const TagSectionContent = ({
       return tag.name_en;
     }
 
-    return tag.name_pt || tag.name || "Sem nome";
+    return tag.name_pt || tag.name_en || t("no_name");
   };
 
   const getStyle = (className: string) => {
@@ -97,14 +94,12 @@ const TagSectionContent = ({
   return (
     <div className={getStyle("tagsSectionContainer")}>
       <div className={getStyle("tagsHeader")}>
-        <h3 className={getStyle("formSectionTitle")}>
-          {t("tags_title", "Etiquetas")}
-        </h3>
+        <h3 className={getStyle("formSectionTitle")}>{t("tags_title")}</h3>
         <button
           type="button"
           onClick={onEditTags}
           className={getStyle("headerButton")}
-          aria-label={t("manage_tags", "Gerir etiquetas")}
+          aria-label={t("manage_tags")}
         >
           <RiSettings5Fill size={20} />
         </button>
@@ -117,25 +112,23 @@ const TagSectionContent = ({
           type="button"
           className={getStyle("addTagButtonRound")}
           onClick={onAddTag}
-          aria-label={t("add_tag", "Criar nova etiqueta")}
+          aria-label={t("add_tag")}
         >
           +
         </button>
       </div>
 
       <div className={getStyle("ucTagsContainer")}>
-        <div className={getStyle("ucTagsLabel")}>
-          {t("ucs_tags", "Unidades Curriculares")}
-        </div>
+        <div className={getStyle("ucTagsLabel")}>{t("ucs_tags")}</div>
         {ucTags.length > 0 ? (
           <div className={getStyle("ucTagsList")}>
             {ucTags.map(renderTagButton)}
           </div>
         ) : (
           <p className={getStyle("emptyUcText")}>
-            {t("task:no_ucs_text", "Ainda não tens UCs associadas.")}{" "}
+            {t("task:no_ucs_text")}{" "}
             <Link to="/curricular-units" className={getStyle("emptyUcLink")}>
-              {t("task:add_ucs_link", "Adicionar UCs")}
+              {t("task:add_ucs_link")}
             </Link>
           </p>
         )}
@@ -144,10 +137,20 @@ const TagSectionContent = ({
   );
 };
 
-export const TagSection = (props: Props) => (
-  <React.Suspense
-    fallback={<div className={styles?.tagsSectionContainer}>A carregar...</div>}
-  >
-    <TagSectionContent {...props} />
-  </React.Suspense>
-);
+export const TagSection = (props: Props) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className={styles?.tagsSectionContainer || "tagsSectionContainer"}>
+        A carregar etiquetas...
+      </div>
+    );
+  }
+
+  return <TagSectionContent {...props} />;
+};

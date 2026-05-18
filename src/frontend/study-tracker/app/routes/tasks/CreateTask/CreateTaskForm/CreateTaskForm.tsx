@@ -8,6 +8,7 @@ import {
   Label,
   Popover,
   TextField,
+  Modal,
 } from "react-aria-components";
 import { SlotToWork } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
 import classNames from "classnames";
@@ -19,6 +20,7 @@ import { RiSettings5Fill } from "react-icons/ri";
 import { FaTrash } from "react-icons/fa";
 import { useNavigate } from "@remix-run/react";
 import { TagSection } from "~/components/TagSection/TagSection";
+import calendarStyles from "~/routes/calendar/CreateEvent/EventModal.module.css";
 
 const priorityValues = ["low", "medium", "high"];
 
@@ -171,6 +173,9 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
               onClosePressed={(data: SlotToWorkDto | undefined) => {
                 if (data) {
                   handleUpdateSlotData(slotWrapper.id, data);
+                } else if (slotWrapper.data === undefined) {
+                  // Se os dados são undefined (cancelou) e o slot ainda estava vazio, apaga o slot da lista
+                  handleRemoveSlot(slotWrapper.id);
                 }
               }}
             />
@@ -287,7 +292,7 @@ const PrioritySection = React.memo(function PrioritySection({
         {priorityValues.map((priorityValue, index) => (
           <button
             key={index}
-            aria-selected={priority === priorityValue}
+            aria-pressed={priority === priorityValue}
             onClick={(e) => priorityButtonClickHandler(e, priorityValue)}
             className={classNames(
               styles.priorityButton,
@@ -318,6 +323,7 @@ export function CreateTaskForm({
   availableTags,
   refreshTags,
   setIsEditTagModalOpen,
+  setIsCreateTagModalOpen,
   isMicroTask,
   setIsMicroTask,
 }: {
@@ -336,26 +342,37 @@ export function CreateTaskForm({
   availableTags: Tag[];
   refreshTags: () => void;
   setIsEditTagModalOpen: (isOpen: boolean) => void;
+  setIsCreateTagModalOpen: (isOpen: boolean) => void;
   isMicroTask: boolean;
   setIsMicroTask: (isMicroTask: boolean) => void;
 }) {
+  const { t } = useTranslation(["task"]);
+  
+  const microTaskInfoText = t(
+    "task:title_micro_task_info",
+    "Uma micro-tarefa é uma tarefa rápida que não requer planeamento de blocos de tempo."
+  );
+
   return (
     <form className={styles.newTaskForm}>
       <div className={styles.microTaskContainer}>
         <input
           type="checkbox"
-          id="micro-task-checkbox"
-          className={styles.hiddenCheckbox}
           checked={isMicroTask}
           onChange={(e) => setIsMicroTask(e.target.checked)}
         />
-        <label htmlFor="micro-task-checkbox" className={styles.microTaskLabel}>
-          Tarefa relâmpago
-        </label>
-
+        <label>{t("task:micro_task_label")}</label>
         <div
           className={styles.infoIcon}
-          title="Tarefas rápidas apenas com título, sem horários ou detalhes."
+          title={microTaskInfoText}
+          aria-label={microTaskInfoText}
+          role="note"
+          onClick={() => {
+            if (window.matchMedia("(max-width: 768px)").matches) {
+              alert(microTaskInfoText);
+            }
+          }}
+          style={{ cursor: "pointer", marginLeft: "8px" }}
         >
           i
         </div>
@@ -365,22 +382,18 @@ export function CreateTaskForm({
 
       {!isMicroTask && (
         <>
-          <DescriptionSection
-            description={description}
-            setDescription={setDescription}
-          />
-          <SlotsToWorkSection
-            slotsToWork={slotsToWork}
-            setSlotsToWork={setSlotsToWork}
-          />
+          <DescriptionSection description={description} setDescription={setDescription} />
+          <SlotsToWorkSection slotsToWork={slotsToWork} setSlotsToWork={setSlotsToWork} />
           <DeadlineSection deadline={deadline} setDeadline={setDeadline} />
           <PrioritySection priority={priority} setPriority={setPriority} />
+          
           <TagSection
             selectedTagIds={selectedTagIds}
             setSelectedTagIds={setSelectedTagIds}
             availableTags={availableTags}
             refreshTags={refreshTags}
-            setIsEditTagModalOpen={setIsEditTagModalOpen}
+            onEditTags={() => setIsEditTagModalOpen(true)}
+            onAddTag={() => setIsCreateTagModalOpen(true)}
           />
         </>
       )}

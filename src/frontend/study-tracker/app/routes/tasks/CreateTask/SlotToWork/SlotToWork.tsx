@@ -245,7 +245,7 @@ export function SlotToWork({
     const createValidDate = (dateStr: string, timeStr: string) => {
       const [year, month, day] = dateStr.split("-").map(Number);
       const [hours, minutes] = timeStr.split(":").map(Number);
-      const newDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+      const newDate = new Date(year, month - 1, day, hours, minutes);
       return isNaN(newDate.getTime()) ? undefined : newDate;
     };
 
@@ -278,9 +278,10 @@ export function SlotToWork({
   };
 
   useEffect(() => {
-    if (isSecondModalOpen) {
+    if (newlyAdded && !date && !startTime) {
+      openModal();
     }
-  }, [date, startTime, endTime]);
+  }, [newlyAdded]);
 
   const formattedDate = formatDate(date, userLocale, t);
   const formattedTimes = formatTimes(startTime, endTime, userLocale, t);

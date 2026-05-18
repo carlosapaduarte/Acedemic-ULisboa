@@ -47,5 +47,9 @@
   "personal": "Personal",
   "study": "Study",
   "available_tasks": "Available Tasks",
-  "micro_tasks_list_title": "Lightning Tasks"
+  "micro_tasks_list_title": "Lightning Tasks",
+  "title_micro_task_info": "Quick tasks with just a title, no schedules or details.",
+  "micro_task_label": "Lightning Task",
+  "no_ucs_text": "No associated curricular unit.",
+  "add_ucs_link": "Add curricular units"
 }

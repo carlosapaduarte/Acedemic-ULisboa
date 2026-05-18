@@ -87,7 +87,7 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
 
   return (
     <div className={styles.createTagTooltip} style={{ position: "relative" }}>
-      <button 
+      <button
         onClick={close} 
         style={{ position: "absolute", top: "10px", right: "10px", background: "none", border: "none", cursor: "pointer", fontSize: "1.2rem", color: "#888" }}
       >

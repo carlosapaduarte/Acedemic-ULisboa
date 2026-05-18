@@ -13,6 +13,8 @@ import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { EditTagModal } from "~/components/TagsModal/EditTagModal";
 import { hasInvalidSlotRanges } from "./slotValidation";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
+import calendarStyles from "~/routes/calendar/CreateEvent/EventModal.module.css";
 
 function useCreateNewTask() {
   const [title, setTitle] = useState<string | undefined>(undefined);
@@ -27,6 +29,7 @@ function useCreateNewTask() {
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [isEditTagModalOpen, setIsEditTagModalOpen] = useState(false);
+  const [isCreateTagModalOpen, setIsCreateTagModalOpen] = useState(false);
 
   const refreshTags = async () => {
     try {
@@ -82,6 +85,8 @@ function useCreateNewTask() {
     refreshTags,
     isEditTagModalOpen,
     setIsEditTagModalOpen,
+    isCreateTagModalOpen,
+    setIsCreateTagModalOpen,
     isMicroTask,
     setIsMicroTask,
   };
@@ -118,6 +123,8 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
     setIsEditTagModalOpen,
     isMicroTask,
     setIsMicroTask,
+    isCreateTagModalOpen,
+    setIsCreateTagModalOpen,
   } = useCreateNewTask();
 
   const { t } = useTranslation();
@@ -197,6 +204,7 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
                   availableTags={availableTags}
                   refreshTags={refreshTags}
                   setIsEditTagModalOpen={setIsEditTagModalOpen}
+                  setIsCreateTagModalOpen={setIsCreateTagModalOpen}
                   isMicroTask={isMicroTask}
                   setIsMicroTask={setIsMicroTask}
                 />
@@ -240,6 +248,20 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
         setIsOpen={setIsEditTagModalOpen}
         onTagsUpdate={refreshTags}
       />
+      <Modal
+        isOpen={isCreateTagModalOpen}
+        onOpenChange={setIsCreateTagModalOpen}
+        className={calendarStyles.createTagModal} 
+      >
+        <Dialog aria-label="Create Tag">
+          {({ close }) => (
+            <CreateTagModal 
+              onTagCreated={refreshTags} 
+              close={close} 
+            />
+          )}
+        </Dialog>
+      </Modal>
     </>
   );
 });
