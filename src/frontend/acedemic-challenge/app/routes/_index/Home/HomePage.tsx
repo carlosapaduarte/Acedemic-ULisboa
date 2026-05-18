@@ -59,7 +59,7 @@ function useHomePage() {
     const currentBatchDays =
         batchDays && currentBatch ? batchDays.get(currentBatch.id) : undefined;
     const notesText =
-        currentBatchDays && currentDayIndex !== undefined
+        currentBatchDays && currentDayIndex !== undefined && currentBatchDays[currentDayIndex]
             ? currentBatchDays[currentDayIndex].notes
             : "";
 
@@ -121,17 +121,18 @@ function HomePageContent() {
                         onViewNotesButtonClick={() => setIsModalOpen(true)}
                     />
 
-                    {isModalOpen &&
-                        currentBatch &&
-                        typeof currentDayIndex === "number" && (
-                            <NotesModal
-                                batchDayNumber={currentDayIndex + 1}
-                                isModalOpen={isModalOpen}
-                                setIsModalOpen={setIsModalOpen}
-                                savedNotesText={notesText}
-                                onNotesSave={onNoteAddClick}
-                            />
-                        )}
+                    {currentBatch && typeof currentDayIndex === "number" && (
+                        <NotesModal
+                            batchDayNumber={currentDayIndex + 1}
+                            isModalOpen={isModalOpen}
+                            setIsModalOpen={setIsModalOpen}
+                            savedNotesText={notesText || ""} 
+                            onNotesSave={(text) => {
+                                onNoteAddClick(text);
+                                setIsModalOpen(false);
+                            }}
+                        />
+                    )}
                 </>
             )}
         </div>
