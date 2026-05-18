@@ -11,6 +11,8 @@ import { SecondModalContext } from "./SecondModalContext";
 import { useTranslation } from "react-i18next";
 import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { EditTagModal } from "~/components/TagsModal/EditTagModal";
+import { hasInvalidSlotRanges } from "./slotValidation";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
 function useCreateNewTask() {
   const [title, setTitle] = useState<string | undefined>(undefined);
@@ -119,36 +121,47 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
   } = useCreateNewTask();
 
   const { t } = useTranslation();
+  const setGlobalError = useSetGlobalError();
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     refreshTags();
   }, []);
 
-  function createTask(
+  async function createTask(
     newTaskInfo: CreateTaskInputDto,
-    onDone: (task: Task) => void
+    onDone: (task: Task) => void,
+    close: () => void,
   ) {
-    service
-      .createNewTask(newTaskInfo)
-      .then((task: Task) => onDone(task))
-      .catch(
-        (error) => {
-          console.error("Erro ao criar tarefa:", error);
-        } /*setGlobalError(error)*/
+    setIsSaving(true);
+    try {
+      const created = await service.createNewTask(newTaskInfo);
+      onDone(created);
+      clearFields();
+      close();
+    } catch (error) {
+      setGlobalError(
+        error instanceof Error ? error : new Error(String(error)),
       );
+    } finally {
+      setIsSaving(false);
+    }
   }
   // 🕵️‍♀️ Espião: Intenção de criar tarefa (abriu o modal)
   useEffect(() => {
       service.logUserAction("tracker", "intent", "open_create_task");
   }, []);
 
-  function onConfirmClick(newTaskInfo: CreateTaskInputDto) {
-    // 🕵️‍♀️ Espião: Efetivamente carregou no botão de Criar
+  function onConfirmClick(
+    newTaskInfo: CreateTaskInputDto,
+    close: () => void,
+  ) {
     service.logUserAction("tracker", "action", "create_task");
-    createTask(newTaskInfo, onTaskCreated);
+    void createTask(newTaskInfo, onTaskCreated, close);
   }
 
-  const finishCreatingTaskButtonDisabled = !title || !priority;
+  const finishCreatingTaskButtonDisabled =
+    !title || !priority || hasInvalidSlotRanges(slotsToWork);
 
   return (
     <>
@@ -191,28 +204,31 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
               <div className={styles.finishCreatingTaskButtonContainer}>
                 <Button
                   className={classNames(styles.finishCreatingTaskButton)}
-                  isDisabled={finishCreatingTaskButtonDisabled}
+                  isDisabled={finishCreatingTaskButtonDisabled || isSaving}
                   onPress={() => {
-                    if (finishCreatingTaskButtonDisabled) {
+                    if (finishCreatingTaskButtonDisabled || isSaving) {
                       return;
                     }
-                    close();
-                    onConfirmClick({
-                      title: title!,
-                      description,
-                      deadline,
-                      priority: priority!,
-                      tags: selectedTagIds,
-                      status: status ?? "not_completed",
-                      subTasks,
-                      slotsToWork,
-                      is_micro_task: isMicroTask,
-                      parent_task_id: parentTaskId,
-                    });
-                    clearFields();
+                    onConfirmClick(
+                      {
+                        title: title!,
+                        description,
+                        deadline,
+                        priority: priority!,
+                        tags: selectedTagIds,
+                        status: status ?? "not_completed",
+                        subTasks,
+                        slotsToWork,
+                        is_micro_task: isMicroTask,
+                        parent_task_id: parentTaskId,
+                      },
+                      close,
+                    );
                   }}
                 >
-                  {t("task:create_task")}
+                  {isSaving
+                    ? t("task:saving", "A guardar...")
+                    : t("task:create_task")}
                 </Button>
               </div>
             </div>

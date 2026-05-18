@@ -139,11 +139,26 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
     );
   };
 
+  const slotsInfoText = t(
+    "task:slots_to_work_info",
+    "Define blocos de tempo dedicados a esta tarefa para organizar o teu dia.",
+  );
+
   return (
     <div className={styles.slotsToWorkSectionContainer}>
-      <h2 className={styles.formSectionTitle}>
-        {t("task:slots_to_work_label")}
-      </h2>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <h2 className={styles.formSectionTitle} style={{ margin: 0 }}>
+          {t("task:slots_to_work_label")}
+        </h2>
+        <div
+          className={styles.infoIcon}
+          title={slotsInfoText}
+          aria-label={slotsInfoText}
+          role="note"
+        >
+          i
+        </div>
+      </div>
       <div className={styles.slotsToWorkContainer}>
         {localSlots.map((slotWrapper, index) => (
           <div

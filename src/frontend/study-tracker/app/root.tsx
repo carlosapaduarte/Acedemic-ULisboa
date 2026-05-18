@@ -34,6 +34,7 @@ import i18next from "~/i18next.server";
 import { useChangeLanguage } from "remix-i18next/react";
 import { AppBarProvider } from "~/components/AppBar/AppBarProvider";
 import { AppTutorial } from "./components/Tutorial/AppTutorial";
+import { TutorialProvider } from "./components/Tutorial/TutorialContext";
 import { service, UserInfo } from "./service/service";
 import { useLocation } from "@remix-run/react";
 
@@ -158,20 +159,22 @@ export function App() {
 
   return (
     <AppBarProvider>
-      <div className="app">
-        <AppTutorial user={currentUser} refreshUser={fetchUser} />
+      <TutorialProvider>
+        <div className="app">
+          <AppTutorial user={currentUser} refreshUser={fetchUser} />
 
-        <AppBar aria-hidden={loading ? true : undefined} />
-        <main className="mainContentContainer" aria-hidden={loading}>
-          <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
-            <GlobalErrorController>
-              <Outlet />
-            </GlobalErrorController>
-          </ReactErrorBoundary>
-        </main>
-        <Footer aria-hidden={loading ? true : undefined} />
-        <LoadingOverlay loading={loading} />
-      </div>
+          <AppBar aria-hidden={loading ? true : undefined} />
+          <main className="mainContentContainer" aria-hidden={loading}>
+            <ReactErrorBoundary fallback={<h1>{t("error:title")}</h1>}>
+              <GlobalErrorController>
+                <Outlet />
+              </GlobalErrorController>
+            </ReactErrorBoundary>
+          </main>
+          <Footer aria-hidden={loading ? true : undefined} />
+          <LoadingOverlay loading={loading} />
+        </div>
+      </TutorialProvider>
     </AppBarProvider>
   );
 }

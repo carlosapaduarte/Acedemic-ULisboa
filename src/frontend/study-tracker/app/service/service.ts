@@ -546,27 +546,41 @@ async function updateTask(
   taskId: number,
   newTaskInfo: CreateTaskInputDto,
   previousTaskName: string,
-) {
-  function toUpdateTaskInputDto(
-    newTaskInfo: CreateTaskInputDto,
-    previousTaskName: string,
-  ): any {
-    return {
-      previous_task_name: previousTaskName,
-      updated_task: requestBody(newTaskInfo),
-    };
-  }
+): Promise<void> {
+  const payload = {
+    previous_task_name: previousTaskName,
+    updated_task: requestBody(newTaskInfo),
+  };
 
   const request = {
     path: `study-tracker/users/me/tasks/${taskId}`,
     method: "PUT",
-    body: toJsonBody(toUpdateTaskInputDto(newTaskInfo, previousTaskName)),
+    body: toJsonBody(payload),
   };
 
   const response: Response = await doFetch(request);
   if (response.ok) {
-    await response.json();
-  } else return Promise.reject(new Error("Task could not be updated!"));
+    return;
+  }
+
+  const text = await response.text().catch(() => "");
+  let message = "Task could not be updated!";
+  if (text) {
+    try {
+      const body = JSON.parse(text);
+      if (body?.detail) {
+        message =
+          typeof body.detail === "string"
+            ? body.detail
+            : JSON.stringify(body.detail);
+      } else {
+        message = text;
+      }
+    } catch {
+      message = text;
+    }
+  }
+  return Promise.reject(new Error(message));
 }
 
 export type Task = {

@@ -11,6 +11,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IconContext } from "react-icons";
 import { AppBarContext } from "./AppBarProvider";
 import { useTranslation } from "react-i18next";
+import { useTutorialMenu } from "~/components/Tutorial/TutorialContext";
 
 function GlobalStatusWidgets() {
   const navigate = useNavigate();
@@ -227,11 +228,32 @@ function SideBar() {
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const { appBarVariant } = useContext(AppBarContext);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { preventSidebarClose, registerSidebarSetter } = useTutorialMenu();
+  const preventSidebarCloseRef = useRef(preventSidebarClose);
 
-  // detetor de cliques fora
+  useEffect(() => {
+    preventSidebarCloseRef.current = preventSidebarClose;
+  }, [preventSidebarClose]);
+
+  useEffect(() => {
+    registerSidebarSetter(setIsSideBarOpen);
+    return () => registerSidebarSetter(null);
+  }, [registerSidebarSetter]);
+
+  // detetor de cliques fora (desativado enquanto o tutorial depende do menu aberto)
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (preventSidebarCloseRef.current) {
+        return;
+      }
+      const target = event.target as Node | null;
+      if (
+        target instanceof Element &&
+        target.closest("[class*='react-joyride']")
+      ) {
+        return;
+      }
+      if (menuRef.current && target && !menuRef.current.contains(target)) {
         setIsSideBarOpen(false);
       }
     }

@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Joyride from "react-joyride";
 import { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
 import { useLocation } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import { service, UserInfo } from "~/service/service";
+import {
+  isOnboardingMenuNavStep,
+  ONBOARDING_HAMBURGER_STEP,
+  useTutorialMenu,
+} from "./TutorialContext";
 
 interface AppTutorialProps {
   user: UserInfo | null;
@@ -16,6 +21,8 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
   const [tutorialKey, setTutorialKey] = useState("");
   const [stepIndex, setStepIndex] = useState(0);
   const location = useLocation();
+  const targetRetryRef = useRef<Record<number, number>>({});
+  const { setPreventSidebarClose, setSidebarOpen } = useTutorialMenu();
 
   const { t, i18n } = useTranslation(["tutorial"]);
 
@@ -64,24 +71,28 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
         target: ".tutorial-target-nav-calendar",
         content: "No Calendário visualizas e crias os teus eventos.",
         placement: "right" as const,
+        disableOverlayClose: true,
       },
       {
         target: ".tutorial-target-nav-tasks",
         content:
           "A tua lista de afazeres. Cria tarefas, define prioridades e nunca falhas um prazo.",
         placement: "right" as const,
+        disableOverlayClose: true,
       },
       {
         target: ".tutorial-target-nav-study",
         content:
           "Esta é a tua Zona de Estudo. Aqui ativas o cronómetro Pomodoro, geres os teus apontamentos e Unidades Curriculares.",
         placement: "right" as const,
+        disableOverlayClose: true,
       },
       {
         target: ".tutorial-target-nav-statistics",
         content:
           "Analisa a tua performance. Vê gráficos sobre o teu foco, energia e tarefas concluídas.",
         placement: "right" as const,
+        disableOverlayClose: true,
       },
       {
         target: "body",
@@ -407,8 +418,21 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
   }, [user, location.pathname, i18n.language, tutorialKey]);
 
   useEffect(() => {
+    if (!run || tutorialKey !== "onboarding_general") {
+      setPreventSidebarClose(false);
+      return;
+    }
+
+    const onMenuNavSteps = isOnboardingMenuNavStep(stepIndex);
+    setPreventSidebarClose(onMenuNavSteps);
+    if (onMenuNavSteps) {
+      setSidebarOpen(true);
+    }
+  }, [stepIndex, run, tutorialKey, setPreventSidebarClose, setSidebarOpen]);
+
+  useEffect(() => {
     if (!run || tutorialKey !== "onboarding_general") return;
-    if (stepIndex === 3) {
+    if (stepIndex === ONBOARDING_HAMBURGER_STEP) {
       const check = setInterval(() => {
         const sidebar = document.querySelector('div[data-expanded="true"]');
         if (sidebar) {
@@ -437,6 +461,23 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
     const { status, action, type, index } = data;
 
     if (type === EVENTS.TARGET_NOT_FOUND) {
+      if (tutorialKey === "onboarding_general") {
+        const target = steps[index]?.target;
+        if (
+          typeof target === "string" &&
+          target.startsWith(".tutorial-target-nav")
+        ) {
+          const retries = targetRetryRef.current[index] ?? 0;
+          if (retries < 5) {
+            targetRetryRef.current[index] = retries + 1;
+            setSidebarOpen(true);
+            window.setTimeout(() => setStepIndex(index), 150);
+            return;
+          }
+          setStepIndex(index + 1);
+          return;
+        }
+      }
       if (tutorialKey === "page_curricular_units") {
         setStepIndex(index + 1);
       }
@@ -448,6 +489,8 @@ export function AppTutorial({ user, refreshUser }: AppTutorialProps) {
 
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
       setRun(false);
+      setPreventSidebarClose(false);
+      targetRetryRef.current = {};
       if (tutorialKey) {
         await service.markTutorialAsSeen(tutorialKey);
         refreshUser();

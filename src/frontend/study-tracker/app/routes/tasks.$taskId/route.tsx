@@ -334,6 +334,7 @@ function RenderPage() {
           onTaskUpdated={() => {
             setEditTask(false);
             refreshTask();
+            refreshTasks();
           }}
         />
 

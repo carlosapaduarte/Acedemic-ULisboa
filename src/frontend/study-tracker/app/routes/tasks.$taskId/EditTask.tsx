@@ -10,6 +10,8 @@ import { CreateTaskForm } from "~/routes/tasks/CreateTask/CreateTaskForm/CreateT
 import { useTranslation } from "react-i18next";
 import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { SecondModalContext } from "../tasks/CreateTask/SecondModalContext";
+import { hasInvalidSlotRanges } from "~/routes/tasks/CreateTask/slotValidation";
+import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 
 function useEditTask(task: Task) {
   const [title, setTitle] = useState<string | undefined>(undefined);
@@ -19,6 +21,7 @@ function useEditTask(task: Task) {
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [subTasks, setSubTasks] = useState<CreateTaskInputDto[]>([]);
   const [isMicroTask, setIsMicroTask] = useState<boolean>(false);
+  const [originalTaskTitle, setOriginalTaskTitle] = useState<string>("");
 
   const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -44,6 +47,8 @@ function useEditTask(task: Task) {
       setSlotsToWork([]);
       setSelectedTags(task.data.tags || []);
       setIsMicroTask(task.data.is_micro_task);
+      setOriginalTaskTitle(task.data.title);
+      setSubTasks([]);
       refreshTags();
     }
   }, [task]);
@@ -58,17 +63,7 @@ function useEditTask(task: Task) {
     setSlotsToWork([]);
     setSelectedTags([]);
     setIsMicroTask(false);
-  }
-
-  function appendSubSubTask(subTask: CreateTaskInputDto) {
-    let newSubTasks;
-    if (subTasks == undefined) newSubTasks = [subTask];
-    else {
-      if (subTasks.includes(subTask)) return;
-      newSubTasks = [...subTasks];
-      newSubTasks.push(subTask);
-    }
-    setSubTasks(newSubTasks);
+    setOriginalTaskTitle("");
   }
 
   return {
@@ -87,7 +82,6 @@ function useEditTask(task: Task) {
     selectedTags,
     setSelectedTags,
     subTasks,
-    appendSubSubTask,
     clearFields,
     availableTags,
     refreshTags,
@@ -95,10 +89,11 @@ function useEditTask(task: Task) {
     setIsEditTagModalOpen,
     isMicroTask,
     setIsMicroTask,
+    originalTaskTitle,
   };
 }
 
-const EditTaskModal = React.memo(function CreateTaskModal({
+const EditTaskModal = React.memo(function EditTaskModal({
   taskId,
   task,
   onTaskUpdated,
@@ -129,24 +124,42 @@ const EditTaskModal = React.memo(function CreateTaskModal({
     setIsEditTagModalOpen,
     isMicroTask,
     setIsMicroTask,
+    originalTaskTitle,
   } = useEditTask(task);
 
   const { t } = useTranslation(["task"]);
+  const setGlobalError = useSetGlobalError();
+  const [isSaving, setIsSaving] = useState(false);
 
-  function updateTask(newTaskInfo: CreateTaskInputDto, onDone: () => void) {
-    service
-      .updateTask(taskId, newTaskInfo, task.data.title)
-      .then(() => onDone())
-      .catch((error) => {
-        console.error(error);
-      });
+  const finishCreatingTaskButtonDisabled =
+    !title || !priority || hasInvalidSlotRanges(slotsToWork);
+
+  async function handleConfirm(
+    newTaskInfo: CreateTaskInputDto,
+    close: () => void,
+  ) {
+    if (finishCreatingTaskButtonDisabled || isSaving) {
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await service.updateTask(
+        taskId,
+        newTaskInfo,
+        originalTaskTitle || task.data.title,
+      );
+      onTaskUpdated();
+      clearFields();
+      close();
+    } catch (error) {
+      setGlobalError(
+        error instanceof Error ? error : new Error(String(error)),
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
-
-  function onConfirmClick(newTaskInfo: CreateTaskInputDto) {
-    updateTask(newTaskInfo, onTaskUpdated);
-  }
-
-  const finishCreatingTaskButtonDisabled = !title || !priority;
 
   return (
     <Modal>
@@ -183,27 +196,25 @@ const EditTaskModal = React.memo(function CreateTaskModal({
             <div className={styles.finishCreatingTaskButtonContainer}>
               <Button
                 className={classNames(styles.finishCreatingTaskButton)}
-                isDisabled={finishCreatingTaskButtonDisabled}
+                isDisabled={finishCreatingTaskButtonDisabled || isSaving}
                 onPress={() => {
-                  if (finishCreatingTaskButtonDisabled) {
-                    return;
-                  }
-                  onConfirmClick({
-                    title: title!,
-                    description,
-                    deadline,
-                    priority: priority!,
-                    tags: selectedTags,
-                    status: status ?? "not_completed",
-                    subTasks,
-                    slotsToWork,
-                    is_micro_task: isMicroTask,
-                  });
-                  clearFields();
-                  close();
+                  void handleConfirm(
+                    {
+                      title: title!,
+                      description,
+                      deadline,
+                      priority: priority!,
+                      tags: selectedTags,
+                      status: status ?? "not_completed",
+                      subTasks,
+                      slotsToWork,
+                      is_micro_task: isMicroTask,
+                    },
+                    close,
+                  );
                 }}
               >
-                {t("task:update_task")}
+                {isSaving ? t("task:saving", "A guardar...") : t("task:update_task")}
               </Button>
             </div>
           </div>
@@ -229,7 +240,7 @@ const ModalWrapper = React.memo(function ModalWrapper({
     JSX.Element | undefined
   >(undefined);
   const [secondModalClass, setSecondModalClass] = useState<string | undefined>(
-    undefined
+    undefined,
   );
 
   const secondModalContextValue = useMemo(
@@ -248,7 +259,7 @@ const ModalWrapper = React.memo(function ModalWrapper({
       setSecondModalContent,
       secondModalClass,
       setSecondModalClass,
-    ]
+    ],
   );
 
   return (

@@ -5,6 +5,7 @@ import classNames from "classnames";
 import { SecondModalContext } from "~/routes/tasks/CreateTask/SecondModalContext";
 import { useTranslation } from "react-i18next";
 import { SlotToWorkDto } from "~/service/output_dtos";
+import { isTimeRangeInvalid } from "~/routes/tasks/CreateTask/slotValidation";
 
 const formatDate = (
   dateString: string | undefined,
@@ -78,6 +79,10 @@ function ModalContent({
       setShowError(true);
       return;
     }
+    if (isTimeRangeInvalid(tempStartTime, tempEndTime)) {
+      setShowError(true);
+      return;
+    }
 
     onConfirm({
       date: tempDate,
@@ -94,6 +99,7 @@ function ModalContent({
   };
 
   const isInvalid = (value: string | undefined) => showError && !value;
+  const isEndBeforeStart = isTimeRangeInvalid(tempStartTime, tempEndTime);
 
   return (
     <Dialog
@@ -115,10 +121,15 @@ function ModalContent({
 
           {showError && (
             <p className={styles.errorText}>
-              {t(
-                "task:fill_all_fields",
-                "Preencha todos os campos obrigatórios."
-              )}
+              {isEndBeforeStart
+                ? t(
+                    "task:slot_end_before_start",
+                    "A hora de fim deve ser posterior à hora de início.",
+                  )
+                : t(
+                    "task:fill_all_fields",
+                    "Preencha todos os campos obrigatórios.",
+                  )}
             </p>
           )}
 
@@ -167,7 +178,8 @@ function ModalContent({
                   if (e.target.value) setShowError(false);
                 }}
                 className={classNames(styles.timeInput, {
-                  [styles.inputError]: isInvalid(tempEndTime),
+                  [styles.inputError]:
+                    isInvalid(tempEndTime) || isEndBeforeStart,
                 })}
               />
             </TextField>
@@ -183,6 +195,7 @@ function ModalContent({
           >
             <Button
               className={styles.confirmButton}
+              isDisabled={isEndBeforeStart}
               onPress={() => handleSave(close)}
             >
               {t("task:confirm", "Confirmar")}
