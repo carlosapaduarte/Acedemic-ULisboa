@@ -1,0 +1,20 @@
+{
+    "title": "Definições",
+    "profile_title": "Perfil do Aluno",
+    "name_label": "Nome:",
+    "id_label": "ID:",
+    "challenge_level_title": "Nível de Desafio",
+    "coming_soon": "Em breve...",
+    "challenge_level_description": "Ajusta a dificuldade dos teus desafios semanais.",
+    "level_beginner": "Iniciado",
+    "level_intermediate": "Intermédio",
+    "level_advanced": "Avançado",
+    "avatar_title": "Avatar",
+    "dark_mode_title": "Modo Noturno",
+    "coming_soon_short": "Brevemente",
+    "dark_mode_description": "Ativar interface escura para poupar a vista.",
+    "save_success": "Guardado!",
+    "save_profile": "Guardar Perfil",
+    "save_error": "Erro ao guardar: {{message}}",
+    "save_error_unknown": "Erro desconhecido"
+}

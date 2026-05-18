@@ -3,7 +3,13 @@ import { service, UserInfo } from "~/service/service";
 import { useTranslation } from "react-i18next";
 import styles from "./settingsPage.module.css";
 import classNames from "classnames";
-import { RiSave3Fill, RiRestartLine, RiCheckLine, RiMoonClearFill } from "react-icons/ri";
+import { RiSave3Fill, RiCheckLine, RiMoonClearFill } from "react-icons/ri";
+
+const CHALLENGE_LEVELS = [
+  { id: 1, labelKey: "level_beginner" },
+  { id: 2, labelKey: "level_intermediate" },
+  { id: 3, labelKey: "level_advanced" },
+] as const;
 
 /**
  * DOCUMENTAÇÃO: Gera a lista de caminhos para os avatares disponíveis.
@@ -47,7 +53,7 @@ export default function SettingsPage() {
         );
         setSelectedAvatarIndex(currentAvatarIndex !== -1 ? currentAvatarIndex : 0);
       })
-      .catch((err) => console.error("Erro ao carregar settings:", err))
+      .catch((err) => console.error("Failed to load settings:", err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -61,7 +67,7 @@ export default function SettingsPage() {
 
     try {
       const promises = [];
-      
+
       const newAvatarFullString = avatars[selectedAvatarIndex];
       if (newAvatarFullString && !newAvatarFullString.includes(user.avatarFilename)) {
         const filename = newAvatarFullString.split("/").pop() || newAvatarFullString;
@@ -69,39 +75,47 @@ export default function SettingsPage() {
       }
 
       promises.push(service.updateDisplayName(displayName));
-      
+
       if (promises.length > 0) {
         await Promise.all(promises);
         setUser({
           ...user,
           avatarFilename: newAvatarFullString?.split("/").pop() || user.avatarFilename,
-          displayName: displayName
+          displayName: displayName,
         });
       }
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (error: any) {
-      alert(`Erro ao guardar: ${error.message || "Erro desconhecido"}`);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("settings:save_error_unknown");
+      alert(t("settings:save_error", { message }));
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <div className={styles.loadingContainer}>{t("common:loading", "A carregar...")}</div>;
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>{t("common:loading")}</div>
+    );
+  }
 
   return (
     <div className={styles.settingsPage}>
-      <h1 className={styles.settingTitle}>{t("settings:title", "Definições")}</h1>
+      <h1 className={styles.settingTitle}>{t("settings:title")}</h1>
 
       <div className={styles.sectionsWrapper}>
-        
+
         {/* SECÇÃO: PERFIL DO ALUNO */}
         <section className={styles.sectionCard}>
-          <h2 className={styles.cardTitle}>{t("settings:profile_title", "Perfil do Aluno")}</h2>
-          
+          <h2 className={styles.cardTitle}>{t("settings:profile_title")}</h2>
+
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Nome:</label>
+            <label className={styles.label}>{t("settings:name_label")}</label>
             <input
               type="text"
               className={styles.nameInput}
@@ -111,7 +125,7 @@ export default function SettingsPage() {
           </div>
 
           <div className={styles.fieldGroup}>
-            <span className={styles.label}>ID:</span>
+            <span className={styles.label}>{t("settings:id_label")}</span>
             <span className={styles.readOnlyValue}>{user?.username}</span>
           </div>
         </section>
@@ -119,17 +133,13 @@ export default function SettingsPage() {
         {/* SECÇÃO: NÍVEL DO DESAFIO (FUNCIONALIDADE FUTURA) */}
         <section className={classNames(styles.sectionCard, styles.disabledSection)}>
           <div className={styles.cardHeaderWithBadge}>
-            <h2 className={styles.cardTitle}>Nível de Desafio</h2>
-            <span className={styles.comingSoonBadge}>{t("settings:coming_soon", "Em breve...")}</span>
+            <h2 className={styles.cardTitle}>{t("settings:challenge_level_title")}</h2>
+            <span className={styles.comingSoonBadge}>{t("settings:coming_soon")}</span>
           </div>
-          <p className={styles.description}>Ajusta a dificuldade dos teus desafios semanais.</p>
-          
+          <p className={styles.description}>{t("settings:challenge_level_description")}</p>
+
           <div className={styles.levelButtonGroup}>
-            {[
-              { id: 1, label: "Iniciado" },
-              { id: 2, label: "Intermédio" },
-              { id: 3, label: "Avançado" }
-            ].map(level => {
+            {CHALLENGE_LEVELS.map((level) => {
               const isSelected = user?.currentChallengeLevel === level.id;
               return (
                 <button
@@ -137,7 +147,7 @@ export default function SettingsPage() {
                   disabled
                   className={classNames(styles.levelBtn, isSelected && styles.levelBtnSelected)}
                 >
-                  {level.label}
+                  {t(`settings:${level.labelKey}`)}
                 </button>
               );
             })}
@@ -146,7 +156,7 @@ export default function SettingsPage() {
 
         {/* SECÇÃO: SELEÇÃO DE AVATAR */}
         <section className={styles.sectionCard}>
-          <h2 className={styles.cardTitle}>Avatar</h2>
+          <h2 className={styles.cardTitle}>{t("settings:avatar_title")}</h2>
           <div className={styles.avatarGrid}>
             {avatars.map((avatar, index) => (
               <div
@@ -163,14 +173,16 @@ export default function SettingsPage() {
         {/* SECÇÃO: MODO NOTURNO (VISUAL) */}
         <section className={styles.sectionCard}>
           <div className={styles.cardHeaderWithBadge}>
-             <h2 className={styles.cardTitle}><RiMoonClearFill /> Modo Noturno</h2>
-             <span className={styles.comingSoonBadge}>Brevemente</span>
+            <h2 className={styles.cardTitle}>
+              <RiMoonClearFill /> {t("settings:dark_mode_title")}
+            </h2>
+            <span className={styles.comingSoonBadge}>{t("settings:coming_soon_short")}</span>
           </div>
           <div className={styles.systemRow}>
-             <p className={styles.description}>Ativar interface escura para poupar a vista.</p>
-             <label className={styles.switchDisabled}>
-                <span className={styles.slider}></span>
-             </label>
+            <p className={styles.description}>{t("settings:dark_mode_description")}</p>
+            <label className={styles.switchDisabled}>
+              <span className={styles.slider}></span>
+            </label>
           </div>
         </section>
 
@@ -182,16 +194,20 @@ export default function SettingsPage() {
           onClick={handleSave}
           disabled={saving}
           className={classNames(
-            styles.saveButton, 
-            saveSuccess && styles.saveSuccess
+            styles.saveButton,
+            saveSuccess && styles.saveSuccess,
           )}
         >
           {saving ? (
-            t("common:saving", "A guardar...")
+            t("common:saving")
           ) : saveSuccess ? (
-            <><RiCheckLine /> Guardado!</>
+            <>
+              <RiCheckLine /> {t("settings:save_success")}
+            </>
           ) : (
-            <><RiSave3Fill /> Guardar Perfil</>
+            <>
+              <RiSave3Fill /> {t("settings:save_profile")}
+            </>
           )}
         </button>
       </div>

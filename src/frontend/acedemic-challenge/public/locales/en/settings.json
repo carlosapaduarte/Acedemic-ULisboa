@@ -1,0 +1,20 @@
+{
+    "title": "Settings",
+    "profile_title": "Student Profile",
+    "name_label": "Name:",
+    "id_label": "ID:",
+    "challenge_level_title": "Challenge Level",
+    "coming_soon": "Coming soon...",
+    "challenge_level_description": "Adjust the difficulty of your weekly challenges.",
+    "level_beginner": "Beginner",
+    "level_intermediate": "Intermediate",
+    "level_advanced": "Advanced",
+    "avatar_title": "Avatar",
+    "dark_mode_title": "Dark Mode",
+    "coming_soon_short": "Soon",
+    "dark_mode_description": "Enable dark interface to reduce eye strain.",
+    "save_success": "Saved!",
+    "save_profile": "Save Profile",
+    "save_error": "Error saving: {{message}}",
+    "save_error_unknown": "Unknown error"
+}
