@@ -196,16 +196,12 @@ function SideBarNavigationMenu({
         iconUrl={"icons/calendar_icon.png"}
         setIsSideBarOpen={setIsSideBarOpen}
       />
-      {/*<SideBarNavButton text={t("navigation:schedule")} url={"/calendar"} iconUrl={"icons/schedule_icon.png"}
-                              setIsSideBarOpen={setIsSideBarOpen} />*/}
       <SideBarNavButton
         text={t("navigation:tasks")}
         url={"/tasks"}
         iconUrl={"icons/tasks_icon.png"}
         setIsSideBarOpen={setIsSideBarOpen}
       />
-      {/*<SideBarNavButton text={t("navigation:notes")} url={"/archives"} iconUrl={"icons/notes_icon.png"}
-                              setIsSideBarOpen={setIsSideBarOpen} />*/}
       <SideBarNavButton
         text={t("navigation:study")}
         url={"/study"}
@@ -218,8 +214,6 @@ function SideBarNavigationMenu({
         iconUrl={"icons/statistics_icon.png"}
         setIsSideBarOpen={setIsSideBarOpen}
       />
-      {/*<SideBarNavButton text={t("navigation:badges")} url={"/badges"} iconUrl={"icons/badges_icon.png"}
-                              setIsSideBarOpen={setIsSideBarOpen} />*/}
     </>
   );
 }
@@ -240,7 +234,7 @@ function SideBar() {
     return () => registerSidebarSetter(null);
   }, [registerSidebarSetter]);
 
-  // detetor de cliques fora (desativado enquanto o tutorial depende do menu aberto)
+  // detetor de cliques fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (preventSidebarCloseRef.current) {
@@ -301,15 +295,80 @@ function SideBar() {
   );
 }
 
+function AppSwitcher() {
+  const location = useLocation();
+  const isTrackerActuallyActive = !location.pathname.includes('/challenge');
+  const [visualState, setVisualState] = useState(isTrackerActuallyActive);
+
+  const toggleApp = () => {
+    setVisualState(!visualState);
+
+    setTimeout(() => {
+      // Deteta se estamos em localhost para usar as URLs corretas
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+      if (isTrackerActuallyActive) {
+        // Vai para o Challenge
+        window.location.href = isLocalhost 
+          ? "http://localhost:5173/challenge/"
+          : "https://acedemic.studentlife.ulisboa.pt/challenge/";
+      } else {
+        // Vai para o Tracker
+        window.location.href = isLocalhost 
+          ? "http://localhost:5273/tracker/"
+          : "https://acedemic.studentlife.ulisboa.pt/tracker/";
+      }
+    }, 300);
+  };
+
+  return (
+    <div 
+      className={styles.switcherContainer} 
+      onClick={toggleApp}
+      role="switch"
+      aria-checked={visualState}
+      title={visualState ? "Mudar para o Challenge" : "Mudar para o Tracker"}
+    >
+      <div 
+        className={classNames(
+          styles.pill, 
+          visualState ? styles.pillTracker : styles.pillChallenge
+        )} 
+      />
+      
+      <div className={styles.switcherIconContainer}>
+        <img 
+          src="icons/tasks_icon.png" 
+          alt="Tracker" 
+          className={classNames(
+            styles.switcherLogo, 
+            visualState ? styles.iconActive : styles.iconInactive
+          )} 
+        />
+      </div>
+      
+      <div className={styles.switcherIconContainer}>
+        <img 
+          src="assets/logos/medal_icon.svg" 
+          alt="Challenge" 
+          className={classNames(
+            styles.switcherLogo, 
+            !visualState ? styles.iconActive : styles.iconInactive
+          )} 
+        />
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------------
 export function AppBar({
   "aria-hidden": ariaHidden,
 }: {
   "aria-hidden"?: boolean;
 }) {
   const { appBarVariant } = useContext(AppBarContext);
-
   const { t } = useTranslation("appbar");
-
   const navigate = useNavigate();
 
   return (
@@ -364,16 +423,8 @@ export function AppBar({
               : styles.settingsButtons
           }
         >
-          {/* LOGO DO CHALLENGE (Atalho para ir para o Challenge) */}
-          <div className={styles.appSwitchers}>
-            <a 
-              href="https://acedemic.studentlife.ulisboa.pt/challenge" 
-              className={styles.switcherLink}
-              title="Ir para o ACEdemic Challenge"
-            >
-              <img src="assets/logos/medal_icon.svg" alt="Challenge" className={styles.switcherLogo} />
-            </a>
-          </div>
+          
+          <AppSwitcher />
 
           <LanguageButton
             language={t("appbar:portugueseLanguage")}

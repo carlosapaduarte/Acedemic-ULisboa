@@ -274,3 +274,62 @@
     height: 22px;
   }
 }
+
+/* --- ESTILOS DO APP SWITCHER --- */
+.switcherContainer {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-2, #e2e8f0);
+  border-radius: 50px;
+  padding: 4px;
+  position: relative;
+  width: 100px; /* Largura do botão */
+  height: 36px; /* Altura do botão */
+  cursor: pointer;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-right: 12px;
+}
+
+.pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: calc(50% - 4px);
+  background-color: white;
+  border-radius: 50px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pillTracker {
+  transform: translateX(0);
+}
+
+.pillChallenge {
+  transform: translateX(100%);
+}
+
+.switcherIconContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.switcherLogo {
+  height: 20px;
+  width: auto;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.iconActive {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.iconActive {
+  opacity: 1;
+  transform: scale(1.1);
+  filter: brightness(0.2); 
+}

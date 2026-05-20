@@ -1,5 +1,5 @@
 import { LanguageButton } from "~/components/LanguageButton/LanguageButton";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
 import styles from "./appBar.module.css";
 import cleanAppBarStyles from "./cleanAppBar.module.css";
@@ -10,6 +10,60 @@ import { GreetingsContainer, NavBar } from "./HomeAppBar/HomeAppBar";
 import classNames from "classnames";
 import { AppBarContext } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
+
+function AppSwitcher() {
+  const [isTrackerActive, setIsTrackerActive] = useState(false);
+
+  const toggleApp = () => {
+    setIsTrackerActive(true);
+
+    setTimeout(() => {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      // Manda para o Tracker
+      window.location.href = isLocalhost 
+        ? "http://localhost:5273/tracker/" 
+        : "https://acedemic.studentlife.ulisboa.pt/tracker/";
+    }, 300);
+  };
+
+  return (
+    <div 
+      className={styles.switcherContainer} 
+      onClick={toggleApp}
+      role="switch"
+      aria-checked={isTrackerActive}
+      title="Mudar para o Tracker"
+    >
+      <div 
+        className={classNames(
+          styles.pill, 
+          isTrackerActive ? styles.pillTracker : styles.pillChallenge
+        )} 
+      />
+      
+      <div className={styles.switcherIconContainer}>
+        <img 
+          src="icons/logo_tracker.png"
+          alt="Tracker" 
+          className={classNames(
+            styles.switcherLogo, 
+            isTrackerActive ? styles.iconActive : styles.iconInactive
+          )} 
+        />
+      </div>
+      
+      <div className={styles.switcherIconContainer}>
+        <img 
+          alt="Challenge" 
+          className={classNames(
+            styles.switcherLogo, 
+            !isTrackerActive ? styles.iconActive : styles.iconInactive
+          )} 
+        />
+      </div>
+    </div>
+  );
+}
 
 export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean }) {
     const { appBarVariant } = useContext(AppBarContext);
