@@ -88,6 +88,9 @@ interface CalendarEventResource {
   is_uc?: boolean;
   recurrenceStart?: Date;
   recurrenceEnd?: Date;
+  isActive?: boolean;
+  parentTaskCompleted?: boolean;
+  readOnlyPastCompleted?: boolean;
 }
 
 const EventWithTags = ({
@@ -164,7 +167,9 @@ const EventWithTags = ({
   let isCompletedTaskSlot = false;
   const taskId = event.resource?.task_id;
 
-  if (taskId && allTasks) {
+  if (event.resource?.parentTaskCompleted) {
+    isCompletedTaskSlot = true;
+  } else if (taskId && allTasks) {
     const associatedTask = allTasks.find((t) => t.id === taskId);
     if (associatedTask && associatedTask.data.status === "completed") {
       isCompletedTaskSlot = true;
@@ -460,6 +465,9 @@ function useMyCalendar() {
 
       let allOccurrences: CalendarEvent[] = [];
       eventsFromBackend.forEach((event) => {
+        if (event.isActive === false) {
+          return;
+        }
         const styleProps = {};
 
         // Se recurrenceStart existir, usa-o. Se não, usa startDate.
@@ -520,6 +528,14 @@ function useMyCalendar() {
           }
 
           if (shouldAddEvent) {
+            const occurrenceEnd = new Date(eventOccurrenceEndDate);
+            const isPastOccurrence = occurrenceEnd.getTime() < Date.now();
+            const parentCompleted =
+              event.parentTaskCompleted === true ||
+              (event.task_id &&
+                tasksFromBackend?.find((t) => t.id === event.task_id)?.data
+                  .status === "completed");
+
             allOccurrences.push({
               title: event.title,
               start: eventOccurrenceStartDate,
@@ -538,6 +554,10 @@ function useMyCalendar() {
                 is_uc: event.is_uc,
                 recurrenceStart: event.recurrenceStart,
                 recurrenceEnd: event.recurrenceEnd,
+                isActive: event.isActive,
+                parentTaskCompleted: event.parentTaskCompleted,
+                readOnlyPastCompleted:
+                  Boolean(isPastOccurrence && parentCompleted && event.task_id),
               } as CalendarEventResource,
             });
           }
@@ -568,6 +588,9 @@ function useMyCalendar() {
     async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
       try {
         const resource = event.resource as CalendarEventResource;
+        if (resource.readOnlyPastCompleted) {
+          return;
+        }
 
         const rawTags = resource.tags || [];
 
@@ -607,6 +630,9 @@ function useMyCalendar() {
     async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
       try {
         const resource = event.resource as CalendarEventResource;
+        if (resource.readOnlyPastCompleted) {
+          return;
+        }
 
         const rawTags = resource.tags || [];
 
@@ -805,19 +831,22 @@ function MyCalendar() {
     [],
   );
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
+    const res = event.resource as CalendarEventResource;
     setEventToEdit({
-      id: event.resource.id,
+      id: res.id,
       title: event.title,
       start: event.start as Date,
       end: event.end as Date,
-      tags: event.resource.tags || [],
-      notes: event.resource.notes || "",
-      color: event.resource.color,
-      everyDay: event.resource.everyDay,
-      everyWeek: event.resource.everyWeek,
-      is_uc: event.resource.is_uc || false,
-      recurrenceStart: event.resource.recurrenceStart,
-      recurrenceEnd: event.resource.recurrenceEnd,
+      tags: res.tags || [],
+      notes: res.notes || "",
+      color: res.color,
+      everyDay: res.everyDay,
+      everyWeek: res.everyWeek,
+      is_uc: res.is_uc || false,
+      recurrenceStart: res.recurrenceStart,
+      recurrenceEnd: res.recurrenceEnd,
+      task_id: res.task_id,
+      readOnly: Boolean(res.readOnlyPastCompleted),
     });
     setSelectedSlot(null);
     setIsModalOpen(true);
@@ -1024,7 +1053,9 @@ function MyCalendar() {
 
             let isCompletedTaskSlot = false;
             const taskId = event.resource?.task_id;
-            if (taskId && allTasks) {
+            if (event.resource?.parentTaskCompleted) {
+              isCompletedTaskSlot = true;
+            } else if (taskId && allTasks) {
               const associatedTask = allTasks.find((t) => t.id === taskId);
               if (
                 associatedTask &&

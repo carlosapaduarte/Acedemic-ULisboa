@@ -143,6 +143,7 @@ class STEventModel(SQLModel, table=True):
     notes: str = Field(default="", nullable=False)
     color: str = Field(nullable=False)
     is_uc: bool = Field(default=False, nullable=False)
+    is_active: bool = Field(default=True, nullable=False)
 
     recurrence_start: Optional[datetime] = Field(default=None, nullable=True)
     recurrence_end: Optional[datetime] = Field(default=None, nullable=True)

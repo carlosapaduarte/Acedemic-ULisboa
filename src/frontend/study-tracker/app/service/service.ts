@@ -328,6 +328,8 @@ type EventDto = {
   is_uc: boolean;
   recurrenceStart?: number;
   recurrenceEnd?: number;
+  isActive?: boolean;
+  parentTaskCompleted?: boolean;
 };
 
 export type Event = {
@@ -344,6 +346,8 @@ export type Event = {
   is_uc: boolean;
   recurrenceStart?: Date;
   recurrenceEnd?: Date;
+  isActive: boolean;
+  parentTaskCompleted: boolean;
 };
 
 export type UpdateEventInputDto = {
@@ -428,6 +432,8 @@ async function getUserEvents(
         recurrenceEnd: eventDto.recurrenceEnd
           ? new Date(eventDto.recurrenceEnd * 1000)
           : undefined,
+        isActive: eventDto.isActive !== false,
+        parentTaskCompleted: Boolean(eventDto.parentTaskCompleted),
       };
     });
   } else {

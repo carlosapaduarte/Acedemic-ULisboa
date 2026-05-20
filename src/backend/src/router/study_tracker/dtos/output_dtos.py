@@ -83,6 +83,8 @@ class EventOutputDto(BaseModel):
     is_uc: bool = False
     recurrenceStart: int | None = None
     recurrenceEnd: int | None = None
+    isActive: bool = True
+    parentTaskCompleted: bool = False
 
     @staticmethod
     def from_events(events: list[Event]) -> list['EventOutputDto']:
@@ -107,6 +109,8 @@ class EventOutputDto(BaseModel):
                     is_uc=event.is_uc,
                     recurrenceStart=get_datetime_utc(event.recurrence_start) if event.recurrence_start else None,
                     recurrenceEnd=get_datetime_utc(event.recurrence_end) if event.recurrence_end else None,
+                    isActive=event.is_active,
+                    parentTaskCompleted=event.parent_task_completed,
                 )
             )
 

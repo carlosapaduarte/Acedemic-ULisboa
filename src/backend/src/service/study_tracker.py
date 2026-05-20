@@ -144,7 +144,9 @@ def update_task_status(user_id: int, task_id: int, new_status: str):
     study_tracker_repo.update_task_status(user_id, task_id, new_status)
 
     if new_status == "completed":
-        delete_future_slots_for_task(user_id, task_id)
+        study_tracker_repo.deactivate_future_task_events(user_id, task_id)
+    else:
+        study_tracker_repo.reactivate_inactive_task_events(user_id, task_id)
 
 def delete_task(user_id: int, task_id: int):
     """Apaga uma tarefa pelo ID."""
@@ -152,9 +154,6 @@ def delete_task(user_id: int, task_id: int):
         study_tracker_repo.delete_task(user_id, task_id)
     except Exception as e:
         raise NotFoundException(f"Task {task_id} to delete not found")
-    
-def delete_future_slots_for_task(user_id: int, task_id: int):
-    study_tracker_repo.delete_future_slots_for_task(user_id, task_id) 
 
 def create_archive(user_id: int, name: str, parent_archive_id: int | None = None):
     # Alterámos para receber também o parent_archive_id

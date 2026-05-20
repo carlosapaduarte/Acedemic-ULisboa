@@ -77,6 +77,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 task_id=event.task_id,
                 task_user_id=user_id if event.task_id else None,
                 is_uc=event.is_uc,
+                is_active=True,
                 recurrence_start=rec_start_dt,
                 recurrence_end=rec_end_dt
             )
@@ -133,7 +134,9 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             statement = select(STEventModel).where(STEventModel.id == event_id, STEventModel.user_id == user_id)
             event_model = session.exec(statement).first()
             if not event_model:
-                return 
+                return
+            if not event_model.is_active:
+                raise NotFoundException(event_id)
             event_model.title = event.title
             event_model.start_date = event.date.start_date
             event_model.end_date = event.date.end_date
@@ -196,6 +199,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             event_model = result.first()
             if event_model is None:
                 raise NotFoundException(event_id)
+            if not event_model.is_active:
+                raise NotFoundException(event_id)
             
             session.delete(event_model)
             session.commit()
@@ -255,6 +260,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             statement = (
                 select(STEventModel)
                 .where(STEventModel.user_id == user_id)
+                .where(STEventModel.is_active == True)
                 .options(
                     selectinload(STEventModel.tags_associations).selectinload(STEventTagModel.tag_ref)
                 )
@@ -323,7 +329,19 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             if study_events:
                 events_to_return = [e for e in events_to_return if StudyTrackerSqlRepo.is_study_event(e)]
 
-            return Event.from_STEventModel(events_to_return)
+            task_ids = {e.task_id for e in events_to_return if e.task_id is not None}
+            task_completed_by_id: dict[int, bool] = {}
+            if task_ids:
+                task_models = session.exec(
+                    select(STTaskModel).where(
+                        STTaskModel.user_id == user_id,
+                        STTaskModel.id.in_(task_ids),
+                    )
+                ).all()
+                for tm in task_models:
+                    task_completed_by_id[tm.id] = tm.status == "completed"
+
+            return Event.from_STEventModel(events_to_return, task_completed_by_id)
 
 
     def update_receive_notifications_pref(self, user_id: int, receive: bool):
@@ -900,11 +918,11 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             statement = (
                 select(STEventModel)
                 .where(STEventModel.user_id == user_id)
+                .where(STEventModel.is_active == True)
                 .options(
                     selectinload(STEventModel.tags_associations).selectinload(STEventTagModel.tag_ref)
                 )
             )
-            events: list[STEventModel] = list(session.exec(statement).all())
             stats: dict[int, dict[int, dict[str, int]]] = {}
 
             # Definir janela de análise (Ano Atual)
@@ -1071,20 +1089,29 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.delete(task_to_delete)
             session.commit()
 
-    def delete_future_slots_for_task(self, user_id: int, task_id: int):
+    def deactivate_future_task_events(self, user_id: int, task_id: int):
+        now = datetime.now(timezone.utc)
         with Session(engine) as session:
-            now = datetime.utcnow()
-            
             statement = select(STEventModel).where(
                 STEventModel.user_id == user_id,
                 STEventModel.task_id == task_id,
-                STEventModel.start_date > now 
+                STEventModel.start_date > now,
             )
-            
-            future_events_to_delete = session.exec(statement).all()
-            for event in future_events_to_delete:
-                session.delete(event)
-            
+            for event in session.exec(statement).all():
+                event.is_active = False
+                session.add(event)
+            session.commit()
+
+    def reactivate_inactive_task_events(self, user_id: int, task_id: int):
+        with Session(engine) as session:
+            statement = select(STEventModel).where(
+                STEventModel.user_id == user_id,
+                STEventModel.task_id == task_id,
+                STEventModel.is_active == False,
+            )
+            for event in session.exec(statement).all():
+                event.is_active = True
+                session.add(event)
             session.commit()
 
     def delete_tag(self, session: Session, tag_id: int) -> bool:

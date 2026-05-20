@@ -85,7 +85,11 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def delete_future_slots_for_task(self, user_id: int, task_id: int):
+    def deactivate_future_task_events(self, user_id: int, task_id: int):
+        pass
+
+    @abstractmethod
+    def reactivate_inactive_task_events(self, user_id: int, task_id: int):
         pass
     
     @abstractmethod

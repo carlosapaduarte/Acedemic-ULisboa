@@ -29,6 +29,12 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
 
     def update_task_status(self, user_id: int, task_id: int, new_status: str):
         pass
+
+    def deactivate_future_task_events(self, user_id: int, task_id: int):
+        pass
+
+    def reactivate_inactive_task_events(self, user_id: int, task_id: int):
+        pass
     
     def create_archive(self, user_id: int, name: str):
         pass

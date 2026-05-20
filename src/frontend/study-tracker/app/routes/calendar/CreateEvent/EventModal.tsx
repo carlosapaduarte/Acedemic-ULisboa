@@ -31,6 +31,8 @@ export interface EventData {
   task_id?: number;
   recurrenceStart?: Date;
   recurrenceEnd?: Date;
+  /** Past occurrence of a slot tied to an already-completed task */
+  readOnly?: boolean;
 }
 
 export type RecurrenceType = "none" | "daily" | "weekly";
@@ -44,41 +46,63 @@ interface EventModalProps {
   initialEndDate?: Date;
 }
 
-const TitleSection = React.memo(({ title, setTitle }: any) => {
-  const { t } = useTranslation("calendar");
-  return (
-    <div className={styles.titleSectionContainer}>
-      <TextField className={styles.formTextField} autoFocus>
-        <Label className={styles.formSectionTitle}>{t("title_label")}</Label>
-        <Input
-          className={`${styles.formInput} tutorial-target-event-title`}
-          required
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder={t("title_placeholder") || ""}
-        />
-      </TextField>
-    </div>
-  );
-});
+const TitleSection = React.memo(
+  ({
+    title,
+    setTitle,
+    readOnly,
+  }: {
+    title: string;
+    setTitle: (title: string) => void;
+    readOnly?: boolean;
+  }) => {
+    const { t } = useTranslation("calendar");
+    return (
+      <div className={styles.titleSectionContainer}>
+        <TextField className={styles.formTextField} autoFocus>
+          <Label className={styles.formSectionTitle}>{t("title_label")}</Label>
+          <Input
+            className={`${styles.formInput} tutorial-target-event-title`}
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={t("title_placeholder") || ""}
+            isDisabled={readOnly}
+          />
+        </TextField>
+      </div>
+    );
+  },
+);
 
-const NotesSection = React.memo(({ notes, setNotes }: any) => {
-  const { t } = useTranslation("calendar");
-  return (
-    <div className={styles.notesSectionContainer}>
-      <TextField className={styles.formTextField}>
-        <Label className={styles.formSectionTitle}>{t("notes_label")}</Label>
-        <TextArea
-          className={styles.formInput}
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder={t("notes_placeholder")}
-          rows={3}
-        />
-      </TextField>
-    </div>
-  );
-});
+const NotesSection = React.memo(
+  ({
+    notes,
+    setNotes,
+    readOnly,
+  }: {
+    notes: string;
+    setNotes: (notes: string) => void;
+    readOnly?: boolean;
+  }) => {
+    const { t } = useTranslation("calendar");
+    return (
+      <div className={styles.notesSectionContainer}>
+        <TextField className={styles.formTextField}>
+          <Label className={styles.formSectionTitle}>{t("notes_label")}</Label>
+          <TextArea
+            className={styles.formInput}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder={t("notes_placeholder")}
+            rows={3}
+            isDisabled={readOnly}
+          />
+        </TextField>
+      </div>
+    );
+  },
+);
 
 const IsRecurrentSection = React.memo(
   ({
@@ -88,6 +112,7 @@ const IsRecurrentSection = React.memo(
     setRecurrenceStart,
     recurrenceEnd,
     setRecurrenceEnd,
+    readOnly,
   }: any) => {
     const { t } = useTranslation("calendar");
 
@@ -119,6 +144,7 @@ const IsRecurrentSection = React.memo(
           value={recurrenceType}
           onChange={(e) => setRecurrenceType(e.target.value)}
           aria-label={t("recurrence_label")}
+          disabled={readOnly}
         >
           <option value="none">{t("recurrence_none_label")}</option>
           <option value="daily">{t("recurrence_daily_label")}</option>
@@ -140,6 +166,7 @@ const IsRecurrentSection = React.memo(
                 value={formatDate(recurrenceStart)}
                 onChange={handleRecStartChange}
                 placeholder="Hoje"
+                isDisabled={readOnly}
               />
               <span style={{ fontSize: "0.8em", color: "#666" }}>
                 {recurrenceStart ? "" : "(Começa hoje)"}
@@ -155,6 +182,7 @@ const IsRecurrentSection = React.memo(
                 className={classNames(styles.dateInput)}
                 value={formatDate(recurrenceEnd)}
                 onChange={handleRecEndChange}
+                isDisabled={readOnly}
               />
               <span style={{ fontSize: "0.8em", color: "#666" }}>
                 {recurrenceEnd ? "" : "(Infinito)"}
@@ -173,6 +201,7 @@ const DateSection = React.memo(
     setEventStartDate,
     eventEndDate,
     setEventEndDate,
+    readOnly,
   }: any) => {
     const { t } = useTranslation("calendar");
     const formatDate = (d: Date) => d.toISOString().split("T")[0];
@@ -221,6 +250,7 @@ const DateSection = React.memo(
                 className={classNames(styles.dateInput)}
                 value={formatDate(eventStartDate)}
                 onChange={handleStartDateChange}
+                isDisabled={readOnly}
               />
             </TextField>
             <TextField className={styles.formTextField}>
@@ -232,6 +262,7 @@ const DateSection = React.memo(
                 className={classNames(styles.timeInput)}
                 value={formatTime(eventStartDate)}
                 onChange={handleStartTimeChange}
+                isDisabled={readOnly}
               />
             </TextField>
           </div>
@@ -247,6 +278,7 @@ const DateSection = React.memo(
                 className={classNames(styles.dateInput)}
                 value={formatDate(eventEndDate)}
                 onChange={handleEndDateChange}
+                isDisabled={readOnly}
               />
             </TextField>
             <TextField className={styles.formTextField}>
@@ -258,6 +290,7 @@ const DateSection = React.memo(
                 className={classNames(styles.timeInput)}
                 value={formatTime(eventEndDate)}
                 onChange={handleEndTimeChange}
+                isDisabled={readOnly}
               />
             </TextField>
           </div>

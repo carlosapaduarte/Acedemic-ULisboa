@@ -153,7 +153,9 @@ class Event():
         task_id: Optional[int] = None, 
         is_uc: bool = False,
         recurrence_start: Optional[datetime] = None,
-        recurrence_end: Optional[datetime] = None
+        recurrence_end: Optional[datetime] = None,
+        is_active: bool = True,
+        parent_task_completed: bool = False,
     ) -> None:
         self.id = id
         self.title = title
@@ -167,9 +169,15 @@ class Event():
         self.is_uc = is_uc
         self.recurrence_start = recurrence_start
         self.recurrence_end = recurrence_end
+        self.is_active = is_active
+        self.parent_task_completed = parent_task_completed
 
     @staticmethod
-    def from_STEventModel(events: list['STEventModel']) -> list['Event']:
+    def from_STEventModel(
+        events: list['STEventModel'],
+        task_completed_by_id: dict[int, bool] | None = None,
+    ) -> list['Event']:
+        task_completed_by_id = task_completed_by_id or {}
         domain_events: list[Event] = []
         for event_model in events:
             
@@ -214,7 +222,13 @@ class Event():
                     task_id=event_model.task_id,
                     is_uc=event_model.is_uc,
                     recurrence_start=event_model.recurrence_start,
-                    recurrence_end=event_model.recurrence_end
+                    recurrence_end=event_model.recurrence_end,
+                    is_active=getattr(event_model, "is_active", True),
+                    parent_task_completed=(
+                        task_completed_by_id.get(event_model.task_id, False)
+                        if event_model.task_id is not None
+                        else False
+                    ),
                 )
             )
 
