@@ -33,6 +33,7 @@ export interface EventData {
   recurrenceEnd?: Date;
   /** Past occurrence of a slot tied to an already-completed task */
   readOnly?: boolean;
+  readOnlyPastCompleted?: boolean;
 }
 
 export type RecurrenceType = "none" | "daily" | "weekly";
@@ -303,7 +304,7 @@ const DateSection = React.memo(
 const EventForm = (props: any) => {
   return (
     <div className={styles.newEventForm}>
-      <TitleSection title={props.title} setTitle={props.setTitle} />
+      <TitleSection title={props.title} setTitle={props.setTitle} readOnly={props.readOnly} />
 
       <div
         id="tutorial-scroll-dates"
@@ -314,9 +315,10 @@ const EventForm = (props: any) => {
           setEventStartDate={props.setStartDate}
           eventEndDate={props.endDate}
           setEventEndDate={props.setEndDate}
+          readOnly={props.readOnly}
         />
 
-        <NotesSection notes={props.notes} setNotes={props.setNotes} />
+        <NotesSection notes={props.notes} setNotes={props.setNotes} readOnly={props.readOnly} />
 
         <IsRecurrentSection
           recurrenceType={props.recurrenceType}
@@ -325,6 +327,7 @@ const EventForm = (props: any) => {
           setRecurrenceStart={props.setRecurrenceStart}
           recurrenceEnd={props.recurrenceEnd}
           setRecurrenceEnd={props.setRecurrenceEnd}
+          readOnly={props.readOnly}
         />
       </div>
 
@@ -336,28 +339,34 @@ const EventForm = (props: any) => {
         }}
       />
 
-      <div
-        id="tutorial-scroll-customization"
-        className="tutorial-target-event-color"
-      >
-        <ColorPickerInput
-          label={props.label}
-          color={props.color}
-          setColor={props.setColor}
-          clearColor={() => props.setColor(null)}
-        />
-      </div>
+      {/* Condicionalmente esconde ColorPicker se for ReadOnly */}
+      {!props.readOnly && (
+        <div
+          id="tutorial-scroll-customization"
+          className="tutorial-target-event-color"
+        >
+          <ColorPickerInput
+            label={props.label}
+            color={props.color}
+            setColor={props.setColor}
+            clearColor={() => props.setColor(null)}
+          />
+        </div>
+      )}
 
-      <div id="tutorial-scroll-tags" className="tutorial-target-event-tags">
-        <TagSection
-          selectedTagIds={props.selectedTagIds}
-          setSelectedTagIds={props.setSelectedTagIds}
-          availableTags={props.availableTags}
-          refreshTags={props.refreshTags}
-          onEditTags={() => props.setIsEditTagModalOpen(true)}
-          onAddTag={() => props.setIsCreateTagModalOpen(true)}
-        />
-      </div>
+      {/* Condicionalmente esconde TagSection se for ReadOnly */}
+      {!props.readOnly && (
+        <div id="tutorial-scroll-tags" className="tutorial-target-event-tags">
+          <TagSection
+            selectedTagIds={props.selectedTagIds}
+            setSelectedTagIds={props.setSelectedTagIds}
+            availableTags={props.availableTags}
+            refreshTags={props.refreshTags}
+            onEditTags={() => props.setIsEditTagModalOpen(true)}
+            onAddTag={() => props.setIsCreateTagModalOpen(true)}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -518,7 +527,6 @@ export function EventModal({
       <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>
         <Dialog aria-label="Event Modal">
           {() => (
-            // TARGET DO MODAL (JANELA INTEIRA)
             <div
               className={`${styles.newEventModalContainer} tutorial-target-event-modal-window`}
             >
@@ -537,8 +545,25 @@ export function EventModal({
                 )}
               </h1>
 
+              {eventToEdit?.readOnlyPastCompleted && (
+                <div style={{
+                  backgroundColor: "#ffebee",
+                  color: "#c62828",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  margin: "0 20px 10px 20px",
+                  border: "1px solid #ef9a9a",
+                  fontSize: "0.9rem"
+                }}>
+                  Este evento não pode ser editado porque a tarefa associada já está concluída.
+                </div>
+              )}
+
               <div className={styles.newEventFormContainer}>
                 <EventForm
+                  readOnly={eventToEdit?.readOnlyPastCompleted} 
                   title={title}
                   setTitle={setTitle}
                   startDate={startDate}
@@ -579,7 +604,7 @@ export function EventModal({
                   <Button
                     className={classNames(styles.deleteEventButton)}
                     onPress={handleDelete}
-                    isDisabled={saving}
+                    isDisabled={saving || eventToEdit?.readOnlyPastCompleted}
                   >
                     {t("delete_button")}
                   </Button>
@@ -590,7 +615,7 @@ export function EventModal({
                     styles.finishCreatingEventButton,
                     "tutorial-target-event-save",
                   )}
-                  isDisabled={!title || saving}
+                  isDisabled={!title || saving || eventToEdit?.readOnlyPastCompleted}
                   onPress={handleSave}
                 >
                   {saving
