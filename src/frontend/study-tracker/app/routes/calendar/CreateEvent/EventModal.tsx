@@ -10,6 +10,7 @@ import {
   TextArea,
 } from "react-aria-components";
 import classNames from "classnames";
+import { FaCheckCircle } from "react-icons/fa";
 import { service, Tag } from "../../../service/service";
 import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
 import { EditTagModal } from "../../../components/TagsModal/EditTagModal";
@@ -544,6 +545,32 @@ export function EventModal({
                     : "new_event_modal_title",
                 )}
               </h1>
+              
+              {eventToEdit?.readOnlyPastCompleted && (
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "15px",
+                  backgroundColor: "#E8F5E9", // Verde muito suave
+                  color: "#2E7D32",         // Verde escuro para o texto
+                  padding: "12px 20px",
+                  borderRadius: "8px",
+                  margin: "0 20px 15px 20px",
+                  border: "1px solid #A5D6A7", // Borda ligeiramente mais escura
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                }}>
+                  <FaCheckCircle size={28} style={{ color: "#4CAF50" }} /> 
+                  
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+                        Ocorrência Concluída
+                        </div>
+                        <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>
+                        Este bloco de tempo já ocorreu e a tarefa associada está marcada como resolvida, por isso não pode ser editado.
+                        </div>
+                  </div>
+                </div>
+              )}
 
               {eventToEdit?.readOnlyPastCompleted && (
                 <div style={{
