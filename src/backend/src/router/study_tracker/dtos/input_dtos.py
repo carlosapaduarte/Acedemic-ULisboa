@@ -82,7 +82,7 @@ class UpdateArchiveInputDto(BaseModel):
     
 class CreateFileInputDto(BaseModel):
     name: str
-    archive_id: int
+    archive_id: Optional[int] = None
     file_type: str = "txt"
     text_content: str = ""
     

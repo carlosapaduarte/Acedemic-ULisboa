@@ -1,5 +1,6 @@
 import random
 import json
+from typing import Optional
 from sqlmodel import Session, select, or_
 from domain.study_tracker import Archive, MoodLog, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, SlotToWork, DateInterval
 from exception import NotFoundException
@@ -668,16 +669,19 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             archive_models: list[STArchiveModel] = list(result.all())
             return Archive.from_STArchiveModel(archive_models)
         
-    def create_file(self, user_id: int, archive_id: int, name: str, file_type: str = "txt", text_content: str = ""):
+
+    def create_file(self, user_id: int, archive_id: Optional[int], name: str, file_type: str = "txt", text_content: str = ""):
         from service.gamification import core as gamification_service
         with Session(engine) as session:
-            statement = select(STArchiveModel).where(
-                STArchiveModel.user_id == user_id,
-                STArchiveModel.id == archive_id
-            )
-            archive_model = session.exec(statement).first()
-            if not archive_model:
-                raise NotFoundException("Pasta destino não encontrada.")
+            
+            if archive_id is not None:
+                statement = select(STArchiveModel).where(
+                    STArchiveModel.user_id == user_id,
+                    STArchiveModel.id == archive_id
+                )
+                archive_model = session.exec(statement).first()
+                if not archive_model:
+                    raise NotFoundException("Pasta destino não encontrada.")
             
             new_file = STFileModel(
                 name=name,
@@ -689,7 +693,8 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             session.add(new_file)
             session.commit()
             session.refresh(new_file)
-                        
+            return new_file
+                      
     def update_file(self, user_id: int, file_id: int, new_name: str | None = None, new_content: str | None = None):
         with Session(engine) as session:
             statement = select(STFileModel).where(

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styles from "../createTask.module.css";
 import {
   Button,
@@ -10,7 +10,7 @@ import {
   TextField,
   Modal,
 } from "react-aria-components";
-import { SlotToWork } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
+import { SlotToWork, ModalContent } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 import { SlotToWorkDto } from "~/service/output_dtos";
@@ -21,6 +21,8 @@ import { FaTrash } from "react-icons/fa";
 import { useNavigate } from "@remix-run/react";
 import { TagSection } from "~/components/TagSection/TagSection";
 import calendarStyles from "~/routes/calendar/CreateEvent/EventModal.module.css";
+import { SecondModalContext } from "~/routes/tasks/CreateTask/SecondModalContext";
+import slotStyles from "~/routes/tasks/CreateTask/SlotToWork/slotToWork.module.css";
 
 const priorityValues = ["low", "medium", "high"];
 
@@ -82,7 +84,7 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
   setSlotsToWork: (slotsToWork: SlotToWorkDto[]) => void;
 }) {
   const { t } = useTranslation(["task"]);
-  const [slotAddingQueue, setSlotAddingQueue] = useState<number[]>([]);
+  const { setIsSecondModalOpen, setSecondModalContent, setSecondModalClass } = useContext(SecondModalContext);
 
   const [localSlots, setLocalSlots] = useState<
     { id: string; data: SlotToWorkDto | undefined }[]
@@ -110,20 +112,33 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
     }
   }, [localSlots]);
 
-  function addToSlotAddingQueue(index: number) {
-    setSlotAddingQueue((prev) => [...prev, index]);
-    setTimeout(() => {
-      setSlotAddingQueue((prev) => prev.filter((i) => i !== index));
-    }, 1000);
-  }
-
-  const handleAddVisualSlot = () => {
-    const newIndex = localSlots.length;
-    setLocalSlots((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), data: undefined },
-    ]);
-    addToSlotAddingQueue(newIndex);
+  const handleAddDirectly = () => {
+    setSecondModalClass(slotStyles.slotToWorkModal);
+    setSecondModalContent(
+      <ModalContent
+        index={localSlots.length}
+        initialDate={undefined}
+        initialStartTime={undefined}
+        initialEndTime={undefined}
+        onConfirm={(data) => {
+          const [year, month, day] = data.date.split("-").map(Number);
+          const [startH, startM] = data.start.split(":").map(Number);
+          const [endH, endM] = data.end.split(":").map(Number);
+          
+          const startObj = new Date(year, month - 1, day, startH, startM);
+          const endObj = new Date(year, month - 1, day, endH, endM);
+          
+          if (!isNaN(startObj.getTime()) && !isNaN(endObj.getTime())) {
+            setLocalSlots((prev) => [
+              ...prev,
+              { id: crypto.randomUUID(), data: { start: startObj, end: endObj } },
+            ]);
+          }
+        }}
+        onCancel={() => {}} // Se cancelar, não fazemos nada e a caixa fantasma não é criada
+      />
+    );
+    setIsSecondModalOpen(true);
   };
 
   const handleRemoveSlot = (idToRemove: string) => {
@@ -143,7 +158,7 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
 
   const slotsInfoText = t(
     "task:slots_to_work_info",
-    "Define blocos de tempo dedicados a esta tarefa para organizar o teu dia.",
+    "Define sessões de trabalho dedicadas a esta tarefa para organizar o teu dia.",
   );
 
   return (
@@ -169,13 +184,10 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
           >
             <SlotToWork
               index={index}
-              newlyAdded={slotAddingQueue.includes(index)}
+              initialData={slotWrapper.data}
               onClosePressed={(data: SlotToWorkDto | undefined) => {
                 if (data) {
                   handleUpdateSlotData(slotWrapper.id, data);
-                } else if (slotWrapper.data === undefined) {
-                  // Se os dados são undefined (cancelou) e o slot ainda estava vazio, apaga o slot da lista
-                  handleRemoveSlot(slotWrapper.id);
                 }
               }}
             />
@@ -198,7 +210,7 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
                 cursor: "pointer",
                 zIndex: 10,
               }}
-              aria-label="Remover slot"
+              aria-label="Remover sessão"
             >
               <FaTrash size={12} />
             </Button>
@@ -206,10 +218,10 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
         ))}
       </div>
       <Button
-        onPress={handleAddVisualSlot}
+        onPress={handleAddDirectly}
         className={classNames(styles.addSlotToWorkButton)}
       >
-        {t("task:add_slot_to_work")}
+        {t("task:add_slot_to_work", "Adicionar Sessão de Trabalho")}
       </Button>
     </div>
   );

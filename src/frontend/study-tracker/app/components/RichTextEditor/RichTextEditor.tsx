@@ -1,9 +1,11 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
 import styles from "./richTextEditor.module.css";
 import { useTranslation } from "react-i18next";
+
 const MenuBar = ({ editor }: { editor: any }) => {
-  const { t } = useTranslation(["task"]);
+  const { t } = useTranslation(["task", "notes"]);
   if (!editor) return null;
 
   return (
@@ -32,18 +34,14 @@ const MenuBar = ({ editor }: { editor: any }) => {
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={
-          editor.isActive("heading", { level: 1 }) ? styles.isActive : ""
-        }
+        className={editor.isActive("heading", { level: 1 }) ? styles.isActive : ""}
       >
         H1
       </button>
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={
-          editor.isActive("heading", { level: 2 }) ? styles.isActive : ""
-        }
+        className={editor.isActive("heading", { level: 2 }) ? styles.isActive : ""}
       >
         H2
       </button>
@@ -65,9 +63,11 @@ const MenuBar = ({ editor }: { editor: any }) => {
   );
 };
 
-export const RichTextEditor = ({ content, onUpdate }) => {
+export const RichTextEditor = ({ content, onUpdate }: { content: string, onUpdate: (c: any) => void }) => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+    ],
     content: content,
     onUpdate: ({ editor }) => {
       onUpdate(editor.getJSON());

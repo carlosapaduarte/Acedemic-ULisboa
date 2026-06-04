@@ -68,26 +68,58 @@ function useTimerSetup(
 ) {
   const { t } = useTranslation(["study"]);
   const setError = useSetGlobalError();
-  const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(
-    undefined,
-  );
-  const [pauseStopDate, setPauseStopDate] = useState<Date | undefined>(
-    undefined,
-  );
-  const [timerStopDate, setTimerStopDate] = useState<Date | undefined>(
-    undefined,
-  );
-  const [motivationalMessage, setMotivationalMessage] = useState<string | null>(
-    null,
-  );
+  
+  const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(() => {
+    if (typeof window !== "undefined") {
+      const activeEnd = window.localStorage.getItem("active_pomodoro_end");
+      const state = window.localStorage.getItem("pomodoro_state");
+      if (activeEnd && state === "study") {
+        return new Date(parseInt(activeEnd, 10));
+      }
+    }
+    return undefined;
+  });
 
-  // 1. Guardar a hora exata em que o utilizador começou a estudar (Cronómetro Inteligente)
-  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [pauseStopDate, setPauseStopDate] = useState<Date | undefined>(() => {
+    if (typeof window !== "undefined") {
+      const pauseEnd = window.localStorage.getItem("active_pause_end");
+      if (pauseEnd) {
+        return new Date(parseInt(pauseEnd, 10));
+      }
+    }
+    return undefined;
+  });
+
+  const [timerStopDate, setTimerStopDate] = useState<Date | undefined>(() => {
+    if (typeof window !== "undefined") {
+      const activeEnd = window.localStorage.getItem("active_pomodoro_end");
+      if (activeEnd) {
+        return new Date(parseInt(activeEnd, 10));
+      }
+    }
+    return undefined;
+  });
+
+  const [motivationalMessage, setMotivationalMessage] = useState<string | null>(null);
+
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(() => {
+    if (typeof window !== "undefined") {
+      const startStr = window.localStorage.getItem("active_pomodoro_start");
+      if (startStr) {
+        return new Date(parseInt(startStr, 10));
+      }
+    }
+    return null;
+  });
 
   // Se houver um Evento do Calendário a acontecer, começa logo a contar!
   useEffect(() => {
     if (activeBlock && !sessionStartTime) {
-      setSessionStartTime(new Date());
+      const now = new Date();
+      setSessionStartTime(now);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("active_pomodoro_start", now.getTime().toString());
+      }
     }
   }, [activeBlock]);
 
@@ -109,10 +141,12 @@ function useTimerSetup(
   }, [motivationalMessage]);
 
   function onTimeSelected(studyStopDate: Date, pauseStopDate: Date) {
+    const now = new Date();
     if (typeof window !== "undefined") {
       window.localStorage.setItem("active_pomodoro_end", studyStopDate.getTime().toString());
       window.localStorage.setItem("active_pause_end", pauseStopDate.getTime().toString());
       window.localStorage.setItem("pomodoro_state", "study");
+      window.localStorage.setItem("active_pomodoro_start", now.getTime().toString());
       window.localStorage.removeItem("streak_deadline");
       window.dispatchEvent(new window.Event("storage")); 
     }
@@ -122,7 +156,7 @@ function useTimerSetup(
     setStudyStopDate(studyStopDate);
     setPauseStopDate(pauseStopDate);
     setTimerStopDate(studyStopDate);
-    setSessionStartTime(new Date()); 
+    setSessionStartTime(now); 
     setMotivationalMessage(null);
 
     if (audioRef.current) {
@@ -156,7 +190,14 @@ function useTimerSetup(
     setSessionStartTime(null);
     setMotivationalMessage(null);
 
-    localStorage.removeItem("active_pomodoro_end");
+    // Limpa a memória toda
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("active_pomodoro_end");
+      localStorage.removeItem("active_pause_end");
+      localStorage.removeItem("active_pomodoro_start");
+      localStorage.removeItem("pomodoro_state");
+      window.dispatchEvent(new window.Event("storage"));
+    }
 
     if (activeBlock) {
       onDismissBlock();
@@ -174,6 +215,7 @@ function useTimerSetup(
       audioRef.current.play().catch((e) => console.error("Erro ao tocar:", e));
     }
 
+    // Estudo acabou, passa para a pausa
     if (timerStopDate === studyStopDate) {
       const elapsed = getElapsedMinutes();
       onSessionEnd(elapsed);
@@ -187,10 +229,12 @@ function useTimerSetup(
       
       if (pauseStopDate && typeof window !== "undefined") {
         window.localStorage.setItem("active_pomodoro_end", pauseStopDate.getTime().toString());
+        window.localStorage.setItem("pomodoro_state", "pause");
         window.dispatchEvent(new window.Event("storage")); 
       }
       
     } else {
+      // Pausa acabou, termina tudo
       setTimerStopDate(undefined);
       setSessionStartTime(null);
       setMotivationalMessage(null);
@@ -199,13 +243,22 @@ function useTimerSetup(
       if (typeof window !== "undefined") {
         window.localStorage.setItem("streak_deadline", (Date.now() + 5 * 60000).toString());
         window.localStorage.removeItem("active_pomodoro_end");
+        window.localStorage.removeItem("active_pause_end");
+        window.localStorage.removeItem("active_pomodoro_start");
+        window.localStorage.removeItem("pomodoro_state");
         window.dispatchEvent(new window.Event("storage")); 
       }
     }
   }
 
   function markTimerStart() {
-    if (!sessionStartTime) setSessionStartTime(new Date());
+    const now = new Date();
+    if (!sessionStartTime) {
+      setSessionStartTime(now);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("active_pomodoro_start", now.getTime().toString());
+      }
+    }
     service.startStudySession().catch((error) => setError(error));
   }
 

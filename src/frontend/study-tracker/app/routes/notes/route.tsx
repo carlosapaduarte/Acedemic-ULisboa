@@ -2,10 +2,12 @@ import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { ArchiveItem, FileItem, service } from "~/service/service";
 import styles from "./notesPage.module.css";
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useState, useRef, Suspense, lazy, startTransition } from "react";
+import React, { useEffect, useState, startTransition } from "react";
+// Importamos o teu novo Rich Text Editor
+import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
+
 import {
   FaFolder,
-  FaFilePdf,
   FaArrowLeft,
   FaCloudArrowUp,
   FaEllipsisVertical,
@@ -16,11 +18,14 @@ import {
   FaFolderPlus,
   FaFileCirclePlus,
   FaNoteSticky,
+  FaFileWord,
+  FaFileExcel,
+  FaFilePowerpoint,
+  FaLink
 } from "react-icons/fa6";
 import {
   Button,
   Dialog,
-  DialogTrigger,
   Modal,
   Menu,
   MenuItem,
@@ -28,36 +33,26 @@ import {
   MenuTrigger,
 } from "react-aria-components";
 
-import "react-quill/dist/quill.snow.css";
-const ReactQuill = lazy(() => import("react-quill"));
-
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ color: [] }, { background: [] }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["image", "link"],
-    ["clean"],
-  ],
-};
-
 function NotesPage() {
   const { t } = useTranslation();
   const [isClient, setIsClient] = useState(false);
-
+  const [rootFiles, setRootFiles] = useState<FileItem[]>([]);
   const [rootArchives, setRootArchives] = useState<ArchiveItem[]>([]);
   const [folderPath, setFolderPath] = useState<ArchiveItem[]>([]);
   const currentFolder =
     folderPath.length > 0 ? folderPath[folderPath.length - 1] : null;
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
   const [isCreateFileOpen, setIsCreateFileOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [folderError, setFolderError] = useState("");
   const [newTextFileName, setNewTextFileName] = useState("");
+
+  // ESTADOS DOS LINKS
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [newLinkUrl, setNewLinkUrl] = useState("");
+  const [newLinkName, setNewLinkName] = useState("");
 
   const [editingFile, setEditingFile] = useState<FileItem | null>(null);
   const [textContent, setTextContent] = useState("");
@@ -73,16 +68,12 @@ function NotesPage() {
   } | null>(null);
   const [renameValue, setRenameValue] = useState("");
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Lógica de abertura de ficheiro e carregamento
   const loadData = () => {
     service
       .getArchives()
       .then((data) => {
         setRootArchives(data);
 
-        // Sincroniza pasta atual se estivermos navegando
         if (folderPath.length > 0) {
           const currentId = folderPath[folderPath.length - 1].id;
           const findFolder = (list: ArchiveItem[]): ArchiveItem | null => {
@@ -97,7 +88,6 @@ function NotesPage() {
           if (updated) setFolderPath((prev) => [...prev.slice(0, -1), updated]);
         }
 
-        // LER URL PARA ABRIR AUTOMATICAMENTE (Vindo da Home)
         const urlParams = new URLSearchParams(window.location.search);
         const fileIdToOpen = urlParams.get("openFile");
         if (fileIdToOpen) {
@@ -122,6 +112,11 @@ function NotesPage() {
         }
       })
       .catch(console.error);
+      /*
+      service
+      .getRootFiles()
+      .then((files) => setRootFiles(files))
+      .catch(console.error);*/
   };
 
   useEffect(() => {
@@ -129,7 +124,7 @@ function NotesPage() {
     loadData();
   }, []);
 
-  // AUTO-SAVE
+  // AUTO-SAVE DA NOTA
   useEffect(() => {
     if (!editingFile || !isClient) return;
     setSaveStatus("A guardar...");
@@ -152,8 +147,7 @@ function NotesPage() {
     try {
       const recent = JSON.parse(localStorage.getItem("recent_notes") || "[]");
       const updated = recent.filter((n: any) => n.id !== file.id);
-
-      const folderName = currentFolder ? currentFolder.name : "Geral";
+      const folderName = currentFolder ? currentFolder.name : "Raiz";
 
       updated.unshift({
         id: file.id,
@@ -180,11 +174,26 @@ function NotesPage() {
   };
 
   const handleCreateFile = async () => {
-    if (!currentFolder || !newTextFileName.trim()) return;
+    if (!newTextFileName.trim()) return;
     try {
-      await service.createFile(currentFolder.id, newTextFileName, "note", "");
+      // Agora permite currentFolder ser nulo (cria na Raiz)
+      await service.createFile(currentFolder?.id || null, newTextFileName, "note", "");
       setNewTextFileName("");
       setIsCreateFileOpen(false);
+      loadData();
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  const handleCreateLink = async () => {
+    if (!newLinkName.trim() || !newLinkUrl.trim()) return;
+    try {
+      // Cria um ficheiro mas guarda a URL no conteúdo do texto e o tipo como "link"
+      await service.createFile(currentFolder?.id || null, newLinkName, "link", newLinkUrl);
+      setNewLinkName("");
+      setNewLinkUrl("");
+      setIsLinkModalOpen(false);
       loadData();
     } catch (e: any) {
       alert(e.message);
@@ -218,12 +227,10 @@ function NotesPage() {
     }
   };
 
-  // PESQUISA
   const isSearching = searchQuery.trim().length > 0;
   
   const handleFolderClick = (clickedFolder: ArchiveItem) => {
     if (isSearching) {
-      // Reconstrói o caminho exato desde a raiz até à pasta clicada
       const findPath = (targetId: number, list: ArchiveItem[], currentPath: ArchiveItem[] = []): ArchiveItem[] | null => {
         for (const item of list) {
           const path = [...currentPath, item];
@@ -242,7 +249,6 @@ function NotesPage() {
       }
       setSearchQuery(""); 
     } else {
-      // Se não estiver a pesquisar, faz a navegação normal
       setFolderPath([...folderPath, clickedFolder]);
     }
   };
@@ -255,6 +261,7 @@ function NotesPage() {
     });
     return res;
   };
+
   const getAllFiles = (list: ArchiveItem[]): FileItem[] => {
     let res: FileItem[] = [];
     list.forEach((a) => {
@@ -269,22 +276,41 @@ function NotesPage() {
     : currentFolder
     ? currentFolder.sub_archives
     : rootArchives;
+
   const filesToShow = isSearching
     ? getAllFiles(rootArchives)
     : currentFolder
     ? currentFolder.files
-    : [];
+    : rootFiles;
+
+  // Função detetora de Ícones (Identifica Docs, Sheets, Slides, etc)
+  const getFileIcon = (file: FileItem) => {
+    const isLink = file.file_type === "link" || (file.text && file.text.startsWith("http"));
+    if (!isLink) return <FaNoteSticky color="#3399ff" size={20} style={{ marginRight: "10px" }} />;
+    
+    const url = file.text?.toLowerCase() || "";
+    if (url.includes("docs.google.com/spreadsheets") || url.includes("excel")) {
+      return <FaFileExcel color="#107c41" size={20} style={{ marginRight: "10px" }} />;
+    }
+    if (url.includes("docs.google.com/presentation") || url.includes("powerpoint") || url.includes("slides")) {
+      return <FaFilePowerpoint color="#c62828" size={20} style={{ marginRight: "10px" }} />;
+    }
+    if (url.includes("docs.google.com/document") || url.includes("word")) {
+      return <FaFileWord color="#1976d2" size={20} style={{ marginRight: "10px" }} />;
+    }
+    return <FaLink color="#4caf50" size={20} style={{ marginRight: "10px" }} />;
+  };
 
   if (editingFile) {
     return (
-      <div className={styles.pageContainer} style={{ background: "white" }}>
+      <div className={styles.pageContainer}>
         <header
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             paddingBottom: "15px",
-            borderBottom: "1px solid #eee",
+            borderBottom: "1px solid var(--border-color, #eee)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
@@ -301,6 +327,7 @@ function NotesPage() {
                 display: "flex",
                 alignItems: "center",
                 gap: "5px",
+                color: "inherit"
               }}
             >
               <FaArrowLeft /> Voltar
@@ -309,37 +336,33 @@ function NotesPage() {
               {editingFile.name}
             </h1>
           </div>
-          <span style={{ fontSize: "0.8rem", color: "#888" }}>
+          <span style={{ fontSize: "0.8rem", opacity: 0.6 }}>
             {saveStatus}
           </span>
         </header>
         <div style={{ flex: 1, marginTop: "20px" }}>
           {isClient && (
-            <Suspense fallback={<div>Carregando...</div>}>
-              <ReactQuill
-                theme="snow"
-                value={textContent}
-                onChange={setTextContent}
-                modules={quillModules}
-                style={{ height: "70vh" }}
-              />
-            </Suspense>
+            <RichTextEditor content={textContent} onUpdate={setTextContent} />
           )}
         </div>
       </div>
     );
   }
 
+  // ECRÃ PRINCIPAL DE GESTÃO DE PASTAS/FICHEIROS
   return (
     <div className={styles.pageContainer}>
       <header className={styles.header}>
         <h1 className={styles.mainTitle}>
           {t("notes:repository_title", "Apontamentos")}
         </h1>
+        {/* BREADCRUMBS INTELIGENTES COM RETICÊNCIAS */}
         <p className={styles.subTitle}>
           {folderPath.length === 0
-            ? "Visão Geral"
-            : folderPath.map((f) => f.name).join(" / ")}
+            ? "Raiz"
+            : folderPath.length <= 2
+            ? folderPath.map((f) => f.name).join(" > ")
+            : `${folderPath[0].name} > ... > ${folderPath[folderPath.length - 1].name}`}
         </p>
       </header>
 
@@ -363,6 +386,8 @@ function NotesPage() {
           </div>
         )}
         <div style={{ flex: 1 }} />
+        
+        {/* BOTÕES DE AÇÃO: Pasta, Link e Nota */}
         <div className={styles.actions}>
           <Button
             className={styles.secondaryButton}
@@ -370,14 +395,18 @@ function NotesPage() {
           >
             <FaFolderPlus /> Pasta
           </Button>
-          {currentFolder && (
-            <Button
-              className={styles.primaryButton}
-              onPress={() => setIsCreateFileOpen(true)}
-            >
-              <FaFileCirclePlus /> Nota
-            </Button>
-          )}
+          <Button
+            className={styles.secondaryButton}
+            onPress={() => setIsLinkModalOpen(true)}
+          >
+            <FaCloudArrowUp /> Link
+          </Button>
+          <Button
+            className={styles.primaryButton}
+            onPress={() => setIsCreateFileOpen(true)}
+          >
+            <FaFileCirclePlus /> Nota
+          </Button>
         </div>
       </div>
 
@@ -430,13 +459,18 @@ function NotesPage() {
               <div
                 key={file.id}
                 className={styles.fileRow}
-                onClick={() => openTextEditor(file)}
+                onClick={() => {
+                  const isLink = file.file_type === "link" || (file.text && file.text.startsWith("http"));
+                  if (isLink) {
+                    window.open(file.text, "_blank"); // Abre o link noutra aba
+                  } else {
+                    openTextEditor(file); // Abre o RichTextEditor
+                  }
+                }}
               >
-                <FaNoteSticky
-                  color="#3399ff"
-                  size={20}
-                  style={{ marginRight: "10px" }}
-                />
+                {/* Mostra ícones dinâmicos de Links ou o de Notas */}
+                {getFileIcon(file)}
+                
                 <span style={{ flex: 1 }}>{file.name}</span>
                 <MenuTrigger>
                   <Button className={styles.iconButton}>
@@ -474,99 +508,80 @@ function NotesPage() {
       </div>
 
       {/* MODAL CRIAR PASTA */}
-      <Modal
-        isOpen={isCreateFolderOpen}
-        onOpenChange={setIsCreateFolderOpen}
-        className={styles.modalOverlay}
-      >
-        <Dialog className={styles.modalContent} style={{ position: "relative" }}>
-          <button 
-            onClick={() => setIsCreateFolderOpen(false)} 
-            style={{ position: "absolute", top: "15px", right: "15px", background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#888" }}
-          >
-            <FaXmark />
+      <Modal isOpen={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen} className={styles.modalOverlay}>
+        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Pasta">
+          <button onClick={() => setIsCreateFolderOpen(false)} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+            <FaXmark size={18} />
           </button>
           <h2 style={{ marginTop: 0 }}>Nova Pasta</h2>
           <input
             className={styles.searchInput}
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              width: "100%",
-              margin: "10px 0",
-              boxSizing: "border-box"
-            }}
+            style={{ border: "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
           />
           {folderError && <p style={{ color: "red" }}>{folderError}</p>}
-          <Button className={styles.primaryButton} onPress={handleCreateFolder}>
-            Criar
-          </Button>
+          <Button className={styles.primaryButton} onPress={handleCreateFolder}>Criar</Button>
         </Dialog>
       </Modal>
 
-      {/* MODAL CRIAR NOTA */}
-      <Modal
-        isOpen={isCreateFileOpen}
-        onOpenChange={setIsCreateFileOpen}
-        className={styles.modalOverlay}
-      >
-        <Dialog className={styles.modalContent} style={{ position: "relative" }}>
-          <button 
-            onClick={() => setIsCreateFileOpen(false)} 
-            style={{ position: "absolute", top: "15px", right: "15px", background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#888" }}
-          >
-            <FaXmark />
+      {/* MODAL CRIAR NOTA (TXT) */}
+      <Modal isOpen={isCreateFileOpen} onOpenChange={setIsCreateFileOpen} className={styles.modalOverlay}>
+        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Nota">
+          <button onClick={() => setIsCreateFileOpen(false)} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+            <FaXmark size={18} />
           </button>
           <h2 style={{ marginTop: 0 }}>Nova Nota</h2>
           <input
+            placeholder="Ex: Resumo Aula 1"
             className={styles.searchInput}
             value={newTextFileName}
             onChange={(e) => setNewTextFileName(e.target.value)}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              width: "100%",
-              margin: "10px 0",
-              boxSizing: "border-box"
-            }}
+            style={{ border: "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
           />
-          <Button className={styles.primaryButton} onPress={handleCreateFile}>
-            Criar
-          </Button>
+          <Button className={styles.primaryButton} onPress={handleCreateFile}>Criar</Button>
+        </Dialog>
+      </Modal>
+
+      {/* MODAL CRIAR LINK */}
+      <Modal isOpen={isLinkModalOpen} onOpenChange={setIsLinkModalOpen} className={styles.modalOverlay}>
+        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Adicionar Link Externo">
+          <button onClick={() => setIsLinkModalOpen(false)} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+            <FaXmark size={18} />
+          </button>
+          <h2 style={{ marginTop: 0 }}>Adicionar Link Externo</h2>
+          <input
+            placeholder="Nome (ex: Slides Excel)"
+            className={styles.searchInput}
+            value={newLinkName}
+            onChange={(e) => setNewLinkName(e.target.value)}
+            style={{ border: "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
+          />
+          <input
+            placeholder="URL (ex: https://docs.google.com/...)"
+            className={styles.searchInput}
+            value={newLinkUrl}
+            onChange={(e) => setNewLinkUrl(e.target.value)}
+            style={{ border: "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
+          />
+          <Button className={styles.primaryButton} onPress={handleCreateLink}>Adicionar</Button>
         </Dialog>
       </Modal>
 
       {/* MODAL RENOMEAR */}
-      <Modal
-        isOpen={!!renameTarget}
-        onOpenChange={() => setRenameTarget(null)}
-        className={styles.modalOverlay}
-      >
-        <Dialog className={styles.modalContent} style={{ position: "relative" }}>
-          <button 
-            onClick={() => setRenameTarget(null)} 
-            style={{ position: "absolute", top: "15px", right: "15px", background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#888" }}
-          >
-            <FaXmark />
+      <Modal isOpen={!!renameTarget} onOpenChange={() => setRenameTarget(null)} className={styles.modalOverlay}>
+        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Renomear Item">
+          <button onClick={() => setRenameTarget(null)} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+            <FaXmark size={18} />
           </button>
           <h2 style={{ marginTop: 0 }}>Renomear</h2>
           <input
             className={styles.searchInput}
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              width: "100%",
-              margin: "10px 0",
-              boxSizing: "border-box"
-            }}
+            style={{ border: "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
           />
-          <Button className={styles.primaryButton} onPress={handleRenameSubmit}>
-            Guardar
-          </Button>
+          <Button className={styles.primaryButton} onPress={handleRenameSubmit}>Guardar</Button>
         </Dialog>
       </Modal>
     </div>

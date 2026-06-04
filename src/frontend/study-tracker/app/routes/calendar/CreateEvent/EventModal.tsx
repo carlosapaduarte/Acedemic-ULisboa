@@ -69,7 +69,7 @@ const TitleSection = React.memo(
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("title_placeholder") || ""}
-            isDisabled={readOnly}
+            disabled={readOnly}
           />
         </TextField>
       </div>
@@ -98,7 +98,7 @@ const NotesSection = React.memo(
             onChange={(e) => setNotes(e.target.value)}
             placeholder={t("notes_placeholder")}
             rows={3}
-            isDisabled={readOnly}
+            disabled={readOnly}
           />
         </TextField>
       </div>
@@ -168,7 +168,7 @@ const IsRecurrentSection = React.memo(
                 value={formatDate(recurrenceStart)}
                 onChange={handleRecStartChange}
                 placeholder="Hoje"
-                isDisabled={readOnly}
+                disabled={readOnly}
               />
               <span style={{ fontSize: "0.8em", color: "#666" }}>
                 {recurrenceStart ? "" : "(Começa hoje)"}
@@ -184,7 +184,7 @@ const IsRecurrentSection = React.memo(
                 className={classNames(styles.dateInput)}
                 value={formatDate(recurrenceEnd)}
                 onChange={handleRecEndChange}
-                isDisabled={readOnly}
+                disabled={readOnly}
               />
               <span style={{ fontSize: "0.8em", color: "#666" }}>
                 {recurrenceEnd ? "" : "(Infinito)"}
@@ -252,7 +252,7 @@ const DateSection = React.memo(
                 className={classNames(styles.dateInput)}
                 value={formatDate(eventStartDate)}
                 onChange={handleStartDateChange}
-                isDisabled={readOnly}
+                disabled={readOnly}
               />
             </TextField>
             <TextField className={styles.formTextField}>
@@ -264,7 +264,7 @@ const DateSection = React.memo(
                 className={classNames(styles.timeInput)}
                 value={formatTime(eventStartDate)}
                 onChange={handleStartTimeChange}
-                isDisabled={readOnly}
+                disabled={readOnly}
               />
             </TextField>
           </div>
@@ -280,7 +280,7 @@ const DateSection = React.memo(
                 className={classNames(styles.dateInput)}
                 value={formatDate(eventEndDate)}
                 onChange={handleEndDateChange}
-                isDisabled={readOnly}
+                disabled={readOnly}
               />
             </TextField>
             <TextField className={styles.formTextField}>
@@ -292,7 +292,7 @@ const DateSection = React.memo(
                 className={classNames(styles.timeInput)}
                 value={formatTime(eventEndDate)}
                 onChange={handleEndTimeChange}
-                isDisabled={readOnly}
+                disabled={readOnly}
               />
             </TextField>
           </div>

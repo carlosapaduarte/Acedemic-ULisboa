@@ -528,8 +528,6 @@ function useMyCalendar() {
           }
 
           if (shouldAddEvent) {
-            const occurrenceEnd = new Date(eventOccurrenceEndDate);
-            const isPastOccurrence = occurrenceEnd.getTime() < Date.now();
             const parentCompleted =
               event.parentTaskCompleted === true ||
               (event.task_id &&
@@ -556,8 +554,8 @@ function useMyCalendar() {
                 recurrenceEnd: event.recurrenceEnd,
                 isActive: event.isActive,
                 parentTaskCompleted: event.parentTaskCompleted,
-                readOnlyPastCompleted:
-                  Boolean(isPastOccurrence && parentCompleted && event.task_id),
+                
+                readOnlyPastCompleted: Boolean(parentCompleted && event.task_id),
               } as CalendarEventResource,
             });
           }
@@ -847,6 +845,7 @@ function MyCalendar() {
       recurrenceEnd: res.recurrenceEnd,
       task_id: res.task_id,
       readOnly: Boolean(res.readOnlyPastCompleted),
+      readOnlyPastCompleted: Boolean(res.readOnlyPastCompleted),
     });
     setSelectedSlot(null);
     setIsModalOpen(true);

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@tiptap/extension-placeholder": "^3.24.0",
     "react-joyride": "^2.9.3"
   }
 }

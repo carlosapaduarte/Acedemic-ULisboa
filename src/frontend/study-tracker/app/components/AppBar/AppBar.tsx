@@ -21,7 +21,8 @@ function GlobalStatusWidgets() {
   const [streakWarning, setStreakWarning] = useState<string | null>(null);
   const [currentState, setCurrentState] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
-
+  const [isStreakWarningDismissed, setIsStreakWarningDismissed] = useState(false);
+  
   // 💡 INJETAR O SOM DIRETAMENTE NA APPBAR
   const audioRef = useRef<HTMLAudioElement | null>(null);
   useEffect(() => {
@@ -112,9 +113,41 @@ function GlobalStatusWidgets() {
 
   return (
     <>
-      {streakWarning && (
-        <div style={{ position: "fixed", top: "70px", left: "50%", transform: "translateX(-50%)", zIndex: 9999, backgroundColor: "#FFCA28", color: "#5D4037", padding: "8px 16px", borderRadius: "50px", fontWeight: "bold", boxShadow: "0 4px 10px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: "8px", animation: "pulse 2s infinite", whiteSpace: "nowrap" }}>
-          🔥 Começa em {streakWarning} para manter a Streak!
+      {streakWarning && !isStreakWarningDismissed && (
+        <div 
+          className={styles.StreakWarning}
+          onClick={() => {
+            if (!isPomodoroRoute) {
+              navigate('/pomodoro');
+            }
+          }}
+          style={{
+            cursor: isPomodoroRoute ? "default" : "pointer"
+          }}
+        >
+          <span>🔥 Começa a próxima sessão em {streakWarning} para não perderes o ritmo!</span>
+          
+          <button 
+            onClick={(e) => {
+              e.stopPropagation(); 
+              setIsStreakWarningDismissed(true);
+            }}
+            style={{ 
+              background: "none", 
+              border: "none", 
+              color: "#5D4037", 
+              fontWeight: "bold", 
+              fontSize: "1.1rem", 
+              cursor: "pointer", 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              padding: "0 4px" 
+            }}
+            aria-label="Esconder aviso"
+          >
+            ✕
+          </button>
         </div>
       )}
 

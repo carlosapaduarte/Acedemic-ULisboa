@@ -1,8 +1,7 @@
 from datetime import datetime
 from http.client import HTTPException
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, Response, Query
-
+from fastapi import APIRouter, Depends, HTTPException, Response, Query
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
 from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, TrackTimeInputDto, UpdateArchiveInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto

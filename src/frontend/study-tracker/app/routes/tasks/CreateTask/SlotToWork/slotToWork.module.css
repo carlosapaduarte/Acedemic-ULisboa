@@ -10,17 +10,10 @@
 
 .slotFormContainer {
   padding: 0.5rem 1rem;
-
-  flex-grow: 0;
-  flex-shrink: 1;
-  flex-basis: 90%;
   width: 100%;
-
   overflow: auto;
-
   box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, 0.2),
     inset 0 -4px 4px 0 rgba(0, 0, 0, 0.2);
-
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -32,7 +25,6 @@
 
 .slotToWorkButton {
   width: 100%;
-
   border-radius: 0.5rem;
   background-color: var(--color-2);
 
@@ -55,7 +47,6 @@
   from {
     transform: scale(0.8);
   }
-
   to {
     transform: scale(1);
   }
@@ -64,13 +55,10 @@
 .slotToWorkText {
   width: 100%;
   height: 100%;
-
   padding: 0.25rem 0.5rem;
-
   color: var(--text-color-2);
   font-size: 1rem;
   text-align: left;
-
   display: grid;
   grid-template-rows: 1fr;
 }
@@ -88,9 +76,11 @@
   width: clamp(
     calc(var(--min-viewport-width) * 0.8),
     calc(80% - 25vw + 2rem),
-    80%
+    350px 
   );
-  height: 70%;
+  
+  height: fit-content;
+  max-height: 90vh;
 
   overflow: auto;
 
@@ -107,7 +97,6 @@
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
@@ -117,29 +106,25 @@
   from {
     transform: scale(0.8);
   }
-
   to {
     transform: scale(1);
   }
 }
 
-.slotToWorkTextField {
-}
+.slotToWorkTextField {}
 
 .slotToWorkDateTextField {
   width: 50%;
   font-size: 0.9rem;
 }
 
-.slotToWorkTimeTextField {
-}
+.slotToWorkTimeTextField {}
 
 .addSlotToWorkButton {
   composes: roundButton;
   height: unset;
   width: unset;
   padding: 0.5rem 0.5rem;
-
   margin-top: 0.25rem;
   font-size: 1rem;
   text-align: center;

@@ -712,6 +712,11 @@ async function deleteTask(taskId: number): Promise<void> {
   }
 }
 
+async function getRootFiles(): Promise<FileItem[]> {
+    const response = await this.api.get('/study-tracker/users/me/root-files');
+    return response.data;
+}
+
 async function getArchives(): Promise<ArchiveItem[]> {
   const request = { path: `study-tracker/users/me/archives`, method: "GET" };
   const response: Response = await doFetch(request);

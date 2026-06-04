@@ -331,7 +331,7 @@ class STFileModel(SQLModel, table=True):
     text: str = Field(default="")
     file_type: str = Field(default="txt") # Pode ser 'txt', 'pdf', etc.
     
-    archive_id: int = Field(foreign_key="st_archive.id", index=True)
+    archive_id: Optional[int] = Field(default=None, foreign_key="st_archive.id")
     user_id: int = Field(foreign_key="user.id")
 
     archive: "STArchiveModel" = Relationship(back_populates="files")

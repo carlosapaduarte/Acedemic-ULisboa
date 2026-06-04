@@ -333,3 +333,22 @@
   transform: scale(1.1);
   filter: brightness(0.2); 
 }
+
+.StreakWarning {
+  position: fixed;
+  top: 70px;
+  left: 50%; 
+  transform: translateX(-50%);
+  z-index: 9999;
+  background-color: #FFCA28;
+  color: #5D4037;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: pulse 2s infinite;
+  white-space: nowrap;
+}

@@ -29,7 +29,7 @@
   "slot_ending_time": "Hora de término",
   "slot_starting_time": "Hora de início",
   "slot_to_work": "Espaço {{number}}",
-  "slots_to_work_label": "Espaços de trabalho",
+  "slots_to_work_label": "Sessões de trabalho",
   "slots_to_work_info": "Define blocos de tempo dedicados a esta tarefa para organizar o teu dia.",
   "slot_end_before_start": "A hora de fim deve ser posterior à hora de início.",
   "saving": "A guardar...",

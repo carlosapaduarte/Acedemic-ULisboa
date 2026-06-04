@@ -12,7 +12,7 @@ const formatDate = (
   locale: string = "en-US",
   t: any
 ) => {
-  if (!dateString) return t("task:unset_date");
+  if (!dateString) return t("task:unset_date", "Sem data");
   const date = new Date(dateString);
   return date.toLocaleDateString(locale, {
     year: "numeric",
@@ -42,14 +42,15 @@ const formatTimes = (
   locale: string = "en-US",
   t: any
 ) => {
-  if (!startTimeString || !endTimeString) return t("task:unset_time_range");
+  if (!startTimeString || !endTimeString) return t("task:unset_time_range", "Sem horas");
   return t("task:time_range", {
     startTime: formatTime(startTimeString, locale),
     endTime: formatTime(endTimeString, locale),
+    defaultValue: `${formatTime(startTimeString, locale)} - ${formatTime(endTimeString, locale)}`
   });
 };
 
-function ModalContent({
+export function ModalContent({
   index,
   initialDate,
   initialStartTime,
@@ -116,7 +117,7 @@ function ModalContent({
           </Button>
 
           <h1 className={styles.mainFormModalTitleText}>
-            {t("task:slot_to_work", { number: index + 1 })}
+            {t("task:slot_to_work", { number: index + 1, defaultValue: `Sessão de Trabalho ${index + 1}` })}
           </h1>
 
           {showError && (
@@ -136,7 +137,7 @@ function ModalContent({
           <div className={styles.slotFormContainer}>
             <TextField autoFocus>
               <Label className={styles.formSectionTitle}>
-                {t("task:slot_date_to_work")}
+                {t("task:slot_date_to_work", "Data da Sessão")}
               </Label>
               <Input
                 type="date"
@@ -152,7 +153,7 @@ function ModalContent({
             </TextField>
             <TextField>
               <Label className={styles.formSectionTitle}>
-                {t("task:slot_starting_time")}
+                {t("task:slot_starting_time", "Hora de Início")}
               </Label>
               <Input
                 type="time"
@@ -168,7 +169,7 @@ function ModalContent({
             </TextField>
             <TextField>
               <Label className={styles.formSectionTitle}>
-                {t("task:slot_ending_time")}
+                {t("task:slot_ending_time", "Hora de Fim")}
               </Label>
               <Input
                 type="time"
@@ -185,7 +186,6 @@ function ModalContent({
             </TextField>
           </div>
 
-          {/* BOTÃO CONFIRMAR */}
           <div
             style={{
               marginTop: "1.5rem",
@@ -209,17 +209,16 @@ function ModalContent({
 
 export function SlotToWork({
   index,
-  newlyAdded,
+  initialData,
   onClosePressed,
 }: {
   index: number;
-  newlyAdded: boolean;
+  initialData: SlotToWorkDto | undefined;
   onClosePressed: (slot: SlotToWorkDto | undefined) => void;
 }) {
   const { t } = useTranslation(["task"]);
   const {
     setIsSecondModalOpen,
-    isSecondModalOpen,
     setSecondModalContent,
     setSecondModalClass,
   } = useContext(SecondModalContext);
@@ -232,6 +231,27 @@ export function SlotToWork({
   useEffect(() => {
     setUserLocale(navigator.language || "en-US");
   }, []);
+
+  // Preencher os dados quando o componente recebe uma sessão que já existe
+  useEffect(() => {
+    if (initialData) {
+      const d = new Date(initialData.start);
+      const e = new Date(initialData.end);
+      
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      setDate(`${year}-${month}-${day}`);
+      
+      const startH = String(d.getHours()).padStart(2, "0");
+      const startM = String(d.getMinutes()).padStart(2, "0");
+      setStartTime(`${startH}:${startM}`);
+      
+      const endH = String(e.getHours()).padStart(2, "0");
+      const endM = String(e.getMinutes()).padStart(2, "0");
+      setEndTime(`${endH}:${endM}`);
+    }
+  }, [initialData]);
 
   const handleConfirm = (data: {
     date: string;
@@ -277,12 +297,6 @@ export function SlotToWork({
     );
   };
 
-  useEffect(() => {
-    if (newlyAdded && !date && !startTime) {
-      openModal();
-    }
-  }, [newlyAdded]);
-
   const formattedDate = formatDate(date, userLocale, t);
   const formattedTimes = formatTimes(startTime, endTime, userLocale, t);
 
@@ -292,8 +306,8 @@ export function SlotToWork({
       id={`slotToWork-button-${index}`}
       aria-label={`${t("task:slot_to_work", {
         number: index + 1,
+        defaultValue: `Sessão de Trabalho ${index + 1}`
       })} - ${formattedDate}, ${formattedTimes}`}
-      data-newly-added={newlyAdded}
       onPress={openModal}
     >
       <div className={styles.slotToWorkText}>
@@ -301,7 +315,7 @@ export function SlotToWork({
           {date ? (
             <span>{formattedDate}</span>
           ) : (
-            <span style={{ opacity: "0.7" }}>{t("task:unset_date")}</span>
+            <span style={{ opacity: "0.7" }}>{t("task:unset_date", "Sem data")}</span>
           )}
           {", "}
         </span>
@@ -309,7 +323,7 @@ export function SlotToWork({
           {startTime && endTime ? (
             <span>{formattedTimes}</span>
           ) : (
-            <span style={{ opacity: "0.7" }}>{t("task:unset_time_range")}</span>
+            <span style={{ opacity: "0.7" }}>{t("task:unset_time_range", "Sem horas")}</span>
           )}
         </span>
       </div>
