@@ -1,0 +1,16 @@
+{
+  "status_IN_PROGRESS": "IN PROGRESS",
+  "status_COMPLETED": "LEVEL COMPLETED",
+  "status_HAS_PROGRESS": "HAS PROGRESS",
+  "status_NOT_SELECTED": "NOT SELECTED",
+  "loading": "Loading badges...",
+  "error_prefix": "Error:",
+  "error_loading": "Failed to load gamification profile.",
+  "locked_alt": "Level Locked",
+
+  "level_1_name": "Initiate",
+  "ac_novato_title": "Newbie",
+  "ac_novato_desc": "After finishing app authentication.",
+  "ac_caloiro_autoeficacia_title": "Self-Efficacy Freshman",
+  "ac_caloiro_autoeficacia_desc": "After completing the first challenge."
+}

@@ -27,5 +27,11 @@
 
     "password_rules_title": "Password must contain:",
     "rule_length": "At least 6 characters",
-    "password_rule_min_length": "Password must be at least {{count}} characters."
+    "password_rule_min_length": "Password must be at least {{count}} characters.",
+
+    "challenge_title": "ACEdemic Challenge",
+    "challenge_subtitle": "Unleash your potential. Enter the arena to unlock achievements and elevate your academic journey.",
+    "auth_button": "ULisboa Authentication",
+    "auth_helper": "Your ULisboa account is all you need. If it's your first access, the account will be created automatically!",
+    "error_state": "Should not have arrived here!"
 }

@@ -6,6 +6,7 @@ import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import Confetti from "react-confetti";
 import { service } from "~/service/service";
+import { useTranslation } from "react-i18next";
 
 function useWindowSize() {
     const [size, setSize] = useState({
@@ -15,14 +16,7 @@ function useWindowSize() {
 
     useEffect(() => {
         if (typeof window === "undefined") return;
-
-        const handleResize = () => {
-            setSize({
-                width: window.innerWidth,
-                height: window.innerHeight,
-            });
-        };
-
+        const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
@@ -36,17 +30,19 @@ interface GamificationProfile {
     completed_level_ranks: number[];
 }
 
-//chip de Status
-const LevelStatusChip = ({ status }: { status: string }) => {
+const LevelStatusChip = ({ statusKey }: { statusKey: string }) => {
+    const { t } = useTranslation(["badges"]);
+    
     const chipStyles: { [key: string]: string } = {
-        "EM CURSO": styles.chipInProgress,
-        "NÍVEL COMPLETADO": styles.chipCompleted,
-        "EM PROGRESSO": styles.chipHasProgress,
-        "NÃO SELECIONADO": styles.chipNotSelected,
+        "IN_PROGRESS": styles.chipInProgress,
+        "COMPLETED": styles.chipCompleted,
+        "HAS_PROGRESS": styles.chipHasProgress,
+        "NOT_SELECTED": styles.chipNotSelected,
     };
+    
     return (
-        <div className={classNames(styles.chip, chipStyles[status])}>
-            {status}
+        <div className={classNames(styles.chip, chipStyles[statusKey])}>
+            {t(`badges:status_${statusKey}`, statusKey)}
         </div>
     );
 };
@@ -56,6 +52,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function BadgesPage() {
+    const { t, i18n } = useTranslation(["badges"]);
     const navigate = useNavigate();
     const [badges, setBadges] = useState<CombinedBadgeStatus[]>([]);
     const [currentUserChallengeLevel, setCurrentUserChallengeLevel] = useState<number | null>(null);
@@ -67,6 +64,8 @@ export default function BadgesPage() {
     const { width, height } = useWindowSize(); 
     const [confettiSource, setConfettiSource] = useState<{ x: number; y: number; } | null>(null);
     const levelRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+    const currentLang = i18n.language?.startsWith("en") ? "en" : "pt";
 
     useEffect(() => {
         service.logUserAction("challenge", "page_view", "badges");
@@ -88,13 +87,13 @@ export default function BadgesPage() {
                     navigate("/log-in");
                     return;
                 }
-                setError(err.message || "Falha ao carregar o perfil de gamificação.");
+                setError(err.message || t("badges:error_loading", "Falha ao carregar o perfil de gamificação."));
             } finally {
                 setLoading(false);
             }
         };
         fetchProfile();
-    }, [navigate]);
+    }, [navigate, t]);
 
     useEffect(() => {
         if (loading || badges.length === 0) return;
@@ -137,8 +136,8 @@ export default function BadgesPage() {
         return Array.from(grouped.values()).sort((a, b) => a.league.rank - b.league.rank);
     }, [badges]);
 
-    if (loading) return <p className="p-4 text-gray-300">A carregar medalhas...</p>;
-    if (error) return <p className="p-4 text-red-400">Erro: {error}</p>;
+    if (loading) return <p className="p-4 text-gray-300">{t("badges:loading", "A carregar medalhas...")}</p>;
+    if (error) return <p className="p-4 text-red-400">{t("badges:error_prefix", "Erro:")} {error}</p>;
 
     return (
         <div className="p-4 min-h-screen bg-purple-900 text-gray-100 relative tutorial-target-badges-header">
@@ -154,7 +153,8 @@ export default function BadgesPage() {
                 const isCurrent = league.rank === currentUserChallengeLevel;
                 const hasProgress = earnedCount > 0;
                 const isAccessible = isCurrent || isCompleted || hasProgress;
-                let statusText = isCompleted ? "NÍVEL COMPLETADO" : isCurrent ? "EM CURSO" : hasProgress ? "EM PROGRESSO" : "NÃO SELECIONADO";
+                
+                let statusKey = isCompleted ? "COMPLETED" : isCurrent ? "IN_PROGRESS" : hasProgress ? "HAS_PROGRESS" : "NOT_SELECTED";
                 const isExpanded = expandedLevels.has(league.rank);
 
                 return (
@@ -162,8 +162,10 @@ export default function BadgesPage() {
                         <div className={styles.levelHeaderContainer} onClick={() => toggleLevelExpansion(league.rank)}>
                             <h2 className={styles.levelHeader}>{league.name}</h2>
                             <div className={styles.headerRight}>
-                                <span className={styles.badgeCounter}>🏆 {levelBadges.filter((b) => b.has_earned).length} / {levelBadges.length}</span>
-                                <div className={classNames({ [styles.chipAnimate]: animatingLevel === league.rank, })}><LevelStatusChip status={statusText} /></div>
+                                <span className={styles.badgeCounter}>🏆 {earnedCount} / {totalCount}</span>
+                                <div className={classNames({ [styles.chipAnimate]: animatingLevel === league.rank, })}>
+                                    <LevelStatusChip statusKey={statusKey} />
+                                </div>
                                 <span className={classNames(styles.arrowIcon, { [styles.arrowExpanded]: isExpanded, })}>▼</span>
                             </div>
                         </div>
@@ -175,7 +177,7 @@ export default function BadgesPage() {
                                         <div className={styles.lockIconContainer}>
                                             <img
                                                 src={`/challenge/icons/padlock.svg`}
-                                                alt="Nível Bloqueado"
+                                                alt={t("badges:locked_alt", "Nível Bloqueado")}
                                                 className={styles.lockIconSvg}
                                             />
                                         </div>
@@ -185,13 +187,12 @@ export default function BadgesPage() {
                                     {levelBadges.map((badge: CombinedBadgeStatus, badgeIndex) => (
                                         <li key={badge.id} className={classNames(styles.badgeItem, { [styles.badgeEarned]: badge.has_earned, [styles.badgeLocked]: !badge.has_earned, "tutorial-target-badge-item": index === 0 && badgeIndex === 0, })}>
                                             <img
-                                                src={`/challenge/badges/${badge.code}.png`}
+                                                src={`/challenge/badges/${badge.code}_${currentLang}.png`}
                                                 alt={badge.title}
                                                 className={classNames(styles.badgeImage, {
                                                     [styles.badgeImageLocked]: !badge.has_earned,
                                                 })}
                                                 onError={(e) => {
-                                                    // console.error(`[ERRO BADGE] Falhou ao carregar: /challenge/badges/${badge.code}.png`);
                                                     (e.target as HTMLImageElement).style.visibility = 'hidden'; 
                                                 }}
                                             />
@@ -204,7 +205,7 @@ export default function BadgesPage() {
                         )}
                     </div>
                 );
-            },)}
+            })}
         </div>
     );
 }

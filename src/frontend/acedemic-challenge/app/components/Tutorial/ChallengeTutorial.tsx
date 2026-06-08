@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Joyride, {
     ACTIONS,
     CallBackProps,
@@ -8,68 +8,7 @@ import Joyride, {
 } from "react-joyride";
 import { useLocation } from "@remix-run/react";
 import { service, UserInfo } from "~/service/service";
-
-const TUTORIAL_STEPS = {
-    // Passos para a página do Calendário (Home do Challenge)
-    calendar_page: [
-        {
-            target: "body",
-            placement: "center" as const,
-            content: (
-                <div style={{ textAlign: "center" }}>
-                    <h3>Bem-vindo ao Desafio Académico! 🚀</h3>
-                    <p>
-                        Aqui é onde a consistência encontra a recompensa.
-                        Completa os teus objetivos diários para ganhares
-                        medalhas.
-                    </p>
-                </div>
-            ),
-            disableBeacon: true,
-        },
-        {
-            target: ".tutorial-target-calendar-grid",
-            content:
-                "Este é o teu mapa de batalha. Os dias a verde são vitórias, os dias a vermelho são oportunidades de melhoria.",
-            placement: "bottom" as const,
-        },
-        {
-            target: ".tutorial-target-day-info",
-            content:
-                "Clica num dia para veres os detalhes. Aqui verás o que precisas de fazer (ou o que já conquistaste) nesse dia.",
-            placement: "left" as const,
-        },
-    ],
-
-    // Passos para a página de Medalhas (Gamification)
-    badges_page: [
-        {
-            target: ".tutorial-target-badges-header",
-            content: (
-                <div>
-                    <h3>Hall da Fama 🏆</h3>
-                    <p>
-                        Aqui visualizas a tua evolução nas Ligas e as Medalhas
-                        que já ganhaste.
-                    </p>
-                </div>
-            ),
-            disableBeacon: true,
-            placement: "bottom" as const,
-        },
-        {
-            target: ".tutorial-target-level-container", // Aponta para o primeiro nível visível
-            content:
-                "O sistema divide-se em Níveis (ou Ligas). Precisas de completar desafios para desbloquear o próximo nível.",
-            placement: "top" as const,
-        },
-        {
-            target: ".tutorial-target-badge-item", // Aponta para a primeira medalha
-            content:
-                "Cada ícone é uma medalha. As coloridas já são tuas! As cinzentas... bem, ainda tens de as ganhar!",
-        },
-    ],
-};
+import { useTranslation } from "react-i18next";
 
 interface ChallengeTutorialProps {
     user: UserInfo | null;
@@ -80,10 +19,63 @@ export function ChallengeTutorial({
     user,
     refreshUser,
 }: ChallengeTutorialProps) {
+    const { t } = useTranslation(["tutorial"]);
     const [run, setRun] = useState(false);
     const [steps, setSteps] = useState<Step[]>([]);
     const [tutorialKey, setTutorialKey] = useState("");
     const location = useLocation();
+
+    const TUTORIAL_STEPS = useMemo(() => ({
+        calendar_page: [
+            {
+                target: "body",
+                placement: "center" as const,
+                content: (
+                    <div style={{ textAlign: "center" }}>
+                        <h3>{t("tutorial:calendar_step1_title", "Bem-vindo ao Desafio Académico! 🚀")}</h3>
+                        <p>
+                            {t("tutorial:calendar_step1_desc", "Aqui é onde a consistência encontra a recompensa. Completa os teus objetivos diários para ganhares medalhas.")}
+                        </p>
+                    </div>
+                ),
+                disableBeacon: true,
+            },
+            {
+                target: ".tutorial-target-calendar-grid",
+                content: t("tutorial:calendar_step2", "Este é o teu mapa de batalha. Os dias a verde são vitórias, os dias a vermelho são oportunidades de melhoria."),
+                placement: "bottom" as const,
+            },
+            {
+                target: ".tutorial-target-day-info",
+                content: t("tutorial:calendar_step3", "Clica num dia para veres os detalhes. Aqui verás o que precisas de fazer (ou o que já conquistaste) nesse dia."),
+                placement: "left" as const,
+            },
+        ],
+        badges_page: [
+            {
+                target: ".tutorial-target-badges-header",
+                content: (
+                    <div>
+                        <h3>{t("tutorial:badges_step1_title", "Hall da Fama 🏆")}</h3>
+                        <p>
+                            {t("tutorial:badges_step1_desc", "Aqui visualizas a tua evolução nas Ligas e as Medalhas que já ganhaste.")}
+                        </p>
+                    </div>
+                ),
+                disableBeacon: true,
+                placement: "bottom" as const,
+            },
+            {
+                target: ".tutorial-target-level-container",
+                content: t("tutorial:badges_step2", "O sistema divide-se em Níveis (ou Ligas). Precisas de completar desafios para desbloquear o próximo nível."),
+                placement: "top" as const,
+            },
+            {
+                target: ".tutorial-target-badge-item",
+                content: t("tutorial:badges_step3", "Cada ícone é uma medalha. As coloridas já são tuas! As cinzentas... bem, ainda tens de as ganhar!"),
+            },
+        ],
+    }), [t]);
 
     useEffect(() => {
         if (!user) return;
@@ -93,16 +85,10 @@ export function ChallengeTutorial({
         let stepsToRun: Step[] = [];
         let key = "";
 
-        if (
-            location.pathname.includes("/calendar") &&
-            !seen.includes("challenge_calendar")
-        ) {
+        if (location.pathname.includes("/calendar") && !seen.includes("challenge_calendar")) {
             stepsToRun = TUTORIAL_STEPS.calendar_page;
             key = "challenge_calendar";
-        } else if (
-            location.pathname.includes("/badges") &&
-            !seen.includes("challenge_badges")
-        ) {
+        } else if (location.pathname.includes("/badges") && !seen.includes("challenge_badges")) {
             stepsToRun = TUTORIAL_STEPS.badges_page;
             key = "challenge_badges";
         }
@@ -113,7 +99,7 @@ export function ChallengeTutorial({
             setTutorialKey(key);
             setTimeout(() => setRun(true), 1000);
         }
-    }, [user, location.pathname, tutorialKey]);
+    }, [user, location.pathname, tutorialKey, TUTORIAL_STEPS]);
 
     const handleJoyrideCallback = async (data: CallBackProps) => {
         const { status } = data;
@@ -125,9 +111,7 @@ export function ChallengeTutorial({
                     await service.markTutorialAsSeen(tutorialKey);
                     refreshUser();
                 } else {
-                    console.warn(
-                        "Service method markTutorialAsSeen not implemented yet",
-                    );
+                    console.warn("Service method markTutorialAsSeen not implemented yet");
                 }
             }
         }
@@ -148,22 +132,16 @@ export function ChallengeTutorial({
                     primaryColor: "#7e22ce",
                     zIndex: 100000,
                 },
-                tooltipContainer: {
-                    textAlign: "left",
-                },
-                buttonNext: {
-                    backgroundColor: "#7e22ce",
-                },
-                buttonBack: {
-                    color: "#7e22ce",
-                },
+                tooltipContainer: { textAlign: "left" },
+                buttonNext: { backgroundColor: "#7e22ce" },
+                buttonBack: { color: "#7e22ce" },
             }}
             locale={{
-                back: "Anterior",
-                close: "Fechar",
-                last: "Vamos lá!",
-                next: "Próximo",
-                skip: "Saltar",
+                back: t("tutorial:back", "Anterior"),
+                close: t("tutorial:close", "Fechar"),
+                last: t("tutorial:last", "Vamos lá!"),
+                next: t("tutorial:next", "Próximo"),
+                skip: t("tutorial:skip", "Saltar"),
             }}
         />
     );

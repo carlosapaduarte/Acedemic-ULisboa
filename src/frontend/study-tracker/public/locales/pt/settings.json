@@ -1,0 +1,21 @@
+{
+  "page_title": "Configurações",
+  "student_profile": "Perfil do Estudante",
+  "display_name": "Nome de Exibição:",
+  "email": "E-mail:",
+  "avatar_title": "Avatar",
+  "usage_goals_title": "Objetivos de Uso",
+  "goal_improve_grades": "Melhorar minhas notas/classificações",
+  "goal_track_progress": "Rastrear meu progresso",
+  "goal_prepare_exams": "Preparar-me para exames específicos",
+  "goal_personalize_plan": "Personalizar meu plano de estudos",
+  "goal_meet_deadlines": "Cumprir prazos e entregas",
+  "goal_manage_life_study": "Gerir estudos com outras áreas da minha vida",
+  "system_title": "Sistema",
+  "dark_mode": "Modo Noturno (Em breve)",
+  "repeat_tutorial": "Repetir Tutorial",
+  "saving": "Salvando...",
+  "saved_success": "Alterações Salvas!",
+  "save_profile": "Salvar Perfil",
+  "save_error": "Erro ao salvar alterações!"
+}

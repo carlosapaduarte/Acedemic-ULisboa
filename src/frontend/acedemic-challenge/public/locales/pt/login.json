@@ -27,5 +27,11 @@
 
     "password_rules_title": "A password deve conter:",
     "rule_length": "Pelo menos 6 caracteres",
-    "password_rule_min_length": "A password deve ter no mínimo {{count}} caracteres."
+    "password_rule_min_length": "A password deve ter no mínimo {{count}} caracteres.",
+
+    "challenge_title": "ACEdemic Challenge",
+    "challenge_subtitle": "Liberta o teu potencial. Entra na arena para desbloqueares conquistas e elevares o teu percurso académico.",
+    "auth_button": "Autenticação ULisboa",
+    "auth_helper": "A tua conta ULisboa é tudo o que precisas. Se for o teu primeiro acesso, a conta será criada automaticamente!",
+    "error_state": "Não devias ter chegado aqui!"
 }

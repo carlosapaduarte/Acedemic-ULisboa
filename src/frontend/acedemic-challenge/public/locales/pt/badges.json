@@ -1,0 +1,10 @@
+{
+  "status_IN_PROGRESS": "Em curso",
+  "status_COMPLETED": "NÍVEL COMPLETADO",
+  "status_HAS_PROGRESS": "TEM PROGRESSO",
+  "status_NOT_SELECTED": "NÃO SELECIONADO",
+  "loading": "Carregando medalhas...",
+  "error_prefix": "Erro:",
+  "error_loading": "Falha ao carregar o perfil de gamificação.",
+  "locked_alt": "Nível Bloqueado"
+}

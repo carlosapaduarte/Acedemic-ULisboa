@@ -1,0 +1,21 @@
+{
+  "page_title": "Settings",
+  "student_profile": "Student Profile",
+  "display_name": "Display Name:",
+  "email": "E-mail:",
+  "avatar_title": "Avatar",
+  "usage_goals_title": "Usage Goals",
+  "goal_improve_grades": "Improve my grades/classifications",
+  "goal_track_progress": "Track my progress",
+  "goal_prepare_exams": "Prepare for specific exams",
+  "goal_personalize_plan": "Personalize my study plan",
+  "goal_meet_deadlines": "Meet deadlines and deliverables",
+  "goal_manage_life_study": "Manage studies with other areas of my life",
+  "system_title": "System",
+  "dark_mode": "Dark Mode (Coming soon)",
+  "repeat_tutorial": "Repeat Tutorial",
+  "saving": "Saving...",
+  "saved_success": "Changes Saved!",
+  "save_profile": "Save Profile",
+  "save_error": "Error saving changes!"
+}

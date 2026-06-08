@@ -1,6 +1,5 @@
 {
     "advance_message": "Click here to advance...",
-
     "authenticate_title": "Register or Login",
     "authenticated_message": "Authenticated",
     "confirm": "Confirm",
@@ -9,12 +8,17 @@
     "password_field_name": "Password",
     "receive_notification_title": "Receive notifications",
     "register_button_title": "Register",
-
     "select_avatar_initial_question": "Select your avatar",
     "select_level_initial_question": "How effective have been your study habits lately?",
     "share_progress_question": "Do you want to share your progress?",
     "submit_selection_message": "Submit selection",
     "usage_objectives_title": "Usage objectives",
     "username_field_name": "Username",
-    "yes_answer_option": "Yes"
+    "yes_answer_option": "Yes",
+
+    "tracker_title": "Study Tracker",
+    "tracker_subtitle": "Organiza o teu estudo, acompanha o teu progresso e atinge os teus objetivos.",
+    "auth_button": "Autenticação ULisboa",
+    "auth_helper": "A tua conta ULisboa é tudo o que precisas. Se for o teu primeiro acesso, a conta será criada automaticamente!",
+    "error_state": "Não devias ter chegado aqui!"
 }

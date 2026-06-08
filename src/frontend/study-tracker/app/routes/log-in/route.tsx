@@ -11,6 +11,7 @@ import classNames from "classnames";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useIsLoggedIn } from "~/components/auth/Authn";
 import { Button } from "react-aria-components";
+import { useTranslation } from "react-i18next";
 
 type Views =
     | "initial"
@@ -22,6 +23,7 @@ type Views =
     | "avatarSelection";
 
 function CurrentView() {
+    const { t } = useTranslation(["login"]);
     const [currentView, setCurrentView] = useState<Views>("initial");
     const navigate = useNavigate();
     const isLoggedIn = useIsLoggedIn();
@@ -59,20 +61,11 @@ function CurrentView() {
             return (
                 <div className={styles.authContainer}>
                     <div className={styles.authCard}>
-                        {/* logotipo aqui! Substituir o src pelo correto */}
-                        <img 
-                            src="/tracker/icons/logo.png" 
-                            alt="Logo Study Tracker" 
-                            className={styles.appLogo} 
-                            onError={(e) => {
-                                // Plano B: Se não encontrar a imagem, mete o alvo!
-                                (e.target as HTMLImageElement).style.display = 'none';
-                                e.currentTarget.insertAdjacentHTML('afterend', '<div style="font-size: 4rem; margin-bottom: 1rem; color: #2563eb;">🎯</div>');
-                            }}
-                        />
-                        <h2 className={styles.title}>Study Tracker</h2>
+                        <div className={styles.targetIcon}>🎯</div>
+                        
+                        <h2 className={styles.title}>{t("login:tracker_title", "Study Tracker")}</h2>
                         <p className={styles.subtitle}>
-                            Organiza o teu estudo, acompanha o teu progresso e atinge os teus objetivos.
+                            {t("login:tracker_subtitle", "Organiza o teu estudo, acompanha o teu progresso e atinge os teus objetivos.")}
                         </p>
                         
                         {/* 💡 O Botão Atualizado */}
@@ -80,47 +73,27 @@ function CurrentView() {
                             className={styles.actionButton}
                             onPress={() => window.location.href = "/api/auth/ulisboa/login?target=tracker"}
                         >
-                            Autenticação ULisboa
+                            {t("login:auth_button", "Autenticação ULisboa")}
                         </Button>
                         
                         <p className={styles.helperText}>
-                            A tua conta ULisboa é tudo o que precisas. O teu espaço será configurado automaticamente.
+                            {t("login:auth_helper", "A tua conta ULisboa é tudo o que precisas. Se for o teu primeiro acesso, a conta será criada automaticamente!")}
                         </p>
                     </div>
                 </div>
             );
         case "appUsagesSelection":
-            return (
-                <AppUsagesSelectionPage
-                    onProceed={() => setCurrentView("avatarSelection")} 
-                />
-            );
+            return <AppUsagesSelectionPage onProceed={() => setCurrentView("avatarSelection")} />;
         case "receiveNotificationsSelection":
-            return (
-                <ReceiveNotificationsSelectionPage
-                    onProceed={() => setCurrentView("planDaySelection")}
-                />
-            );
+            return <ReceiveNotificationsSelectionPage onProceed={() => setCurrentView("planDaySelection")} />;
         case "planDaySelection":
-            return (
-                <PlanDaySelectionPage
-                    onProceed={() => setCurrentView("shareProgressSelection")}
-                />
-            );
+            return <PlanDaySelectionPage onProceed={() => setCurrentView("shareProgressSelection")} />;
         case "shareProgressSelection":
-            return (
-                <ShareProgressPage
-                    onShareSelected={() => setCurrentView("avatarSelection")}
-                />
-            );
+            return <ShareProgressPage onShareSelected={() => setCurrentView("avatarSelection")} />;
         case "avatarSelection":
-            return (
-                <AvatarSelectionPage
-                    onComplete={() => navigate(`/`)}
-                />
-            );
+            return <AvatarSelectionPage onComplete={() => navigate(`/`)} />;
         default:
-            return <h1>Should not have arrived here!</h1>;
+            return <h1>{t("login:error_state", "Should not have arrived here!")}</h1>;
     }
 }
 

@@ -88,3 +88,20 @@
     color: #888;
     margin-top: 1.5rem;
 }
+
+.targetIcon, .trophyIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  animation: bounce 2s infinite ease-in-out;
+  display: inline-block;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px); /* Sobe 15 pixeis a meio do tempo */
+  }
+}

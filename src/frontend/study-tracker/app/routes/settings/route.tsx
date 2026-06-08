@@ -7,12 +7,12 @@ import classNames from "classnames";
 import { RiSave3Fill, RiRestartLine, RiCheckLine, RiMoonClearFill } from "react-icons/ri";
 
 const OBJETIVOS_LIST = [
-  "Melhorar as minhas notas/classificações",
-  "Acompanhar o meu progresso",
-  "Preparar-me para exames específicos",
-  "Personalizar o meu plano de estudo",
-  "Cumprir prazos e entregas",
-  "Gerir os estudos com as outras áreas da minha vida"
+  { key: "goal_improve_grades", default: "Melhorar as minhas notas/classificações" },
+  { key: "goal_track_progress", default: "Acompanhar o meu progresso" },
+  { key: "goal_prepare_exams", default: "Preparar-me para exames específicos" },
+  { key: "goal_personalize_plan", default: "Personalizar o meu plano de estudo" },
+  { key: "goal_meet_deadlines", default: "Cumprir prazos e entregas" },
+  { key: "goal_manage_life_study", default: "Gerir os estudos com as outras áreas da minha vida" }
 ];
 
 function createAvatars(): string[] {
@@ -63,27 +63,27 @@ export default function SettingsPage() {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error: any) {
-      alert("Erro ao guardar!");
+      alert(t("settings:save_error", "Erro ao guardar!"));
     } finally { setSaving(false); }
   };
 
-  if (loading) return <div className={styles.pageContainer}>A carregar...</div>;
+  if (loading) return <div className={styles.pageContainer}>{t("common:loading", "A carregar...")}</div>;
 
   return (
     <div className={styles.pageContainer}>
-      <div className={styles.header}><h1>Definições</h1></div>
+      <div className={styles.header}><h1>{t("settings:page_title", "Definições")}</h1></div>
       <div className={styles.content}>
         
         {/* PERFIL */}
         <section className={styles.section}>
-          <h2>Perfil do Aluno</h2>
+          <h2>{t("settings:student_profile", "Perfil do Aluno")}</h2>
           <div className={styles.profileCard}>
             <div className={styles.infoRow}>
-              <span className={styles.label}>Nome de Exibição:</span>
+              <span className={styles.label}>{t("settings:display_name", "Nome de Exibição:")}</span>
               <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={styles.nameInput} />
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.label}>E-mail:</span>
+              <span className={styles.label}>{t("settings:email", "E-mail:")}</span>
               <span className={styles.value_text}>{user?.institutional_email}</span>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function SettingsPage() {
 
         {/* AVATAR SELECTION */}
         <section className={styles.section}>
-          <h2>Avatar</h2>
+          <h2>{t("settings:avatar_title", "Avatar")}</h2>
           <div className={styles.avatarGrid}>
             {avatars.map((avatar, index) => (
               <div key={index} className={classNames(styles.avatarItem, selectedAvatarIndex === index && styles.avatarSelected)} onClick={() => setSelectedAvatarIndex(index)}>
@@ -103,7 +103,7 @@ export default function SettingsPage() {
 
         {/* OBJETIVOS DE USO */}
         <section className={styles.section}>
-          <h2>Objetivos de Uso</h2>
+          <h2>{t("settings:usage_goals_title", "Objetivos de Uso")}</h2>
           <div className={styles.goalsContainer}>
             {OBJETIVOS_LIST.map((obj, index) => (
               <label key={index} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
@@ -113,7 +113,7 @@ export default function SettingsPage() {
                   onChange={() => handleToggleObjetivo(index)}
                   style={{ width: "18px", height: "18px", accentColor: "var(--color-2)" }}
                 />
-                <span style={{ fontSize: "0.95rem" }}>{obj}</span>
+                <span style={{ fontSize: "0.95rem" }}>{t(`settings:${obj.key}`, obj.default)}</span>
               </label>
             ))}
           </div>
@@ -121,12 +121,12 @@ export default function SettingsPage() {
 
         {/* SISTEMA */}
         <section className={styles.section} style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px" }}>
-          <h2>Sistema</h2>
+          <h2>{t("settings:system_title", "Sistema")}</h2>
           <div className={styles.toggleRow} style={{ opacity: 0.6, marginBottom: "1rem" }}>
-            <span><RiMoonClearFill /> Modo Noturno (Em breve)</span>
+            <span><RiMoonClearFill /> {t("settings:dark_mode", "Modo Noturno (Em breve)")}</span>
             <label className={styles.switch}><input type="checkbox" disabled /><span className={styles.slider}></span></label>
           </div>
-          <button onClick={() => window.location.reload()} className={styles.dangerButton}><RiRestartLine /> Repetir Tutorial</button>
+          <button onClick={() => window.location.reload()} className={styles.dangerButton}><RiRestartLine /> {t("settings:repeat_tutorial", "Repetir Tutorial")}</button>
         </section>
 
         <div style={{ height: "60px" }}></div>
@@ -149,11 +149,11 @@ export default function SettingsPage() {
           style={{ width: "100%", maxWidth: "500px", margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px" }}
         >
           {saving ? (
-            "A guardar..."
+            t("settings:saving", "A guardar...")
           ) : saveSuccess ? (
-            <><RiCheckLine size={20} /> Alterações Guardadas!</>
+            <><RiCheckLine size={20} /> {t("settings:saved_success", "Alterações Guardadas!")}</>
           ) : (
-            <><RiSave3Fill size={20} /> Guardar Perfil</>
+            <><RiSave3Fill size={20} /> {t("settings:save_profile", "Guardar Perfil")}</>
           )}
         </button>
       </div>

@@ -572,22 +572,6 @@ export function EventModal({
                 </div>
               )}
 
-              {eventToEdit?.readOnlyPastCompleted && (
-                <div style={{
-                  backgroundColor: "#ffebee",
-                  color: "#c62828",
-                  padding: "10px",
-                  borderRadius: "6px",
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  margin: "0 20px 10px 20px",
-                  border: "1px solid #ef9a9a",
-                  fontSize: "0.9rem"
-                }}>
-                  Este evento não pode ser editado porque a tarefa associada já está concluída.
-                </div>
-              )}
-
               <div className={styles.newEventFormContainer}>
                 <EventForm
                   readOnly={eventToEdit?.readOnlyPastCompleted} 

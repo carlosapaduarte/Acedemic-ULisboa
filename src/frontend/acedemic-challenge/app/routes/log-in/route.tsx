@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { useIsLoggedIn } from "~/components/auth/Authn";
 import { Button } from "react-aria-components";
+import { useTranslation } from "react-i18next";
 
 type Views =
     | "initial"
@@ -19,23 +20,21 @@ type Views =
     | "selectAvatar";
 
 function CurrentView() {
+    const { t } = useTranslation(["login"]);
     const [currentView, setCurrentView] = useState<Views>("initial");
     const navigate = useNavigate();
     const isLoggedIn = useIsLoggedIn();
     const [searchParams] = useSearchParams();
     
-    // Deteta se o utilizador é novo e precisa de configurar a conta
     const isSetup = searchParams.get("setup") === "true";
     const [userId, setUserId] = useState<number | undefined>(undefined);
 
     useEffect(() => {
-        if (isLoggedIn === undefined) return; // Ainda a carregar
+        if (isLoggedIn === undefined) return; 
 
         if (isLoggedIn) {
-            // Se já tem sessão, mas está preso no ecrã de login/inicial
             if (currentView === "initial" || currentView === "authentication") {
                 if (isSetup) {
-                    // É um utilizador novo! Vai buscar o ID dele para o Quiz funcionar.
                     const token = localStorage.getItem("token");
                     if (token) {
                         fetch('/api/commons/users/me', {
@@ -45,15 +44,12 @@ function CurrentView() {
                         .then(data => setUserId(data.id))
                         .catch(console.error);
                     }
-                    // Manda-o escolher o nível
                     setCurrentView("chooseLevel");
                 } else {
-                    // Utilizador antigo, vai direto para a Home Page
                     navigate(`/`);
                 }
             }
         } else {
-            // Se não tem sessão iniciada, mostra o botão da ULisboa
             if (currentView === "initial") {
                 setCurrentView("authentication");
             }
@@ -68,21 +64,21 @@ function CurrentView() {
                 <div className={styles.authContainer}>
                     <div className={styles.authCard}>
                         <div className={styles.trophyIcon}>🏆</div>
-                        <h2 className={styles.title}>ACEdemic Challenge</h2>
+                        
+                        <h2 className={styles.title}>{t("login:challenge_title", "ACEdemic Challenge")}</h2>
                         <p className={styles.subtitle}>
-                            Liberta o teu potencial. Entra na arena para desbloqueares conquistas e elevares o teu percurso académico.
+                            {t("login:challenge_subtitle", "Liberta o teu potencial. Entra na arena para desbloqueares conquistas e elevares o teu percurso académico.")}
                         </p>
                         
-                        {/* 💡 O Botão Atualizado para Entrar E Registar */}
                         <Button
                             className={styles.actionButton}
                             onPress={() => window.location.href = "/api/auth/ulisboa/login?target=challenge"}
                         >
-                            Autenticação ULisboa
+                            {t("login:auth_button", "Autenticação ULisboa")}
                         </Button>
                         
                         <p className={styles.helperText}>
-                            A tua conta ULisboa é tudo o que precisas. Se for o teu primeiro acesso, a conta será criada automaticamente!
+                            {t("login:auth_helper", "A tua conta ULisboa é tudo o que precisas. Se for o teu primeiro acesso, a conta será criada automaticamente!")}
                         </p>
                     </div>
                 </div>
@@ -96,7 +92,7 @@ function CurrentView() {
         case "selectAvatar":
             return <AvatarSelectionPage onComplete={() => navigate(`/`)} />;
         default:
-            return <h1>Should not have arrived here!</h1>;
+            return <h1>{t("login:error_state", "Should not have arrived here!")}</h1>;
     }
 }
 

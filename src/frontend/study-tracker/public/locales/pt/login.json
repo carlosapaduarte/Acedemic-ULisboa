@@ -16,5 +16,11 @@
     "submit_selection_message": "Enviar seleção",
     "usage_objectives_title": "Objetivos de Uso",
     "username_field_name": "Nome de utilizador",
-    "yes_answer_option": "Sim"
+    "yes_answer_option": "Sim",
+
+    "tracker_title": "Study Tracker",
+    "tracker_subtitle": "Organiza o teu estudo, acompanha o teu progresso e atinge os teus objetivos.",
+    "auth_button": "Autenticação ULisboa",
+    "auth_helper": "Your ULisboa account is all you need. If it's your first access, the account will be created automatically!",
+    "error_state": "Should not have arrived here!"
 }
