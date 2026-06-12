@@ -53,9 +53,9 @@ export const meta: MetaFunction = ({
 }: {
     data: { locale: string; metaDescription: string };
 }) => {
-    const description = data?.metaDescription || "Academic Challenge";
+    const description = data?.metaDescription || "Acedemic Challenge";
     return [
-        { title: "Academic Challenge" },
+        { title: "Acedemic Challenge" },
         {
             name: "description",
             content: description,
