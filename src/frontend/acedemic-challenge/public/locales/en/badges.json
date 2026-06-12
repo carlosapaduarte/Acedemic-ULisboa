@@ -8,9 +8,47 @@
   "error_loading": "Failed to load gamification profile.",
   "locked_alt": "Level Locked",
 
-  "level_1_name": "Initiate",
+  "level_0_name": "Start",
+  "level_1_name": "Beginner",
+  "level_2_name": "Intermediate",
+  "level_3_name": "Advanced",
+
   "ac_novato_title": "Newbie",
   "ac_novato_desc": "After finishing app authentication.",
+  
   "ac_caloiro_autoeficacia_title": "Self-Efficacy Freshman",
-  "ac_caloiro_autoeficacia_desc": "After completing the first challenge."
+  "ac_caloiro_autoeficacia_desc": "After completing the first challenge.",
+  
+  "ac_prodigio_autoeficacia_title": "Self-Efficacy Prodigy",
+  "ac_prodigio_autoeficacia_desc": "After completing the first three challenges.",
+  
+  "ac_mestre_disciplina_title": "Discipline Master",
+  "ac_mestre_disciplina_desc": "If you complete 1 full week of challenges (7 in a row).",
+  
+  "ac_campeao_consistencia_title": "Consistency Champion",
+  "ac_campeao_consistencia_desc": "If you complete 2 full weeks of challenges (14 in a row).",
+  
+  "ac_iniciante_determinado_title": "Determined Beginner",
+  "ac_iniciante_determinado_desc": "After finishing Level 1 (21 challenges).",
+  
+  "ac_pioneiro_determinacao_title": "Determination Pioneer",
+  "ac_pioneiro_determinacao_desc": "After completing the first challenge of Level 2.",
+  
+  "ac_desbravador_autoeficacia_title": "Self-Efficacy Trailblazer",
+  "ac_desbravador_autoeficacia_desc": "After completing three challenges of Level 2.",
+  
+  "ac_mestre_desafio_title": "Challenge Master",
+  "ac_mestre_desafio_desc": "If you complete 1 week of challenges in Level 2.",
+  
+  "ac_guerreiro_resiliente_title": "Resilient Warrior",
+  "ac_guerreiro_resiliente_desc": "If you complete 2 weeks of challenges in Level 2.",
+  
+  "ac_cavaleiro_persistencia_title": "Persistence Knight",
+  "ac_cavaleiro_persistencia_desc": "After finishing Level 2 (21 challenges).",
+  
+  "ac_construtor_habitos_title": "Habit Builder",
+  "ac_construtor_habitos_desc": "If you complete 1 week of challenges in Level 3.",
+  
+  "ac_campeao_autoeficacia_title": "Self-Efficacy Champion",
+  "ac_campeao_autoeficacia_desc": "After finishing Level 3 (21 challenges)."
 }

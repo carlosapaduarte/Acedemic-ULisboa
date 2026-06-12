@@ -32,13 +32,12 @@
   "task_time_progress": "Fizeste {{tracked}} de {{planned}} planeadas",
   "pomodoro_no_task_warning": "(Caso não tenhas terminado nenhuma tarefa, não seleciones nenhuma e clica apenas em confirmar.)",
   "motivational_messages": [
-    "Bom trabalho! 🌟",
-    "Pausa merecida! ☕",
-    "Estás no caminho certo! 🚀",
-    "Respira fundo. Relaxa. 🍃",
-    "Foco impecável! Continua assim. 💪",
+    "Tempo de pausa ☕",
+    "Mais uma sessão concluída ✨",
+    "Agora é tempo de descansar um pouco 🍃",
+    "Segue ao teu ritmo 🚀",
     "Hora de recarregar baterias! 🔋",
-    "Excelente sessão! 🏆",
-    "O teu esforço conta. Descansa. ✨"
+    "Uns minutos para ti ✨",
+    "Equilíbrio entre foco e descanso ⚖️"
   ]
 }

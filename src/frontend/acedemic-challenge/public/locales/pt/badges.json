@@ -1,10 +1,54 @@
 {
-  "status_IN_PROGRESS": "Em curso",
+  "status_IN_PROGRESS": "EM CURSO",
   "status_COMPLETED": "NÍVEL COMPLETADO",
-  "status_HAS_PROGRESS": "TEM PROGRESSO",
+  "status_HAS_PROGRESS": "EM PROGRESSO",
   "status_NOT_SELECTED": "NÃO SELECIONADO",
-  "loading": "Carregando medalhas...",
+  "loading": "A carregar medalhas...",
   "error_prefix": "Erro:",
   "error_loading": "Falha ao carregar o perfil de gamificação.",
-  "locked_alt": "Nível Bloqueado"
+  "locked_alt": "Nível Bloqueado",
+
+  "level_0_name": "Início",
+  "level_1_name": "Iniciado",
+  "level_2_name": "Intermédio",
+  "level_3_name": "Avançado",
+
+  "ac_novato_title": "Novato",
+  "ac_novato_desc": "Após finalizar a autenticação na app.",
+  
+  "ac_caloiro_autoeficacia_title": "Caloiro da Autoeficácia",
+  "ac_caloiro_autoeficacia_desc": "Após completar o primeiro desafio.",
+  
+  "ac_prodigio_autoeficacia_title": "Prodígio da Autoeficácia",
+  "ac_prodigio_autoeficacia_desc": "Após completar os três primeiros desafios.",
+  
+  "ac_mestre_disciplina_title": "Mestre da Disciplina",
+  "ac_mestre_disciplina_desc": "Se cumprir 1 semana de desafios na totalidade (7 desafios seguidos).",
+  
+  "ac_campeao_consistencia_title": "Campeão da Consistência",
+  "ac_campeao_consistencia_desc": "Se cumprir 2 semanas de desafios na totalidade (14 desafios seguidos).",
+  
+  "ac_iniciante_determinado_title": "Iniciante Determinado",
+  "ac_iniciante_determinado_desc": "Após finalizar o Nível 1 (21 desafios).",
+  
+  "ac_pioneiro_determinacao_title": "Pioneiro da Determinação",
+  "ac_pioneiro_determinacao_desc": "Após completar o primeiro desafio do Nível 2.",
+  
+  "ac_desbravador_autoeficacia_title": "Desbravador da Autoeficácia",
+  "ac_desbravador_autoeficacia_desc": "Após completar três desafios do Nível 2.",
+  
+  "ac_mestre_desafio_title": "Mestre do Desafio",
+  "ac_mestre_desafio_desc": "Se cumprir 1 semana de desafios no Nível 2",
+  
+  "ac_guerreiro_resiliente_title": "Guerreiro Resiliente",
+  "ac_guerreiro_resiliente_desc": "Se cumprir 2 semanas de desafios no Nível 2",
+  
+  "ac_cavaleiro_persistencia_title": "Cavaleiro da Persistência",
+  "ac_cavaleiro_persistencia_desc": "Após finalizar o Nível 2 (21 desafios).",
+  
+  "ac_construtor_habitos_title": "Construtor de Hábitos",
+  "ac_construtor_habitos_desc": "Se cumprir 1 semana de desafios no Nível 3",
+  
+  "ac_campeao_autoeficacia_title": "Campeão da Autoeficácia",
+  "ac_campeao_autoeficacia_desc": "Após finalizar o Nível 3 (21 desafios)"
 }

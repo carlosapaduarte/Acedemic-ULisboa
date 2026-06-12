@@ -14,17 +14,6 @@ import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
 import { RiCloseLine } from "react-icons/ri";
 
-const MOTIVATIONAL_MESSAGES = [
-  "Bom trabalho! 🌟",
-  "Pausa merecida! ☕",
-  "Estás no caminho certo! 🚀",
-  "Respira fundo. Relaxa. 🍃",
-  "Foco impecável! Continua assim. 💪",
-  "Hora de recarregar baterias! 🔋",
-  "Excelente sessão! 🏆",
-  "O teu esforço conta. Descansa. ✨",
-];
-
 function isDateToday(date: Date | undefined): boolean {
   if (!date) return false;
   const d = new Date(date);
