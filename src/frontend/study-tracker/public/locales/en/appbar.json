@@ -4,5 +4,9 @@
     "settings": "Settings",
     "portugueseLanguage": "Portuguese",
     "englishLanguage": "English",
-    "language": "Switch to {{language}}"
+    "language": "Switch to {{language}}",
+    "switch_to_tracker": "Switch to Tracker",
+    "already_in_tracker": "You are already in the Tracker",
+    "switch_to_challenge": "Switch to Challenge",
+    "already_in_challenge": "You are already in the Challenge"
 }

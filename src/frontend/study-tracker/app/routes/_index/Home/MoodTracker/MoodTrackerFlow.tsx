@@ -13,13 +13,13 @@ interface MoodStepProps {
 const MOOD_LEVELS = [
   {
     value: 1,
-    label: "Muito Desagradável",
+    label: "Muito Mal",
     color: "#6e67cf",
     icon: "./icons/MoodTracker/energy_very_bad_icon.png",
   },
   {
     value: 2,
-    label: "Desagradável",
+    label: "Não muito bem",
     color: "#8a84e2",
     icon: "./icons/MoodTracker/energy_bad_icon.png",
   },
@@ -31,13 +31,13 @@ const MOOD_LEVELS = [
   },
   {
     value: 4,
-    label: "Agradável",
+    label: "Bem",
     color: "#66cdaa",
     icon: "./icons/MoodTracker/energy_well_icon.png",
   },
   {
     value: 5,
-    label: "Muito Agradável",
+    label: "Muito Bem",
     color: "#ffa500",
     icon: "./icons/MoodTracker/energy_very_well_icon.png",
   },
@@ -165,15 +165,12 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
     else setList([...list, item]);
   };
 
-  // 🕵️‍♀️ Espião: Quando o MoodTracker renderiza, conta como intenção de abrir
   useEffect(() => {
       service.logUserAction("tracker", "intent", "open_mood_modal");
   }, []);
   
   const saveData = async () => {
     setSaving(true);
-    
-    // 🕵️‍♀️ Espião: Quando efetivamente guardam
     service.logUserAction("tracker", "action", "save_mood");
 
     try {
@@ -205,7 +202,8 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
           )}
         </div>
         <span className={styles.navTitle}>
-          {t("mood_tracker:log_state_of_mind")}
+          {/* 🔥 Alterado para Estado Emocional */}
+          {t("mood_tracker:log_state_of_mind", "Registar Estado Emocional")}
         </span>
         <div style={{ width: 80, display: "flex", justifyContent: "flex-end" }}>
           <button
@@ -228,7 +226,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
         <div className={styles.sheetContainer}>
           {renderNavBar()}
           <div className={styles.content}>
-            <h2 className={styles.title}>{t("mood_tracker:mood_question")}</h2>
+            <h2 className={styles.title}>{t("mood_tracker:mood_question", "Como está o teu estado emocional hoje?")}</h2>
             <div
               className={styles.moodVisual}
               style={{
@@ -242,20 +240,21 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
             >
               <img
                 src={currentMood.icon}
-                alt={t(`mood_tracker:mood_level_${currentMood.value}`)}
+                alt={t(`mood_tracker:mood_level_${currentMood.value}`, currentMood.label)}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             </div>
             <h3 className={styles.subtitle}>
-              {t(`mood_tracker:mood_level_${currentMood.value}`)}
+              {t(`mood_tracker:mood_level_${currentMood.value}`, currentMood.label)}
             </h3>
             <div className={styles.sliderContainer}>
               <div
                 className={styles.sliderLabels}
                 style={{ marginBottom: "10px" }}
               >
-                <span>{t("mood_tracker:very_unpleasant")}</span>
-                <span>{t("mood_tracker:very_pleasant")}</span>
+                {/* 🔥 Alterado para Muito Mal e Muito Bem */}
+                <span>{t("mood_tracker:very_unpleasant", "Muito Mal")}</span>
+                <span>{t("mood_tracker:very_pleasant", "Muito Bem")}</span>
               </div>
               <input
                 type="range"
@@ -301,7 +300,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
               >
                 <img
                   src={currentMood.icon}
-                  alt={t(`mood_tracker:mood_level_${currentMood.value}`)}
+                  alt={t(`mood_tracker:mood_level_${currentMood.value}`, currentMood.label)}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -313,7 +312,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 className={styles.subtitle}
                 style={{ marginBottom: "0.5rem" }}
               >
-                {t(`mood_tracker:mood_level_${currentMood.value}`)}
+                {t(`mood_tracker:mood_level_${currentMood.value}`, currentMood.label)}
               </h3>
               <p style={{ fontWeight: 600, color: "#555", marginBottom: "1.5rem" }}>
                 {t("mood_tracker:emotions_question")}
@@ -333,7 +332,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                     )
                   }
                 >
-                  {t(`mood_tracker:emotion_${formatKey(emotion)}`)}
+                  {t(`mood_tracker:emotion_${formatKey(emotion)}`, emotion)}
                 </button>
               ))}
             </div>
@@ -391,7 +390,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
               >
                 <img
                   src={currentMood.icon}
-                  alt={t(`mood_tracker:mood_level_${currentMood.value}`)}
+                  alt={t(`mood_tracker:mood_level_${currentMood.value}`, currentMood.label)}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -403,7 +402,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                 className={styles.subtitle}
                 style={{ marginBottom: "0.5rem" }}
               >
-                {t(`mood_tracker:mood_level_${currentMood.value}`)}
+                {t(`mood_tracker:mood_level_${currentMood.value}`, currentMood.label)}
               </h3>
               <p style={{ fontWeight: 600, color: "#555", marginBottom: "1.5rem" }}>
                 {t("mood_tracker:impact_question")}
@@ -419,7 +418,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                     toggleSelection(impact, selectedImpacts, setSelectedImpacts)
                   }
                 >
-                  {t(`mood_tracker:impact_${formatKey(impact)}`)}
+                  {t(`mood_tracker:impact_${formatKey(impact)}`, impact)}
                 </button>
               ))}
             </div>

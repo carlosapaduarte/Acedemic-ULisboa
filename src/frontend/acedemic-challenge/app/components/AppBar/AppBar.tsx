@@ -4,7 +4,7 @@ import homeAppBarStyles from "./HomeAppBar/homeAppBar.module.css";
 import styles from "./appBar.module.css";
 import cleanAppBarStyles from "./cleanAppBar.module.css";
 
-import { useNavigate } from "@remix-run/react";
+import { useLocation, useNavigate } from "@remix-run/react";
 import { SettingsButton } from "~/components/LanguageButton/SettingsButton";
 import { GreetingsContainer, NavBar } from "./HomeAppBar/HomeAppBar";
 import classNames from "classnames";
@@ -12,17 +12,28 @@ import { AppBarContext } from "~/components/AppBar/AppBarProvider";
 import { useTranslation } from "react-i18next";
 
 function AppSwitcher() {
-  const [isTrackerActive, setIsTrackerActive] = useState(false);
+  const location = useLocation();
+  const { t } = useTranslation(["appbar"]); 
+  
+  // Deteta automaticamente em que app estamos a ler o URL
+  const isTrackerActuallyActive = !location.pathname.includes('/challenge');
+  const [visualState, setVisualState] = useState(isTrackerActuallyActive);
 
   const toggleApp = () => {
-    setIsTrackerActive(true);
+    setVisualState(!visualState);
 
     setTimeout(() => {
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      // Manda para o Tracker
-      window.location.href = isLocalhost 
-        ? "http://localhost:5273/tracker/" 
-        : "https://acedemic.studentlife.ulisboa.pt/tracker/";
+
+      if (isTrackerActuallyActive) {
+        window.location.href = isLocalhost 
+          ? "http://localhost:5173/challenge/"
+          : "https://acedemic.studentlife.ulisboa.pt/challenge/";
+      } else {
+        window.location.href = isLocalhost 
+          ? "http://localhost:5273/tracker/"
+          : "https://acedemic.studentlife.ulisboa.pt/tracker/";
+      }
     }, 300);
   };
 
@@ -31,33 +42,40 @@ function AppSwitcher() {
       className={styles.switcherContainer} 
       onClick={toggleApp}
       role="switch"
-      aria-checked={isTrackerActive}
-      title="Mudar para o Tracker"
+      aria-checked={visualState}
     >
       <div 
         className={classNames(
           styles.pill, 
-          isTrackerActive ? styles.pillTracker : styles.pillChallenge
+          visualState ? styles.pillTracker : styles.pillChallenge
         )} 
       />
       
-      <div className={styles.switcherIconContainer}>
+      {/* ÍCONE DO TRACKER */}
+      <div 
+        className={styles.switcherIconContainer}
+        title={visualState ? t("appbar:already_in_tracker") : t("appbar:switch_to_tracker")}
+      >
         <img 
-          src="icons/logo_tracker.png"
+          src="/icons/tasks_icon.png" 
           alt="Tracker" 
           className={classNames(
             styles.switcherLogo, 
-            isTrackerActive ? styles.iconActive : styles.iconInactive
+            visualState ? styles.iconActive : styles.iconInactive
           )} 
         />
       </div>
       
-      <div className={styles.switcherIconContainer}>
+      <div 
+        className={styles.switcherIconContainer}
+        title={!visualState ? t("appbar:already_in_challenge") : t("appbar:switch_to_challenge")}
+      >
         <img 
+          src="/assets/logos/medal_icon.svg" 
           alt="Challenge" 
           className={classNames(
             styles.switcherLogo, 
-            !isTrackerActive ? styles.iconActive : styles.iconInactive
+            !visualState ? styles.iconActive : styles.iconInactive
           )} 
         />
       </div>

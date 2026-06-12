@@ -1,20 +1,20 @@
 {
-  "log_state_of_mind": "Log State of Mind",
+  "log_state_of_mind": "Log Emotional State",
   "back": "Back",
   "cancel": "Cancel",
   "next": "Next",
   "done": "Done",
   "saving": "Saving...",
 
-  "mood_question": "How are you feeling today?",
-  "very_unpleasant": "Very Unpleasant",
-  "very_pleasant": "Very Pleasant",
+  "mood_question": "How is your emotional state today?",
+  "very_unpleasant": "Very Bad",
+  "very_pleasant": "Very Good",
 
-  "mood_level_1": "Very Unpleasant",
-  "mood_level_2": "Unpleasant",
+  "mood_level_1": "Very Bad",
+  "mood_level_2": "Not so good",
   "mood_level_3": "Neutral",
-  "mood_level_4": "Pleasant",
-  "mood_level_5": "Very Pleasant",
+  "mood_level_4": "Good",
+  "mood_level_5": "Very Good",
 
   "emotions_question": "What best describes this feeling?",
   "show_all_emotions": "Show all",

@@ -7,11 +7,11 @@ const MOOD_CONFIG: Record<
   number,
   { emoji: string; color: string; labelDefault: string }
 > = {
-  5: { emoji: "🤩", color: "#2E7D32", labelDefault: "Muito Agradável" },
-  4: { emoji: "😄", color: "#4CAF50", labelDefault: "Agradável" },
+  5: { emoji: "🤩", color: "#2E7D32", labelDefault: "Muito Bem" },
+  4: { emoji: "😄", color: "#4CAF50", labelDefault: "Bem" },
   3: { emoji: "😐", color: "#FFC107", labelDefault: "Neutro" },
-  2: { emoji: "🙁", color: "#FF9800", labelDefault: "Desagradável" },
-  1: { emoji: "😞", color: "#F44336", labelDefault: "Muito Desagradável" },
+  2: { emoji: "🙁", color: "#FF9800", labelDefault: "Não muito bem" },
+  1: { emoji: "😞", color: "#F44336", labelDefault: "Muito Mal" },
 };
 
 function getMoodConfig(level: number | null) {
