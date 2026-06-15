@@ -16,6 +16,7 @@ import { useTutorialMenu } from "~/components/Tutorial/TutorialContext";
 function GlobalStatusWidgets() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation(["appbar"]); 
   
   const [pomodoroTimeLeft, setPomodoroTimeLeft] = useState<string | null>(null);
   const [streakWarning, setStreakWarning] = useState<string | null>(null);
@@ -62,7 +63,6 @@ function GlobalStatusWidgets() {
           }
 
           if (state === "study") {
-            // Passar para Pausa
             const pauseEndStr = localStorage.getItem("active_pause_end");
             if (pauseEndStr) {
               localStorage.setItem("active_pomodoro_end", pauseEndStr);
@@ -107,9 +107,11 @@ function GlobalStatusWidgets() {
   const isPomodoroRoute = location.pathname.includes('/pomodoro');
   const showPomodoroWidget = pomodoroTimeLeft !== null && !isPomodoroRoute;
 
-  // Textos e cores dinâmicas
-  const widgetColor = currentState === "pause" ? "#66BB6A" : "var(--color-2, #3498db)";
-  const widgetText = currentState === "pause" ? "☕ Em Pausa:" : "⏱️ A Estudar:";
+  // Textos dinâmicos com traduções
+  const widgetColor = currentState === "pause" ? "#F39C12" : "#4CAF50";
+  const widgetText = currentState === "pause" 
+    ? t("appbar:status_pause", "☕ Em Pausa:") 
+    : t("appbar:status_study", "⏱️ A Estudar:");
 
   return (
     <>
@@ -125,7 +127,7 @@ function GlobalStatusWidgets() {
             cursor: isPomodoroRoute ? "default" : "pointer"
           }}
         >
-          <span>🔥 Começa a próxima sessão em {streakWarning} para não perderes o ritmo!</span>
+          <span>{t("appbar:streak_warning", { time: streakWarning })}</span>
           
           <button 
             onClick={(e) => {
@@ -133,18 +135,12 @@ function GlobalStatusWidgets() {
               setIsStreakWarningDismissed(true);
             }}
             style={{ 
-              background: "none", 
-              border: "none", 
-              color: "#5D4037", 
-              fontWeight: "bold", 
-              fontSize: "1.1rem", 
-              cursor: "pointer", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center", 
+              background: "none", border: "none", color: "#5D4037", 
+              fontWeight: "bold", fontSize: "1.1rem", cursor: "pointer", 
+              display: "flex", alignItems: "center", justifyContent: "center", 
               padding: "0 4px" 
             }}
-            aria-label="Esconder aviso"
+            aria-label={t("appbar:hide_warning", "Esconder aviso")}
           >
             ✕
           </button>
@@ -257,6 +253,7 @@ function SideBar() {
   const menuRef = useRef<HTMLDivElement>(null);
   const { preventSidebarClose, registerSidebarSetter } = useTutorialMenu();
   const preventSidebarCloseRef = useRef(preventSidebarClose);
+  const { t } = useTranslation(["appbar"]); 
 
   useEffect(() => {
     preventSidebarCloseRef.current = preventSidebarClose;
@@ -305,7 +302,7 @@ function SideBar() {
           onClick={() => setIsSideBarOpen(!isSideBarOpen)}
           aria-expanded={isSideBarOpen ? "true" : "false"}
           aria-controls={"sidebar-content"}
-          aria-label={"Toggle sidebar"}
+          aria-label={t("appbar:toggle_sidebar", "Alternar menu")}
         >
           <IconContext.Provider
             value={{ className: classNames(styles.sideBarIcon) }}

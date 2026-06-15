@@ -35,3 +35,5 @@ whitelist.py
 src/backend/.env
 __pycache__/
 *.pyc
+analise_tese/dados_brutos/
+analise_tese/outputs/

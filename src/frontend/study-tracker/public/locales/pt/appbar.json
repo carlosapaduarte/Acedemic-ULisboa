@@ -8,5 +8,10 @@
     "switch_to_tracker": "Mudar para o Tracker",
     "already_in_tracker": "Já cá estás",
     "switch_to_challenge": "Mudar para o Challenge",
-    "already_in_challenge": "Já cá estás"
+    "already_in_challenge": "Já cá estás",
+    "streak_warning": "🔥 Start your next session in {{time}} to keep the momentum!",
+    "status_pause": "☕ On Break:",
+    "status_study": "⏱️ Studying:",
+    "hide_warning": "Hide warning",
+    "toggle_sidebar": "Toggle sidebar"
 }
