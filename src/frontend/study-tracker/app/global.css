@@ -4,14 +4,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
 
 :root {
-  --color-1: #f9deb9;
-  --color-2: #592e25;
-  --color-3: #703f3a;
-  --color-4: #587750;
-  --color-5: #2e3192;
+  --color-1: #BD1466; /* Cor principal */
+  --color-2: #D5FC81; /* Verde-Lima */
+  --color-3: #990553; /* Cor da caixa do visto */
+  --color-4: #ffd900; 
+  --color-5: #0dff00;
 
-  --color-2-hover: rgba(89, 46, 37, 0.6);
-  --color-4-hover: rgba(88, 119, 80, 0.6);
+  --color-2-hover: rgba(213, 252, 129, 0.6);
+  --color-4-hover: rgba(213, 252, 129, 0.6);
 
   --color-event-fallback: var(--color-3);
 

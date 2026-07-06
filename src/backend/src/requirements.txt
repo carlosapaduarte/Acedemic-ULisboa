@@ -2,7 +2,7 @@ fastapi[standard]==0.112.1
 pydantic==2.8.2
 SQLAlchemy==2.0.32
 sqlmodel==0.0.21
-psycopg2==2.9.9
+psycopg2-binary>=2.9.10
 pyjwt==2.9.0
 passlib[bcrypt]==1.7.4
 bcrypt==3.2.2

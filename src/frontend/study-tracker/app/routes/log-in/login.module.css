@@ -5,7 +5,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: #333;
+    color: var(--text-color-2);
     font-family: var(--font-family1), sans-serif;
 }
 
@@ -37,7 +37,6 @@
     height: 80px;
     object-fit: contain;
     margin-bottom: 1.5rem;
-    /* Podes manter uma pequena animação de flutuar se quiseres, ou remover */
     animation: float 6s ease-in-out infinite; 
 }
 
@@ -51,19 +50,19 @@
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
-    color: #111; /* Quase preto */
+    color: var(--text-color-2);
 }
 
 .subtitle {
     font-size: 1rem;
-    color: #666; /* Cinza intermédio */
+    color: var(--text-color-2);
     margin-bottom: 2.5rem;
     line-height: 1.5;
 }
 
 .actionButton {
-    background: var(--color-2);
-    color: white;
+    background: var(--color-3);
+    color: var(--text-color-2);
     font-weight: bold;
     padding: 1.2rem 1rem;
     border-radius: 0.5rem;
@@ -73,19 +72,19 @@
     transition: all 0.2s ease-in-out;
     width: 100%;
     text-transform: uppercase;
-    box-shadow: 0 4px 6px var(--color-1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     display: inline-block;
 }
 
 .actionButton:hover {
-    background: var(--color-3);
+    filter: brightness(0.9);
     transform: translateY(-2px);
-    box-shadow: 0 8px 12px -3px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.3);
 }
 
 .helperText {
     font-size: 0.85rem;
-    color: #888;
+    color: var(--color-2);
     margin-top: 1.5rem;
 }
 
@@ -102,6 +101,6 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-15px); /* Sobe 15 pixeis a meio do tempo */
+    transform: translateY(-15px);
   }
 }

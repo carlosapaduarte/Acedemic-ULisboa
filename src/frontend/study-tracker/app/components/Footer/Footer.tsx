@@ -11,17 +11,17 @@ export function Footer({
   return (
     <footer className={styles.footer} aria-hidden={ariaHidden}>
       <img
-        src={"./ulisboa_horizontal_logo_positive.png"}
+        src={"./ulisboa_horizontal_logo_negative.png"}
         alt={t("common:ulisboa_logo")}
         className={styles.leftSide}
       />
 
       <div className={styles.middleSide}>
-        <img src={"./logos_parceiros_preto.png"} alt="Parceiros" />
+        <img src={"./logos_parceiros_branco.png"} alt="Parceiros" />
       </div>
 
       <img
-        src={"./sucesso_logo_positive.png"}
+        src={"./sucesso_logo_negative.png"}
         alt={t("common:sucesso_academico_ulisboa_logo")}
         className={styles.rightSide}
       />

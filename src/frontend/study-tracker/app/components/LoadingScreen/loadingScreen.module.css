@@ -55,14 +55,15 @@
 }
 
 .aceText {
-    font-size: 3.5rem;
     color: var(--color-2);
-    font-weight: 900;
 }
 
 .demicText {
-    font-size: 3rem;
-    color: var(--text-color-1);
+    color: var(--text-color-2);
+}
+
+.trackerText {
+    color: var(--text-color-2);
 }
 
 .trackerAndCheckboxContainer {
@@ -70,9 +71,4 @@
     display: flex;
     align-items: center;
     justify-content: end;
-}
-
-.trackerText {
-    font-size: 2rem;
-    color: var(--text-color-1);
 }
