@@ -3,14 +3,25 @@
 
 .newEventModalContainer {
   composes: modalContainer;
+  background-color: var(--color-1) !important;
+  padding: 1.5rem !important;
+  border-radius: 12px;
+  position: relative;
 }
 
 .newEventTitleText {
   composes: mainFormModalTitleText;
+  color: var(--text-color-2);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
 }
 
 .newEventFormContainer {
   composes: formContainer;
+  padding: 0 1rem 0 0 !important;
+  background-color: transparent;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .newEventForm {
@@ -18,7 +29,7 @@
 }
 
 .finishCreatingEventButtonContainer {
-  padding: 0 1rem;
+  padding: 0;
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -26,20 +37,24 @@
   flex-wrap: wrap;
 }
 
+/* Botão Confirmar (Bege com texto magenta escuro) */
 .finishCreatingEventButton {
   composes: roundButton;
-  flex: 1 1 50%;
-  height: 2rem;
-  margin-top: 0.5rem;
-  font-size: 1rem;
-  text-align: center;
+  width: 100%;
+  height: 3rem;
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background-color: var(--bg-color, #F5EBE1) !important;
+  color: var(--color-3) !important;
+  border: none;
 }
 
 .deleteEventButton {
   composes: roundButton;
   flex: 1 1 30%;
-  height: 2rem;
-  margin-top: 0.5rem;
+  height: 3rem;
+  margin-top: 1.5rem;
   font-size: 1rem;
   text-align: center;
   background-color: var(--color-text-danger);
@@ -53,6 +68,73 @@
 .formTextField {
   display: flex;
   flex-direction: column;
+}
+
+/* Labels ("Title", "Slots to work", etc) a branco */
+.formSectionTitle {
+  color: var(--text-color-2);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+/* Inputs (Caixas Beges, Letras Magenta) */
+.formInput,
+.dateInput,
+.timeInput,
+.nativeSelect {
+  width: 100%;
+  padding: 10px 12px;
+  border: none !important;
+  border-radius: 8px;
+  background-color: var(--bg-color, #F5EBE1) !important;
+  color: var(--color-3) !important;
+  font-family: var(--font-family1), sans-serif;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.formInput:focus,
+.dateInput:focus,
+.timeInput:focus,
+.nativeSelect:focus {
+  outline: 2px solid var(--color-3);
+}
+
+/* Dropdown */
+.nativeSelect {
+  height: 40px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%23990553%22%20d%3D%22M10%2C13.5L5.5%2C9h9L10%2C13.5z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 15px;
+}
+
+.closeButton {
+  composes: roundButton formCloseButton;
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background-color: transparent !important;
+  color: var(--text-color-2) !important;
+  border: none !important;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none !important;
+}
+
+.closeButton:hover {
+  opacity: 0.8;
 }
 
 .tagsSectionContainer {
@@ -75,33 +157,6 @@
 .checkboxInput {
   width: 2rem;
 }
-.closeButton {
-  composes: roundButton formCloseButton;
-}
-
-/*dropdown recorrencia*/
-.nativeSelect {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--color-2);
-  border-radius: 6px;
-  background-color: var(--color-1);
-  color: var(--text-color-1);
-  font-family: var(--font-family1), sans-serif;
-  font-size: 1rem;
-  cursor: pointer;
-  box-sizing: border-box;
-  height: 40px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22var(--text-color-1)%22%20d%3D%22M10%2C13.5L5.5%2C9h9L10%2C13.5z%22%2F%3E%3C%2Fsvg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 15px;
-}
-
-/* --- TAGS --- */
 
 .tagsHeader {
   display: flex;
@@ -115,7 +170,7 @@
   background: none;
   border: none;
   padding: 0;
-  color: var(--color-1);
+  color: var(--text-color-2);
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
@@ -128,10 +183,9 @@
 .tagsContent {
   padding: 1rem;
   border-radius: 0.5rem;
-  border: none;
   display: flex;
   flex-wrap: wrap;
-  border: 2px solid var(--color-2);
+  border: 2px solid var(--bg-color, #F5EBE1);
 }
 
 .tagListContainer {
@@ -139,27 +193,6 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-}
-.addTagButtonRound {
-  background-color: transparent;
-  cursor: pointer;
-
-  width: 38px;
-  height: 38px;
-  padding: 0;
-  border-radius: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 24px;
-  line-height: 1;
-  transition: all 0.2s ease;
-}
-
-.addTagButtonRound:hover {
-  transform: scale(1.1);
 }
 
 .tagListAndCreateContainer {
@@ -170,33 +203,37 @@
   flex-grow: 1;
 }
 
+/* Tags inativas a bege */
 .tagItem {
   position: relative;
   display: inline-flex;
   align-items: center;
   border-radius: 5px;
-  color: var(--text-color-2);
+  color: var(--color-3);
+  background-color: var(--bg-color, #F5EBE1);
   padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: opacity 0.2s ease;
   text-transform: uppercase;
   font-family: var(--font-family1), sans-serif;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: bold;
   border: 2px solid transparent;
-  word-break: break-word; /* parte palavras muito longas para não saírem do contentor */
+  word-break: break-word;
 }
 
 .tagItem:hover {
-  background-color: var(--color-2-hover);
+  opacity: 0.9;
 }
 
+/* Tags ativas a Verde Lima com texto Preto */
 .selectedTagItem {
-  background-color: var(--color-4);
+  background-color: var(--color-2);
+  color: var(--text-color-1);
 }
 
 .selectedTagItem:hover {
-  background-color: var(--color-4-hover);
+  background-color: var(--color-2);
 }
 
 .deleteTagButton {
@@ -221,7 +258,7 @@
 }
 
 .deleteTagButton:hover {
-  background-color: var(--color-2-hover);
+  background-color: var(--color-text-danger);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 
@@ -236,40 +273,46 @@
 
 .createTagInput:focus {
   outline: none;
-  box-shadow: 0 2px 4px var(--color-1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .addTagButtonRound {
   width: 35px;
   height: 35px;
   font-size: 1.5rem;
-  background-color: var(--color-4);
+  background-color: var(--bg-color, #F5EBE1);
   border-radius: 5px;
-  color: var(--text-color-2);
+  color: var(--color-3);
+  display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
 }
 
 .addTagButtonRound:hover {
-  background-color: var(--color-4-hover);
+  transform: scale(1.1);
 }
 
 .creatingTagMessage,
 .tagErrorMessage {
-  color: var(--color-text-danger);
+  color: var(--color-2);
   font-size: 0.9em;
   text-align: center;
 }
 
-/* is uc? */
 .titleSectionContainer {
   display: flex;
   align-items: flex-end;
   gap: 16px;
+  width: 100%; /* Adiciona isto */
 }
 
 .formTextField {
-  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Adiciona isto */
 }
 
 .formCheckbox {
@@ -297,32 +340,27 @@
   width: 24px;
   height: 24px;
   display: inline-block;
-
-  background-color: var(--color-1);
+  background-color: var(--bg-color, #F5EBE1);
   border-radius: 5px;
-
   transition: background-color 0.2s ease;
-
   position: relative;
 }
 
 .nativeCheckbox:checked + .customCheckbox {
-  background-color: var(--color-3);
-  border: 2px solid var(--color-1);
+  background-color: var(--color-2);
+  border: none;
 }
 
 .customCheckbox::after {
   content: "";
   position: absolute;
   display: none;
-
   left: 8px;
   top: 4px;
-
   /* Desenha o certo */
   width: 6px;
   height: 12px;
-  border: solid var(--color-1);
+  border: solid var(--text-color-1);
   border-width: 0 3px 3px 0;
   transform: rotate(45deg);
 }

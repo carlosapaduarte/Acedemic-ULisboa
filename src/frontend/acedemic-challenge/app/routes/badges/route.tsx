@@ -192,11 +192,9 @@ export default function BadgesPage() {
                                                 className={classNames(styles.badgeImage, {
                                                     [styles.badgeImageLocked]: !badge.has_earned,
                                                 })}
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).style.visibility = 'hidden'; 
-                                                }}
                                             />
                                             <h3 className={styles.badgeTitle}>{badge.title}</h3>
+                                            
                                             <p className={styles.badgeDescription}>{badge.description}</p>
                                         </li>
                                     ))}

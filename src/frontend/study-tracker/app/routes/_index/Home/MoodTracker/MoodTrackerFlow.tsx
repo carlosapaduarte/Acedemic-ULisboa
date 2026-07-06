@@ -202,7 +202,6 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
           )}
         </div>
         <span className={styles.navTitle}>
-          {/* 🔥 Alterado para Estado Emocional */}
           {t("mood_tracker:log_state_of_mind", "Registar Estado Emocional")}
         </span>
         <div style={{ width: 80, display: "flex", justifyContent: "flex-end" }}>
@@ -344,7 +343,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
                   style={{
                     background: "none",
                     border: "none",
-                    color: "var(--color-2)",
+                    color: "var(--color-3)",
                     textDecoration: "underline",
                     cursor: "pointer",
                     fontWeight: "600",

@@ -59,7 +59,7 @@
 .navButton {
   background: none;
   border: none;
-  color: var(--color-2, #3399ff);
+  color: var(--color-3);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem;
@@ -101,7 +101,7 @@
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 2rem;
-  color: var(--color-2, #3399ff);
+  color: var(--color-3);
 }
 
 /* --- 1: VISUAIS --- */
@@ -184,9 +184,9 @@
 }
 
 .tagButton[data-selected="true"] {
-  background-color: var(--color-2, #3399ff);
+  background-color: var(--color-3);
   color: white;
-  box-shadow: 0 4px 10px rgba(51, 153, 255, 0.4);
+  box-shadow: 0 4px 10px rgba(153, 5, 83, 0.4);
 }
 
 /* --- FOOTER / BOTÃO GRANDE --- */
@@ -200,13 +200,17 @@
   width: 100%;
   padding: 1rem;
   border-radius: 14px;
-  background-color: var(--color-2, #3399ff);
-  color: white;
+  background-color: var(--color-3);
+  color: var(--text-color-2);
   font-weight: 600;
   font-size: 1.1rem;
   border: none;
   cursor: pointer;
   transition: transform 0.1s, opacity 0.2s;
+}
+
+.primaryButton:hover {
+  background-color: var(--color-1);
 }
 
 .primaryButton:active {
@@ -302,7 +306,7 @@
 }
 
 .widgetButton {
-  background-color: var(--color-2, #3399ff);
+  background-color: var(--color-3);
   color: white;
   border: none;
   padding: 0.8rem 1.5rem;
@@ -315,7 +319,7 @@
 }
 
 .widgetButton:hover {
-  background-color: #2b80d6;
+  background-color: var(--color-1);
 }
 
 /* Estado Concluído */

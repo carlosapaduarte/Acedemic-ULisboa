@@ -10,7 +10,7 @@
   box-sizing: border-box;
   max-width: 1400px;
   margin: 0 auto;
-  color: var(--color-2);
+  color: var(--text-color-1);
 }
 
 .headerSection {
@@ -21,7 +21,7 @@
 }
 
 .dateBadge {
-  background-color: var(--color-2);
+  background-color: var(--color-3);
   color: var(--text-color-2);
   padding: 0.5rem 1.2rem;
   border-radius: 4px;
@@ -84,7 +84,7 @@
   font-family: var(--font-family2);
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--color-2);
+  color: var(--color-3); 
   display: flex;
   align-items: center;
   gap: 8px;
@@ -107,7 +107,7 @@
 }
 
 .moodBtn {
-  background-color: var(--color-2);
+  background-color: var(--color-3);
   color: var(--text-color-2);
   padding: 10px 24px;
   border-radius: 6px;
@@ -117,7 +117,7 @@
 }
 
 .moodBtn:hover {
-  background-color: var(--color-3);
+  background-color: var(--color-1);
 }
 
 .moodSuccessContainer {
@@ -148,8 +148,8 @@
 
 .editMoodBtn {
   background: transparent;
-  border: 1px solid var(--color-2);
-  color: var(--color-2);
+  border: 1px solid var(--color-3);
+  color: var(--color-3);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 0.8rem;
@@ -160,7 +160,7 @@
 }
 
 .editMoodBtn:hover {
-  background-color: var(--color-1);
+  background-color: var(--bg-color);
 }
 
 .agendaList {
@@ -183,7 +183,7 @@
 .timeBox {
   font-family: var(--font-family2);
   font-weight: 700;
-  color: var(--color-2);
+  color: inherit; 
   min-width: 45px;
 }
 
@@ -216,18 +216,18 @@
 
 .timeInput {
   background: white;
-  border: 1px solid var(--color-2);
+  border: 1px solid var(--color-3);
   border-radius: 6px;
   padding: 6px;
   font-family: var(--font-family2);
   font-weight: 600;
   text-align: center;
-  color: var(--color-2);
+  color: var(--color-3);
 }
 
 .startPomoBtn {
-  background-color: var(--color-4);
-  color: white;
+  background-color: var(--color-3);
+  color: var(--text-color-2);
   width: 100%;
   padding: 8px;
   border-radius: 6px;
@@ -241,16 +241,13 @@
 }
 
 .startPomoBtn:hover {
-  background-color: var(--color-4-hover);
+  background-color: var(--color-1);
 }
 
-.progressBarBg {
-  width: 100%;
-  height: 8px;
-  background-color: #eee;
-  border-radius: 4px;
-  margin-top: 10px;
-  overflow: hidden;
+.progressBarFill {
+  height: 100%;
+  background-color: var(--color-1);
+  transition: width 0.5s ease;
 }
 
 .progressBarFill {
@@ -263,7 +260,7 @@
   font-family: var(--font-family2);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-2);
+  color: var(--color-1);
 }
 
 .noteArea {

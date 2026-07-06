@@ -535,7 +535,7 @@ export function EventModal({
                 className={styles.closeButton}
                 onPress={clearFormAndClose}
               >
-                {t("close_button")}
+                ✕
               </Button>
 
               <h1 className={styles.newEventTitleText}>

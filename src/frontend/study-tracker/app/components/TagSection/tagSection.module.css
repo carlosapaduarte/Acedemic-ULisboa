@@ -15,28 +15,31 @@
 
 .formSectionTitle {
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
   margin: 0;
+  color: var(--text-color-2);
 }
 
 .headerButton {
   background: none;
   border: none;
   padding: 0;
-  color: var(--color-1);
+  color: var(--text-color-2);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
 .headerButton:hover {
   transform: rotate(90deg);
+  opacity: 0.8;
 }
 
 /* --- CAIXA PRINCIPAL--- */
 .tagsBox {
-  border: 3px solid var(--color-2);
-  border-radius: 5px;
-  padding: 12px;
+  background-color: var(--bg-color, #F5EBE1);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -46,25 +49,30 @@
 
 .tagItem {
   color: var(--text-color-2);
-  background-color: var(--color-2);
+  background-color: var(--color-3);
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: bold;
   text-transform: uppercase;
-  border: 2px solid transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s;
+  transition: opacity 0.3s;
 }
 
+.tagItem:hover {
+  opacity: 0.8;
+}
+
+/* Botão de + do lado das tags */
 .addTagButtonRound {
   width: 35px;
   height: 35px;
   border-radius: 5px;
-  background-color: #5ba563;
+  background-color: var(--color-3);
   color: var(--text-color-2);
   border: none;
   display: flex;
@@ -77,23 +85,24 @@
 }
 
 .addTagButtonRound:hover {
-  background-color: #4a8c50;
+  background-color: var(--color-1);
 }
 
+/* --- CAIXA DAS UNIDADES CURRICULARES --- */
 .ucTagsContainer {
   margin-top: 0.5rem;
-  padding: 12px;
-  background-color: transparent;
-  border: 3px solid var(--color-2);
-  border-radius: 5px;
+  padding: 10px 12px;
+  background-color: var(--bg-color, #F5EBE1);
+  border: none;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .ucTagsLabel {
-  font-size: 0.75rem;
-  color: var(--text-color-2);
+  font-size: 0.85rem;
+  color: var(--color-3);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -107,13 +116,14 @@
 
 .emptyUcText {
   font-size: 0.85rem;
-  color: var(--text-color-2);
+  color: var(--color-3);
   font-style: italic;
   margin: 0;
 }
 
 .emptyUcLink {
-  color: var(--text-color-2);
+  color: var(--color-1);
   text-decoration: underline;
   cursor: pointer;
+  font-weight: bold;
 }

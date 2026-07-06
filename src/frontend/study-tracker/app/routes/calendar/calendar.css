@@ -83,3 +83,24 @@
 .rbc-time-content .rbc-timeslot-group:first-child {
   border-top: none !important;
 }
+
+@media (max-width: 768px) {
+  .rbc-time-view {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Força a grelha e o cabeçalho dos dias a terem o dobro do tamanho do ecrã */
+  .rbc-time-header,
+  .rbc-time-content {
+    min-width: 200%;
+  }
+
+  .rbc-time-header-gutter,
+  .rbc-time-gutter {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: var(--bg-color);
+  }
+}

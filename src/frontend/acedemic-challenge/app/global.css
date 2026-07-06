@@ -75,3 +75,29 @@ button {
     clip: rect(0, 0, 0, 0);
     border: 0;
 }
+
+/* --- SCROLLBARS PERSONALIZADAS --- */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-3) transparent;
+}
+
+/* Chrome, Edge, Safari e Opera */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-3); 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-2); 
+}

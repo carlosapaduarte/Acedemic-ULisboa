@@ -326,69 +326,43 @@ function SideBar() {
 }
 
 function AppSwitcher() {
-  const location = useLocation();
-  const isTrackerActuallyActive = !location.pathname.includes('/challenge');
-  const [visualState, setVisualState] = useState(isTrackerActuallyActive);
+    const location = useLocation();
+    const isTrackerActuallyActive = !location.pathname.includes('/challenge');
+    const [visualState, setVisualState] = useState(isTrackerActuallyActive);
 
-  const toggleApp = () => {
-    setVisualState(!visualState);
+    const toggleApp = () => {
+        setVisualState(!visualState);
+        setTimeout(() => {
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            if (isTrackerActuallyActive) {
+                window.location.href = isLocalhost ? "http://localhost:5173/challenge/" : "https://acedemic.studentlife.ulisboa.pt/challenge/";
+            } else {
+                window.location.href = isLocalhost ? "http://localhost:5273/tracker/" : "https://acedemic.studentlife.ulisboa.pt/tracker/";
+            }
+        }, 300);
+    };
 
-    setTimeout(() => {
-      // Deteta se estamos em localhost para usar as URLs corretas
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-      if (isTrackerActuallyActive) {
-        // Vai para o Challenge
-        window.location.href = isLocalhost 
-          ? "http://localhost:5173/challenge/"
-          : "https://acedemic.studentlife.ulisboa.pt/challenge/";
-      } else {
-        // Vai para o Tracker
-        window.location.href = isLocalhost 
-          ? "http://localhost:5273/tracker/"
-          : "https://acedemic.studentlife.ulisboa.pt/tracker/";
-      }
-    }, 300);
-  };
-
-  return (
-    <div 
-      className={styles.switcherContainer} 
-      onClick={toggleApp}
-      role="switch"
-      aria-checked={visualState}
-      title={visualState ? "Mudar para o Challenge" : "Mudar para o Tracker"}
-    >
-      <div 
-        className={classNames(
-          styles.pill, 
-          visualState ? styles.pillTracker : styles.pillChallenge
-        )} 
-      />
-      
-      <div className={styles.switcherIconContainer}>
-        <img 
-          src="icons/tasks_icon.png" 
-          alt="Tracker" 
-          className={classNames(
-            styles.switcherLogo, 
-            visualState ? styles.iconActive : styles.iconInactive
-          )} 
-        />
-      </div>
-      
-      <div className={styles.switcherIconContainer}>
-        <img 
-          src="assets/logos/medal_icon.svg" 
-          alt="Challenge" 
-          className={classNames(
-            styles.switcherLogo, 
-            !visualState ? styles.iconActive : styles.iconInactive
-          )} 
-        />
-      </div>
-    </div>
-  );
+    return (
+        <div className={styles.switcherContainer} onClick={toggleApp} role="switch" aria-checked={visualState} title={visualState ? "Mudar para o Challenge" : "Mudar para o Tracker"}>
+            <div className={classNames(styles.pill, visualState ? styles.pillTracker : styles.pillChallenge)} />
+            
+            <div className={styles.switcherIconContainer}>
+                <img 
+                    src="assets/logos/logo_tracker.png" 
+                    alt="Tracker" 
+                    className={classNames(styles.switcherLogo, visualState ? styles.iconActive : styles.iconInactive)} 
+                />
+            </div>
+            
+            <div className={styles.switcherIconContainer}>
+                <img 
+                    src="assets/logos/medal_icon.svg" 
+                    alt="Challenge" 
+                    className={classNames(styles.switcherLogo, styles.challengeLogo, !visualState ? styles.iconActive : styles.iconInactive)} 
+                />
+            </div>
+        </div>
+    );
 }
 
 // ------------------------------------------------------------------------

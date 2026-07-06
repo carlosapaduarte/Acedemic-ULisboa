@@ -1,9 +1,9 @@
 .defaultTheme, .beigeTheme {
+    --bg-color: #E0D6CB;
     --color-1: #BD1466;
     --color-2: #D5FC81;
     --color-3: #990553;
-    --color-4: #D5FC81;
-
+    
     --text-color-1: #000000;
     --text-color-2: #ffffff;
 }

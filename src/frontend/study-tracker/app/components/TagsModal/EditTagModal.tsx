@@ -173,7 +173,7 @@ export function EditTagModal({
           onPress={() => setIsOpen(false)}
           isDisabled={isSaving}
         >
-          {t("close_button")}
+          ✕
         </Button>
         <h1 className={styles.mainFormModalTitleText}>
           {t("edit_tags_title")}
