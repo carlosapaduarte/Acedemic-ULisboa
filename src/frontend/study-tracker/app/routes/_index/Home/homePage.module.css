@@ -287,3 +287,27 @@
   letter-spacing: 1px;
   margin-bottom: 10px;
 }
+
+/* --- APONTAMENTOS RECENTES --- */
+.noteInfo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.noteTitle {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: white; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.noteDetail {
+  font-size: 0.8rem;
+  color: var(--color-2); 
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

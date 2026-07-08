@@ -614,36 +614,14 @@ export default function HomePage() {
                     navigate(`/notes?openFile=${note.id}`);
                   }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontWeight: 600,
-                        fontSize: "0.9rem",
-                        whiteSpace: "nowrap",
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                      }}
-                    >
-                      📝 {note.fileName}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.8rem",
-                        color: "var(--color-3)",
-                        whiteSpace: "nowrap",
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                      }}
-                    >
-                      Pasta: {note.folderName}
-                    </span>
-                  </div>
+                  <div className={styles.noteInfo}>
+  <span className={styles.noteTitle}>
+    📝 {note.fileName}
+  </span>
+  <span className={styles.noteDetail}>
+    Pasta: {note.folderName}
+  </span>
+</div>
                 </div>
               ))
             ) : (

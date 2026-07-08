@@ -16,7 +16,7 @@ function AppSwitcher() {
   const { t } = useTranslation(["appbar"]); 
   
   // Deteta automaticamente em que app estamos a ler o URL
-  const isTrackerActuallyActive = !location.pathname.includes('/challenge');
+  const isTrackerActuallyActive = false;
   const [visualState, setVisualState] = useState(isTrackerActuallyActive);
 
   const toggleApp = () => {
@@ -57,29 +57,34 @@ function AppSwitcher() {
         title={visualState ? t("appbar:already_in_tracker") : t("appbar:switch_to_tracker")}
       >
         <img 
-          src="/icons/tasks_icon.png" 
+          src="assets/logos/logo_tracker.png"
           alt="Tracker" 
           className={classNames(
             styles.switcherLogo, 
+            styles.trackerLogo,
             visualState ? styles.iconActive : styles.iconInactive
           )} 
         />
       </div>
       
+      {/* ÍCONE DO CHALLENGE */}
       <div 
         className={styles.switcherIconContainer}
         title={!visualState ? t("appbar:already_in_challenge") : t("appbar:switch_to_challenge")}
       >
         <img 
-          src="/assets/logos/medal_icon.svg" 
+          src="assets/logos/medal_icon.svg" 
           alt="Challenge" 
           className={classNames(
             styles.switcherLogo, 
+            styles.challengeLogo,
             !visualState ? styles.iconActive : styles.iconInactive
           )} 
         />
       </div>
     </div>
+
+    
   );
 }
 
@@ -122,22 +127,13 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
                 </div>
             )}
             <div key="settingsButtons"
-                 className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>
-                
-                <div className={styles.appSwitchers}>
-                  <a 
-                    href="https://acedemic.studentlife.ulisboa.pt/tracker" 
-                    className={styles.switcherLink}
-                    title="Ir para o Study Tracker"
-                  >
-                    <img src="icons/calendar_icon.png" alt="Tracker" className={styles.switcherLogo} />
-                  </a>
-                </div>
+              className={appBarVariant === "home" ? homeAppBarStyles.settingsButtons : styles.settingsButtons}>              
+              <AppSwitcher />
 
-                <LanguageButton language={t("appbar:portugueseLanguage")} languageCode={"pt-PT"} />
-                <LanguageButton language={t("appbar:englishLanguage")} languageCode={"en-GB"} />
-                <SettingsButton />
-            </div>
+              <LanguageButton language={t("appbar:portugueseLanguage")} languageCode={"pt-PT"} />
+              <LanguageButton language={t("appbar:englishLanguage")} languageCode={"en-GB"} />
+              <SettingsButton />
+          </div>
             {appBarVariant === "home" && (
                 <>
                     <GreetingsContainer />

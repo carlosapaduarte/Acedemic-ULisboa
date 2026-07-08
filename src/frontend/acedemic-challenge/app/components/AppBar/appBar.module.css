@@ -109,80 +109,68 @@
     height: 32px;
 }
 
-.switcherLogo {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    transition: all 0.2s ease;
-    filter: grayscale(100%) opacity(0.8);
-    cursor: pointer;
-}
-
-.switcherLogo:hover {
-    filter: grayscale(0%) opacity(1);
-    transform: scale(1.15);
-}
-
 @media (max-width: 600px) {
     .appSwitchers {
         margin-right: 8px;
         padding-right: 8px;
     }
-    .switcherLogo {
-        width: 20px;
-        height: 20px;
-    }
 }
 
 .switcherContainer {
-  display: flex;
-  align-items: center;
-  background-color: var(--color-2, #e2e8f0);
-  border-radius: 50px;
-  padding: 4px;
-  position: relative;
-  width: 100px;
-  height: 36px;
-  cursor: pointer;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-right: 12px;
+    display: flex;
+    align-items: center;
+    background-color: var(--color-2, #e2e8f0);
+    border-radius: 50px;
+    padding: 4px;
+    position: relative;
+    width: 100px;
+    height: 36px;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 12px;
 }
 
 .pill {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  width: calc(50% - 4px);
-  background-color: white;
-  border-radius: 50px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    width: calc(50% - 4px);
+    background-color: white;
+    border-radius: 50px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pillTracker { transform: translateX(0); }
 .pillChallenge { transform: translateX(100%); }
 
 .switcherIconContainer {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
 }
 
+/* Ícone da Esquerda (Tracker) - Cor Fixa: Roxo Escuro */
+.trackerLogo, .trackerLogo:hover, .trackerLogo.iconActive {
+    filter: brightness(0) saturate(100%) invert(12%) sepia(76%) saturate(4649%) hue-rotate(282deg) brightness(86%) contrast(106%);
+}
+
+/* Ícone da Direita (Challenge) - Cor Fixa: Verde Menta */
+.challengeLogo, .challengeLogo:hover, .challengeLogo.iconActive {
+    filter: brightness(0) saturate(100%) invert(84%) sepia(21%) saturate(1048%) hue-rotate(99deg) brightness(104%) contrast(93%);
+}
+
+/* Tamanho e Efeito de aumentar no hover e quando está ativo */
 .switcherLogo {
-  height: 20px;
-  width: auto;
-  transition: opacity 0.3s, transform 0.3s;
+    height: 20px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+    cursor: pointer;
 }
 
-.iconActive {
-  opacity: 1;
-  transform: scale(1.1);
-  filter: brightness(0.2);
-}
-
-.iconInactive {
-  opacity: 0.4;
-  transform: scale(0.9);
+.switcherLogo:hover, .iconActive {
+    transform: scale(1.2); 
 }

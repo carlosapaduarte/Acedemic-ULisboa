@@ -350,7 +350,7 @@ function AppSwitcher() {
                 <img 
                     src="assets/logos/logo_tracker.png" 
                     alt="Tracker" 
-                    className={classNames(styles.switcherLogo, visualState ? styles.iconActive : styles.iconInactive)} 
+                    className={classNames(styles.switcherLogo, styles.trackerLogo, visualState ? styles.iconActive : styles.iconInactive)}
                 />
             </div>
             

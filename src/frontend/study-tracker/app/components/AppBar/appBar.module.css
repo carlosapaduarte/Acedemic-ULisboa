@@ -79,7 +79,7 @@
 }
 
 .sideBar[data-expanded="true"] {
-    --side-bar-height: 280px;
+    --side-bar-height: 290px;
     --side-bar-width: 200px;
 }
 
@@ -104,10 +104,9 @@
 
 .sideBarContentContainer {
     padding-right: 0.8rem;
+    padding-bottom: 0.8rem;
     width: 100%;
     height: 100%;
-
-    /*overflow: auto;*/
     overflow: hidden;
 }
 
@@ -130,16 +129,18 @@
 }
 
 .sideBarNavButton {
-    height: 3rem;
-    padding: 0.5rem;
+    height: 3.2rem;
+    width: 100%;
+    box-sizing: border-box; 
+    padding: 0.5rem 0.5rem;
     text-decoration: none;
     display: flex;
     flex-direction: row;
-    gap: 0.5rem;
+    gap: 0.8rem;
     align-items: center;
     border-radius: 10px;
     
-    color: var(--color-1); 
+    background-color: var(--color-3); 
 }
 
 .sideBarButtonIconContainer {
@@ -148,15 +149,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: transparent;
 }
 
 .sideBarNavButtonIcon {
-    height: 100%;
+    height: 60%; 
+    width: 60%;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(89%) sepia(28%) saturate(755%) hue-rotate(36deg) brightness(105%) contrast(98%);
 }
 
 .sideBarNavButtonText {
     font-size: 1rem;
     font-weight: 800;
+    color: var(--color-2);
 }
 
 .backButton {
@@ -349,4 +355,20 @@
   gap: 12px;
   animation: pulse 2s infinite;
   white-space: nowrap;
+}
+
+.trackerLogo, .trackerLogo:hover, .trackerLogo.iconActive {
+    filter: brightness(0) saturate(100%) invert(89%) sepia(28%) saturate(755%) hue-rotate(36deg) brightness(105%) contrast(98%);
+}
+
+.challengeLogo, .challengeLogo:hover, .challengeLogo.iconActive {
+    filter: brightness(0) saturate(100%) invert(17%) sepia(93%) saturate(3731%) hue-rotate(319deg) brightness(85%) contrast(97%);
+}
+
+.switcherLogo {
+    transition: transform 0.2s ease;
+}
+
+.switcherLogo:hover, .iconActive {
+    transform: scale(1.2); 
 }
