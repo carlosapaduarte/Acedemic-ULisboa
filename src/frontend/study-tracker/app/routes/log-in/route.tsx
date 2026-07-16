@@ -102,6 +102,14 @@ export default function LoginPage() {
 
     return (
         <div className={classNames(styles.loginPage)}>
+            <style>{`
+                body {
+                    background-color: var(--color-1) !important;
+                }
+                header, footer {
+                    background-color: transparent !important;
+                }
+            `}</style>
             <CurrentView />
         </div>
     );

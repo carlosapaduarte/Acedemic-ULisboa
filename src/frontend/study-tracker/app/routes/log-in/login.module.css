@@ -61,8 +61,8 @@
 }
 
 .actionButton {
-    background: var(--color-3);
-    color: var(--text-color-2);
+    background: var(--color-2);
+    color: var(--color-3);
     font-weight: bold;
     padding: 1.2rem 1rem;
     border-radius: 0.5rem;
@@ -77,7 +77,7 @@
 }
 
 .actionButton:hover {
-    filter: brightness(0.9);
+    filter: brightness(1.1);
     transform: translateY(-2px);
     box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.3);
 }

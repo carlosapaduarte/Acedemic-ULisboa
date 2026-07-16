@@ -212,7 +212,7 @@ export function DrillDownStats() {
       <div className={styles.statTitle}>
         {selectedTag
           ? `🔍 Detalhe: ${selectedTag}`
-          : "🏷️ Distribuição de Tempo"}
+          : "Distribuição de Tempo"}
       </div>
 
       {!selectedTag && (
@@ -322,7 +322,7 @@ export function DrillDownStats() {
         <div className={styles.tasksGrid}>
           {/* 1. GERAL (MOVIDO PARA A ESQUERDA) */}
           <div className={styles.chartWrapper}>
-            <div className={styles.chartTitleSmall}>{"🌟 Geral"}</div>
+            <div className={styles.chartTitleSmall}>{"Geral"}</div>
             {otherData.length > 0 ? (
               <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
                 <ResponsiveContainer>
@@ -370,6 +370,7 @@ export function DrillDownStats() {
                     fontSize: "0.7rem",
                     color: "#999",
                     marginTop: "5px",
+                    marginBottom: "5px",
                   }}
                 >
                   (Clica na barra para ver detalhes)
@@ -383,7 +384,7 @@ export function DrillDownStats() {
           </div>
 
           <div className={styles.chartWrapper}>
-            <div className={styles.chartTitleSmall}>{"🎓 Académico (UCs)"}</div>
+            <div className={styles.chartTitleSmall}>{"Académico (UCs)"}</div>
             {ucData.length > 0 ? (
               <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
                 <ResponsiveContainer>
@@ -424,6 +425,7 @@ export function DrillDownStats() {
                     fontSize: "0.7rem",
                     color: "#999",
                     marginTop: "5px",
+                    marginBottom: "5px",
                   }}
                 >
                   (Clica na barra para ver detalhes)

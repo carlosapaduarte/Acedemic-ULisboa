@@ -174,7 +174,7 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
           style={{ height: "1.2em" }}
           onError={(e) => (e.currentTarget.style.display = "none")}
         />
-        ✅ Performance de Tarefas
+        Performance de Tarefas
       </div>
 
       <div className={styles.tasksGrid}>

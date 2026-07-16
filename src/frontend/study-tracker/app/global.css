@@ -27,6 +27,26 @@
 body.dark-theme {
   --color-event-fallback: #2a2a2a;
 }
+:root {
+  --bg-color: #F5EBE1;
+  --color-1: #BD1466; /* Cor principal */
+  --color-2: #D5FC81; /* Verde-Lima */
+  --color-3: #990553; /* Cor da caixa do visto */
+  --color-4: #ffd900; 
+  --color-5: #0ab202;
+
+  --color-2-hover: rgba(213, 252, 129, 0.6);
+  --color-4-hover: rgba(213, 252, 129, 0.6);
+
+  --color-event-fallback: var(--color-3);
+
+  --text-color-1: #000000;
+  --text-color-2: #ffffff;
+  --color-text-danger: #b01b10;
+
+  --font-family1: "DM Sans";
+  --font-family2: "Chakra Petch";
+}
 
 html,
 body {

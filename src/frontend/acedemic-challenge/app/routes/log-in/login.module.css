@@ -63,8 +63,8 @@
 }
 
 .actionButton {
-    background: #f59e0b; /* Dourado/Amarelo */
-    color: #78350f; /* Castanho escuro */
+    background: var(--color-2); /* Verde-lima */
+    color: var(--color-3); /* Cor escura para fazer bom contraste */
     font-weight: bold;
     padding: 1.2rem 1rem;
     border-radius: 9999px;
@@ -75,7 +75,7 @@
     width: 100%;
     text-transform: uppercase;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: inline-block; /* Para o Button do react-aria-components */
+    display: inline-block; 
 }
 
 .actionButton:hover {

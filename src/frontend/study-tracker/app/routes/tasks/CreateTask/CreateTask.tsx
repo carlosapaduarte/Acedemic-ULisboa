@@ -180,7 +180,7 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
                 className={classNames(styles.closeButton)}
                 onPress={close}
               >
-                {t("task:close")}
+                ✕
               </Button>
               <h1 className={styles.newTaskTitleText}>
                 {parentTaskId

@@ -5,49 +5,37 @@ import { useTranslation } from "react-i18next";
 
 const MOOD_CONFIG: Record<
   number,
-  { emoji: string; color: string; labelDefault: string }
+  { iconUrl: string; color: string; labelDefault: string }
 > = {
-  5: { emoji: "🤩", color: "#2E7D32", labelDefault: "Muito Bem" },
-  4: { emoji: "😄", color: "#4CAF50", labelDefault: "Bem" },
-  3: { emoji: "😐", color: "#FFC107", labelDefault: "Neutro" },
-  2: { emoji: "🙁", color: "#FF9800", labelDefault: "Não muito bem" },
-  1: { emoji: "😞", color: "#F44336", labelDefault: "Muito Mal" },
+  5: { iconUrl: "./icons/MoodTracker/energy_very_well_icon.png", color: "#2E7D32", labelDefault: "Muito Bem" },
+  4: { iconUrl: "./icons/MoodTracker/energy_well_icon.png", color: "#4CAF50", labelDefault: "Bem" },
+  3: { iconUrl: "./icons/MoodTracker/energy_container_title_icon.png", color: "#FFC107", labelDefault: "Neutro" },
+  2: { iconUrl: "./icons/MoodTracker/energy_bad_icon.png", color: "#FF9800", labelDefault: "Não muito bem" },
+  1: { iconUrl: "./icons/MoodTracker/energy_very_bad_icon.png", color: "#F44336", labelDefault: "Muito Mal" },
 };
 
 function getMoodConfig(level: number | null) {
   if (level === null) return null;
   return (
-    MOOD_CONFIG[level] || { emoji: "❓", color: "#9E9E9E", labelDefault: "?" }
+    MOOD_CONFIG[level] || { iconUrl: "", color: "#9E9E9E", labelDefault: "?" }
   );
 }
 
 // --- 2. SUGESTÕES PEDAGÓGICAS (ZIMMERMAN - FASE DE PLANEAMENTO) ---
-// Mapeia cada Impacto a uma sugestão de ação futura
 const IMPACT_SUGGESTIONS: Record<string, string> = {
-  Estudo:
-    "Experimenta partir a matéria em blocos mais pequenos e define objetivos curtos.",
-  Trabalho:
-    "Tenta renegociar prazos ou priorizar apenas as 3 tarefas críticas do dia.",
-  Família:
-    "Reserva um momento de qualidade esta semana para resolver pendentes emocionais.",
-  Amigos:
-    "O apoio social é crucial. Agenda uma saída ou conversa para recarregar baterias.",
-  Saúde:
-    "Não ignores o corpo. Considera uma pausa ativa ou marcar aquela consulta pendente.",
+  Estudo: "Experimenta partir a matéria em blocos mais pequenos e define objetivos curtos.",
+  Trabalho: "Tenta renegociar prazos ou priorizar apenas as 3 tarefas críticas do dia.",
+  Família: "Reserva um momento de qualidade esta semana para resolver pendentes emocionais.",
+  Amigos: "O apoio social é crucial. Agenda uma saída ou conversa para recarregar baterias.",
+  Saúde: "Não ignores o corpo. Considera uma pausa ativa ou marcar aquela consulta pendente.",
   Sono: "A higiene do sono é a base de tudo. Tenta definir uma hora fixa para desconectar hoje.",
-  Dinheiro:
-    "A incerteza gera ansiedade. Faz um plano de gastos simples para a próxima semana.",
-  Tempo:
-    "Sentes falta de tempo? Tenta usar a técnica Pomodoro para focar no que importa.",
-  "Auto-estima":
-    "Sê gentil contigo. Regista 3 pequenas vitórias que tiveste hoje, por menores que sejam.",
-  "Acontecimentos Atuais":
-    "Limita o consumo de notícias se te está a afetar. Foca no que podes controlar.",
+  Dinheiro: "A incerteza gera ansiedade. Faz um plano de gastos simples para a próxima semana.",
+  Tempo: "Sentes falta de tempo? Tenta usar a técnica Pomodoro para focar no que importa.",
+  "Auto-estima": "Sê gentil contigo. Regista 3 pequenas vitórias que tiveste hoje, por menores que sejam.",
+  "Acontecimentos Atuais": "Limita o consumo de notícias se te está a afetar. Foca no que podes controlar.",
 };
 
-// Fallback caso apareça um impacto novo que não esteja na lista
-const DEFAULT_SUGGESTION =
-  "Tenta identificar uma pequena ação que possas fazer amanhã para melhorar isto.";
+const DEFAULT_SUGGESTION = "Tenta identificar uma pequena ação que possas fazer amanhã para melhorar isto.";
 
 // --- 3. LÓGICA DE ANÁLISE ---
 function calculateZimmermanInsights(history: DailyEnergyStatus[]) {
@@ -55,7 +43,6 @@ function calculateZimmermanInsights(history: DailyEnergyStatus[]) {
 
   if (validLogs.length === 0) return null;
 
-  // Contar impactos
   const getFrequency = (logs: DailyEnergyStatus[]) => {
     const counts: Record<string, number> = {};
     logs.forEach((log) => {
@@ -66,23 +53,20 @@ function calculateZimmermanInsights(history: DailyEnergyStatus[]) {
     return counts;
   };
 
-  const happyLogs = validLogs.filter((h) => h.level! >= 4); // Níveis 4 e 5
-  const sadLogs = validLogs.filter((h) => h.level! <= 2); // Níveis 1 e 2
+  const happyLogs = validLogs.filter((h) => h.level! >= 4); 
+  const sadLogs = validLogs.filter((h) => h.level! <= 2); 
 
   const happyCounts = getFrequency(happyLogs);
   const sadCounts = getFrequency(sadLogs);
 
-  // Obter o topo
   const getTop = (counts: Record<string, number>) =>
     Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
 
   const facilitator = getTop(happyCounts);
   const barrier = getTop(sadCounts);
 
-  // DETETOR DE RESILIÊNCIA (BANDURA)
   let resilienceEvent: { date: Date; impact: string } | null = null;
   if (barrier) {
-    // Procura dia com a barreira MAS mood >= 3
     const resilienceLog = validLogs.find(
       (log) => log.level! >= 3 && log.impacts?.includes(barrier),
     );
@@ -103,7 +87,6 @@ function calculateZimmermanInsights(history: DailyEnergyStatus[]) {
 function fillMissingDays(history: DailyEnergyStatus[]): DailyEnergyStatus[] {
   if (history.length === 0) return [];
 
-  // 1. Normalizar tudo para meia-noite (00:00:00) para evitar bugs de horas
   const normalize = (d: Date) => {
     const newD = new Date(d);
     newD.setHours(0, 0, 0, 0);
@@ -114,36 +97,34 @@ function fillMissingDays(history: DailyEnergyStatus[]): DailyEnergyStatus[] {
     (a, b) => a.date.getTime() - b.date.getTime(),
   );
 
-  // Datas de referência normalizadas
   const firstDate = normalize(sorted[0].date);
   const today = normalize(new Date());
   const lastDateLog = normalize(sorted[sorted.length - 1].date);
 
-  // Garante que a linha vai até Hoje, mesmo que o último log seja antigo
-  // OU vai até ao futuro se tiveres logs de 2026
   const effectiveLastDate = lastDateLog > today ? lastDateLog : today;
 
-  // Limite visual de 30 dias
   const MAX_DAYS = 30;
   const minDate = new Date(effectiveLastDate);
   minDate.setDate(minDate.getDate() - MAX_DAYS);
 
-  // Data de início (não anterior a 30 dias atrás)
   const startDate = firstDate < minDate ? minDate : firstDate;
 
   const timeline: DailyEnergyStatus[] = [];
-  const current = new Date(startDate); // Começa à meia-noite
+  const current = new Date(startDate); 
 
-  // Mapa usando a string da data (YYYY-MM-DD) para encontrar logs
+  const getLocalKey = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const logMap = new Map(
-    sorted.map((i) => [i.date.toISOString().split("T")[0], i]),
+    sorted.map((i) => [getLocalKey(i.date), i]),
   );
 
-  // Loop dia a dia
   while (current <= effectiveLastDate) {
-    // Formatar data atual do loop para chave
-    // Nota: Ajuste para fuso horário local se necessário, mas split('T') em Date UTC costuma funcionar bem se consistente
-    const dateKey = current.toISOString().split("T")[0];
+    const dateKey = getLocalKey(current);
 
     if (logMap.has(dateKey)) {
       timeline.push(logMap.get(dateKey)!);
@@ -156,7 +137,6 @@ function fillMissingDays(history: DailyEnergyStatus[]): DailyEnergyStatus[] {
         impacts: [],
       });
     }
-    // Avançar 1 dia
     current.setDate(current.getDate() + 1);
   }
   return timeline;
@@ -194,7 +174,7 @@ export function EnergyStats() {
     <div className={styles.statsContainer}>
       <div className={styles.statsContainerTitleAndDateDiv}>
         <div className={styles.statsContainerTitle}>
-          ⚡ Monitorização de Energia
+          Monitorização de Energia
         </div>
       </div>
 
@@ -215,18 +195,20 @@ export function EnergyStats() {
                 title={status.label || (config ? config.labelDefault : "")}
               >
                 {hasLog && config ? (
-                  <div
+                  <img
+                    src={config.iconUrl}
+                    alt={config.labelDefault}
                     style={{
-                      fontSize: isLastItem ? "3.5rem" : "2.2rem",
+                      width: isLastItem ? "56px" : "35px",
+                      height: isLastItem ? "56px" : "35px",
+                      objectFit: "contain",
                       filter: isLastItem
                         ? "drop-shadow(0 4px 6px rgba(0,0,0,0.2))"
                         : "grayscale(40%) opacity(0.8)",
                       cursor: "default",
                       transition: "all 0.3s ease",
                     }}
-                  >
-                    {config.emoji}
-                  </div>
+                  />
                 ) : (
                   <div className={styles.emptyDayDash}>—</div>
                 )}
@@ -266,7 +248,7 @@ export function EnergyStats() {
 
       {/* --- PADRÕES DE AUTORREGULAÇÃO --- */}
       <div>
-        <div className={styles.historyTitle}>🧠 Padrões de Desempenho</div>
+        <div className={styles.historyTitle}>Padrões de Desempenho</div>
 
         {insights && insights.hasData ? (
           <div className={styles.insightsContainer}>
@@ -276,7 +258,7 @@ export function EnergyStats() {
               style={{ borderLeftColor: "#4CAF50" }}
             >
               <div className={styles.insightTitle} style={{ color: "#2E7D32" }}>
-                🔥 Fonte de Eficácia
+                Fonte de Eficácia
               </div>
               <div className={styles.insightContent}>
                 {insights.facilitator ? (
@@ -304,31 +286,18 @@ export function EnergyStats() {
               </div>
             </div>
 
-            {/* 2. Barreiras (COM SUGESTÃO DINÂMICA) */}
-            <div
-              className={styles.insightCard}
-              style={{ borderLeftColor: "#F44336" }}
-            >
-              <div className={styles.insightTitle} style={{ color: "#C62828" }}>
-                🚧 Desafio Recorrente
+            {/* 2. Barreiras */}
+            <div className={styles.insightCardBarrier}>
+              <div className={styles.insightTitleBarrier}>
+                Desafio Recorrente
               </div>
               <div className={styles.insightContent}>
                 {insights.barrier ? (
                   <>
                     O fator <b>{insights.barrier}</b> surge frequentemente nos
                     dias difíceis.
-                    <div
-                      style={{
-                        marginTop: "8px",
-                        fontSize: "0.8rem",
-                        color: "#444",
-                        fontStyle: "italic",
-                        background: "rgba(255,255,255,0.8)",
-                        padding: "8px",
-                        borderRadius: "6px",
-                      }}
-                    >
-                      💡 <b>Estratégia sugerida:</b>
+                    <div className={styles.insightStrategyBox}>
+                      <b>Estratégia sugerida:</b>
                       <br />
                       {IMPACT_SUGGESTIONS[insights.barrier] ||
                         DEFAULT_SUGGESTION}
@@ -342,7 +311,7 @@ export function EnergyStats() {
               </div>
             </div>
 
-            {/* 3. Resiliência (Bandura) */}
+            {/* 3. Resiliência */}
             {insights.resilienceEvent && (
               <div
                 className={styles.insightCard}

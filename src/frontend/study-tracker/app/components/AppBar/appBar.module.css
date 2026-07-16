@@ -140,7 +140,7 @@
     align-items: center;
     border-radius: 10px;
     
-    background-color: var(--color-3); 
+    background-color: var(--color-2); 
 }
 
 .sideBarButtonIconContainer {
@@ -156,13 +156,13 @@
     height: 60%; 
     width: 60%;
     object-fit: contain;
-    filter: brightness(0) saturate(100%) invert(89%) sepia(28%) saturate(755%) hue-rotate(36deg) brightness(105%) contrast(98%);
-}
+filter: brightness(0) saturate(100%) invert(17%) sepia(93%) saturate(3731%) hue-rotate(319deg) brightness(85%) contrast(97%);
+  }
 
 .sideBarNavButtonText {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--color-2);
+    color: var(--color-1);
 }
 
 .backButton {

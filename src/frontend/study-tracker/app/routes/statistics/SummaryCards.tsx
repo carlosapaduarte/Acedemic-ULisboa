@@ -74,14 +74,12 @@ export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
     <div className={styles.summaryGrid}>
       {/* Card 1: Foco */}
       <div className={styles.summaryCard}>
-        <div className={styles.summaryIcon}>⏱️</div>
         <div className={styles.summaryValue}>{stats.focusText}</div>
         <div className={styles.summaryLabel}>Foco esta Semana</div>
       </div>
 
       {/* Card 2: Tarefas (Atualizado) */}
       <div className={styles.summaryCard}>
-        <div className={styles.summaryIcon}>✅</div>
         <div className={styles.summaryValue}>{stats.tasksDone}</div>
         <div className={styles.summaryLabel}>
           Tarefas Concluídas esta Semana
@@ -90,7 +88,6 @@ export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
 
       {/* Card 3: Registos */}
       <div className={styles.summaryCard}>
-        <div className={styles.summaryIcon}>📝</div>
         <div className={styles.summaryValue}>{stats.logsCount}</div>
         <div className={styles.summaryLabel}>
           Apontamentos criados esta Semana
@@ -99,7 +96,6 @@ export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
 
       {/* Card 4: Eventos */}
       <div className={styles.summaryCard}>
-        <div className={styles.summaryIcon}>📅</div>
         <div className={styles.summaryValue}>{stats.eventsCount}</div>
         <div className={styles.summaryLabel}>Eventos nesta Semana</div>
       </div>

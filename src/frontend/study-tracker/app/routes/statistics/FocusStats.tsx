@@ -139,7 +139,7 @@ export function FocusStats() {
 
   return (
     <div className={styles.statCardContainer}>
-      <div className={styles.statTitle}>⏱️ Performance Pomodoro</div>
+      <div className={styles.statTitle}>Performance Pomodoro</div>
 
       <div className={styles.tasksGrid}>
         {/* COLUNA 1: Métricas de Comportamento */}

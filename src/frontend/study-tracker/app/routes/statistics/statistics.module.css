@@ -1,57 +1,115 @@
 /* --- GERAIS DA PÁGINA --- */
 .pageTitleDiv {
   display: flex;
+  justify-content: center; /* 💡 Centra o título horizontalmente */
   margin-bottom: 1em;
-  margin-left: 1.5em;
 }
 
 .pageTitle {
-  font-size: x-large;
+  font-family: var(--font-family2);
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  color: var(--color-3);
+  margin-bottom: 0.5rem;
   font-weight: bolder;
-  color: var(--color-2);
+  text-align: center;
 }
 
-/* --- CONTENTORES DOS CARTÕES (Tasks, Energy, Focus) --- */
+
+/* --- CONTENTORES DOS CARTÕES --- */
 .statsContainer,
 .statCardContainer {
   margin: 0 1rem;
   padding: 1rem;
   box-sizing: border-box;
-  border: 3px solid var(--color-2);
-  border-radius: 10px;
-  background-color: transparent; /* Mantém o fundo da app visível */
-  margin-bottom: 2rem;
-  position: relative; /* Para o título funcionar */
+  background-color: transparent; 
+  margin-bottom: 3.5rem; 
+  position: relative; 
+  border: none; /* 💡 Removemos a borda para não haver buracos */
 }
 
 @media (min-width: 600px) {
   .statsContainer,
   .statCardContainer {
     margin: 0 3rem;
+    margin-bottom: 3.5rem; 
   }
 }
 
-/* TÍTULOS DOS CARTÕES (Estilo "Etiqueta no topo") */
+/* 1. O fundo magenta que vai servir de "borda" */
+.statsContainer::before,
+.statCardContainer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-3);
+  z-index: -2;
+  pointer-events: none;
+  
+  --edge-size: 1rem;
+  clip-path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+}
+
+/* 2. O interior da caixa que cria a ilusão da espessura de 3px */
+.statsContainer::after,
+.statCardContainer::after {
+  content: "";
+  position: absolute;
+  inset: 3px; /* 💡 Isto define a espessura da tua linha */
+  background-color: var(--bg-color); /* A cor base da tua app */
+  z-index: -1;
+  pointer-events: none;
+  
+  --edge-size: calc(1rem - 2px); /* Ajuste milimétrico para o recorte de dentro */
+  clip-path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+}
+
+@media (min-width: 600px) {
+  .statsContainer,
+  .statCardContainer {
+    margin: 0 3rem;
+    margin-bottom: 3.5rem; 
+    padding-top: 3rem;
+  }
+}
+
+/* TÍTULOS DOS CARTÕES */
 .statsContainerTitle,
 .statTitle {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 0.8rem;
-
-  /* Posicionamento para ficar em cima da borda */
   position: absolute;
   top: -20px;
   left: 20px;
+  z-index: 1; /* 💡 Garante que fica por cima de tudo */
 
   background-color: var(--color-2);
-  color: white;
+  color: var(--color-3); 
   font-weight: bolder;
   text-transform: uppercase;
-  font-family: "Chakra Petch", sans-serif;
+  font-family: var(--font-family2);
   font-size: 1rem;
 
-  /* Corte nos cantos (Clip-path) */
   --edge-size: 0.5rem;
   clip-path: polygon(
     var(--edge-size) 0,
@@ -69,36 +127,44 @@
 .statsContainerTitle .titleImg {
   height: 1.2em;
   width: 1.2em;
-  filter: brightness(0) invert(1); /* Torna o ícone branco */
+  filter: brightness(0) invert(1); 
 }
 
 /* --- DATAS E CABEÇALHOS INTERNOS --- */
 .statsContainerTitleAndDateDiv {
   display: flex;
-  justify-content: flex-end; /* Data à direita */
+  justify-content: flex-end; 
   margin-bottom: 1.5rem;
   margin-top: 0.5rem;
 }
 
 .containerHeaderDate {
-  color: var(--color-2);
+  color: var(--color-3);
   font-size: 0.8em;
   font-weight: bold;
   text-transform: uppercase;
   opacity: 0.7;
 }
 
-/* --- GRID PARA OS GRÁFICOS DE TAREFAS (LADO A LADO) --- */
+/* --- DIVISOR LINHA --- */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #eee;
+  margin: 1.5rem 0;
+}
+
+/* --- GRID PARA OS GRÁFICOS DE TAREFAS --- */
 .tasksGrid {
   display: grid;
-  grid-template-columns: 1fr; /* Mobile: 1 coluna */
+  grid-template-columns: 1fr; 
   gap: 2rem;
   margin-top: 1rem;
 }
 
 @media (min-width: 900px) {
   .tasksGrid {
-    grid-template-columns: 60% 40%; /* Desktop: Barras 60%, Pizza 40% */
+    grid-template-columns: 60% 40%; 
     align-items: start;
   }
 }
@@ -113,7 +179,7 @@
 .chartTitleSmall {
   font-size: 0.85rem;
   font-weight: bold;
-  color: var(--color-2);
+  color: var(--color-3);
   margin-bottom: 1rem;
   text-transform: uppercase;
   opacity: 0.8;
@@ -127,13 +193,13 @@
 .energyScrollContainer {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap; /* Garante scroll horizontal */
+  flex-wrap: nowrap; 
   overflow-x: auto;
   padding: 1rem 0.5rem;
   gap: 1.5rem;
   align-items: flex-end;
   scrollbar-width: thin;
-  scrollbar-color: var(--color-2) transparent;
+  scrollbar-color: var(--color-3) transparent;
 }
 
 .energyItem {
@@ -150,6 +216,36 @@
   margin: 0 10px;
 }
 
+.energyIcon {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+  filter: grayscale(40%) opacity(0.8);
+  cursor: default;
+  transition: all 0.3s ease;
+}
+
+.energyIconToday {
+  composes: energyIcon;
+  width: 56px;
+  height: 56px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+}
+
+.energyDate {
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #888;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.energyDateToday {
+  composes: energyDate;
+  font-size: 0.8rem;
+  color: var(--color-3);
+}
+
 .noDataAvailableMessage {
   width: 100%;
   text-align: center;
@@ -157,6 +253,11 @@
   color: #999;
   font-style: italic;
   font-size: 0.9rem;
+}
+
+.emptyDayDash {
+  color: #ccc;
+  font-weight: bold;
 }
 
 /* --- INSIGHTS / AUTO-REFLEXÃO --- */
@@ -176,13 +277,13 @@
 .historyTitle {
   font-size: 1rem;
   font-weight: 900;
-  color: var(--color-2);
+  color: var(--color-3);
   margin-bottom: 1rem;
   text-transform: uppercase;
 }
 
 .insightCard {
-  background: rgba(255, 255, 255, 0.5); /* Translúcido */
+  background: rgba(255, 255, 255, 0.5); 
   padding: 1rem;
   border-radius: 12px;
   border-left: 5px solid #ccc;
@@ -204,6 +305,86 @@
   font-weight: 500;
   color: #444;
   line-height: 1.4;
+  text-transform: none;
+}
+
+/* --- VARIANTES DOS INSIGHTS --- */
+.insightCardFacilitator {
+  composes: insightCard;
+  border-left-color: var(--color-2);
+}
+
+.insightTitleFacilitator {
+  composes: insightTitle;
+  color: #2E7D32;
+}
+
+.facilitatorTag {
+  color: var(--color-2);
+  background: #e8f5e9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.insightCardBarrier {
+  composes: insightCard;
+  border-left-color: var(--color-text-danger);
+}
+
+.insightTitleBarrier {
+  composes: insightTitle;
+  color: var(--color-text-danger);
+}
+
+.insightStrategyBox {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--color-3);
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 8px;
+  border-radius: 6px;
+  text-transform: none;
+}
+
+.insightCardResilience {
+  composes: insightCard;
+  border-left-color: #2196F3;
+  grid-column: 1 / -1;
+}
+
+.insightTitleResilience {
+  composes: insightTitle;
+  color: #1565C0;
+}
+
+.resilienceContentWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resilienceExplanation {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.awaitingDataText {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.continueLoggingMessage {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 /* --- GRÁFICO CIRCULAR (CUSTOM LEGEND) --- */
@@ -220,7 +401,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--color-2);
+  color: var(--color-3);
   font-weight: 600;
 }
 
@@ -230,10 +411,9 @@
   border-radius: 50%;
 }
 
-/* Tooltips do Recharts */
 .customTooltip {
   background-color: white;
-  border: 2px solid var(--color-2);
+  border: 2px solid var(--color-3);
   border-radius: 8px;
   padding: 8px 12px;
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
@@ -242,7 +422,7 @@
 
 .summaryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Responsivo */
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
   gap: 1rem;
   margin: 0 1rem 2rem 1rem;
 }
@@ -254,34 +434,51 @@
 }
 
 .summaryCard {
-  background: white;
-  border: 2px solid var(--color-2);
-  border-radius: 12px;
-  padding: 1rem;
+  position: relative;
+  background-color: transparent;
+  border: none;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  box-shadow: 4px 4px 0px rgba(93, 64, 55, 0.1); /* Sombra subtil castanha */
   transition: transform 0.2s;
+}
+
+/* 💡 Borda Magenta Recortada para os SummaryCards */
+.summaryCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-3); /* Magenta */
+  z-index: -2;
+  --edge-size: 0.8rem;
+  clip-path: polygon(var(--edge-size) 0, calc(100% - var(--edge-size)) 0, 100% var(--edge-size), 100% calc(100% - var(--edge-size)), calc(100% - var(--edge-size)) 100%, var(--edge-size) 100%, 0 calc(100% - var(--edge-size)), 0 var(--edge-size));
+}
+
+/* 💡 Preenchimento interior (Background da app) */
+.summaryCard::after {
+  content: "";
+  position: absolute;
+  inset: 2px; /* Espessura da linha */
+  background-color: var(--bg-color); /* Fundo bege */
+  z-index: -1;
+  --edge-size: calc(0.8rem - 2px);
+  clip-path: polygon(var(--edge-size) 0, calc(100% - var(--edge-size)) 0, 100% var(--edge-size), 100% calc(100% - var(--edge-size)), calc(100% - var(--edge-size)) 100%, var(--edge-size) 100%, 0 calc(100% - var(--edge-size)), 0 var(--edge-size));
 }
 
 .summaryCard:hover {
   transform: translateY(-2px);
 }
 
-.summaryIcon {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
 .summaryValue {
-  font-size: 1.4rem;
+  font-size: 2rem;
   font-weight: 900;
-  color: var(--color-2);
-  font-family: "Chakra Petch", sans-serif;
+  color: var(--color-3);
+  font-family: var(--font-family2);
   line-height: 1;
+  text-shadow: 2px 2px 0px var(--color-2), 4px 4px 5px rgba(0, 0, 0, 0.15);
 }
 
 .summaryLabel {
@@ -292,7 +489,6 @@
   margin-top: 4px;
 }
 
-/* Ajuste para o Gráfico de Tags (Radar ou Treemap) */
 .tagsChartContainer {
   height: 250px;
   width: 100%;
