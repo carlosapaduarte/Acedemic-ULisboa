@@ -34,7 +34,6 @@ import {
 
 const validateAndFormatUrl = (url: string) => {
   let formattedUrl = url.trim();
-  // Se não começar com http:// ou https://, adiciona automaticamente
   if (!/^https?:\/\//i.test(formattedUrl)) {
     formattedUrl = 'https://' + formattedUrl;
   }
@@ -250,7 +249,6 @@ function NotesPage() {
     }
   };
 
-  // Funções para fechar os modais limpando os erros e inputs
   const closeFolderModal = () => {
     setIsCreateFolderOpen(false);
     setNewFolderName("");
@@ -276,7 +274,6 @@ function NotesPage() {
     setRenameError("");
   };
 
-  // Apagar 
   const handleDeleteFile = async (id: number) => {
     if (confirm("Apagar ficheiro?")) {
       await service.deleteFile(id);
@@ -349,19 +346,19 @@ function NotesPage() {
 
   const getFileIcon = (file: FileItem) => {
     const isLink = file.file_type === "link" || (file.text && file.text.startsWith("http"));
-    if (!isLink) return <FaNoteSticky color="#3399ff" size={20} style={{ marginRight: "10px", flexShrink: 0 }} />;
+    if (!isLink) return <FaNoteSticky color="var(--color-3)" size={20} style={{ marginRight: "12px", flexShrink: 0 }} />;
     
     const url = file.text?.toLowerCase() || "";
     if (url.includes("docs.google.com/spreadsheets") || url.includes("excel")) {
-      return <FaFileExcel color="#107c41" size={20} style={{ marginRight: "10px", flexShrink: 0 }} />;
+      return <FaFileExcel color="var(--color-3)" size={20} style={{ marginRight: "12px", flexShrink: 0 }} />;
     }
     if (url.includes("docs.google.com/presentation") || url.includes("powerpoint") || url.includes("slides")) {
-      return <FaFilePowerpoint color="#c62828" size={20} style={{ marginRight: "10px", flexShrink: 0 }} />;
+      return <FaFilePowerpoint color="var(--color-3)" size={20} style={{ marginRight: "12px", flexShrink: 0 }} />;
     }
     if (url.includes("docs.google.com/document") || url.includes("word")) {
-      return <FaFileWord color="#1976d2" size={20} style={{ marginRight: "10px", flexShrink: 0 }} />;
+      return <FaFileWord color="var(--color-3)" size={20} style={{ marginRight: "12px", flexShrink: 0 }} />;
     }
-    return <FaLink color="#4caf50" size={20} style={{ marginRight: "10px", flexShrink: 0 }} />;
+    return <FaLink color="var(--color-3)" size={20} style={{ marginRight: "12px", flexShrink: 0 }} />;
   };
 
   if (editingFile) {
@@ -373,7 +370,8 @@ function NotesPage() {
             justifyContent: "space-between",
             alignItems: "center",
             paddingBottom: "15px",
-            borderBottom: "1px solid var(--border-color, #eee)",
+            borderBottom: "2px solid var(--color-3)",
+            color: "var(--color-3)"
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
@@ -386,20 +384,22 @@ function NotesPage() {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                fontWeight: "bold",
+                fontWeight: "800",
                 display: "flex",
                 alignItems: "center",
-                gap: "5px",
-                color: "inherit"
+                gap: "8px",
+                color: "var(--color-3)",
+                textTransform: "uppercase",
+                fontSize: "0.95rem"
               }}
             >
               <FaArrowLeft /> Voltar
             </button>
-            <h1 style={{ fontSize: "1.5rem", margin: 0 }}>
+            <h1 style={{ fontSize: "1.5rem", margin: 0, fontWeight: "800", textTransform: "uppercase" }}>
               {editingFile.name}
             </h1>
           </div>
-          <span style={{ fontSize: "0.8rem", opacity: 0.6 }}>
+          <span style={{ fontSize: "0.9rem", fontWeight: "700", opacity: 0.8 }}>
             {saveStatus}
           </span>
         </header>
@@ -412,14 +412,12 @@ function NotesPage() {
     );
   }
 
-  // ECRÃ PRINCIPAL DE GESTÃO DE PASTAS/FICHEIROS
   return (
     <div className={styles.pageContainer}>
       <header className={styles.header}>
         <h1 className={styles.mainTitle}>
           {t("notes:repository_title", "Apontamentos")}
         </h1>
-        {/* BREADCRUMBS INTELIGENTES COM RETICÊNCIAS */}
         <p className={styles.subTitle}>
           {folderPath.length === 0
             ? "Raiz"
@@ -450,7 +448,6 @@ function NotesPage() {
         )}
         <div style={{ flex: 1 }} />
         
-        {/* BOTÕES DE AÇÃO: Pasta, Link e Nota */}
         <div className={styles.actions}>
           <Button className={styles.secondaryButton} onPress={() => setIsCreateFolderOpen(true)}>
             <FaFolderPlus /> Pasta
@@ -470,9 +467,11 @@ function NotesPage() {
             .filter((a) => a.name.toLowerCase().includes(searchQuery.toLowerCase()))
             .map((archive) => (
               <div key={archive.id} className={styles.folderCard} onClick={() => handleFolderClick(archive)}>
-                <div style={{ alignSelf: "flex-end", display: "flex", gap: "8px" }}>
+                <div style={{ position: "absolute", top: "10px", right: "10px", display: "flex", gap: "8px" }}>
                   <FaPen
-                    size={12}
+                    size={14}
+                    className={styles.iconButton}
+                    style={{ padding: 0 }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setRenameTarget({ id: archive.id, type: "folder", currentName: archive.name });
@@ -480,6 +479,9 @@ function NotesPage() {
                     }}
                   />
                   <FaXmark
+                    size={16}
+                    className={styles.iconButton}
+                    style={{ padding: 0 }}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteFolder(archive.id);
@@ -509,9 +511,9 @@ function NotesPage() {
                 }}
               >
                 {getFileIcon(file)}
-                <span style={{ flex: 1 }}>{file.name}</span>
+                <span className={styles.fileName} style={{ flex: 1 }}>{file.name}</span>
                 <MenuTrigger>
-                  <Button className={styles.iconButton}>
+                  <Button className={styles.iconButton} style={{ opacity: 1, padding: "8px" }}>
                     <FaEllipsisVertical />
                   </Button>
                   <Popover className={styles.popoverMenu}>
@@ -541,82 +543,77 @@ function NotesPage() {
       {/* MODAL CRIAR PASTA */}
       <Modal isOpen={isCreateFolderOpen} onOpenChange={(isOpen) => !isOpen && closeFolderModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Pasta">
-          <button onClick={closeFolderModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+          <button onClick={closeFolderModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
             <FaXmark size={18} />
           </button>
-          <h2 style={{ marginTop: 0 }}>Nova Pasta</h2>
+          <h2 className={styles.modalTitle}>Nova Pasta</h2>
           <input
             placeholder="Nome da pasta"
-            className={styles.searchInput}
+            className={`${styles.modalInput} ${folderError ? styles.inputError : ''}`}
             value={newFolderName}
             onChange={(e) => { setNewFolderName(e.target.value); setFolderError(""); }}
-            style={{ border: folderError ? "1px solid red" : "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
           />
-          {folderError && <p style={{ color: "red", fontSize: "0.85rem", marginTop: "-5px", marginBottom: "10px" }}>{folderError}</p>}
-          <Button className={styles.primaryButton} onPress={handleCreateFolder}>Criar</Button>
+          {folderError && <p className={styles.errorText}>{folderError}</p>}
+          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateFolder}>Criar</Button>
         </Dialog>
       </Modal>
 
       {/* MODAL CRIAR NOTA (TXT) */}
       <Modal isOpen={isCreateFileOpen} onOpenChange={(isOpen) => !isOpen && closeFileModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Nota">
-          <button onClick={closeFileModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+          <button onClick={closeFileModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
             <FaXmark size={18} />
           </button>
-          <h2 style={{ marginTop: 0 }}>Nova Nota</h2>
+          <h2 className={styles.modalTitle}>Nova Nota</h2>
           <input
             placeholder="Ex: Resumo Aula 1"
-            className={styles.searchInput}
+            className={`${styles.modalInput} ${fileError ? styles.inputError : ''}`}
             value={newTextFileName}
             onChange={(e) => { setNewTextFileName(e.target.value); setFileError(""); }}
-            style={{ border: fileError ? "1px solid red" : "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
           />
-          {fileError && <p style={{ color: "red", fontSize: "0.85rem", marginTop: "-5px", marginBottom: "10px" }}>{fileError}</p>}
-          <Button className={styles.primaryButton} onPress={handleCreateFile}>Criar</Button>
+          {fileError && <p className={styles.errorText}>{fileError}</p>}
+          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateFile}>Criar</Button>
         </Dialog>
       </Modal>
 
       {/* MODAL CRIAR LINK */}
       <Modal isOpen={isLinkModalOpen} onOpenChange={(isOpen) => !isOpen && closeLinkModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Adicionar Link Externo">
-          <button onClick={closeLinkModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+          <button onClick={closeLinkModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
             <FaXmark size={18} />
           </button>
-          <h2 style={{ marginTop: 0 }}>Adicionar Link Externo</h2>
+          <h2 className={styles.modalTitle}>Novo Link</h2>
           <input
             placeholder="Título (ex: Slides Prática)"
-            className={styles.searchInput}
+            className={`${styles.modalInput} ${linkError.includes("título") ? styles.inputError : ''}`}
             value={newLinkName}
             onChange={(e) => { setNewLinkName(e.target.value); setLinkError(""); }}
-            style={{ border: linkError.includes("título") ? "1px solid red" : "1px solid #ccc", padding: "10px", width: "100%", marginTop: "10px", marginBottom: "5px", boxSizing: "border-box", borderRadius: "6px" }}
           />
           <input
             placeholder="URL (ex: www.site.com/link)"
-            className={styles.searchInput}
+            className={`${styles.modalInput} ${linkError.includes("URL") ? styles.inputError : ''}`}
             value={newLinkUrl}
             onChange={(e) => { setNewLinkUrl(e.target.value); setLinkError(""); }}
-            style={{ border: linkError.includes("URL") ? "1px solid red" : "1px solid #ccc", padding: "10px", width: "100%", marginBottom: "10px", boxSizing: "border-box", borderRadius: "6px" }}
           />
-          {linkError && <p style={{ color: "red", fontSize: "0.85rem", marginTop: "-5px", marginBottom: "10px" }}>{linkError}</p>}
-          <Button className={styles.primaryButton} onPress={handleCreateLink}>Adicionar</Button>
+          {linkError && <p className={styles.errorText}>{linkError}</p>}
+          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateLink}>Adicionar</Button>
         </Dialog>
       </Modal>
 
       {/* MODAL RENOMEAR */}
       <Modal isOpen={!!renameTarget} onOpenChange={(isOpen) => !isOpen && closeRenameModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Renomear Item">
-          <button onClick={closeRenameModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px" }}>
+          <button onClick={closeRenameModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
             <FaXmark size={18} />
           </button>
-          <h2 style={{ marginTop: 0 }}>Renomear</h2>
+          <h2 className={styles.modalTitle}>Renomear</h2>
           <input
-            className={styles.searchInput}
+            className={`${styles.modalInput} ${renameError ? styles.inputError : ''}`}
             value={renameValue}
             onChange={(e) => { setRenameValue(e.target.value); setRenameError(""); }}
-            style={{ border: renameError ? "1px solid red" : "1px solid #ccc", padding: "10px", width: "100%", margin: "10px 0", boxSizing: "border-box", borderRadius: "6px" }}
           />
-          {renameError && <p style={{ color: "red", fontSize: "0.85rem", marginTop: "-5px", marginBottom: "10px" }}>{renameError}</p>}
-          <Button className={styles.primaryButton} onPress={handleRenameSubmit}>Guardar</Button>
+          {renameError && <p className={styles.errorText}>{renameError}</p>}
+          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleRenameSubmit}>Guardar</Button>
         </Dialog>
       </Modal>
     </div>

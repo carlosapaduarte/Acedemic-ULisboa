@@ -17,8 +17,8 @@ import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { EventModal, EventData } from "./CreateEvent/EventModal";
 import { useTranslation } from "react-i18next";
 import { utils } from "~/utils";
-import "moment/locale/pt";
 import { getCalendarMessages } from "../../calendarUtils";
+moment.locale("pt");
 import { FaListCheck, FaFilter, FaCheck } from "react-icons/fa6";
 import {
   Button,
@@ -696,20 +696,25 @@ const AgendaEvent = ({
     const tagIdentifiers = event.resource?.tags || [];
 
     if (tagIdentifiers.length > 0 && allUserTags.length > 0) {
-      const associatedTags = allUserTags.filter(
-        (tag) =>
-          (tag.name_pt && tagIdentifiers.includes(tag.name_pt)) ||
-          (tag.name_en && tagIdentifiers.includes(tag.name_en)) ||
-          (tag.name && tagIdentifiers.includes(tag.name)),
-      );
+      colorDots = tagIdentifiers
+        .map((tagItem: any) => {
+          let foundTag: Tag | undefined;
 
-      const tagColors = associatedTags
-        .map((tag) => tag.color)
+          if (typeof tagItem === "object" && tagItem !== null) {
+            foundTag = allUserTags.find((t) => String(t.id) === String(tagItem.id));
+            if (!foundTag) foundTag = tagItem as Tag;
+          } else {
+            foundTag = allUserTags.find(
+              (tag: Tag) =>
+                String(tag.id) === String(tagItem) ||
+                tag.name_pt === tagItem ||
+                tag.name_en === tagItem
+            );
+          }
+
+          return foundTag?.color || tagItem.color;
+        })
         .filter(Boolean) as string[];
-
-      if (tagColors.length > 0) {
-        colorDots = tagColors;
-      }
     }
   }
 
@@ -728,6 +733,7 @@ const AgendaEvent = ({
             borderRadius: "50%",
             backgroundColor: color,
             marginLeft: index > 0 ? "4px" : "0",
+            flexShrink: 0,
           }}
         />
       ))}
@@ -931,6 +937,12 @@ function MyCalendar() {
 
   return (
     <div className={styles.calendarPageContainer}>
+      <style>{`
+        header[class*="appBarContainer"], div[class*="appBarContainer"] {
+          background-color: var(--color-3) !important;
+        }
+      `}</style>
+      
       <EventModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import useTimer from "react-timer-hook";
 import { utils } from "~/utils";
@@ -10,15 +10,24 @@ export function Timer({
   onStart,
   onStopClick,
   onFinish,
+  currentCycle,
+  totalCycles,
 }: {
   title: string;
   stopDate: Date;
   onStart: () => void;
   onStopClick: (minutesElapsed: number) => void;
   onFinish: () => void;
+  currentCycle?: number;
+  totalCycles?: number;
 }) {
   const { t } = useTranslation(["study"]);
   const [startDate, setStartDate] = useState(new Date());
+
+  const onFinishRef = useRef(onFinish);
+  useEffect(() => {
+    onFinishRef.current = onFinish;
+  }, [onFinish]);
 
   const {
     seconds,
@@ -30,7 +39,7 @@ export function Timer({
     resume,
     restart,
   } = // @ts-ignore
-    useTimer({ expiryTimestamp: stopDate, onExpire: onFinish });
+    useTimer({ expiryTimestamp: stopDate, onExpire: () => onFinishRef.current() });
 
   useEffect(() => {
     onStart();
@@ -50,7 +59,15 @@ export function Timer({
   return (
     <div className={styles.pomodoroContainer}>
       <h1 className={styles.title}>{title}</h1>
+      
+      {currentCycle && totalCycles && (
+        <div style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: 'var(--text-color-2)', opacity: 0.8 }}>
+          {t("study:cycle_count", `Ciclo ${currentCycle} de ${totalCycles}`)}
+        </div>
+      )}
+
       <p>{t("study:timer_title")}</p>
+      
       <div className={styles.timerDisplay}>
         <span className={styles.timerText}>
           {hours.toString().padStart(2, "0")}
@@ -64,9 +81,11 @@ export function Timer({
           {seconds.toString().padStart(2, "0")}
         </span>
       </div>
+      
       <p className={styles.statusText}>
         {isRunning ? t("study:timer_running") : t("study:timer_paused")}
       </p>
+      
       <div className={styles.controls}>
         <button className={styles.controlButton} onClick={pause}>
           {t("study:timer_pause")}

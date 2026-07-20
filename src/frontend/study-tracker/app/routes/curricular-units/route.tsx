@@ -70,26 +70,17 @@ function CreateCurricularUnitForm({
       });
   }
 
-  const inputClass = isModal ? styles.modalInput : styles.modalInput;
-  const labelClass = isModal ? styles.modalLabel : styles.modalLabel;
+  const wrapperClass = isModal ? styles.formWrapperModal : styles.formWrapperPage;
 
   return (
-    <div style={{ width: "100%" }}>
-      <div
-        style={{
-          marginBottom: "1.5rem",
-          display: "flex",
-          gap: "1rem",
-          flexDirection: isModal ? "row" : "column",
-          alignItems: "flex-end",
-        }}
-      >
-        <div style={{ flex: 2, width: "100%" }}>
-          <label className={labelClass}>
+    <div>
+      <div className={wrapperClass}>
+        <div className={styles.formColLarge}>
+          <label className={styles.modalLabel}>
             {t("curricular_units:label_uc_name")}
           </label>
           <input
-            className={inputClass}
+            className={styles.modalInput}
             onChange={(e) => {
               setName(e.target.value);
               setError(undefined);
@@ -97,27 +88,25 @@ function CreateCurricularUnitForm({
             placeholder={t("curricular_units:placeholder_uc_name")}
             value={name}
             autoFocus
-            style={{ margin: 0 }}
           />
         </div>
-        <div style={{ flex: 1, width: "100%" }}>
-          <label className={labelClass}>ECTS</label>
+        <div className={styles.formColSmall}>
+          <label className={styles.modalLabel}>ECTS</label>
           <input
             type="number"
-            className={inputClass}
+            className={styles.modalInput}
             onChange={(e) => setEcts(e.target.value)}
             placeholder="6"
             value={ects}
-            style={{ margin: 0 }}
           />
         </div>
-        <div style={{ flex: 1, width: "100%" }}>
-          <label className={labelClass}>
+        <div className={styles.formColSmall}>
+          <label className={styles.modalLabel}>
             {t("curricular_units:label_min_grade", "Nota Min.")}
           </label>
           <input
             type="number"
-            className={inputClass}
+            className={styles.modalInput}
             onChange={(e) => {
               let v = e.target.value;
               if (v !== "" && parseFloat(v) > 20) v = "20";
@@ -128,20 +117,11 @@ function CreateCurricularUnitForm({
             min="0"
             max="20"
             step="0.1"
-            style={{ margin: 0 }}
           />
         </div>
       </div>
       {error && (
-        <p
-          style={{
-            color: "#EF5350",
-            fontSize: "0.85rem",
-            marginTop: "-10px",
-            marginBottom: "15px",
-            fontWeight: "bold",
-          }}
-        >
+        <p className={styles.errorText}>
           {error}
         </p>
       )}
@@ -157,7 +137,6 @@ function CreateCurricularUnitForm({
       ) : (
         <button
           className={styles.confirmButton}
-          style={{ width: "100%" }}
           onClick={handleSubmit}
         >
           {t("curricular_units:btn_create_first")}
@@ -168,7 +147,7 @@ function CreateCurricularUnitForm({
 }
 
 // ==========================================
-// COMPONENTE PARA CADA NOTA (Auto-Save e nota max 20)
+// COMPONENTE PARA CADA NOTA
 // ==========================================
 function GradeRow({
   g,
@@ -177,6 +156,8 @@ function GradeRow({
   isLocked,
   onToggleLock,
   onDelete,
+  onUpdate,
+  onSimulate,
 }: {
   g: any;
   cuName: string;
@@ -184,6 +165,8 @@ function GradeRow({
   isLocked: boolean;
   onToggleLock: (id: number) => void;
   onDelete: (id: number) => void;
+  onUpdate: () => void;
+  onSimulate: (val: number) => void;
 }) {
   const { t } = useTranslation(["curricular_units"]);
   const compName =
@@ -202,6 +185,8 @@ function GradeRow({
         try {
           await service.updateGradeValue(cuName, g.id, valToSave);
           console.log(`Nota ${compName} gravada na BD: ${valToSave}`);
+          // CHAMA O REFRESH DA LISTA ASSIM QUE A BD GRAVA
+          onUpdate();
         } catch (e) {
           console.error(e);
         }
@@ -209,7 +194,7 @@ function GradeRow({
 
       return () => clearTimeout(timeoutId);
     }
-  }, [localValue, g.value, cuName, g.id, compName]);
+  }, [localValue, g.value, cuName, g.id, compName, onUpdate]);
 
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let strVal = e.target.value;
@@ -219,24 +204,18 @@ function GradeRow({
       if (num < 0) strVal = "0";
     }
     setLocalValue(strVal);
+    // ATUALIZA A BARRA DE PROGRESSO INSTANTANEAMENTE NA UI
+    onSimulate(parseFloat(strVal) || 0);
   };
 
   return (
-    <div
-      className={styles.gradeItem}
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        borderLeft: isLocked ? "4px solid #66BB6A" : "4px solid #E8E2D9",
-      }}
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>
+    <div className={`${styles.gradeItem} ${isLocked ? styles.gradeItemLocked : styles.gradeItemUnlocked}`}>
+      <div className={styles.gradeInfoWrapper}>
+        <span className={styles.gradeName}>
           {compName} <span className={styles.gradeWeight}>({g.weight}%)</span>
         </span>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+        <div className={styles.gradeInputWrapper}>
           <input
             type="number"
             disabled={isLocked}
@@ -246,46 +225,25 @@ function GradeRow({
             max="20"
             step="0.1"
             onChange={handleValueChange}
-            style={{
-              background: "var(--color-1)",
-              color: "var(--text-color-1)",
-              border: "1px solid rgba(0,0,0,0.1)",
-              borderRadius: "4px",
-              padding: "4px 8px",
-              width: "70px",
-              outline: "none",
-              cursor: isLocked ? "not-allowed" : "text",
-            }}
+            className={styles.gradeInput}
           />
-          <span style={{ fontSize: "0.8rem", color: "var(--text-color-2)" }}>
+          <span className={styles.gradeValLabel}>
             val.
           </span>
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
+      <div className={styles.gradeActionsWrapper}>
         <button
           onClick={() => onToggleLock(g.id)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.2rem",
-            color: isLocked ? "#66BB6A" : "rgba(255,255,255,0.4)",
-          }}
+          className={`${styles.btnLock} ${!isLocked && styles.btnLockUnlocked}`}
         >
           {isLocked ? <FaLock /> : <FaUnlock />}
         </button>
         <button
           onClick={() => onDelete(g.id)}
           disabled={isLocked}
-          style={{
-            background: "none",
-            border: "none",
-            color: isLocked ? "rgba(255,255,255,0.1)" : "#FF5252",
-            fontSize: "1.1rem",
-            cursor: isLocked ? "not-allowed" : "pointer",
-          }}
+          className={styles.btnDelGrade}
         >
           <FaTrash />
         </button>
@@ -349,14 +307,6 @@ function CurricularUnitCard({
     const tGrade = localTarget === "" ? null : parseFloat(localTarget);
     if (localTarget !== "" && isNaN(tGrade as number)) return;
 
-    console.log("🚀 A ATUALIZAR META DA UC:", {
-      oldName: cu.name,
-      newName: cu.name,
-      ects: cu.ects ?? 6,
-      min: minGrade,
-      target: tGrade,
-    });
-
     try {
       await service.updateCurricularUnit(
         cu.name,
@@ -373,14 +323,6 @@ function CurricularUnitCard({
 
   const handleSaveEditUC = async () => {
     if (!editName || !editEcts || !editMinGrade) return;
-
-    console.log("✏️ A EDITAR DADOS DA UC:", {
-      oldName: cu.name,
-      newName: editName,
-      ects: parseFloat(editEcts),
-      min: parseFloat(editMinGrade),
-      target: cu.target_grade ?? null,
-    });
 
     try {
       await service.updateCurricularUnit(
@@ -400,7 +342,6 @@ function CurricularUnitCard({
 
   const handleDeleteUC = async () => {
     if (confirm(t("curricular_units:confirm_delete_uc"))) {
-      console.log("🗑️ A TENTAR APAGAR A UC:", cu.name);
       try {
         await service.deleteCurricularUnit(cu.name);
         onRefresh();
@@ -414,6 +355,9 @@ function CurricularUnitCard({
   const totalWeight = cu.grades.reduce((acc, g) => acc + g.weight, 0);
   const remainingWeight = 100 - totalWeight;
   const isTotalWeight100 = totalWeight >= 99.9;
+
+  const handleSimulate = (id: number, newValue: number) =>
+    setSimulatedValues((prev) => ({ ...prev, [id]: newValue }));
 
   const componentsAtZero = cu.grades.filter(
     (g) => (simulatedValues[g.id] ?? g.value) === 0,
@@ -440,17 +384,14 @@ function CurricularUnitCard({
     setLockedGrades((prev) =>
       prev.includes(id) ? prev.filter((gId) => gId !== id) : [...prev, id],
     );
-  const handleSimulate = (id: number, newValue: number) =>
-    setSimulatedValues((prev) => ({ ...prev, [id]: newValue }));
+
   function handleDeleteGrade(id: number) {
     service.deleteGrade(cu.name, id).then(onRefresh).catch(console.error);
   }
 
-  // 🛡️ INSIGHTS COM FALLBACKS (Para nunca falhar o texto na demo)
   let neededMessage = "";
 
   if (hasTarget && targetGrade < minGrade) {
-    // ⚠️ AVISO DE META INFERIOR À NOTA MÍNIMA
     neededMessage = `💡 ${t(
       "curricular_units:insight_target_below_min",
       "A tua meta ({{target}}) é inferior à nota mínima ({{min}}). Foca-te em atingir a mínima!",
@@ -512,62 +453,28 @@ function CurricularUnitCard({
           .filter((s) => s.needed >= 0 && s.needed <= 20)
       : [];
 
-  const integerOptions = Array.from({ length: 21 }, (_, i) => i);
-  const decimalOptions = [
-    0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
-    95,
-  ];
-  const chipStyle = {
-    padding: "4px 10px",
-    borderRadius: "12px",
-    fontSize: "0.8rem",
-    fontWeight: "bold",
-    display: "inline-block",
-    margin: 0,
-  };
-
   return (
-    <div className={`${styles.cardContainer} tutorial-target-uc-card`}>
+    <div className={`tutorial-target-uc-card`}>
       <div className={styles.cardContainer}>
         {isEditingUC ? (
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              width: "100%",
-              alignItems: "center",
-              background: "rgba(0,0,0,0.1)",
-              padding: "10px",
-              borderRadius: "8px",
-              marginBottom: "15px",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className={styles.editUcContainer}>
             <input
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               className={styles.input}
-              style={{ flex: 1, margin: 0, padding: "8px" }}
             />
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <div className={styles.editUcInputGroup}>
               <input
                 type="number"
                 value={editEcts}
                 onChange={(e) => setEditEcts(e.target.value)}
                 className={styles.input}
-                style={{ width: "60px", margin: 0, padding: "8px" }}
               />
-              <span
-                style={{
-                  fontSize: "0.85rem",
-                  color: "var(--text-color-2)",
-                  fontWeight: "bold",
-                }}
-              >
+              <span className={styles.editUcLabel}>
                 ECTS
               </span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <div className={styles.editUcInputGroup}>
               <input
                 type="number"
                 value={editMinGrade}
@@ -577,104 +484,45 @@ function CurricularUnitCard({
                   setEditMinGrade(v);
                 }}
                 className={styles.input}
-                style={{ width: "60px", margin: 0, padding: "8px" }}
                 min="0"
                 max="20"
                 step="0.1"
               />
-              <span
-                style={{
-                  fontSize: "0.85rem",
-                  color: "var(--text-color-2)",
-                  fontWeight: "bold",
-                }}
-              >
+              <span className={styles.editUcLabel}>
                 Min
               </span>
             </div>
-            <button
-              onClick={handleSaveEditUC}
-              style={{
-                background: "#66BB6A",
-                border: "none",
-                color: "white",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
+            <button onClick={handleSaveEditUC} className={styles.btnSaveUc}>
               <FaCheck />
             </button>
-            <button
-              onClick={() => setIsEditingUC(false)}
-              style={{
-                background: "#EF5350",
-                border: "none",
-                color: "white",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
+            <button onClick={() => setIsEditingUC(false)} className={styles.btnCancelUc}>
               <FaXmark />
             </button>
           </div>
         ) : (
-          <div
-            className={styles.cardHeader}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                flexWrap: "wrap",
-              }}
-            >
-              <h3 className={styles.cardTitle} style={{ margin: 0 }}>
+          <div className={styles.cardHeader}>
+            <div className={styles.headerTitleWrapper}>
+              <h3 className={styles.cardTitle}>
                 {cu.name}
               </h3>
-              <span className={styles.ectsBadge} style={chipStyle}>
+              <span className={styles.ectsBadge}>
                 {displayEcts} ECTS
               </span>
-              <span
-                style={{
-                  ...chipStyle,
-                  background: "rgba(239, 83, 80, 0.1)",
-                  color: "#EF5350",
-                }}
-              >
+              <span className={styles.minGradeBadge}>
                 Min: {minGrade}
               </span>
             </div>
-            <div style={{ display: "flex", gap: "15px", paddingTop: "5px" }}>
+            <div className={styles.headerActionsWrapper}>
               <button
                 onClick={handleStartEdit}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "var(--text-color-2)",
-                  opacity: 0.5,
-                  cursor: "pointer",
-                }}
+                className={styles.btnActionIcon}
                 title="Editar UC"
               >
                 <FaPen size={14} />
               </button>
               <button
                 onClick={handleDeleteUC}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#EF5350",
-                  opacity: 0.7,
-                  cursor: "pointer",
-                }}
+                className={styles.btnActionIconDel}
                 title={t("curricular_units:btn_delete_uc")}
               >
                 <FaTrash size={14} />
@@ -684,10 +532,7 @@ function CurricularUnitCard({
         )}
 
         <div className={styles.simulatorContainer}>
-          <div
-            className={styles.progressLabels}
-            style={{ alignItems: "center" }}
-          >
+          <div className={styles.progressLabels}>
             <span>
               {t("curricular_units:label_current")}{" "}
               <strong style={{ fontSize: "1.2rem" }}>
@@ -695,8 +540,8 @@ function CurricularUnitCard({
               </strong>{" "}
               val.
             </span>
-            <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-              <FaBullseye color="#FFCA28" />{" "}
+            <span className={styles.targetInputWrapper}>
+              <FaBullseye color="var(--color-3)" />{" "}
               {t("curricular_units:label_target")}
               <input
                 type="number"
@@ -711,132 +556,43 @@ function CurricularUnitCard({
                 min="0"
                 max="20"
                 step="0.1"
-                style={{
-                  width: "70px",
-                  background: "rgba(0,0,0,0.2)",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "4px",
-                  padding: "2px 5px",
-                  fontWeight: "bold",
-                }}
+                className={styles.targetInput}
               />
             </span>
           </div>
 
-          <div
-            style={{
-              position: "relative",
-              marginTop: "30px",
-              marginBottom: "15px",
-            }}
-          >
-            <div
-              style={{
-                left: `${(minGrade / 20) * 100}%`,
-                position: "absolute",
-                top: "-20px",
-                zIndex: 98,
-                transform: "translateX(-50%)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "0.65rem",
-                  color: "#EF5350",
-                  fontWeight: "bold",
-                  whiteSpace: "nowrap",
-                  marginBottom: "2px",
-                }}
-              >
+          <div style={{ position: "relative", marginTop: "30px", marginBottom: "15px" }}>
+            
+            {/* O estilo dinâmico 'left' permanece inline por obrigação do React */}
+            <div className={`${styles.progressMarkerWrapper} ${styles.markerMin}`} style={{ left: `${(minGrade / 20) * 100}%` }}>
+              <span className={styles.progressMarkerLabel}>
                 {t("curricular_units:label_min_grade")}
               </span>
-              <div
-                style={{
-                  width: "2px",
-                  height: "28px",
-                  backgroundColor: "#EF5350",
-                }}
-              ></div>
+              <div className={styles.progressMarkerLine}></div>
             </div>
 
             {hasTarget && (
-              <div
-                style={{
-                  left: `${(targetGrade / 20) * 100}%`,
-                  position: "absolute",
-                  top: "-20px",
-                  zIndex: 99,
-                  transform: "translateX(-50%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "0.65rem",
-                    color: "#FFCA28",
-                    fontWeight: "bold",
-                    whiteSpace: "nowrap",
-                    marginBottom: "2px",
-                  }}
-                >
+              <div className={`${styles.progressMarkerWrapper} ${styles.markerTarget}`} style={{ left: `${(targetGrade / 20) * 100}%` }}>
+                <span className={styles.progressMarkerLabel}>
                   {t("curricular_units:label_target_short", "Meta")}
                 </span>
-                <div
-                  style={{
-                    width: "2px",
-                    height: "28px",
-                    backgroundColor: "#FFCA28",
-                  }}
-                ></div>
+                <div className={styles.progressMarkerLine}></div>
               </div>
             )}
 
-            <div
-              className={styles.progressBarBg}
-              style={{
-                display: "flex",
-                overflow: "hidden",
-                position: "relative",
-                height: "12px",
-              }}
-            >
+            <div className={styles.progressBarBg}>
               <div
-                style={{
-                  width: `${(lockedPoints / 20) * 100}%`,
-                  backgroundColor: "#66BB6A",
-                  height: "100%",
-                  transition: "width 0.3s ease",
-                  borderTopLeftRadius: "6px",
-                  borderBottomLeftRadius: "6px",
-                }}
+                className={styles.progressFillLocked}
+                style={{ width: `${(lockedPoints / 20) * 100}%` }}
               ></div>
               <div
-                style={{
-                  width: `${(unlockedPoints / 20) * 100}%`,
-                  backgroundColor: "#E8E2D9",
-                  height: "100%",
-                  transition: "width 0.3s ease",
-                  borderTopRightRadius: "6px",
-                  borderBottomRightRadius: "6px",
-                }}
+                className={styles.progressFillUnlocked}
+                style={{ width: `${(unlockedPoints / 20) * 100}%` }}
               ></div>
             </div>
           </div>
 
-          <p
-            className={styles.simulationText}
-            style={{
-              fontWeight: 600,
-              color: "var(--text-color-2)",
-              marginBottom: "1rem",
-            }}
-          >
+          <p className={styles.simulationText}>
             {neededMessage}
           </p>
         </div>
@@ -844,52 +600,24 @@ function CurricularUnitCard({
         {canShowScenarios &&
           simulationScenarios.length > 0 &&
           targetComponent && (
-            <div
-              style={{
-                background: "rgba(0,0,0,0.05)",
-                padding: "12px",
-                borderRadius: "8px",
-                marginBottom: "1.5rem",
-              }}
-            >
+            <div className={styles.scenariosContainer}>
               <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
+                className={styles.scenariosHeader}
                 onClick={() => setIsScenariosOpen(!isScenariosOpen)}
               >
-                <h4
-                  style={{
-                    margin: 0,
-                    fontSize: "0.9rem",
-                    color: "var(--text-color-2)",
-                  }}
-                >
+                <h4 className={styles.scenariosTitle}>
                   {t("curricular_units:scenarios_title", {
                     weight: targetComponent.weight,
                   })}
                 </h4>
-                <span
-                  style={{ fontSize: "0.8rem", color: "var(--text-color-2)" }}
-                >
+                <span className={styles.scenariosIcon}>
                   {isScenariosOpen ? <FaChevronUp /> : <FaChevronDown />}
                 </span>
               </div>
               {isScenariosOpen && (
-                <ul
-                  style={{
-                    margin: 0,
-                    marginTop: "10px",
-                    paddingLeft: "20px",
-                    fontSize: "0.85rem",
-                    color: "var(--text-color-2)",
-                  }}
-                >
+                <ul className={styles.scenariosList}>
                   {simulationScenarios.map((scenario, i) => (
-                    <li key={i} style={{ marginBottom: "4px" }}>
+                    <li key={i} className={styles.scenariosItem}>
                       {t("curricular_units:scenario_item", {
                         needed: scenario.needed.toFixed(1),
                         finalGrade: scenario.finalGrade,
@@ -912,6 +640,8 @@ function CurricularUnitCard({
                 isLocked={lockedGrades.includes(g.id)}
                 onToggleLock={toggleLock}
                 onDelete={handleDeleteGrade}
+                onUpdate={onRefresh} // Adicionado: Refresh na BD
+                onSimulate={(val) => handleSimulate(g.id, val)} // Adicionado: Instant update
               />
             ))}
           </div>
@@ -924,17 +654,7 @@ function CurricularUnitCard({
             totalWeight={totalWeight}
           />
         ) : (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "12px",
-              background: "rgba(0,0,0,0.05)",
-              color: "var(--text-color-2)",
-              borderRadius: "8px",
-              fontWeight: "bold",
-              marginTop: "1rem",
-            }}
-          >
+          <div className={styles.evaluationsComplete}>
             {t("curricular_units:evaluations_complete")}
           </div>
         )}
@@ -1055,7 +775,7 @@ export default function CurricularUnitsPage() {
               <br />
               {t("curricular_units:empty_desc_2")}
             </p>
-            <div style={{ maxWidth: "400px", width: "100%" }}>
+            <div>
               <CreateCurricularUnitForm onCuCreated={refresh} />
             </div>
           </div>
@@ -1077,13 +797,7 @@ export default function CurricularUnitsPage() {
         {isCreateModalOpen && (
           <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
-              <h2
-                style={{
-                  marginTop: 0,
-                  color: "#3E2723",
-                  marginBottom: "1.5rem",
-                }}
-              >
+              <h2 className={styles.modalTitle}>
                 {t("curricular_units:modal_new_uc")}
               </h2>
               <CreateCurricularUnitForm

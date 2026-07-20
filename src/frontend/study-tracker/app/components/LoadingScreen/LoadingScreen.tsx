@@ -27,7 +27,7 @@ export function LoadingOverlay({ loading }: { loading: boolean }) {
         >
             <div className="app">
                 <LoadingScreen />
-                <Footer />
+                <Footer isLightContext={true} /> 
             </div>
         </div>
     );

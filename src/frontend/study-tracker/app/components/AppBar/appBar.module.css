@@ -7,8 +7,8 @@
     max-height: 100px;
 
     z-index: 50;
-
     transition: max-height 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    background-color: var(--appbar-bg, transparent);
 }
 
 .appBar {
@@ -358,11 +358,10 @@ filter: brightness(0) saturate(100%) invert(17%) sepia(93%) saturate(3731%) hue-
 }
 
 .trackerLogo, .trackerLogo:hover, .trackerLogo.iconActive {
-    filter: brightness(0) saturate(100%) invert(89%) sepia(28%) saturate(755%) hue-rotate(36deg) brightness(105%) contrast(98%);
-}
+  filter: brightness(0) saturate(100%) invert(48%) sepia(74%) saturate(2971%) hue-rotate(304deg) brightness(101%) contrast(102%);}
 
 .challengeLogo, .challengeLogo:hover, .challengeLogo.iconActive {
-    filter: brightness(0) saturate(100%) invert(17%) sepia(93%) saturate(3731%) hue-rotate(319deg) brightness(85%) contrast(97%);
+  filter: brightness(0) saturate(100%) invert(17%) sepia(93%) saturate(3731%) hue-rotate(319deg) brightness(85%) contrast(97%);
 }
 
 .switcherLogo {

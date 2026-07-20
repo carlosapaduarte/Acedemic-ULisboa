@@ -3,7 +3,7 @@
   margin: 0 auto;
   padding: 2rem;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #3e2723;
+  color: var(--text-color-1);
   min-height: 100vh;
 }
 
@@ -14,22 +14,54 @@
   margin-bottom: 3rem;
 }
 
+/* --- ALTERAÇÕES NOS CARDS INICIAIS --- */
 .statCard {
-  background-color: #fff;
-  border: 1px solid #d7ccc8;
-  border-radius: 12px;
+  position: relative;
+  background-color: transparent;
+  color: var(--color-3);
+  border: none;
   padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(62, 39, 35, 0.05);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   justify-content: center;
+  z-index: 1;
+
+  --edge-size: 0.8rem;
+  --path: polygon(
+    var(--edge-size) 0,
+    calc(100% - var(--edge-size)) 0,
+    100% var(--edge-size),
+    100% calc(100% - var(--edge-size)),
+    calc(100% - var(--edge-size)) 100%,
+    var(--edge-size) 100%,
+    0 calc(100% - var(--edge-size)),
+    0 var(--edge-size)
+  );
+}
+
+.statCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-3);
+  clip-path: var(--path);
+  z-index: -2;
+}
+
+.statCard::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background-color: var(--bg-color);
+  clip-path: var(--path);
+  z-index: -1;
 }
 
 .statLabel {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #8d6e63;
+  color: var(--color-3);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -37,39 +69,42 @@
 .statValue {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #3e2723;
+  color: var(--color-3);
   line-height: 1.1;
 }
 
 .statSub {
   font-size: 0.85rem;
-  color: #a1887f;
+  color: var(--color-3);
+  opacity: 0.8;
 }
+/* ------------------------------------- */
 
 .headerAction {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #efebe9;
+  border-bottom: 2px solid var(--color-3);
   padding-bottom: 1rem;
 }
 
 .pageTitle {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #3e2723;
+  color: var(--color-3);
   margin: 0;
   text-transform: uppercase;
 }
 
+/* --- ALTERAÇÕES NO BOTÃO NOVA UC --- */
 .topCreateButton {
-  background-color: #3e2723;
-  color: #fff;
-  border: none;
+  background-color: var(--color-3);
+  color: var(--color-2);
+  border: 2px solid var(--color-3);
   padding: 0.8rem 1.5rem;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -80,10 +115,12 @@
 }
 
 .topCreateButton:hover {
-  background-color: #5d4037;
+  background-color: var(--color-3);
+  filter: brightness(1.2);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+/* ----------------------------------- */
 
 .ucGrid {
   display: flex;
@@ -92,85 +129,183 @@
 }
 
 .cardContainer {
-  background-color: #4e342e;
-  color: #efebe9;
+  background-color: var(--color-2);
+  color: var(--color-3);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 10px 25px rgba(62, 39, 35, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
 }
-
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding-bottom: 1rem;
 }
 
 .cardTitle {
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
-  color: #fff;
+  color: var(--color-3);
 }
 
 .ectsBadge {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--color-3);
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: 0.5px;
-  color: #ffecb3;
+  color: var(--text-color-2);
+}
+
+.minGradeBadge {
+  background-color: rgba(239, 83, 80, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #EF5350;
+}
+
+.headerTitleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.headerActionsWrapper {
+  display: flex;
+  gap: 15px;
+  padding-top: 5px;
+}
+
+.btnActionIcon {
+  background: none;
+  border: none;
+  color: var(--color-3);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnActionIcon:hover {
+  opacity: 1;
+}
+
+.btnActionIconDel {
+  background: none;
+  border: none;
+  color: #EF5350;
+  opacity: 0.8;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnActionIconDel:hover {
+  opacity: 1;
 }
 
 .simulatorContainer {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.4);
   padding: 1.5rem;
   border-radius: 10px;
   margin-bottom: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .progressLabels {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.9rem;
   margin-bottom: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-3);
+}
+
+.targetInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .progressBarBg {
-  height: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  display: flex;
   overflow: hidden;
   position: relative;
-}
-
-.progressBarFill {
-  height: 100%;
+  height: 12px;
+  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 6px;
-  transition: width 0.6s ease;
 }
 
-.progressMarker {
+.progressFillLocked {
+  background-color: var(--color-3);
+  height: 100%;
+  transition: width 0.3s ease;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.progressFillUnlocked {
+  background-color: rgba(255, 255, 255, 0.8);
+  height: 100%;
+  transition: width 0.3s ease;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.progressMarkerWrapper {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: -20px;
+  z-index: 98;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progressMarkerLabel {
+  font-size: 0.65rem;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-bottom: 2px;
+}
+
+.progressMarkerLine {
   width: 2px;
-  background-color: rgba(255, 255, 255, 0.6);
-  z-index: 2;
+  height: 28px;
+}
+
+.markerMin .progressMarkerLabel {
+  color: #EF5350;
+}
+.markerMin .progressMarkerLine {
+  background-color: #EF5350;
+}
+
+.markerTarget {
+  z-index: 99;
+}
+.markerTarget .progressMarkerLabel {
+  color: var(--color-3);
+}
+.markerTarget .progressMarkerLine {
+  background-color: var(--color-3);
 }
 
 .simulationText {
   margin-top: 1rem;
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  color: var(--color-3);
   font-style: italic;
+  margin-bottom: 1rem;
 }
 
 .gradeList {
@@ -184,31 +319,104 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.4);
   padding: 0.8rem 1.2rem;
   border-radius: 8px;
-  border-left: 4px solid #8d6e63;
   transition: background 0.2s;
 }
 
-.gradeItem:hover {
-  background-color: rgba(255, 255, 255, 0.12);
+.gradeItemLocked {
+  border-left: 4px solid var(--color-3);
 }
 
-.gradeValue {
-  font-size: 1.1rem;
+.gradeItemUnlocked {
+  border-left: 4px solid rgba(255, 255, 255, 0.8);
+}
+
+.gradeItem:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.gradeInfoWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gradeName {
   font-weight: 700;
-  color: #fff;
+  font-size: 0.95rem;
+  color: var(--color-3);
 }
 
 .gradeWeight {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-left: 0.8rem;
+  color: var(--color-3);
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}
+
+.gradeInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gradeInput {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--color-3);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 4px;
+  padding: 4px 8px;
+  width: 70px;
+  outline: none;
+  font-weight: bold;
+}
+
+.gradeInput:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.gradeValLabel {
+  font-size: 0.8rem;
+  color: var(--color-3);
+  opacity: 0.8;
+}
+
+.gradeActionsWrapper {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.btnLock {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--color-3);
+}
+
+.btnLockUnlocked {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.btnDelGrade {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #EF5350;
+}
+
+.btnDelGrade:disabled {
+  color: rgba(0, 0, 0, 0.1);
+  cursor: not-allowed;
 }
 
 .addGradeSection {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.2);
   padding: 1.5rem;
   border-radius: 12px;
   margin-top: 1rem;
@@ -218,9 +426,10 @@
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-3);
+  opacity: 0.8;
   margin: 0 0 1rem 0;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .formGrid {
@@ -238,23 +447,25 @@
 .label {
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-3);
+  font-weight: bold;
 }
 
 .input {
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--color-3);
   padding: 0.8rem;
   border-radius: 6px;
   font-size: 1rem;
   width: 100%;
+  font-weight: bold;
 }
 
 .input:focus {
   outline: none;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-color: #d7ccc8;
+  background-color: #fff;
+  border-color: var(--color-3);
 }
 
 .input::-webkit-outer-spin-button,
@@ -266,35 +477,23 @@
 .addButton {
   width: 100%;
   padding: 0.9rem;
-  background-color: #8d6e63;
-  color: white;
-  border: none;
+  background-color: var(--color-2);
+  color: var(--color-3);
+  border: 2px solid var(--color-3);
   border-radius: 8px;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.addButton:hover {
-  background-color: #a1887f;
-}
-
-.deleteButton {
-  background: transparent;
-  border: 1px solid rgba(239, 83, 80, 0.5);
-  color: #ef5350;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
   transition: all 0.2s;
 }
 
-.deleteButton:hover {
-  background-color: rgba(239, 83, 80, 0.1);
-  border-color: #ef5350;
+.addButton:hover {
+  background-color: var(--color-2-hover);
+}
+
+.addButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .emptyStateWrapper {
@@ -303,21 +502,20 @@
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;
-  background-color: #fff;
+  background-color: var(--color-3);
   border-radius: 16px;
-  border: 2px dashed #d7ccc8;
   text-align: center;
+  color: var(--text-color-2);
 }
 
 .emptyStateTitle {
   font-size: 1.8rem;
-  color: #3e2723;
   margin-bottom: 0.5rem;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .emptyStateText {
-  color: #8d6e63;
+  opacity: 0.8;
   margin-bottom: 2rem;
   font-size: 1.1rem;
 }
@@ -329,7 +527,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(62, 39, 35, 0.7);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -338,7 +536,7 @@
 }
 
 .modalContent {
-  background: #fff;
+  background: var(--color-1);
   padding: 2.5rem;
   border-radius: 16px;
   width: 90%;
@@ -346,25 +544,32 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
+.modalTitle {
+  margin-top: 0;
+  color: var(--color-3);
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+}
+
 .modalInput {
-  background-color: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  color: #3e2723;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  color: var(--color-3);
   padding: 0.8rem;
   border-radius: 8px;
   width: 100%;
   font-size: 1rem;
   margin-top: 0.5rem;
+  font-weight: bold;
 }
 .modalInput:focus {
   outline: none;
-  border-color: #8d6e63;
-  background-color: #fff;
+  border-color: var(--color-3);
 }
 .modalLabel {
   font-size: 0.9rem;
-  font-weight: 700;
-  color: #5d4037;
+  font-weight: 800;
+  color: var(--color-3);
   text-transform: uppercase;
 }
 
@@ -378,33 +583,170 @@
   flex: 1;
   padding: 0.8rem;
   background: transparent;
-  border: 1px solid #d7ccc8;
-  color: #8d6e63;
+  border: 2px solid var(--color-3);
+  color: var(--color-3);
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 800;
 }
 .cancelButton:hover {
-  background-color: #f5f5f5;
+  background-color: rgba(0,0,0,0.05);
 }
 
 .confirmButton {
   flex: 1;
   padding: 0.8rem;
-  background-color: #3e2723;
-  color: white;
-  border: none;
+  background-color: var(--color-2);
+  color: var(--color-3);
+  border: 2px solid var(--color-3);
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 800;
 }
 .confirmButton:hover {
-  background-color: #5d4037;
+  background-color: var(--color-2-hover);
 }
 
-/* ==========================================
-  DISPOSITIVOS MÓVEIS (Cartão da UC)
-   ========================================== */
+/* Edit UC Container */
+.editUcContainer {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
+  background: rgba(255,255,255,0.4);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.editUcInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.editUcLabel {
+  font-size: 0.85rem;
+  color: var(--color-3);
+  font-weight: bold;
+}
+
+.btnSaveUc {
+  background: var(--color-2);
+  border: 2px solid var(--color-3);
+  color: var(--color-3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btnCancelUc {
+  background: #EF5350;
+  border: 2px solid var(--color-3);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Scenarios */
+.scenariosContainer {
+  background: rgba(255,255,255,0.4);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.scenariosHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.scenariosTitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-3);
+  font-weight: bold;
+}
+
+.scenariosIcon {
+  font-size: 0.8rem;
+  color: var(--color-3);
+}
+
+.scenariosList {
+  margin: 0;
+  margin-top: 10px;
+  padding-left: 20px;
+  font-size: 0.85rem;
+  color: var(--color-3);
+  font-weight: bold;
+}
+
+.scenariosItem {
+  margin-bottom: 4px;
+}
+
+.evaluationsComplete {
+  text-align: center;
+  padding: 12px;
+  background: rgba(255,255,255,0.4);
+  color: var(--color-3);
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+/* --- ALTERAÇÃO NO TEXTO DE ERRO --- */
+.errorText {
+  color: #C62828; 
+  font-size: 0.85rem;
+  margin-top: -10px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+/* ---------------------------------- */
+
+.targetInput {
+  width: 70px;
+  background: rgba(255,255,255,0.7);
+  border: none;
+  color: var(--color-3);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-weight: bold;
+  outline: none;
+}
+
+.formWrapperModal {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.formWrapperPage {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.formColLarge {
+  flex: 2;
+  width: 100%;
+}
+
+.formColSmall {
+  flex: 1;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .cardHeader {
     flex-direction: column;
@@ -412,29 +754,25 @@
     gap: 1rem;
   }
 
-  /* Faz a primeira div (Nome, ECTS, Min) ocupar todo o espaço */
-  .cardHeader > div:first-child {
+  .headerTitleWrapper {
     width: 100%;
     margin-bottom: 0.5rem;
   }
 
-  /* Isola os botões (Editar/Apagar) numa nova linha e aumenta-os */
-  .cardHeader > div:last-child {
+  .headerActionsWrapper {
     width: 100%;
-    justify-content: flex-end; /* Encosta os botões à direita */
-    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+    justify-content: flex-end;
+    border-top: 1px dashed rgba(0, 0, 0, 0.2);
     padding-top: 1rem !important;
   }
 
-  /* Aumenta a área de toque dos botões */
-  .cardHeader > div:last-child button {
+  .headerActionsWrapper button {
     padding: 0.5rem;
-    background-color: rgba(255, 255, 255, 0.05) !important; /* Dá um fundo leve para se verem melhor */
+    background-color: rgba(255, 255, 255, 0.4) !important;
     border-radius: 8px;
   }
   
-  /* Aumenta o tamanho do ícone (o SVG lá dentro) */
-  .cardHeader > div:last-child button svg {
+  .headerActionsWrapper button svg {
     width: 18px !important;
     height: 18px !important;
   }

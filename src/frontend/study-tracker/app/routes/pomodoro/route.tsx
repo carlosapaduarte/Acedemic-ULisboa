@@ -58,50 +58,35 @@ function useTimerSetup(
   const { t } = useTranslation(["study"]);
   const setError = useSetGlobalError();
   
-  const [studyStopDate, setStudyStopDate] = useState<Date | undefined>(() => {
-    if (typeof window !== "undefined") {
-      const activeEnd = window.localStorage.getItem("active_pomodoro_end");
-      const state = window.localStorage.getItem("pomodoro_state");
-      if (activeEnd && state === "study") {
-        return new Date(parseInt(activeEnd, 10));
-      }
-    }
-    return undefined;
-  });
-
-  const [pauseStopDate, setPauseStopDate] = useState<Date | undefined>(() => {
-    if (typeof window !== "undefined") {
-      const pauseEnd = window.localStorage.getItem("active_pause_end");
-      if (pauseEnd) {
-        return new Date(parseInt(pauseEnd, 10));
-      }
-    }
-    return undefined;
-  });
-
   const [timerStopDate, setTimerStopDate] = useState<Date | undefined>(() => {
     if (typeof window !== "undefined") {
       const activeEnd = window.localStorage.getItem("active_pomodoro_end");
-      if (activeEnd) {
-        return new Date(parseInt(activeEnd, 10));
-      }
+      if (activeEnd) return new Date(parseInt(activeEnd, 10));
     }
     return undefined;
   });
-
-  const [motivationalMessage, setMotivationalMessage] = useState<string | null>(null);
 
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(() => {
     if (typeof window !== "undefined") {
       const startStr = window.localStorage.getItem("active_pomodoro_start");
-      if (startStr) {
-        return new Date(parseInt(startStr, 10));
-      }
+      if (startStr) return new Date(parseInt(startStr, 10));
     }
     return null;
   });
 
-  // Se houver um Evento do Calendário a acontecer, começa logo a contar!
+  const [motivationalMessage, setMotivationalMessage] = useState<string | null>(null);
+
+  const [studyDuration, setStudyDuration] = useState<number>(25);
+  const [pauseDuration, setPauseDuration] = useState<number>(5);
+  const [totalCycles, setTotalCycles] = useState<number>(1);
+  const [currentCycle, setCurrentCycle] = useState<number>(1);
+  const [isStudyPhase, setIsStudyPhase] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.localStorage.getItem("pomodoro_state") !== "pause";
+    }
+    return true;
+  });
+
   useEffect(() => {
     if (activeBlock && !sessionStartTime) {
       const now = new Date();
@@ -129,11 +114,18 @@ function useTimerSetup(
     }
   }, [motivationalMessage]);
 
-  function onTimeSelected(studyStopDate: Date, pauseStopDate: Date) {
+  function onTimeSelected(studyMins: number, pauseMins: number, cycles: number) {
     const now = new Date();
+    setStudyDuration(studyMins);
+    setPauseDuration(pauseMins);
+    setTotalCycles(cycles);
+    setCurrentCycle(1);
+    setIsStudyPhase(true);
+
+    const newStop = new Date(now.getTime() + studyMins * 60000);
+
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("active_pomodoro_end", studyStopDate.getTime().toString());
-      window.localStorage.setItem("active_pause_end", pauseStopDate.getTime().toString());
+      window.localStorage.setItem("active_pomodoro_end", newStop.getTime().toString());
       window.localStorage.setItem("pomodoro_state", "study");
       window.localStorage.setItem("active_pomodoro_start", now.getTime().toString());
       window.localStorage.removeItem("streak_deadline");
@@ -142,21 +134,16 @@ function useTimerSetup(
 
     service.logUserAction("tracker", "action", "start_pomodoro");
 
-    setStudyStopDate(studyStopDate);
-    setPauseStopDate(pauseStopDate);
-    setTimerStopDate(studyStopDate);
+    setTimerStopDate(newStop);
     setSessionStartTime(now); 
     setMotivationalMessage(null);
 
     if (audioRef.current) {
       audioRef.current.volume = 0;
-      audioRef.current
-        .play()
-        .then(() => {
-          audioRef.current?.pause();
-          audioRef.current!.volume = 1.0;
-        })
-        .catch((e) => console.log("Aviso de som:", e));
+      audioRef.current.play().then(() => {
+        audioRef.current?.pause();
+        audioRef.current!.volume = 1.0;
+      }).catch((e) => console.log("Aviso de som:", e));
     }
 
     service.startStudySession().catch((error) => setError(error));
@@ -169,6 +156,15 @@ function useTimerSetup(
     return Math.max(1, mins);
   }
 
+  function clearStorage() {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("active_pomodoro_end");
+      localStorage.removeItem("active_pomodoro_start");
+      localStorage.removeItem("pomodoro_state");
+      window.dispatchEvent(new window.Event("storage"));
+    }
+  }
+
   function onStopClick() {
     const elapsed = getElapsedMinutes();
     service.finishStudySession().catch((error) => setError(error));
@@ -178,15 +174,10 @@ function useTimerSetup(
     setTimerStopDate(undefined);
     setSessionStartTime(null);
     setMotivationalMessage(null);
+    setCurrentCycle(1);
+    setIsStudyPhase(true);
 
-    // Limpa a memória toda
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("active_pomodoro_end");
-      localStorage.removeItem("active_pause_end");
-      localStorage.removeItem("active_pomodoro_start");
-      localStorage.removeItem("pomodoro_state");
-      window.dispatchEvent(new window.Event("storage"));
-    }
+    clearStorage();
 
     if (activeBlock) {
       onDismissBlock();
@@ -204,38 +195,60 @@ function useTimerSetup(
       audioRef.current.play().catch((e) => console.error("Erro ao tocar:", e));
     }
 
-    // Estudo acabou, passa para a pausa
-    if (timerStopDate === studyStopDate) {
+    if (isStudyPhase) {
       const elapsed = getElapsedMinutes();
       onSessionEnd(elapsed);
 
-      setTimerStopDate(pauseStopDate);
+      setIsStudyPhase(false);
+      const now = new Date();
+      const nextStop = new Date(now.getTime() + pauseDuration * 60000);
+      
+      setTimerStopDate(nextStop);
       setSessionStartTime(null);
 
       const messages = t("study:motivational_messages", { returnObjects: true }) as string[];
       const randomMsg = messages[Math.floor(Math.random() * messages.length)];
       setMotivationalMessage(randomMsg);
       
-      if (pauseStopDate && typeof window !== "undefined") {
-        window.localStorage.setItem("active_pomodoro_end", pauseStopDate.getTime().toString());
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("active_pomodoro_end", nextStop.getTime().toString());
         window.localStorage.setItem("pomodoro_state", "pause");
         window.dispatchEvent(new window.Event("storage")); 
       }
       
     } else {
-      // Pausa acabou, termina tudo
-      setTimerStopDate(undefined);
-      setSessionStartTime(null);
-      setMotivationalMessage(null);
-      if (activeBlock) onDismissBlock();
-      
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("streak_deadline", (Date.now() + 5 * 60000).toString());
-        window.localStorage.removeItem("active_pomodoro_end");
-        window.localStorage.removeItem("active_pause_end");
-        window.localStorage.removeItem("active_pomodoro_start");
-        window.localStorage.removeItem("pomodoro_state");
-        window.dispatchEvent(new window.Event("storage")); 
+      if (currentCycle < totalCycles) {
+        setCurrentCycle(c => c + 1);
+        setIsStudyPhase(true);
+        
+        const now = new Date();
+        const nextStop = new Date(now.getTime() + studyDuration * 60000);
+        
+        setTimerStopDate(nextStop);
+        setSessionStartTime(now);
+        setMotivationalMessage(null);
+        
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("active_pomodoro_end", nextStop.getTime().toString());
+          window.localStorage.setItem("pomodoro_state", "study");
+          window.localStorage.setItem("active_pomodoro_start", now.getTime().toString());
+          window.dispatchEvent(new window.Event("storage")); 
+        }
+        
+        markTimerStart();
+      } else {
+        setTimerStopDate(undefined);
+        setSessionStartTime(null);
+        setMotivationalMessage(null);
+        setCurrentCycle(1);
+        setIsStudyPhase(true);
+        
+        if (activeBlock) onDismissBlock();
+        
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("streak_deadline", (Date.now() + 5 * 60000).toString());
+          clearStorage();
+        }
       }
     }
   }
@@ -254,11 +267,13 @@ function useTimerSetup(
   return {
     timerStopDate,
     onTimeSelected,
-    studyStopDate,
     onStopClick,
     onTimerFinish,
     markTimerStart,
     motivationalMessage,
+    currentCycle,
+    totalCycles,
+    isStudyPhase,
   };
 }
 
@@ -423,7 +438,6 @@ function AssociatedTaskListView({
         onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
         onSelectionToggle={onTaskClick}
-        textColor={"var(--color-3)"}
       />
 
       <h2 className={classNames(styles.taskListTitle, styles.otherTasksTitle)}>
@@ -435,7 +449,6 @@ function AssociatedTaskListView({
         onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
         onSelectionToggle={onTaskClick}
-        textColor={"var(--color-3)"}
       />
     </div>
   );
@@ -484,16 +497,7 @@ function ConfirmationModalContent({
     <Dialog className={styles.pomodoroDialog} style={{ position: "relative" }}>
       <button 
         onClick={onCancel}
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          background: "none",
-          border: "none",
-          fontSize: "1.5rem",
-          cursor: "pointer",
-          color: "var(--text-color-1)"
-        }}
+        className={styles.modalCloseButton}
         aria-label="Fechar"
       >
         <RiCloseLine />
@@ -502,15 +506,10 @@ function ConfirmationModalContent({
       <h3 className={styles.modalTitle}>
         {t("study:pomodoro_complete_title", "Sessão Terminada")}
       </h3>
-      <p style={{ marginBottom: "0.5rem" }}>
+      <p className={styles.modalText}>
         {t("study:pomodoro_multi_q", "Quais das seguintes tarefas concluíste?")}
       </p>
-      <p style={{ 
-          fontSize: "0.85rem", 
-          opacity: 0.8, 
-          fontStyle: "italic", 
-          marginBottom: "1.5rem" 
-      }}>
+      <p className={styles.modalWarningText}>
         {t("study:pomodoro_no_task_warning", "(Caso não tenhas terminado nenhuma tarefa, não seleciones nenhuma e clica apenas em confirmar.)")}
       </p>
 
@@ -598,18 +597,20 @@ function TodayEventsList({
     if (event.tags && event.tags.length > 0) {
       return (
         <div className={styles.eventColorStripContainer}>
-          {event.tags.map((tagIdentifier: string, index: number) => {
+          {event.tags.map((tag: any, index: number) => {
+            // Compara os IDs como string para evitar falhas de tipo (1 === "1")
             const tagObj = allTags.find(
               (t) =>
-                t.name_pt === tagIdentifier ||
-                t.name_en === tagIdentifier ||
-                t.id === tagIdentifier,
+                String(t.id) === String(tag.id || tag) ||
+                t.name_pt === tag ||
+                t.name_en === tag,
             );
 
-            const finalColor = tagObj?.color || "var(--color-2)";
+            // Tenta ir buscar a cor à tag diretamente (se for um objeto), ou à lista, ou usa fallback
+            const finalColor = tag.color || tagObj?.color || "var(--color-2)";
             const finalName = tagObj
               ? tagObj.name_en || tagObj.name_pt
-              : tagIdentifier;
+              : tag.name_pt || tag;
 
             return (
               <div
@@ -701,23 +702,27 @@ function TodayEventsList({
 function TimerView({
   happeningStudyBlock,
   timerStopDate,
-  studyStopDate,
+  isStudyPhase,
   onStopClick,
   onTimerFinish,
   markTimerStart,
   motivationalMessage,
+  currentCycle,
+  totalCycles,
 }: {
   happeningStudyBlock: Event | undefined;
   timerStopDate: Date | undefined;
-  studyStopDate: Date | undefined;
+  isStudyPhase: boolean;
   onStopClick: () => void;
   onTimerFinish: () => void;
   markTimerStart: () => void;
   motivationalMessage: string | null;
+  currentCycle?: number;
+  totalCycles?: number;
 }) {
   const { t } = useTranslation("study");
 
-  const isPause = timerStopDate && studyStopDate && timerStopDate.getTime() !== studyStopDate.getTime();
+  const isPause = !isStudyPhase;
 
   let title = isPause ? t("study:pause_time", "Tempo de Pausa") : t("study:study_time", "Tempo de Estudo");
   let stopDate = timerStopDate;
@@ -733,32 +738,7 @@ function TimerView({
       style={{ position: "relative", zIndex: 1 }}
     >
       {motivationalMessage && (
-        <div
-          style={{
-            position: "absolute",
-            top: "15px",
-            left: "50%",
-            transform: "translateX(-50%)",
-
-            zIndex: 99,
-            backgroundColor: "#ffffff",
-            color: "#5d4037",
-            padding: "8px 20px",
-            borderRadius: "50px",
-            border: "2px solid #5d4037",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-
-            fontWeight: "bold",
-            fontSize: "1rem",
-            whiteSpace: "nowrap",
-
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-
-            animation: "fadeIn 0.3s ease-out",
-          }}
-        >
+        <div className={styles.motivationPopup}>
           <span style={{ fontSize: "1.2rem" }}>🎉</span>
           <span>{motivationalMessage}</span>
         </div>
@@ -777,6 +757,8 @@ function TimerView({
         onStart={markTimerStart}
         onStopClick={onStopClick}
         onFinish={onTimerFinish}
+        currentCycle={currentCycle}
+        totalCycles={totalCycles}
       />
     </div>
   );
@@ -820,10 +802,8 @@ function PomodoroPage() {
   >();
   const [isLoadingBlock, setIsLoadingBlock] = useState(true);
 
-  // NOVO: Permite ao utilizador ignorar um bloco de estudo de calendário se carregar em "Parar"
   const [dismissedBlockId, setDismissedBlockId] = useState<number | null>(null);
 
-  // O bloco que domina o ecrã, desde que não tenha sido "dispensado"
   const activeBlock =
     happeningStudyBlock?.id === dismissedBlockId
       ? undefined
@@ -864,7 +844,6 @@ function PomodoroPage() {
   };
 
   const handleConfirmCompletion = (completedTaskIds: number[]) => {
-    // 🕵️‍♀️ Espião: Submeter tempo/tarefas do Pomodoro
     service.logUserAction("tracker", "action", "add_manual_time");
     
     setIsConfirmModalOpen(false);
@@ -889,11 +868,13 @@ function PomodoroPage() {
   const {
     timerStopDate,
     onTimeSelected,
-    studyStopDate,
     onStopClick,
     onTimerFinish,
     markTimerStart,
     motivationalMessage,
+    currentCycle,
+    totalCycles,
+    isStudyPhase,
   } = useTimerSetup(
     openConfirmationModal,
     activeBlock,
@@ -929,11 +910,13 @@ function PomodoroPage() {
             <TimerView
               happeningStudyBlock={activeBlock}
               timerStopDate={timerStopDate}
-              studyStopDate={studyStopDate}
+              isStudyPhase={isStudyPhase}
               onStopClick={onStopClick}
               onTimerFinish={onTimerFinish}
               markTimerStart={markTimerStart}
               motivationalMessage={motivationalMessage}
+              currentCycle={currentCycle}
+              totalCycles={totalCycles}
             />
           </div>
         ) : (

@@ -350,7 +350,7 @@ export default function HomePage() {
           ) : (
             <div className={styles.moodSuccessContainer}>
               <div className={styles.successHeader}>
-                <FaCircleCheck /> Mood Registado!
+                <FaCircleCheck style={{ color: 'var(--color-2)' }} /> Mood Registado!
               </div>
               <div className={styles.moodQuote}>"{currentQuote.text}"</div>
               <div className={styles.quoteAuthor}>— {currentQuote.author}</div>

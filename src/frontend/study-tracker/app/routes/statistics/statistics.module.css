@@ -446,23 +446,21 @@
   transition: transform 0.2s;
 }
 
-/* 💡 Borda Magenta Recortada para os SummaryCards */
 .summaryCard::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-color: var(--color-3); /* Magenta */
+  background-color: var(--color-3);
   z-index: -2;
   --edge-size: 0.8rem;
   clip-path: polygon(var(--edge-size) 0, calc(100% - var(--edge-size)) 0, 100% var(--edge-size), 100% calc(100% - var(--edge-size)), calc(100% - var(--edge-size)) 100%, var(--edge-size) 100%, 0 calc(100% - var(--edge-size)), 0 var(--edge-size));
 }
 
-/* 💡 Preenchimento interior (Background da app) */
 .summaryCard::after {
   content: "";
   position: absolute;
-  inset: 2px; /* Espessura da linha */
-  background-color: var(--bg-color); /* Fundo bege */
+  inset: 2px;
+  background-color: var(--bg-color); 
   z-index: -1;
   --edge-size: calc(0.8rem - 2px);
   clip-path: polygon(var(--edge-size) 0, calc(100% - var(--edge-size)) 0, 100% var(--edge-size), 100% calc(100% - var(--edge-size)), calc(100% - var(--edge-size)) 100%, var(--edge-size) 100%, 0 calc(100% - var(--edge-size)), 0 var(--edge-size));
