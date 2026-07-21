@@ -31,7 +31,7 @@
 }
 
 .taskTitleContainer:hover {
-  background-color: #592e258f;
+  background-color: var(--color-2);
 }
 
 .taskTitleContainer.strikeThrough:hover {
@@ -47,7 +47,7 @@
 }
 
 .selectedTask {
-  background-color: #ffffff1a;
+  background-color: var(--color-2);
   border-radius: 4px;
 }
 
@@ -59,7 +59,7 @@
   pointer-events: none;
   background: none;
   border: none;
-  color: var(--text-color-1);
+  color: var(--color-1);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.35rem;
@@ -71,8 +71,8 @@
 }
 
 .deleteButton:hover {
-  background-color: var(--color-text-danger);
-  color: white;
+  background-color: var(--color-1);
+  color: var(--color-2);
 }
 
 .taskTitleContainer:hover + .deleteButton,
@@ -108,7 +108,7 @@
 }
 
 .priorityIcon {
-  color: #e74c3c;
+  color: var(--color-text-danger);
   font-size: 0.9rem;
 }
 

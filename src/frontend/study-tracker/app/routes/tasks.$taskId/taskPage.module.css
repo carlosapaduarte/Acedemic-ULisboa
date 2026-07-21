@@ -148,7 +148,7 @@
 }
 
 .deleteButton:hover {
-  background-color: #780606;
+  background-color: var(--color-text-danger);
   filter: brightness(1);
 }
 

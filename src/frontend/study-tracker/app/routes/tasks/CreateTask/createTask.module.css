@@ -4,18 +4,28 @@
 @import "../../../components/FormModal/formModal.module.css";
 
 .createNewTaskButton {
-  composes: roundButton;
-  height: unset;
-  width: unset;
+  padding: 0.5rem 0.7rem;
+  border-radius: 5px;
+  font-family: var(--font-family2);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 
-  margin: 0;
-  padding: 0.25rem 0.5rem;
-  font-size: 1rem;
-  text-align: center;
+  background-color: var(--color-1);
+  color: var(--color-2);
+  border: 2px solid var(--color-1);
+}
+
+.createNewTaskButton:hover {
+  background-color: transparent;
+  color: var(--color-1);
 }
 
 .newTaskModalContainer {
   composes: modalContainer;
+  /* Fundo magenta mais escuro do modal */
+  background-color: var(--color-3); 
 }
 
 .newTaskTitleText {
@@ -31,8 +41,7 @@
 }
 
 .finishCreatingTaskButtonContainer {
-  padding: 0 1rem;
-
+  padding: 0 2rem; 
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -42,25 +51,69 @@
   composes: roundButton;
   flex-grow: 1;
   flex-shrink: 0;
-
-  height: 2rem;
+  height: 2.8rem;
   width: 100%;
-
-  margin-top: 0.5rem;
-  font-size: 1rem;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
   text-align: center;
+  
+  /* Estado Normal (Ativo) */
+  background-color: var(--color-2);
+  color: var(--color-3);
+  border: none;
+  transition: all 0.2s;
+}
+
+.finishCreatingTaskButton:hover:not(:disabled) {
+  background-color: var(--color-2-hover);
+  transform: translateY(-2px);
+}
+
+/* Estado Desativado (Falta preencher campos) */
+.finishCreatingTaskButton:disabled,
+.finishCreatingTaskButton[data-disabled="true"] {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  transform: none;
 }
 
 .formSectionTitle {
 }
 
-.formInput {
-}
-
-.dateInput {
-}
-
+.formInput,
+.dateInput,
 .timeInput {
+  color: white !important;
+  border: 1px solid var(--color-1);
+  border-radius: 8px;
+  padding: 0.6rem;
+  font-weight: 600;
+  width: 100%;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.formInput:focus,
+.dateInput:focus,
+.timeInput:focus {
+  border-color: var(--color-2);
+}
+
+.formInput::placeholder,
+.dateInput::placeholder,
+.timeInput::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Ícones de Data/Hora (Calendário e Relógio) a Verde */
+.dateInput::-webkit-calendar-picker-indicator,
+.timeInput::-webkit-calendar-picker-indicator {
+  filter: invert(79%) sepia(50%) saturate(600%) hue-rotate(33deg) brightness(100%) contrast(100%);
+  cursor: pointer;
 }
 
 .titleSectionContainer {
@@ -97,18 +150,27 @@
 
 .closeButton {
   composes: roundButton formCloseButton;
+  background: transparent !important;
+  color: var(--color-2) !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 1.5rem;
 }
 
+.closeButton:hover {
+  color:var(--color-1) !important;
+  
+}
+
+/* --- PRIORIDADE --- */
 .priorityValuesContainer {
-  height: 2rem;
+  height: 2.5rem;
   width: 100%;
-
   border-radius: 8px;
-  border: 2px solid var(--color-2);
-
+  border: 1px solid var(--color-2);
+  background-color: color-mix(in srgb, var(--color-2) 15%, transparent);
   display: flex;
   flex-direction: row;
-
   overflow: hidden;
 }
 
@@ -116,31 +178,40 @@
   composes: roundButton;
   width: 100%;
   height: 100%;
-
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 800;
   text-align: center;
   text-transform: uppercase;
-
   border-radius: 0;
+  border: none;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
 
-  transition: background-color 0.2s;
+.priorityButton:hover:not([aria-selected="true"]) {
+  background-color: rgba(255, 255, 255, 0.2);
+}
 
-  &[aria-selected="true"] {
-    background-color: var(--color-4);
+.priorityButton[aria-selected="true"] {
+  background-color: var(--color-2);
+  color: var(--color-3);
+}
 
-    &.lowPriority {
-      background-color: var(--color-4);
-    }
+.priorityButton[aria-selected="true"].lowPriority {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
 
-    &.mediumPriority {
-      background-color: #dc9510;
-      color: var(--text-color-1);
-    }
+.priorityButton[aria-selected="true"].mediumPriority {
+  background-color: #FFC107 !important;
+  color: #333 !important;
+}
 
-    &.highPriority {
-      background-color: #ac0909;
-    }
-  }
+.priorityButton[aria-selected="true"].highPriority {
+  background-color: #F44336 !important;
+  color: white !important;
 }
 
 .tagsContainer {
@@ -177,10 +248,10 @@
 .tagsContent {
   padding: 1rem;
   border-radius: 0.5rem;
-  border: none;
   display: flex;
   flex-wrap: wrap;
-  border: 2px solid var(--color-2);
+  background-color: var(--color-2);
+  border: none;
 }
 
 .tagListContainer {
@@ -189,19 +260,17 @@
   gap: 10px;
   align-items: center;
 }
+
 .addTagButtonRound {
   background-color: transparent;
   cursor: pointer;
-
   width: 38px;
   height: 38px;
   padding: 0;
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 24px;
   line-height: 1;
   transition: all 0.2s ease;
@@ -233,7 +302,7 @@
   font-size: 1rem;
   font-weight: 500;
   border: 2px solid transparent;
-  word-break: break-word; /* parte palavras muito longas para não saírem do contentor */
+  word-break: break-word;
 }
 
 .tagItem:hover {
@@ -310,21 +379,21 @@
   text-align: center;
 }
 
+/* --- TAREFA RELÂMPAGO --- */
 .microTaskContainer {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 1.5rem;
   padding: 10px 15px;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none;
   transition: all 0.2s ease;
 }
 
 .microTaskContainer:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
 .hiddenCheckbox {
@@ -350,16 +419,16 @@
 .hiddenCheckbox:checked::after {
   content: "✔";
   font-size: 14px;
-  color: #3e2723;
+  color: var(--color-3);
   font-weight: bold;
 }
 
 .microTaskLabel {
   font-family: var(--font-family1);
   font-size: 1rem;
-  color: var(--text-color-2);
+  color: var(--color-2) !important; /* Texto Verde */
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   user-select: none;
 }
 
@@ -376,4 +445,12 @@
   font-weight: bold;
   cursor: help;
   margin-left: auto;
+  transition: background-color 0.2s;
+}
+
+/* O :focus e :active ativam o tooltip/ação também em touch screens (mobile) */
+.infoIcon:hover,
+.infoIcon:active,
+.infoIcon:focus {
+  background-color: rgba(255, 255, 255, 0.4);
 }

@@ -19,30 +19,28 @@
 
 .header {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  margin-bottom: 1.5rem;
-  padding-right: 0.5rem;
-}
-
-.headerTopRow {
-  display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-}
-
-.headerBottomRow {
-  display: flex;
-  justify-content: flex-start;
-  width: 100%;
+  margin-bottom: 1.5rem;
+  padding-right: 0.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .tasksListTitle {
   font-size: 1.5rem;
   margin: 0;
   font-weight: bold;
+  color: var(--color-3);
+  text-transform: uppercase;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem; 
 }
 
 .taskListContainer {
@@ -58,18 +56,19 @@
   width: 40px;
   height: 40px;
   padding: 0;
-  background-color: transparent;
-  border: 2px solid var(--color-2);
-  border-radius: 8px;
+  background-color: var(--color-3);
+  border: 2px solid var(--color-3);
   color: var(--color-2);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .filterButton:hover,
 .filterButton[data-pressed] {
-  background-color: var(--color-2);
-  color: var(--color-1);
+  background-color: transparent;
+  color: var(--color-3);
+  border-color: var(--color-3);
 }
 
 .filterPopover {

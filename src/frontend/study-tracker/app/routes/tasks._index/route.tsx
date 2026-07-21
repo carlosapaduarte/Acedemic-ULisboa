@@ -80,10 +80,18 @@ export default function TasksPage() {
   return (
     <div className={styles.taskListPage}>
       <div className={styles.header}>
-        <div className={styles.headerTopRow}>
-          <h1 className={styles.tasksListTitle}>
-            {t("task:my_tasks_list_title", "As minhas tarefas")}
-          </h1>
+        <h1 className={styles.tasksListTitle}>
+          {t("task:my_tasks_list_title", "As minhas tarefas")}
+        </h1>
+
+        {/* Agrupamos os botões lado a lado aqui */}
+        <div className={styles.headerActions}>
+          <CreateTaskButton
+            onTaskCreated={onTaskCreated}
+            parentTaskId={parentTaskIdForCreation}
+            forceOpen={!!parentTaskIdForCreation}
+            onClose={() => setParentTaskIdForCreation(undefined)}
+          />
 
           <MenuTrigger>
             <Button
@@ -109,7 +117,6 @@ export default function TasksPage() {
                 <MenuItem id="only_micro" className={styles.filterMenuItem}>
                   {t("task:filter_only_micro", "Só Relâmpago")}
                 </MenuItem>
-
                 <MenuItem id="high_priority" className={styles.filterMenuItem}>
                   {t("task:filter_high_priority", "Prioridade Alta")}
                 </MenuItem>
@@ -119,15 +126,6 @@ export default function TasksPage() {
               </Menu>
             </Popover>
           </MenuTrigger>
-        </div>
-
-        <div className={styles.headerBottomRow}>
-          <CreateTaskButton
-            onTaskCreated={onTaskCreated}
-            parentTaskId={parentTaskIdForCreation}
-            forceOpen={!!parentTaskIdForCreation}
-            onClose={() => setParentTaskIdForCreation(undefined)}
-          />
         </div>
       </div>
 
