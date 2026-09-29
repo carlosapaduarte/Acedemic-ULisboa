@@ -88,19 +88,37 @@
     margin-top: 1.5rem;
 }
 
-.targetIcon, .trophyIcon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  animation: bounce 2s infinite ease-in-out;
-  display: inline-block;
+/* --- LOGÓTIPO (Caixa com Visto) --- */
+.logoContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
+.logoBox {
+  width: 4.5rem;
+  height: 4.5rem;
+  background-color: transparent;
+  border-radius: 8px;
+  /* Borda com o teu verde lima característico */
+  border: 5px solid var(--color-2); 
+  position: relative;
+}
+
+.logoBox::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  bottom: -6px;
+  width: 150%;
+  height: 150%;
+  
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
+  background-image: url("/tracker-checkmark.png");
+  
+  /* Se a tua imagem original for preta e quiseres forçar 
+     que o visto fique com o verde lima (--color-2), descomenta a linha abaixo: */
+  /* filter: brightness(0) saturate(100%) invert(79%) sepia(50%) saturate(600%) hue-rotate(33deg) brightness(100%) contrast(100%); */
 }

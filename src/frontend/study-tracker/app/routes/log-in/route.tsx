@@ -61,7 +61,9 @@ function CurrentView() {
             return (
                 <div className={styles.authContainer}>
                     <div className={styles.authCard}>
-                        <div className={styles.targetIcon}>🎯</div>
+                        <div className={styles.logoContainer}>
+                            <div className={styles.logoBox}></div>
+                        </div>
                         
                         <h2 className={styles.title}>{t("login:tracker_title", "Study Tracker")}</h2>
                         <p className={styles.subtitle}>
