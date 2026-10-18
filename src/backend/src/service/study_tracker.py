@@ -1,5 +1,5 @@
 from datetime import datetime
-from domain.study_tracker import Archive, File, CurricularUnit, MoodLog, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, verify_time_of_day
+from domain.study_tracker import Archive, File, CurricularUnit, MoodLog, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
 from exception import InvalidDate, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc

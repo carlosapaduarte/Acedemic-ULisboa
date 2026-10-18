@@ -59,6 +59,7 @@
 
 .menuButton:hover {
   transform: translateY(-5px);
+  color: var(--color-3);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   background-color: var(--color-2);
 }
@@ -68,6 +69,10 @@
   height: 64px;
   margin-bottom: 1rem;
   filter: brightness(0) invert(1);
+}
+
+.menuButton:hover .menuIcon {
+  filter: brightness(0) saturate(100%) invert(14%) sepia(53%) saturate(4965%) hue-rotate(313deg) brightness(86%) contrast(108%);
 }
 
 .menuText {

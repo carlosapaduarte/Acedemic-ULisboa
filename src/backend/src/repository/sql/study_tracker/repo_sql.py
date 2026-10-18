@@ -1006,6 +1006,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                     selectinload(STEventModel.tags_associations).selectinload(STEventTagModel.tag_ref)
                 )
             )
+            events = session.exec(statement).all()
             stats: dict[int, dict[int, dict[str, int]]] = {}
 
             # Definir janela de análise (Ano Atual)
@@ -1017,7 +1018,11 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 duration_minutes = StudyTrackerSqlRepo.compute_elapsed_minutes(event.end_date, event.start_date)
                 
                 # Se não tiver tags, conta como "Sem Tag"
-                tags_to_process = event.tags if event.tags else []
+                tags_to_process = [
+                    association.tag_ref
+                    for association in event.tags_associations
+                    if association.tag_ref is not None
+                ]
                 
                 # Função auxiliar para adicionar aos stats
                 def add_to_stats(date_ref: datetime):
