@@ -2,7 +2,7 @@ import random
 import json
 from typing import Optional
 from sqlmodel import Session, select, or_
-from domain.study_tracker import Archive, MoodLog, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, SlotToWork, DateInterval
+from domain.study_tracker import Archive, File, MoodLog, CurricularUnit, DailyEnergyStatus, Event, Grade, Priority, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, SlotToWork, DateInterval
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
@@ -668,6 +668,18 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             result = session.exec(statement)
             archive_models: list[STArchiveModel] = list(result.all())
             return Archive.from_STArchiveModel(archive_models)
+
+    def get_root_files(self, user_id: int) -> list[File]:
+        with Session(engine) as session:
+            files = session.exec(
+                select(STFileModel)
+                .where(
+                    STFileModel.user_id == user_id,
+                    STFileModel.archive_id == None,
+                )
+                .order_by(STFileModel.id)
+            ).all()
+            return File.from_STFileModel(files)
         
 
     def create_file(self, user_id: int, archive_id: Optional[int], name: str, file_type: str = "txt", text_content: str = ""):
@@ -815,7 +827,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
 
                         # Rename only this user's linked UC tag. Updating the row
                         # preserves its ID, color, and task/event tag associations.
-                        uc_tag = session.exec(
+                        matching_uc_tags = session.exec(
                             select(TagModel)
                             .join(UserTagLink, UserTagLink.tag_id == TagModel.id)
                             .where(
@@ -826,7 +838,19 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                                     TagModel.name_en == old_name,
                                 ),
                             )
-                        ).first()
+                        ).all()
+                        uc_tag = None
+                        for candidate_tag in matching_uc_tags:
+                            linked_user_ids = session.exec(
+                                select(UserTagLink.user_id).where(
+                                    UserTagLink.tag_id == candidate_tag.id
+                                )
+                            ).all()
+                            if all(linked_user_id == user_id for linked_user_id in linked_user_ids):
+                                uc_tag = candidate_tag
+                                break
+                        if matching_uc_tags and not uc_tag:
+                            raise ValueError("UC tag is shared with another user")
                         if uc_tag:
                             uc_tag.name_pt = new_name
                             uc_tag.name_en = new_name

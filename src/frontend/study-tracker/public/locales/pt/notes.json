@@ -6,5 +6,16 @@
     "file_name": "Documento:",
     "filename": "Nome do documento",
     "new_archive_name": "Nome do arquivo",
-    "open_file": "Abrir documento"
+    "open_file": "Abrir documento",
+    "bold": "Negrito",
+    "italic": "Itálico",
+    "strike": "Rasurado",
+    "heading_1": "Título 1",
+    "heading_2": "Título 2",
+    "bullets": "Lista com marcadores",
+    "numbered": "Lista numerada",
+    "save": "Guardar apontamento",
+    "saving": "A guardar…",
+    "saved": "Guardado",
+    "save_error": "Não foi possível guardar"
 }

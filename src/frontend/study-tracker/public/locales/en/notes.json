@@ -6,5 +6,16 @@
     "file_name": "File:",
     "filename": "File Name",
     "new_archive_name": "Archive name",
-    "open_file": "Open File"
+    "open_file": "Open File",
+    "bold": "Bold",
+    "italic": "Italic",
+    "strike": "Strikethrough",
+    "heading_1": "Heading 1",
+    "heading_2": "Heading 2",
+    "bullets": "Bulleted list",
+    "numbered": "Numbered list",
+    "save": "Save note",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "save_error": "Could not save"
 }

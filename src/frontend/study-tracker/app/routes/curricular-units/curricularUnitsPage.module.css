@@ -554,9 +554,9 @@
 
 .modalTitle {
   margin-top: 0;
-  color: var(--color-3);
+  color: var(--text-color-2);
   margin-bottom: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .modalInput {
@@ -576,8 +576,8 @@
 }
 .modalLabel {
   font-size: 0.9rem;
-  font-weight: 800;
-  color: var(--color-3);
+  font-weight: 500;
+  color: var(--text-color-2);
   text-transform: uppercase;
 }
 
@@ -591,8 +591,8 @@
   flex: 1;
   padding: 0.8rem;
   background: transparent;
-  border: 2px solid var(--color-3);
-  color: var(--color-3);
+  border: 2px solid var(--text-color-2);
+  color: var(--text-color-2);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 800;
@@ -710,7 +710,7 @@
 
 /* --- ALTERAÇÃO NO TEXTO DE ERRO --- */
 .errorText {
-  color: #C62828; 
+  color: var(--text-color-2);
   font-size: 0.85rem;
   margin-top: -10px;
   margin-bottom: 15px;

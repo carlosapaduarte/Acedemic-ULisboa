@@ -22,7 +22,7 @@ export type FileItem = {
   name: string;
   text: string;
   file_type: string;
-  archive_id: number;
+  archive_id: number | null;
 };
 
 export type ArchiveItem = {
@@ -713,8 +713,10 @@ async function deleteTask(taskId: number): Promise<void> {
 }
 
 async function getRootFiles(): Promise<FileItem[]> {
-    const response = await this.api.get('/study-tracker/users/me/root-files');
-    return response.data;
+  const request = { path: `study-tracker/users/me/root-files`, method: "GET" };
+  const response: Response = await doFetch(request);
+  if (response.ok) return await response.json();
+  return Promise.reject(new Error("Could not fetch root files"));
 }
 
 async function getArchives(): Promise<ArchiveItem[]> {
@@ -748,7 +750,7 @@ async function createArchive(
 }
 
 async function createFile(
-  archive_id: number,
+  archive_id: number | null,
   name: string,
   file_type: string,
   text_content: string = "",
@@ -774,7 +776,12 @@ async function updateFileText(file_id: number, content: string): Promise<void> {
     body: toJsonBody({ content }),
   };
   const response: Response = await doFetch(request);
-  if (!response.ok) return Promise.reject(new Error("Could not update file"));
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    return Promise.reject(
+      new Error(errData.detail || `Could not update file (${response.status})`),
+    );
+  }
 }
 
 async function renameArchive(archive_id: number, name: string): Promise<void> {
@@ -1227,6 +1234,7 @@ export const service = {
   deleteTask,
   createArchive,
   getArchives,
+  getRootFiles,
   createFile,
   updateFileText,
   deleteArchive,

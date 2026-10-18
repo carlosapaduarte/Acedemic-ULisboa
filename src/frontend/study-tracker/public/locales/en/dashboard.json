@@ -25,6 +25,7 @@
     "start": "Start",
     "recent_notes": "Recent Notes",
     "folder": "Folder: {{name}}",
+    "root_folder": "Root",
     "no_recent_notes": "You haven't opened any notes yet.",
     "today_date_locale": "en-GB",
     "task_progress_alt": "Task progress icon",

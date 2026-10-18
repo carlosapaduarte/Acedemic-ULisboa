@@ -235,7 +235,7 @@ class Event():
         return domain_events
 
 class File():
-    def __init__(self, id: int | None, name: str, text: str, file_type: str, archive_id: int):
+    def __init__(self, id: int | None, name: str, text: str, file_type: str, archive_id: int | None):
         self.id = id
         self.name = name
         self.text = text

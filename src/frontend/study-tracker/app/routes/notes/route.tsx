@@ -86,10 +86,10 @@ function NotesPage() {
   const [renameError, setRenameError] = useState("");
 
   const loadData = () => {
-    service
-      .getArchives()
-      .then((data) => {
+    Promise.all([service.getArchives(), service.getRootFiles()])
+      .then(([data, rootFilesData]) => {
         setRootArchives(data);
+        setRootFiles(rootFilesData);
 
         if (folderPath.length > 0) {
           const currentId = folderPath[folderPath.length - 1].id;
@@ -108,7 +108,8 @@ function NotesPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const fileIdToOpen = urlParams.get("openFile");
         if (fileIdToOpen) {
-          let found: FileItem | null = null;
+          let found: FileItem | null =
+            rootFilesData.find((f) => f.id.toString() === fileIdToOpen) || null;
           const search = (list: ArchiveItem[]) => {
             for (const a of list) {
               const match = a.files.find(
@@ -121,7 +122,7 @@ function NotesPage() {
               search(a.sub_archives);
             }
           };
-          search(data);
+          if (!found) search(data);
           if (found) {
             openTextEditor(found);
             window.history.replaceState({}, "", window.location.pathname);
@@ -147,7 +148,7 @@ function NotesPage() {
         .catch(() => setSaveStatus("Erro"));
     }, 1500);
     return () => clearTimeout(timer);
-  }, [textContent]);
+  }, [editingFile?.id, isClient, textContent]);
 
   const openTextEditor = (file: FileItem) => {
     startTransition(() => {
@@ -165,6 +166,7 @@ function NotesPage() {
         id: file.id,
         fileName: file.name,
         folderName: folderName,
+        isRootFolder: currentFolder === null,
       });
 
       localStorage.setItem("recent_notes", JSON.stringify(updated.slice(0, 3)));
@@ -363,8 +365,9 @@ function NotesPage() {
 
   if (editingFile) {
     return (
-      <div className={styles.pageContainer}>
+      <div className={`${styles.pageContainer} ${styles.editorPage}`}>
         <header
+          className={styles.editorHeader}
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -403,9 +406,9 @@ function NotesPage() {
             {saveStatus}
           </span>
         </header>
-        <div style={{ flex: 1, marginTop: "20px" }}>
+        <div className={styles.editorWorkspace}>
           {isClient && (
-            <RichTextEditor content={textContent} onUpdate={setTextContent} />
+            <RichTextEditor key={editingFile.id} content={textContent} onUpdate={setTextContent} />
           )}
         </div>
       </div>

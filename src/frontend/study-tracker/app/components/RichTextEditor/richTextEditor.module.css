@@ -2,14 +2,14 @@
 .editorContainer {
   background-color: transparent;
   border: none;
-  
-  /* Limita a largura ao centro para facilitar a leitura */
-  max-width: 850px;
-  margin: 0 auto;
-  padding: 1rem 0;
-  
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 /* 🛠️ A BARRA DE FERRAMENTAS */
@@ -18,12 +18,15 @@
   margin-bottom: 1.5rem;
   border-bottom: 1px solid rgba(128, 128, 128, 0.15); /* Linha divisória muito subtil */
   display: flex;
+  flex: 0 0 auto;
   gap: 4px;
   flex-wrap: wrap;
 }
 
 .menuBar button {
-  padding: 0.3rem 0.6rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.35rem;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -41,23 +44,39 @@
 
 .menuBar button.isActive {
   background-color: var(--color-2, #3399ff);
-  color: white;
+  color: var(--color-3, #990553);
 }
 
 /* ✍️ O TEXTO EM SI */
 .editorContent {
   flex: 1;
+  display: flex;
+  min-height: 60vh;
   padding: 0;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  cursor: text;
   font-family: var(--font-family1);
   color: var(--text-color-1, #eaeaea);
   font-size: 1.05rem;
   line-height: 1.7;
 }
 
+.editorContent > .tiptap {
+  display: flex;
+  flex: 1;
+}
+
 /* Força o cursor a piscar com uma cor visível */
 .editorContent .ProseMirror {
   outline: none;
-  min-height: 50vh;
+  flex: 1;
+  min-height: 60vh;
+  width: 100%;
+  padding: 1.25rem;
+  box-sizing: border-box;
+  cursor: text;
   caret-color: var(--text-color-1, #fff); 
 }
 

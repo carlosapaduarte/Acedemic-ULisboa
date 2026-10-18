@@ -7,6 +7,21 @@
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+.editorPage {
+  min-height: 100vh;
+}
+
+.editorHeader {
+  flex: 0 0 auto;
+}
+
+.editorWorkspace {
+  display: flex;
+  flex: 1 0 auto;
+  min-height: calc(100vh - 11rem);
+  margin-top: 1.25rem;
+}
+
 .modalCloseButton {
   composes: formCloseButton from "../../components/FormModal/formModal.module.css";
 }

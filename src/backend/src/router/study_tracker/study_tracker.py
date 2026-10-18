@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, Query
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
 from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, TrackTimeInputDto, UpdateArchiveInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
-from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
+from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, FileOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
 
@@ -264,6 +264,13 @@ def get_archives(
 ) -> list[ArchiveOutputDto]:
     archives = study_tracker_service.get_archives(user_id)
     return ArchiveOutputDto.from_archives(archives)
+
+@router.get("/users/me/root-files")
+def get_root_files(
+    user_id: Annotated[int, Depends(get_current_user_id)]
+) -> list[FileOutputDto]:
+    files = study_tracker_service.get_root_files(user_id)
+    return FileOutputDto.from_files(files)
 
 @router.post("/users/me/archives")
 def create_archive(

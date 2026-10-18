@@ -121,7 +121,7 @@ class FileOutputDto(BaseModel):
     name: str
     text: str
     file_type: str
-    archive_id: int
+    archive_id: Optional[int]
     
     @staticmethod
     def from_files(files: list[File]) -> list['FileOutputDto']:

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, date
 from typing import Optional
 
-from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, Grade, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
+from domain.study_tracker import Archive, CurricularUnit, DailyEnergyStatus, Event, File, Grade, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy
 
 class StudyTrackerRepo(ABC):
     @abstractmethod
@@ -107,9 +107,13 @@ class StudyTrackerRepo(ABC):
     @abstractmethod
     def get_archives(self, user_id: int) -> list[Archive]:
         pass
+
+    @abstractmethod
+    def get_root_files(self, user_id: int) -> list[File]:
+        pass
     
     @abstractmethod
-    def create_file(self, user_id: int, archive_id: int, name: str, file_type: str = "txt", text_content: str = ""):
+    def create_file(self, user_id: int, archive_id: Optional[int], name: str, file_type: str = "txt", text_content: str = ""):
         pass
     
     @abstractmethod

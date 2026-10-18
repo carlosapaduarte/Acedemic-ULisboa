@@ -1,5 +1,5 @@
 from datetime import datetime
-from domain.study_tracker import Archive, CurricularUnit, MoodLog, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, WeekTimeStudy, verify_time_of_day
+from domain.study_tracker import Archive, File, CurricularUnit, MoodLog, DailyEnergyStatus, DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock, WeekAndYear, verify_time_of_day
 from exception import InvalidDate, NotAvailableScheduleBlockCollision, NotFoundException
 from repository.sql.study_tracker.repo_sql import StudyTrackerSqlRepo
 from utils import get_datetime_utc
@@ -167,7 +167,10 @@ def delete_archive(user_id: int, archive_id: int):
 def get_archives(user_id: int) -> list[Archive]:
     return study_tracker_repo.get_archives(user_id)
 
-def create_file(user_id: int, archive_id: int, name: str, file_type: str = "txt", text_content: str = ""):
+def get_root_files(user_id: int) -> list[File]:
+    return study_tracker_repo.get_root_files(user_id)
+
+def create_file(user_id: int, archive_id: int | None, name: str, file_type: str = "txt", text_content: str = ""):
     # Agora usa archive_id em vez de name
     study_tracker_repo.create_file(user_id, archive_id, name, file_type, text_content)
 

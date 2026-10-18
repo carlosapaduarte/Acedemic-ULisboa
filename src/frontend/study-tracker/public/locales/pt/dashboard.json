@@ -25,6 +25,7 @@
     "start": "Iniciar",
     "recent_notes": "Apontamentos Recentes",
     "folder": "Pasta: {{name}}",
+    "root_folder": "Raiz",
     "no_recent_notes": "Ainda não abriste nenhum apontamento.",
     "today_date_locale": "pt-PT",
     "task_progress_alt": "Ícone de progresso das tarefas",

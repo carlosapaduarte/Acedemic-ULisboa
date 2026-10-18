@@ -480,7 +480,7 @@ export default function HomePage() {
 
         {/* 3. AGENDA */}
         <div
-          className={styles.card}
+          className={`${styles.card} ${styles.accessCard} ${styles.agendaAccessCard}`}
           onClick={() => navigate("/calendar")}
           style={{
             display: "flex",
@@ -562,7 +562,7 @@ export default function HomePage() {
 
         {/* 4. POMODORO */}
         <div
-          className={styles.card}
+          className={`${styles.card} ${styles.accessCard}`}
           onClick={handleGoToPomodoro}
           style={{ cursor: "pointer" }}
         >
@@ -607,7 +607,7 @@ export default function HomePage() {
         </div>
 
         <div
-          className={styles.card}
+          className={`${styles.card} ${styles.accessCard} ${styles.notesAccessCard}`}
           onClick={() => navigate("/notes")}
           style={{ cursor: "pointer" }}
         >
@@ -635,7 +635,7 @@ export default function HomePage() {
     <FaFileLines aria-hidden="true" /> {note.fileName}
   </span>
   <span className={styles.noteDetail}>
-    {t("folder", { name: note.folderName })}
+    {t("folder", { name: note.isRootFolder ? t("root_folder") : note.folderName })}
   </span>
 </div>
                 </div>

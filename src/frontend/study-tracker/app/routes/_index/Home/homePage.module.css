@@ -244,6 +244,36 @@
   background-color: var(--color-1);
 }
 
+@media (hover: hover) {
+  .accessCard:hover .cardTitle,
+  .accessCard:hover .cardTitle svg,
+  .accessCard:hover svg {
+    color: var(--color-1) !important;
+  }
+
+  .accessCard:hover .startPomoBtn {
+    background-color: var(--color-2);
+    color: var(--color-1) !important;
+  }
+
+  .notesAccessCard:hover .agendaItem {
+    background-color: var(--color-2);
+    color: var(--color-1) !important;
+  }
+
+  .agendaAccessCard:hover .agendaItem,
+  .agendaAccessCard:hover .agendaItem * {
+    background-color: var(--color-2);
+    color: var(--color-1) !important;
+  }
+
+  .notesAccessCard:hover .noteTitle,
+  .notesAccessCard:hover .noteDetail,
+  .notesAccessCard:hover .noteTitle svg {
+    color: var(--color-1) !important;
+  }
+}
+
 .progressBarFill {
   height: 100%;
   background-color: var(--color-1);

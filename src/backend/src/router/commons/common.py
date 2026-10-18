@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
 from sqlalchemy import or_
 from service.gamification import core as gamification_service
-from repository.sql.models.models import TagModel, UserModel, UserTagLink
+from repository.sql.models.models import TagModel, UserModel, UserTagLink, STCurricularUnitModel, STGradeModel
 from pydantic import BaseModel
 #from service.common.badge_service import 
 from repository.sql.models.database import get_session as get_db_session
@@ -273,14 +273,25 @@ def create_user_tag(
     final_en = name_en if name_en else name_pt
 
     try:
-        existing_tag = (db.exec(
-            select(TagModel).where(or_(TagModel.name_pt.ilike(final_pt), TagModel.name_en.ilike(final_en)))
+        # UC tags represent a user-owned curricular unit. Never reuse a global
+        # or normal tag with the same visible name for this relationship.
+        existing_tag = None if tag_input.is_uc else (db.exec(
+            select(TagModel).where(
+                TagModel.is_uc == False,
+                or_(TagModel.name_pt.ilike(final_pt), TagModel.name_en.ilike(final_en)),
+            )
         )).first()
 
         tag_to_associate: TagModel
 
         if not existing_tag:
-            new_tag = TagModel(name_pt=final_pt, name_en=final_en, color=tag_input.color, is_global=True, is_uc=getattr(tag_input, 'is_uc', False))
+            new_tag = TagModel(
+                name_pt=final_pt,
+                name_en=final_en,
+                color=tag_input.color,
+                is_global=not tag_input.is_uc,
+                is_uc=tag_input.is_uc,
+            )
             db.add(new_tag)
             db.flush()
             tag_to_associate = new_tag
@@ -350,14 +361,87 @@ def update_user_tag(
         #para confirmar
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag não encontrada.")
 
-    #atualiza os campos da tag com os dados recebidos.
-    tag_to_update.name_pt = tag_input.name_pt
-    tag_to_update.name_en = tag_input.name_en
-    tag_to_update.color = tag_input.color
+    try:
+        if tag_to_update.is_uc:
+            # A curricular unit has one canonical name. UC tags are created with
+            # the same value in both locales, so use PT first (EN as fallback)
+            # and keep both tag labels aligned with the UC name.
+            canonical_name = (tag_input.name_pt or tag_input.name_en or "").strip()
+            if not canonical_name:
+                raise HTTPException(status_code=422, detail="UC tag name cannot be empty.")
 
-    db.add(tag_to_update)
-    db.commit()
-    db.refresh(tag_to_update)
+            linked_user_ids = db.exec(
+                select(UserTagLink.user_id).where(UserTagLink.tag_id == tag_id)
+            ).all()
+            if any(linked_user_id != current_user_id for linked_user_id in linked_user_ids):
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="A shared UC tag cannot be renamed for only one user.",
+                )
+
+            old_name = tag_to_update.name_pt or tag_to_update.name_en
+            if old_name and canonical_name != old_name:
+                curricular_unit = db.exec(
+                    select(STCurricularUnitModel).where(
+                        STCurricularUnitModel.user_id == current_user_id,
+                        STCurricularUnitModel.name == old_name,
+                    )
+                ).first()
+                if curricular_unit:
+                    conflicting_unit = db.exec(
+                        select(STCurricularUnitModel).where(
+                            STCurricularUnitModel.user_id == current_user_id,
+                            STCurricularUnitModel.name == canonical_name,
+                        )
+                    ).first()
+                    if conflicting_unit:
+                        raise HTTPException(
+                            status_code=status.HTTP_409_CONFLICT,
+                            detail="A curricular unit with this name already exists.",
+                        )
+
+                    grades = db.exec(
+                        select(STGradeModel).where(
+                            STGradeModel.user_id == current_user_id,
+                            STGradeModel.curricular_unit_name == old_name,
+                        )
+                    ).all()
+                    replacement_unit = STCurricularUnitModel(
+                        name=canonical_name,
+                        user_id=current_user_id,
+                        ects=curricular_unit.ects,
+                        min_grade=curricular_unit.min_grade,
+                        target_grade=curricular_unit.target_grade,
+                    )
+                    db.add(replacement_unit)
+                    db.flush()
+                    for grade in grades:
+                        grade.curricular_unit_name = canonical_name
+                        db.add(grade)
+                    db.flush()
+                    db.delete(curricular_unit)
+
+            tag_to_update.name_pt = canonical_name
+            tag_to_update.name_en = canonical_name
+        else:
+            # Keep normal user tags' existing bilingual values and behavior.
+            if tag_input.name_pt is not None:
+                tag_to_update.name_pt = tag_input.name_pt
+            if tag_input.name_en is not None:
+                tag_to_update.name_en = tag_input.name_en
+
+        if tag_input.color is not None:
+            tag_to_update.color = tag_input.color
+
+        db.add(tag_to_update)
+        db.commit()
+        db.refresh(tag_to_update)
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception:
+        db.rollback()
+        raise
 
     return TagOutputDto(
         id=str(tag_to_update.id),     
@@ -365,7 +449,8 @@ def update_user_tag(
         name_en=tag_to_update.name_en, 
         user_id=user_tag_link.user_id,  
         is_custom=user_tag_link.is_custom,
-        color=tag_to_update.color 
+        color=tag_to_update.color,
+        is_uc=tag_to_update.is_uc,
     )
 class UpdateUserColorsDto(BaseModel):
     colors: List[str]
