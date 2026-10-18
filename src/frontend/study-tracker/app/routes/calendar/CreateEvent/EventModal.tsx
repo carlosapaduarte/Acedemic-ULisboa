@@ -161,24 +161,24 @@ const IsRecurrentSection = React.memo(
           >
             <TextField className={styles.formTextField}>
               <Label className={styles.formSectionTitle}>
-                Início da Repetição
+                {t("recurrence_start_label")}
               </Label>
               <Input
                 type="date"
                 className={classNames(styles.dateInput)}
                 value={formatDate(recurrenceStart)}
                 onChange={handleRecStartChange}
-                placeholder="Hoje"
+                placeholder={t("today")}
                 disabled={readOnly}
               />
               <span style={{ fontSize: "0.8em", color: "#666" }}>
-                {recurrenceStart ? "" : "(Começa hoje)"}
+                {recurrenceStart ? "" : t("recurrence_starts_today_hint")}
               </span>
             </TextField>
 
             <TextField className={styles.formTextField}>
               <Label className={styles.formSectionTitle}>
-                Fim da Repetição
+                {t("recurrence_end_label")}
               </Label>
               <Input
                 type="date"
@@ -188,7 +188,7 @@ const IsRecurrentSection = React.memo(
                 disabled={readOnly}
               />
               <span style={{ fontSize: "0.8em", color: "#666" }}>
-                {recurrenceEnd ? "" : "(Infinito)"}
+                {recurrenceEnd ? "" : t("recurrence_no_end_date_hint")}
               </span>
             </TextField>
           </div>
@@ -612,7 +612,11 @@ export function EventModal({
                 </div>
               )}
 
-              <div className={styles.finishCreatingEventButtonContainer}>
+              <div
+                className={classNames(styles.finishCreatingEventButtonContainer, {
+                  [styles.editEventActionButtonsContainer]: isEditMode,
+                })}
+              >
                 {isEditMode && (
                   <Button
                     className={classNames(styles.deleteEventButton)}
@@ -626,6 +630,7 @@ export function EventModal({
                 <Button
                   className={classNames(
                     styles.finishCreatingEventButton,
+                    { [styles.editEventSaveButton]: isEditMode },
                     "tutorial-target-event-save",
                   )}
                   isDisabled={!title || saving || eventToEdit?.readOnlyPastCompleted}

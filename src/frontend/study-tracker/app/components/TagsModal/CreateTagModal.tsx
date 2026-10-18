@@ -103,7 +103,7 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
           value={namePt}
           onChange={(e) => setNamePt(e.target.value)}
           maxLength={MAX_CHARS}
-          placeholder={t("new_tag_name_placeholder", "Nome da nova etiqueta")}
+          placeholder={t("calendar:new_tag_name_placeholder", "Nome da nova etiqueta")}
           autoFocus
         />
         <div className={styles.charCounter}>
@@ -118,7 +118,7 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
           value={nameEn}
           onChange={(e) => setNameEn(e.target.value)}
           maxLength={MAX_CHARS}
-          placeholder="e.g. Study"
+          placeholder={t("calendar:tag_name_en_placeholder", "e.g. Study")}
         />
         <div className={styles.charCounter}>
           {nameEn.length} / {MAX_CHARS}

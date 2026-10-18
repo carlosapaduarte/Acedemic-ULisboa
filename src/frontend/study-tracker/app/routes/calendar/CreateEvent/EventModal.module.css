@@ -3,7 +3,7 @@
 
 .newEventModalContainer {
   composes: modalContainer;
-  background-color: var(--color-1) !important;
+  background-color: var(--color-3) !important;
   padding: 1.5rem !important;
   border-radius: 12px;
   position: relative;
@@ -12,6 +12,7 @@
 .newEventTitleText {
   composes: mainFormModalTitleText;
   color: var(--text-color-2);
+  padding-left: 0;
   margin-top: 0;
   margin-bottom: 1.5rem;
 }
@@ -37,6 +38,11 @@
   flex-wrap: wrap;
 }
 
+.editEventActionButtonsContainer {
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+}
+
 .finishCreatingEventButton {
   composes: roundButton;
   width: 100%;
@@ -49,9 +55,33 @@
   border: none;
 }
 
+.editEventSaveButton {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  height: 3rem;
+  margin-top: 1.5rem;
+}
+
+.finishCreatingEventButton:hover:not(:disabled) {
+  background-color: var(--color-2-hover) !important;
+}
+
+.finishCreatingEventButton:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
+}
+
+.finishCreatingEventButton:disabled,
+.finishCreatingEventButton[data-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .deleteEventButton {
   composes: roundButton;
-  flex: 1 1 30%;
+  flex: 1 1 0;
+  min-width: 0;
   height: 3rem;
   margin-top: 1.5rem;
   font-size: 1rem;
@@ -60,8 +90,20 @@
   color: var(--text-color-2);
 }
 
-.deleteEventButton:hover {
-  background-color: var(--color-2-hover);
+.deleteEventButton:hover:not(:disabled) {
+  background-color: var(--color-text-danger);
+  opacity: 0.85;
+}
+
+.deleteEventButton:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
+}
+
+.deleteEventButton:disabled,
+.deleteEventButton[data-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .formTextField {
@@ -72,23 +114,29 @@
 /* Labels ("Title", "Slots to work", etc) a branco */
 .formSectionTitle {
   color: var(--text-color-2);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1rem;
   margin-bottom: 6px;
   margin-top: 12px;
 }
 
-/* Inputs (Caixas Beges, Letras Magenta) */
+@media (max-width: 360px) {
+  .editEventActionButtonsContainer {
+    gap: 0.35rem;
+  }
+}
+
+/* Inputs com o mesmo fundo magenta e texto claro do formulário de tarefas */
 .formInput,
 .dateInput,
 .timeInput,
 .nativeSelect {
   width: 100%;
   padding: 10px 12px;
-  border: none !important;
+  border: 1px solid var(--color-1) !important;
   border-radius: 8px;
-  background-color: var(--color-3) !important;
-  color: var(--color-3) !important;
+  background-color: var(--color-1) !important;
+  color: var(--text-color-2) !important;
   font-family: var(--font-family1), sans-serif;
   font-size: 1rem;
   box-sizing: border-box;
@@ -98,7 +146,28 @@
 .dateInput:focus,
 .timeInput:focus,
 .nativeSelect:focus {
-  outline: 2px solid var(--color-3);
+  border-color: var(--color-2) !important;
+  outline: 2px solid var(--color-2);
+  outline-offset: 1px;
+}
+
+.formInput::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+  opacity: 1;
+}
+
+.formInput:disabled,
+.dateInput:disabled,
+.timeInput:disabled,
+.nativeSelect:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.dateInput::-webkit-calendar-picker-indicator,
+.timeInput::-webkit-calendar-picker-indicator {
+  filter: invert(79%) sepia(50%) saturate(600%) hue-rotate(33deg) brightness(100%) contrast(100%);
+  cursor: pointer;
 }
 
 /* Dropdown */
@@ -107,10 +176,15 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%23990553%22%20d%3D%22M10%2C13.5L5.5%2C9h9L10%2C13.5z%22%2F%3E%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%23D5FC81%22%20d%3D%22M10%2C13.5L5.5%2C9h9L10%2C13.5z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 15px;
+}
+
+.nativeSelect option {
+  background-color: var(--color-3);
+  color: var(--text-color-2);
 }
 
 .closeButton {
@@ -125,6 +199,11 @@
 .recurrentEventSectionContainer {
   display: flex;
   flex-direction: column;
+}
+
+.recurrentEventSectionContainer span {
+  color: var(--text-color-2) !important;
+  opacity: 0.75;
 }
 
 .recurrentEventSectionCheckboxField {

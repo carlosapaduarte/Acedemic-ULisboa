@@ -11,13 +11,13 @@ export function SeeFullHistory() {
     const { t } = useTranslation(["statistics"]);
     return (
         <button className={styles.seeFullHistoryButton}>
-            <img src="icons/history_icon.svg" alt="History Icon" className={styles.historyIcon} />
+            <img src="icons/history_icon.svg" alt={t("statistics:history_icon_alt")} className={styles.historyIcon} />
             {t("statistics:see_full_history")}
         </button>
     );
 }
 
-export function getWeekIntervalStr(date: Date): string {
+export function getWeekIntervalStr(date: Date, locale: string): string {
     const weekDay = date.getDay();
     const today = date.getDate();
 
@@ -32,14 +32,20 @@ export function getWeekIntervalStr(date: Date): string {
     // Offsets date to last day of week
     lastDayOfWeek.setDate(firstDayOfWeekDate + 6);
 
-    return `${firstDayOfWeek.getDate()} ${firstDayOfWeek.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}-${lastDayOfWeek.getDate()} ${lastDayOfWeek.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}`;
+    const monthLabel = (value: Date) =>
+        new Intl.DateTimeFormat(locale, { month: "short" })
+            .format(value)
+            .replace(".", "")
+            .toUpperCase();
+    return `${firstDayOfWeek.getDate()} ${monthLabel(firstDayOfWeek)}-${lastDayOfWeek.getDate()} ${monthLabel(lastDayOfWeek)}`;
 }
 
 export function CurWeekDate() {
-    const { t } = useTranslation(["statistics"]);
+    const { t, i18n } = useTranslation(["statistics"]);
+    const locale = i18n.resolvedLanguage?.toLowerCase().startsWith("en") ? "en-GB" : "pt-PT";
     return (
         <span className={styles.containerHeaderDate}>
-            {t("statistics:week")} {getWeekIntervalStr(new Date())}
+            {t("statistics:week")} {getWeekIntervalStr(new Date(), locale)}
         </span>
     );
 }

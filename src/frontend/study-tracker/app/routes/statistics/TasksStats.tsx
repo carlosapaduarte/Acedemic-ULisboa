@@ -13,6 +13,7 @@ import {
 import styles from "./statistics.module.css";
 import { Task } from "~/service/service";
 import { useTranslation } from "react-i18next";
+import { FaBed, FaBolt, FaChartLine, FaBullseye, FaCircleCheck } from "react-icons/fa6";
 
 const COLORS = {
   bar: "#4CAF50",
@@ -27,54 +28,17 @@ function calculateDetailedInsights(
   activeDaysCount: number,
   priorityBreakdown: { high: number; med: number; low: number },
 ) {
-  if (totalCompleted === 0) {
-    return {
-      type: "neutral",
-      title: "💤 Sem dados recentes",
-      text: "Ainda não concluíste tarefas nos últimos 7 dias. Começa com algo pequeno!",
-    };
-  }
-
-  // 1. ANÁLISE DE CONSISTÊNCIA (Zimmerman - Gestão de Tempo)
-  // Se trabalhou em poucos dias mas fez muito = "Cramming" (Surtos)
-  if (activeDaysCount <= 2 && totalCompleted > 3) {
-    return {
-      type: "warning",
-      title: "⚡ Surtos de Produtividade",
-      text: `Concluíste ${totalCompleted} tarefas, mas concentradas em apenas ${activeDaysCount} dia(s). Tenta distribuir a carga ao longo da semana para evitar cansaço.`,
-    };
-  }
-
-  // Se trabalhou em 4 ou mais dias = Consistência Real
-  if (activeDaysCount >= 4) {
-    return {
-      type: "success",
-      title: "📈 Ritmo Consistente",
-      text: "Ótimo trabalho! Estás a manter uma rotina diária estável, o que ajuda a criar hábitos duradouros.",
-    };
-  }
-
-  // 2. ANÁLISE DE PRIORIDADE (Bandura - Autoeficácia)
-  // Se fez muitas tarefas de prioridade ALTA
-  if (priorityBreakdown.high > priorityBreakdown.low + priorityBreakdown.med) {
-    return {
-      type: "success",
-      title: "🦁 Foco no Essencial",
-      text: "Estás a atacar as tarefas de Prioridade Alta! Resolver o mais difícil primeiro aumenta muito a tua autoeficácia.",
-    };
-  }
-
-  // Default
-  return {
-    type: "neutral",
-    title: "✅ Tarefas em Dia",
-    text: `Completaste ${totalCompleted} tarefas recentemente. Continua a registar o teu progresso.`,
-  };
+  if (totalCompleted === 0) return { type: "neutral", titleKey: "no_data_recent_title", icon: FaBed, textKey: "no_data_recent_text" };
+  if (activeDaysCount <= 2 && totalCompleted > 3) return { type: "warning", titleKey: "productivity_bursts_title", icon: FaBolt, textKey: "productivity_bursts_text", values: { total: totalCompleted, days: activeDaysCount } };
+  if (activeDaysCount >= 4) return { type: "success", titleKey: "consistent_pace_title", icon: FaChartLine, textKey: "consistent_pace_text" };
+  if (priorityBreakdown.high > priorityBreakdown.low + priorityBreakdown.med) return { type: "success", titleKey: "essential_focus_title", icon: FaBullseye, textKey: "essential_focus_text" };
+  return { type: "neutral", titleKey: "tasks_on_track_title", icon: FaCircleCheck, textKey: "tasks_on_track_text", values: { total: totalCompleted } };
 }
 
 // --- COMPONENTE PRINCIPAL ---
 export function TasksStats({ tasks }: { tasks: Task[] }) {
-  const { t } = useTranslation(["statistics"]);
+  const { t, i18n } = useTranslation(["statistics"]);
+  const locale = i18n.language.startsWith("en") ? "en-GB" : "pt-PT";
 
   // Processamento de Dados
   const { barData, pieData, totalCompleted, activeDays, priorities } =
@@ -89,7 +53,7 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
       const groupedBar: Record<string, number> = {};
       last7Days.forEach((d) => {
         const key = `${d.getDate()} ${d
-          .toLocaleString("pt-PT", { month: "short" })
+          .toLocaleString(locale, { month: "short" })
           .replace(".", "")}`;
         groupedBar[key] = 0;
       });
@@ -118,7 +82,7 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
 
           if (dayDiff < 7 && dayDiff >= 0) {
             const key = `${date.getDate()} ${date
-              .toLocaleString("pt-PT", { month: "short" })
+              .toLocaleString(locale, { month: "short" })
               .replace(".", "")}`;
             if (groupedBar[key] !== undefined) {
               groupedBar[key]++;
@@ -145,9 +109,9 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
       }));
 
       const pieChartData = [
-        { name: "Alta", value: prioCount.high, color: COLORS.prioHigh },
-        { name: "Média", value: prioCount.med, color: COLORS.prioMedium },
-        { name: "Baixa", value: prioCount.low, color: COLORS.prioLow },
+        { name: t("priority_high"), value: prioCount.high, color: COLORS.prioHigh },
+        { name: t("priority_medium"), value: prioCount.med, color: COLORS.prioMedium },
+        { name: t("priority_low"), value: prioCount.low, color: COLORS.prioLow },
       ].filter((d) => d.value > 0); // Só mostra o que tem dados
 
       return {
@@ -157,7 +121,7 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
         activeDays: activeDaysCount,
         priorities: prioCount,
       };
-    }, [tasks]);
+    }, [tasks, locale, t]);
 
   const insight = calculateDetailedInsights(
     totalCompleted,
@@ -170,17 +134,17 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
       <div className={styles.statTitle}>
         <img
           src="/icons/task_progress_icon.svg"
-          alt="Tasks"
+            alt={t("task_progress_icon_alt")}
           style={{ height: "1.2em" }}
           onError={(e) => (e.currentTarget.style.display = "none")}
         />
-        Performance de Tarefas
+        {t("task_performance")}
       </div>
 
       <div className={styles.tasksGrid}>
         {/* GRÁFICO 1: BARRAS (VOLUME) */}
         <div className={styles.chartWrapper}>
-          <div className={styles.chartTitleSmall}>Tarefas / Dia</div>
+          <div className={styles.chartTitleSmall}>{t("tasks_per_day")}</div>
           {totalCompleted > 0 ? (
             <div style={{ width: "100%", height: 180, fontSize: "0.65rem" }}>
               <ResponsiveContainer>
@@ -218,14 +182,14 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
             </div>
           ) : (
             <div style={{ color: "#999", fontSize: "0.8rem" }}>
-              Sem tarefas concluídas.
+              {t("no_completed_tasks")}
             </div>
           )}
         </div>
 
         {/* GRÁFICO 2: DONUT (PRIORIDADE) */}
         <div className={styles.chartWrapper}>
-          <div className={styles.chartTitleSmall}>Por Prioridade</div>
+          <div className={styles.chartTitleSmall}>{t("by_priority")}</div>
           {pieData.length > 0 ? (
             <>
               <div style={{ width: "100%", height: 160 }}>
@@ -265,7 +229,7 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
               </div>
             </>
           ) : (
-            <div style={{ color: "#999", fontSize: "0.8rem" }}>Sem dados.</div>
+            <div style={{ color: "#999", fontSize: "0.8rem" }}>{t("no_data_short")}</div>
           )}
         </div>
       </div>
@@ -294,13 +258,13 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
                   : "#1565C0",
             }}
           >
-            {insight.title}
+            {React.createElement(insight.icon)} {t(insight.titleKey)}
           </div>
           <div
             className={styles.insightContent}
             style={{ fontSize: "0.9rem", fontWeight: "normal" }}
           >
-            {insight.text}
+            {t(insight.textKey, insight.values)}
           </div>
         </div>
       )}

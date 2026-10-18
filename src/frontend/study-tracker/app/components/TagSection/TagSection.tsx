@@ -12,6 +12,7 @@ interface Props {
   onEditTags: () => void;
   onAddTag: () => void;
   refreshTags: (newTag?: Tag) => void;
+  tasksLayout?: boolean;
 }
 
 const TagSectionContent = ({
@@ -20,6 +21,7 @@ const TagSectionContent = ({
   availableTags,
   onEditTags,
   onAddTag,
+  tasksLayout,
 }: Props) => {
   const { t, i18n } = useTranslation(["tagsection", "task"]);
 
@@ -93,7 +95,11 @@ const TagSectionContent = ({
 
   return (
     <div className={getStyle("tagsSectionContainer")}>
-      <div className={getStyle("tagsHeader")}>
+      <div
+        className={`${getStyle("tagsHeader")} ${
+          tasksLayout ? styles.tasksTagsHeader : ""
+        }`}
+      >
         <h3 className={getStyle("formSectionTitle")}>{t("tags_title")}</h3>
         <button
           type="button"

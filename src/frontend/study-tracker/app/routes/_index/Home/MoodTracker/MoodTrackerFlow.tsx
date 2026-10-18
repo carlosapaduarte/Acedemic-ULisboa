@@ -73,27 +73,19 @@ const IMPACT_LIST = [
   "Outro",
 ];
 
-const QUOTES = [
-  {
-    text: "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
-    author: "Robert Collier",
-  },
-  {
-    text: "Acredita que consegues e já percorreste metade do caminho.",
-    author: "Theodore Roosevelt",
-  },
-  {
-    text: "Não contes os dias, faz com que os dias contem.",
-    author: "Muhammad Ali",
-  },
-  { text: "A persistência é o caminho do êxito.", author: "Charlie Chaplin" },
-  { text: "A energia flui para onde vai a atenção.", author: "Tony Robbins" },
+const QUOTE_AUTHORS = [
+  "Robert Collier",
+  "Theodore Roosevelt",
+  "Muhammad Ali",
+  "Charlie Chaplin",
+  "Tony Robbins",
+  "Bill Phillips",
 ];
 
 type StepType = 1 | 2 | 3 | 4;
 
 export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
-  const { t } = useTranslation(["mood_tracker"]);
+  const { t, i18n } = useTranslation(["mood_tracker"]);
   const [step, setStep] = useState<StepType>(1);
 
   const [moodValue, setMoodValue] = useState(3);
@@ -103,8 +95,12 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
   const [showAllEmotions, setShowAllEmotions] = useState(false);
 
   const randomQuote = useMemo(() => {
-    return QUOTES[Math.floor(Math.random() * QUOTES.length)];
-  }, []);
+    const quoteIndex = Math.floor(Math.random() * QUOTE_AUTHORS.length);
+    return {
+      text: t(`mood_tracker:quote_${quoteIndex + 1}`),
+      author: QUOTE_AUTHORS[quoteIndex],
+    };
+  }, [i18n.language, t]);
 
   const currentMood =
     MOOD_LEVELS.find((m) => m.value === moodValue) || MOOD_LEVELS[2];
@@ -174,7 +170,7 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
     try {
       const payload = {
         value: moodValue,
-        label: currentMood.label,
+        label: t(`mood_tracker:mood_level_${currentMood.value}`, currentMood.label),
         emotions: selectedEmotions,
         impacts: selectedImpacts,
         date: new Date(),

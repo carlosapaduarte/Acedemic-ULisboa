@@ -6,6 +6,7 @@ import {
   TaskDistributionPerWeek,
 } from "~/service/service";
 import { utils } from "~/utils";
+import { useTranslation } from "react-i18next";
 
 interface SummaryProps {
   tasks: Task[];
@@ -14,6 +15,7 @@ interface SummaryProps {
 }
 
 export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
+  const { t } = useTranslation(["statistics"]);
   const stats = useMemo(() => {
     // Obter data de hoje para referência
     const today = new Date();
@@ -27,7 +29,9 @@ export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
 
     const hours = Math.floor(weeklyFocusMinutes / 60);
     const mins = weeklyFocusMinutes % 60;
-    const focusText = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+    const focusText = hours > 0
+      ? t("statistics:time_hours_minutes_short", { hours, minutes: mins })
+      : t("statistics:time_minutes_short", { minutes: mins });
 
     // 2. Tarefas Completas (APENAS ESTA SEMANA)
     const tasksDone = tasks.filter((t) => {
@@ -68,21 +72,21 @@ export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
     const eventsCount = focusStats.filter((s) => s.week === currentWeek).length;
 
     return { focusText, tasksDone, logsCount, eventsCount };
-  }, [tasks, moodHistory, focusStats]);
+  }, [tasks, moodHistory, focusStats, t]);
 
   return (
     <div className={styles.summaryGrid}>
       {/* Card 1: Foco */}
       <div className={styles.summaryCard}>
         <div className={styles.summaryValue}>{stats.focusText}</div>
-        <div className={styles.summaryLabel}>Foco esta Semana</div>
+        <div className={styles.summaryLabel}>{t("statistics:summary_focus_week")}</div>
       </div>
 
       {/* Card 2: Tarefas (Atualizado) */}
       <div className={styles.summaryCard}>
         <div className={styles.summaryValue}>{stats.tasksDone}</div>
         <div className={styles.summaryLabel}>
-          Tarefas Concluídas esta Semana
+          {t("statistics:tasks_completed_week")}
         </div>
       </div>
 
@@ -90,14 +94,14 @@ export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
       <div className={styles.summaryCard}>
         <div className={styles.summaryValue}>{stats.logsCount}</div>
         <div className={styles.summaryLabel}>
-          Apontamentos criados esta Semana
+          {t("statistics:notes_created_week")}
         </div>
       </div>
 
       {/* Card 4: Eventos */}
       <div className={styles.summaryCard}>
         <div className={styles.summaryValue}>{stats.eventsCount}</div>
-        <div className={styles.summaryLabel}>Eventos nesta Semana</div>
+        <div className={styles.summaryLabel}>{t("statistics:events_this_week")}</div>
       </div>
     </div>
   );

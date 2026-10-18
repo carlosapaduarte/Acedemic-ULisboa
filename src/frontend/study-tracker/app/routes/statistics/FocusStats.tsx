@@ -11,6 +11,7 @@ import {
 import styles from "./statistics.module.css";
 import { service, Event } from "~/service/service";
 import { utils } from "~/utils";
+import { useTranslation } from "react-i18next";
 
 const COLORS = {
   focusBar: "#ff7043",
@@ -49,6 +50,7 @@ function calculateMaxStreak(events: Event[]) {
 }
 
 export function FocusStats() {
+  const { t } = useTranslation(["statistics"]);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -125,26 +127,26 @@ export function FocusStats() {
     });
 
     const chartData = [
-      { day: "Seg", min: daysMap["Seg"] },
-      { day: "Ter", min: daysMap["Ter"] },
-      { day: "Qua", min: daysMap["Qua"] },
-      { day: "Qui", min: daysMap["Qui"] },
-      { day: "Sex", min: daysMap["Sex"] },
-      { day: "Sáb", min: daysMap["Sáb"] },
-      { day: "Dom", min: daysMap["Dom"] },
+      { day: t("statistics:weekday_mon"), min: daysMap["Seg"] },
+      { day: t("statistics:weekday_tue"), min: daysMap["Ter"] },
+      { day: t("statistics:weekday_wed"), min: daysMap["Qua"] },
+      { day: t("statistics:weekday_thu"), min: daysMap["Qui"] },
+      { day: t("statistics:weekday_fri"), min: daysMap["Sex"] },
+      { day: t("statistics:weekday_sat"), min: daysMap["Sáb"] },
+      { day: t("statistics:weekday_sun"), min: daysMap["Dom"] },
     ];
 
     return { hasData: true, avg, min, max, streak, interrupted, chartData };
-  }, [events]);
+  }, [events, t]);
 
   return (
     <div className={styles.statCardContainer}>
-      <div className={styles.statTitle}>Performance Pomodoro</div>
+      <div className={styles.statTitle}>{t("statistics:pomodoro_performance")}</div>
 
       <div className={styles.tasksGrid}>
         {/* COLUNA 1: Métricas de Comportamento */}
         <div className={styles.chartWrapper} style={{ alignItems: "stretch" }}>
-          <div className={styles.chartTitleSmall}>Métricas da Semana</div>
+          <div className={styles.chartTitleSmall}>{t("statistics:weekly_metrics")}</div>
 
           {stats.hasData ? (
             <div
@@ -167,13 +169,13 @@ export function FocusStats() {
                     color: COLORS.neutral,
                   }}
                 >
-                  {stats.avg}m
+                  {stats.avg} {t("statistics:minute_short")}
                 </div>
                 <div
                   className={styles.summaryLabel}
                   style={{ fontSize: "0.7rem" }}
                 >
-                  Média / Sessão
+                  {t("statistics:average_per_session")}
                 </div>
               </div>
 
@@ -195,7 +197,7 @@ export function FocusStats() {
                   className={styles.summaryLabel}
                   style={{ fontSize: "0.7rem" }}
                 >
-                  Ciclos Seguidos
+                  {t("statistics:consecutive_cycles")}
                 </div>
               </div>
 
@@ -211,13 +213,13 @@ export function FocusStats() {
                     color: COLORS.text,
                   }}
                 >
-                  {stats.min}m
+                  {stats.min} {t("statistics:minute_short")}
                 </div>
                 <div
                   className={styles.summaryLabel}
                   style={{ fontSize: "0.7rem" }}
                 >
-                  Sessão + Curta
+                  {t("statistics:shortest_session")}
                 </div>
               </div>
 
@@ -233,13 +235,13 @@ export function FocusStats() {
                     color: COLORS.text,
                   }}
                 >
-                  {stats.max}m
+                  {stats.max} {t("statistics:minute_short")}
                 </div>
                 <div
                   className={styles.summaryLabel}
                   style={{ fontSize: "0.7rem" }}
                 >
-                  Sessão + Longa
+                  {t("statistics:longest_session")}
                 </div>
               </div>
 
@@ -265,7 +267,7 @@ export function FocusStats() {
                   className={styles.summaryLabel}
                   style={{ fontSize: "0.7rem" }}
                 >
-                  Interrupções (Antes do Fim)
+                  {t("statistics:early_interruptions")}
                 </div>
               </div>
             </div>
@@ -274,14 +276,14 @@ export function FocusStats() {
               className={styles.noDataAvailableMessage}
               style={{ fontSize: "0.8rem", padding: "2rem" }}
             >
-              Sem sessões de estudo esta semana.
+              {t("statistics:no_sessions_this_week")}
             </div>
           )}
         </div>
 
         {/* COLUNA 2: Gráfico Diário */}
         <div className={styles.chartWrapper}>
-          <div className={styles.chartTitleSmall}>Volume Diário</div>
+          <div className={styles.chartTitleSmall}>{t("statistics:daily_volume")}</div>
           <div style={{ width: "100%", height: 200, fontSize: "0.65rem" }}>
             <ResponsiveContainer>
               <BarChart
@@ -305,7 +307,10 @@ export function FocusStats() {
                     borderRadius: "8px",
                     border: `2px solid ${COLORS.axis}`,
                   }}
-                  formatter={(value: number) => [`${value} min`, "Foco"]}
+                  formatter={(value: number) => [
+                    `${value} ${t("statistics:minute_short")}`,
+                    t("statistics:focus_container_title"),
+                  ]}
                 />
                 <Bar
                   dataKey="min"

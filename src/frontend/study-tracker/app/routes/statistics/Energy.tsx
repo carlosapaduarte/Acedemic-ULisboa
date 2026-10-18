@@ -2,40 +2,31 @@ import styles from "./statistics.module.css";
 import { useEffect, useRef, useState } from "react";
 import { DailyEnergyStatus, service } from "~/service/service";
 import { useTranslation } from "react-i18next";
+import { FaTrophy, FaDumbbell, FaWandMagicSparkles } from "react-icons/fa6";
 
 const MOOD_CONFIG: Record<
   number,
-  { iconUrl: string; color: string; labelDefault: string }
+  { iconUrl: string; color: string; labelKey: string }
 > = {
-  5: { iconUrl: "./icons/MoodTracker/energy_very_well_icon.png", color: "#2E7D32", labelDefault: "Muito Bem" },
-  4: { iconUrl: "./icons/MoodTracker/energy_well_icon.png", color: "#4CAF50", labelDefault: "Bem" },
-  3: { iconUrl: "./icons/MoodTracker/energy_container_title_icon.png", color: "#FFC107", labelDefault: "Neutro" },
-  2: { iconUrl: "./icons/MoodTracker/energy_bad_icon.png", color: "#FF9800", labelDefault: "Não muito bem" },
-  1: { iconUrl: "./icons/MoodTracker/energy_very_bad_icon.png", color: "#F44336", labelDefault: "Muito Mal" },
+  5: { iconUrl: "./icons/MoodTracker/energy_very_well_icon.png", color: "#2E7D32", labelKey: "very_well" },
+  4: { iconUrl: "./icons/MoodTracker/energy_well_icon.png", color: "#4CAF50", labelKey: "well" },
+  3: { iconUrl: "./icons/MoodTracker/energy_container_title_icon.png", color: "#FFC107", labelKey: "neutral" },
+  2: { iconUrl: "./icons/MoodTracker/energy_bad_icon.png", color: "#FF9800", labelKey: "not_very_well" },
+  1: { iconUrl: "./icons/MoodTracker/energy_very_bad_icon.png", color: "#F44336", labelKey: "very_bad" },
 };
 
 function getMoodConfig(level: number | null) {
   if (level === null) return null;
   return (
-    MOOD_CONFIG[level] || { iconUrl: "", color: "#9E9E9E", labelDefault: "?" }
+    MOOD_CONFIG[level] || { iconUrl: "", color: "#9E9E9E", labelKey: "neutral" }
   );
 }
 
-// --- 2. SUGESTÕES PEDAGÓGICAS (ZIMMERMAN - FASE DE PLANEAMENTO) ---
-const IMPACT_SUGGESTIONS: Record<string, string> = {
-  Estudo: "Experimenta partir a matéria em blocos mais pequenos e define objetivos curtos.",
-  Trabalho: "Tenta renegociar prazos ou priorizar apenas as 3 tarefas críticas do dia.",
-  Família: "Reserva um momento de qualidade esta semana para resolver pendentes emocionais.",
-  Amigos: "O apoio social é crucial. Agenda uma saída ou conversa para recarregar baterias.",
-  Saúde: "Não ignores o corpo. Considera uma pausa ativa ou marcar aquela consulta pendente.",
-  Sono: "A higiene do sono é a base de tudo. Tenta definir uma hora fixa para desconectar hoje.",
-  Dinheiro: "A incerteza gera ansiedade. Faz um plano de gastos simples para a próxima semana.",
-  Tempo: "Sentes falta de tempo? Tenta usar a técnica Pomodoro para focar no que importa.",
-  "Auto-estima": "Sê gentil contigo. Regista 3 pequenas vitórias que tiveste hoje, por menores que sejam.",
-  "Acontecimentos Atuais": "Limita o consumo de notícias se te está a afetar. Foca no que podes controlar.",
+const IMPACT_KEYS: Record<string, string> = {
+  Estudo: "study", Trabalho: "work", Família: "family", Amigos: "friends",
+  Saúde: "health", Sono: "sleep", Dinheiro: "money", Tempo: "time",
+  "Auto-estima": "self_esteem", "Acontecimentos Atuais": "current_events",
 };
-
-const DEFAULT_SUGGESTION = "Tenta identificar uma pequena ação que possas fazer amanhã para melhorar isto.";
 
 // --- 3. LÓGICA DE ANÁLISE ---
 function calculateZimmermanInsights(history: DailyEnergyStatus[]) {
@@ -132,7 +123,7 @@ function fillMissingDays(history: DailyEnergyStatus[]): DailyEnergyStatus[] {
       timeline.push({
         date: new Date(current),
         level: null as any,
-        label: "Sem registo",
+          label: "no_record",
         emotions: [],
         impacts: [],
       });
@@ -144,7 +135,8 @@ function fillMissingDays(history: DailyEnergyStatus[]): DailyEnergyStatus[] {
 
 // --- COMPONENTE PRINCIPAL ---
 export function EnergyStats() {
-  const { t } = useTranslation(["statistics"]);
+  const { t, i18n } = useTranslation(["statistics"]);
+  const locale = i18n.language.startsWith("en") ? "en-GB" : "pt-PT";
   const [timeline, setTimeline] = useState<DailyEnergyStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -174,7 +166,7 @@ export function EnergyStats() {
     <div className={styles.statsContainer}>
       <div className={styles.statsContainerTitleAndDateDiv}>
         <div className={styles.statsContainerTitle}>
-          Monitorização de Energia
+          {t("energy_monitoring")}
         </div>
       </div>
 
@@ -192,12 +184,12 @@ export function EnergyStats() {
                 className={`${styles.energyItem} ${
                   isLastItem ? styles.todayItem : ""
                 }`}
-                title={status.label || (config ? config.labelDefault : "")}
+                title={status.label === "no_record" ? t("no_record") : (config ? t(config.labelKey) : "")}
               >
                 {hasLog && config ? (
                   <img
                     src={config.iconUrl}
-                    alt={config.labelDefault}
+                    alt={t(config.labelKey)}
                     style={{
                       width: isLastItem ? "56px" : "35px",
                       height: isLastItem ? "56px" : "35px",
@@ -224,7 +216,7 @@ export function EnergyStats() {
                 >
                   {status.date.getDate()}{" "}
                   {status.date
-                    .toLocaleString("pt-PT", { month: "short" })
+                    .toLocaleString(locale, { month: "short" })
                     .replace(".", "")}
                 </div>
               </div>
@@ -233,7 +225,7 @@ export function EnergyStats() {
         </div>
       ) : (
         <div className={styles.noDataAvailableMessage}>
-          {loading ? "A carregar..." : "Sem dados disponíveis."}
+          {loading ? t("loading") : t("no_data_available")}
         </div>
       )}
 
@@ -248,7 +240,7 @@ export function EnergyStats() {
 
       {/* --- PADRÕES DE AUTORREGULAÇÃO --- */}
       <div>
-        <div className={styles.historyTitle}>Padrões de Desempenho</div>
+        <div className={styles.historyTitle}>{t("performance_patterns")}</div>
 
         {insights && insights.hasData ? (
           <div className={styles.insightsContainer}>
@@ -258,12 +250,12 @@ export function EnergyStats() {
               style={{ borderLeftColor: "#4CAF50" }}
             >
               <div className={styles.insightTitle} style={{ color: "#2E7D32" }}>
-                Fonte de Eficácia
+                {t("efficacy_source")}
               </div>
               <div className={styles.insightContent}>
                 {insights.facilitator ? (
                   <>
-                    Sentes-te mais capaz e energizado quando o contexto envolve:{" "}
+                    {t("more_capable_context")} {" "}
                     <br />
                     <span
                       style={{
@@ -275,12 +267,12 @@ export function EnergyStats() {
                         marginTop: "4px",
                       }}
                     >
-                      ✨ {insights.facilitator}
+                      <FaWandMagicSparkles /> {t(`impact_${IMPACT_KEYS[insights.facilitator] || "other"}`)}
                     </span>
                   </>
                 ) : (
                   <span style={{ fontSize: "0.8rem", color: "#888" }}>
-                    A aguardar mais dados positivos...
+                    {t("awaiting_positive_data")}
                   </span>
                 )}
               </div>
@@ -289,23 +281,21 @@ export function EnergyStats() {
             {/* 2. Barreiras */}
             <div className={styles.insightCardBarrier}>
               <div className={styles.insightTitleBarrier}>
-                Desafio Recorrente
+                {t("recurring_challenge")}
               </div>
               <div className={styles.insightContent}>
                 {insights.barrier ? (
                   <>
-                    O fator <b>{insights.barrier}</b> surge frequentemente nos
-                    dias difíceis.
+                    {t("factor_difficult_days", { impact: t(`impact_${IMPACT_KEYS[insights.barrier] || "other"}`) })}
                     <div className={styles.insightStrategyBox}>
-                      <b>Estratégia sugerida:</b>
+                      <b>{t("suggested_strategy")}</b>
                       <br />
-                      {IMPACT_SUGGESTIONS[insights.barrier] ||
-                        DEFAULT_SUGGESTION}
+                      {t(`suggestion_${IMPACT_KEYS[insights.barrier] || "default"}`)}
                     </div>
                   </>
                 ) : (
                   <span style={{ fontSize: "0.8rem", color: "#888" }}>
-                    A aguardar dados sobre dificuldades...
+                    {t("awaiting_challenge_data")}
                   </span>
                 )}
               </div>
@@ -321,7 +311,7 @@ export function EnergyStats() {
                   className={styles.insightTitle}
                   style={{ color: "#1565C0" }}
                 >
-                  🏆 Momento de Domínio (Resiliência)
+                  <FaTrophy /> {t("resilience_moment")}
                 </div>
                 <div className={styles.insightContent}>
                   <div
@@ -331,21 +321,14 @@ export function EnergyStats() {
                       gap: "10px",
                     }}
                   >
-                    <span style={{ fontSize: "1.5rem" }}>💪</span>
+                    <FaDumbbell style={{ fontSize: "1.5rem", color: "var(--color-1)" }} />
                     <div>
-                      No dia{" "}
-                      <b>
-                        {insights.resilienceEvent.date.toLocaleDateString(
-                          "pt-PT",
-                          { day: "numeric", month: "long" },
-                        )}
-                      </b>
-                      , lidaste com <b>"{insights.resilienceEvent.impact}"</b>{" "}
-                      mas mantiveste um bom nível de energia!
+                      {t("on_day", { date: insights.resilienceEvent.date.toLocaleDateString(locale, { day: "numeric", month: "long" }) })}{" "}
+                      <b>"{t(`impact_${IMPACT_KEYS[insights.resilienceEvent.impact] || "other"}`)}"</b>{" "}
+                      {t("maintained_energy")}
                       <br />
                       <span style={{ fontSize: "0.8rem", color: "#666" }}>
-                        Isto prova a tua capacidade de adaptação. O que fizeste
-                        de diferente nesse dia?
+                        {t("adaptation_reflection")}
                       </span>
                     </div>
                   </div>
@@ -366,8 +349,7 @@ export function EnergyStats() {
               borderRadius: "8px",
             }}
           >
-            Continua a registar o teu dia. O sistema irá identificar
-            automaticamente estratégias para a tua motivação.
+            {t("keep_logging_energy")}
           </div>
         )}
       </div>

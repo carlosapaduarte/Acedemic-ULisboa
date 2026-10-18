@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useId, useState } from "react";
 import styles from "../createTask.module.css";
 import {
   Button,
@@ -18,6 +18,7 @@ import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
 import { Tag } from "~/service/service";
 import { RiSettings5Fill } from "react-icons/ri";
 import { FaTrash } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa6";
 import { useNavigate } from "@remix-run/react";
 import { TagSection } from "~/components/TagSection/TagSection";
 import calendarStyles from "~/routes/calendar/CreateEvent/EventModal.module.css";
@@ -163,12 +164,12 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
 
   return (
     <div className={styles.slotsToWorkSectionContainer}>
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <div className={styles.slotsToWorkHeading}>
         <h2 className={styles.formSectionTitle} style={{ margin: 0 }}>
           {t("task:slots_to_work_label")}
         </h2>
         <div
-          className={styles.infoIcon}
+          className={classNames(styles.infoIcon, styles.slotsInfoIcon)}
           title={slotsInfoText}
           aria-label={slotsInfoText}
           role="note"
@@ -221,6 +222,7 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
         onPress={handleAddDirectly}
         className={classNames(styles.addSlotToWorkButton)}
       >
+        <FaPlus aria-hidden="true" />
         {t("task:add_slot_to_work", "Adicionar Sessão de Trabalho")}
       </Button>
     </div>
@@ -382,6 +384,7 @@ export function CreateTaskForm({
   setIsMicroTask: (isMicroTask: boolean) => void;
 }) {
   const { t } = useTranslation(["task"]);
+  const microTaskCheckboxId = useId();
   
   const microTaskInfoText = t(
     "task:title_micro_task_info",
@@ -393,12 +396,19 @@ export function CreateTaskForm({
       <div className={styles.microTaskContainer}>
         <input
           type="checkbox"
+          className={styles.hiddenCheckbox}
+          id={microTaskCheckboxId}
           checked={isMicroTask}
           onChange={(e) => setIsMicroTask(e.target.checked)}
         />
-        <label>{t("task:micro_task_label")}</label>
+        <label
+          className={styles.microTaskLabel}
+          htmlFor={microTaskCheckboxId}
+        >
+          {t("task:micro_task_label")}
+        </label>
         <div
-          className={styles.infoIcon}
+          className={classNames(styles.infoIcon, styles.microTaskInfoIcon)}
           title={microTaskInfoText}
           aria-label={microTaskInfoText}
           role="note"
@@ -407,7 +417,7 @@ export function CreateTaskForm({
               alert(microTaskInfoText);
             }
           }}
-          style={{ cursor: "pointer", marginLeft: "8px" }}
+          style={{ cursor: "pointer" }}
         >
           i
         </div>
@@ -423,6 +433,7 @@ export function CreateTaskForm({
           <PrioritySection priority={priority} setPriority={setPriority} />
           
           <TagSection
+            tasksLayout
             selectedTagIds={selectedTagIds}
             setSelectedTagIds={setSelectedTagIds}
             availableTags={availableTags}

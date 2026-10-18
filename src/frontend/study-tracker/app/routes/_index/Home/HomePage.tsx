@@ -5,6 +5,7 @@ import React, {
   useRef,
   useLayoutEffect,
 } from "react";
+import { useTranslation } from "react-i18next";
 import styles from "./homePage.module.css";
 import { useAppBar } from "~/components/AppBar/AppBarProvider";
 import { MoodTrackerFlow } from "./MoodTracker/MoodTrackerFlow";
@@ -20,29 +21,25 @@ import {
   FaPlay,
   FaListCheck,
   FaBookOpen,
+  FaFaceSmile,
+  FaMagnifyingGlass,
+  FaDumbbell,
+  FaFileLines,
 } from "react-icons/fa6";
 
 const MOOD_STORAGE_KEY = "mood_tracker_log_v1";
 
-const QUOTES = [
-  {
-    text: "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
-    author: "Robert Collier",
-  },
-  {
-    text: "Acredita que consegues e já percorreste metade do caminho.",
-    author: "Theodore Roosevelt",
-  },
-  {
-    text: "Não contes os dias, faz com que os dias contem.",
-    author: "Muhammad Ali",
-  },
-  { text: "A persistência é o caminho do êxito.", author: "Charlie Chaplin" },
-  { text: "A energia flui para onde vai a atenção.", author: "Tony Robbins" },
-  { text: "Foca-te no progresso, não na perfeição.", author: "Bill Phillips" },
+const QUOTE_AUTHORS = [
+  "Robert Collier",
+  "Theodore Roosevelt",
+  "Muhammad Ali",
+  "Charlie Chaplin",
+  "Tony Robbins",
+  "Bill Phillips",
 ];
 
 function useHomePage() {
+  const { t, i18n } = useTranslation(["dashboard", "mood_tracker"]);
   const [isMoodLogged, setIsMoodLogged] = useState<boolean>(false);
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
   const [currentQuote, setCurrentQuote] = useState({ text: "", author: "" });
@@ -128,8 +125,6 @@ function useHomePage() {
         today.getDate() === prompted.getDate();
       setIsMoodLogged(hasAnsweredToday);
     }
-
-    setCurrentQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
 
     async function fetchData() {
       try {
@@ -239,12 +234,24 @@ function useHomePage() {
     fetchData();
   }, []);
 
+  const getRandomQuote = () => {
+    const quoteIndex = Math.floor(Math.random() * QUOTE_AUTHORS.length) + 1;
+    return {
+      text: t(`mood_tracker:quote_${quoteIndex}`),
+      author: QUOTE_AUTHORS[quoteIndex - 1],
+    };
+  };
+
+  useEffect(() => {
+    setCurrentQuote(getRandomQuote());
+  }, [i18n.language]);
+
   const completeTracker = () => {
     const today = new Date();
     localStorage.setItem(MOOD_STORAGE_KEY, today.toISOString());
     setIsMoodLogged(true);
     setIsSheetOpen(false);
-    setCurrentQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
+    setCurrentQuote(getRandomQuote());
   };
 
   return {
@@ -261,6 +268,8 @@ function useHomePage() {
     pomoBreak,
     setPomoBreak,
     showConfetti,
+    t,
+    i18n,
   };
 }
 
@@ -280,6 +289,8 @@ export default function HomePage() {
     pomoBreak,
     setPomoBreak,
     showConfetti,
+    t,
+    i18n,
   } = useHomePage();
 
   useAppBar("home");
@@ -316,11 +327,16 @@ export default function HomePage() {
     <div className={`${styles.homePage} tutorial-target-dashboard-container`}>
       <div className={styles.headerSection}>
         <div className={styles.dateBadge}>
-          {new Date().toLocaleDateString("pt-PT", {
+          {new Date().toLocaleDateString(
+            i18n.resolvedLanguage?.toLowerCase().startsWith("en")
+              ? "en-GB"
+              : "pt-PT",
+            {
             weekday: "long",
             day: "numeric",
             month: "long",
-          })}
+            },
+          )}
         </div>
       </div>
 
@@ -334,23 +350,23 @@ export default function HomePage() {
           {!isMoodLogged ? (
             <div className={styles.moodInitial}>
               <div>
-                <h3 className={styles.cardTitle}>Mood Tracker</h3>
+                <h3 className={styles.cardTitle}>{t("mood_tracker")}</h3>
                 <p style={{ marginTop: "8px", marginBottom: "1rem" }}>
-                  Como te sentes hoje? Regista o teu progresso.
+                  {t("mood_prompt")}
                 </p>
                 <button
                   className={styles.moodBtn}
                   onClick={handleOpenMoodTracker}
                 >
-                  Registar Agora
+                  {t("log_mood")}
                 </button>
               </div>
-              <div style={{ fontSize: "3rem", opacity: 0.8 }}>✨</div>
+              <FaFaceSmile size={40} aria-hidden="true" />
             </div>
           ) : (
             <div className={styles.moodSuccessContainer}>
               <div className={styles.successHeader}>
-                <FaCircleCheck style={{ color: 'var(--color-2)' }} /> Mood Registado!
+                  <FaCircleCheck style={{ color: "var(--color-1)" }} /> {t("mood_logged")}
               </div>
               <div className={styles.moodQuote}>"{currentQuote.text}"</div>
               <div className={styles.quoteAuthor}>— {currentQuote.author}</div>
@@ -358,7 +374,7 @@ export default function HomePage() {
                 className={styles.editMoodBtn}
                 onClick={handleOpenMoodTracker}
               >
-                <FaPen size={10} /> Editar
+                <FaPen size={10} /> {t("edit")}
               </button>
             </div>
           )}
@@ -401,7 +417,7 @@ export default function HomePage() {
             style={{ position: "relative", zIndex: 1 }}
           >
             <div className={styles.cardTitle}>
-              <FaListCheck /> Tarefas com prazo para Hoje
+              <FaListCheck /> {t("tasks_due_today")}
             </div>
           </div>
 
@@ -417,9 +433,9 @@ export default function HomePage() {
                 gap: "0.5rem",
               }}
             >
-              <span style={{ fontSize: "1.5rem" }}>🔍</span>
+              <FaMagnifyingGlass size={22} aria-hidden="true" />
               <span style={{ fontSize: "0.9rem", fontStyle: "italic" }}>
-                Sem tarefas para hoje!
+                {t("no_tasks_today")}
               </span>
             </div>
           ) : (
@@ -433,7 +449,7 @@ export default function HomePage() {
               >
                 <span className={styles.statNumber}>{taskStats.completed}</span>
                 <span style={{ fontSize: "0.9rem", color: "var(--color-3)" }}>
-                  de {taskStats.total}
+                  {t("of_total", { count: taskStats.total })}
                 </span>
               </div>
               <div className={styles.progressBarBg}>
@@ -455,7 +471,7 @@ export default function HomePage() {
                     fontWeight: "bold",
                   }}
                 >
-                  Bom trabalho! 💪
+                  {t("great_work")} <FaDumbbell aria-hidden="true" />
                 </div>
               )}
             </div>
@@ -476,7 +492,7 @@ export default function HomePage() {
         >
           <div className={styles.cardHeader}>
             <div className={styles.cardTitle}>
-              <FaCalendar /> Agenda
+              <FaCalendar /> {t("calendar")}
             </div>
           </div>
 
@@ -538,7 +554,7 @@ export default function HomePage() {
                   padding: "10px",
                 }}
               >
-                Agenda livre hoje.
+                {t("calendar_empty_today")}
               </div>
             )}
           </div>
@@ -552,13 +568,13 @@ export default function HomePage() {
         >
           <div className={styles.cardHeader}>
             <div className={styles.cardTitle}>
-              <FaPlay size={12} /> Foco
+              <FaPlay size={12} /> {t("focus")}
             </div>
           </div>
           <div className={styles.pomodoroContainer}>
             <div className={styles.pomodoroInputs}>
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Foco (m)</label>
+                <label className={styles.inputLabel}>{t("focus_minutes")}</label>
                 <input
                   type="number"
                   className={styles.timeInput}
@@ -568,7 +584,7 @@ export default function HomePage() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Pausa (m)</label>
+                <label className={styles.inputLabel}>{t("break_minutes")}</label>
                 <input
                   type="number"
                   className={styles.timeInput}
@@ -585,7 +601,7 @@ export default function HomePage() {
                 handleGoToPomodoro();
               }}
             >
-              Iniciar
+              {t("start")}
             </button>
           </div>
         </div>
@@ -597,7 +613,7 @@ export default function HomePage() {
         >
           <div className={styles.cardHeader}>
             <div className={styles.cardTitle}>
-              <FaBookOpen /> Apontamentos Recentes
+              <FaBookOpen /> {t("recent_notes")}
             </div>
           </div>
 
@@ -616,10 +632,10 @@ export default function HomePage() {
                 >
                   <div className={styles.noteInfo}>
   <span className={styles.noteTitle}>
-    📝 {note.fileName}
+    <FaFileLines aria-hidden="true" /> {note.fileName}
   </span>
   <span className={styles.noteDetail}>
-    Pasta: {note.folderName}
+    {t("folder", { name: note.folderName })}
   </span>
 </div>
                 </div>
@@ -634,7 +650,7 @@ export default function HomePage() {
                   color: "#888",
                 }}
               >
-                Ainda não abriste nenhum apontamento.
+                {t("no_recent_notes")}
               </div>
             )}
           </div>

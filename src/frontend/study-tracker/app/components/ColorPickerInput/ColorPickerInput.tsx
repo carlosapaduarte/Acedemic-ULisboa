@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { Label, Input, Button } from "react-aria-components";
 import { RiAddFill, RiCloseLine, RiDeleteBinLine } from "react-icons/ri";
 import styles from "./ColorPickerInput.module.css";
-import { service } from "~/service/service";
+import {
+  getCustomColorsSnapshot,
+  loadCustomColors,
+  saveCustomColors,
+  subscribeToCustomColors,
+} from "./customColorsStore";
 
 interface ColorPickerInputProps {
   label?: string;
@@ -22,7 +27,11 @@ export function ColorPickerInput({
   const fallbackHexValue = "#703f3a";
   const currentColor = color || fallbackHexValue;
 
-  const [customColors, setCustomColors] = useState<string[]>([]);
+  const customColors = useSyncExternalStore(
+    subscribeToCustomColors,
+    getCustomColorsSnapshot,
+    getCustomColorsSnapshot,
+  );
 
   // Drag & Drop States
   const [isDragging, setIsDragging] = useState(false);
@@ -32,40 +41,24 @@ export function ColorPickerInput({
   const trashRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    service
-      .fetchUserInfoFromApi()
-      .then((user) => {
-        const coresVindasDaBD =
-          user.custom_colors ||
-          (user as any).customColors ||
-          (user as any).colors ||
-          [];
-        if (Array.isArray(coresVindasDaBD)) {
-          setCustomColors(coresVindasDaBD);
-        }
-      })
-      .catch((err) => console.error("Erro user info:", err));
+    void loadCustomColors();
   }, []);
 
   const handleSaveColor = async () => {
     if (customColors.includes(currentColor)) return;
 
-    const newColors = [currentColor, ...customColors];
-    setCustomColors(newColors);
-
     try {
-      await service.updateUserCustomColors(newColors);
+      await saveCustomColors((colors) => [currentColor, ...colors]);
     } catch (error) {
       console.error("Erro ao guardar cor:", error);
     }
   };
 
   const handleDeleteColor = async (colorToDelete: string) => {
-    const newColors = customColors.filter((c) => c !== colorToDelete);
-    setCustomColors(newColors);
-
     try {
-      await service.updateUserCustomColors(newColors);
+      await saveCustomColors((colors) =>
+        colors.filter((c) => c !== colorToDelete),
+      );
     } catch (error) {
       console.error("Erro ao apagar cor:", error);
     }
@@ -168,7 +161,7 @@ export function ColorPickerInput({
           }`}
           isDisabled={isColorSaved}
           onPress={handleSaveColor}
-          title="Guardar cor"
+          title={t("save_color", "Guardar cor")}
         >
           <RiAddFill />
         </Button>
@@ -177,7 +170,7 @@ export function ColorPickerInput({
           <Button
             className={styles.actionButton}
             onPress={clearColor}
-            title="Limpar cor"
+            title={t("clear_color", "Limpar cor")}
           >
             <RiCloseLine />
           </Button>
@@ -186,7 +179,7 @@ export function ColorPickerInput({
 
       {customColors.length > 0 ? (
         <div className={styles.paletteSection}>
-          <span className={styles.sectionTitle}>Minhas Cores</span>
+          <span className={styles.sectionTitle}>{t("my_colors", "Minhas Cores")}</span>
 
           <div className={styles.presetGrid}>
             {customColors.map((c, index) => (
@@ -218,7 +211,7 @@ export function ColorPickerInput({
             onDrop={handleDropOnTrash}
           >
             <RiDeleteBinLine size={18} />
-            <span>Arrastar para apagar</span>
+            <span>{t("drag_to_delete", "Arrastar para apagar")}</span>
           </div>
         </div>
       ) : (
@@ -231,7 +224,7 @@ export function ColorPickerInput({
             marginTop: "5px",
           }}
         >
-          As tuas cores guardadas aparecerão aqui.
+          {t("saved_colors_empty", "As tuas cores guardadas aparecerão aqui.")}
         </div>
       )}
     </div>

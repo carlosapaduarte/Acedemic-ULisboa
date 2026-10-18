@@ -777,12 +777,66 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 uc = session.exec(statement).first()
                 
                 if uc:
-                    uc.name = new_name
-                    uc.ects = ects
-                    uc.min_grade = min_grade
-                    uc.target_grade = target_grade
-                    
-                    session.add(uc)
+                    if new_name != old_name:
+                        conflicting_uc = session.exec(
+                            select(STCurricularUnitModel).where(
+                                STCurricularUnitModel.user_id == user_id,
+                                STCurricularUnitModel.name == new_name,
+                            )
+                        ).first()
+                        if conflicting_uc:
+                            raise ValueError("UC already exists")
+
+                        # The name is part of the UC primary key and the grade FK.
+                        # Insert the new key first, move grades, then remove the old
+                        # key, all in this transaction so a failure rolls everything back.
+                        grades = session.exec(
+                            select(STGradeModel).where(
+                                STGradeModel.user_id == user_id,
+                                STGradeModel.curricular_unit_name == old_name,
+                            )
+                        ).all()
+                        replacement_uc = STCurricularUnitModel(
+                            user_id=user_id,
+                            name=new_name,
+                            ects=ects,
+                            min_grade=min_grade,
+                            target_grade=target_grade,
+                        )
+                        session.add(replacement_uc)
+                        session.flush()
+
+                        for grade in grades:
+                            grade.curricular_unit_name = new_name
+                            session.add(grade)
+                        session.flush()
+
+                        session.delete(uc)
+
+                        # Rename only this user's linked UC tag. Updating the row
+                        # preserves its ID, color, and task/event tag associations.
+                        uc_tag = session.exec(
+                            select(TagModel)
+                            .join(UserTagLink, UserTagLink.tag_id == TagModel.id)
+                            .where(
+                                UserTagLink.user_id == user_id,
+                                TagModel.is_uc == True,
+                                or_(
+                                    TagModel.name_pt == old_name,
+                                    TagModel.name_en == old_name,
+                                ),
+                            )
+                        ).first()
+                        if uc_tag:
+                            uc_tag.name_pt = new_name
+                            uc_tag.name_en = new_name
+                            session.add(uc_tag)
+                    else:
+                        uc.ects = ects
+                        uc.min_grade = min_grade
+                        uc.target_grade = target_grade
+                        session.add(uc)
+
                     session.commit()
             except Exception as e:
                 print("\n\n❌ ERRO GRAVE AO ATUALIZAR A UC:", str(e), "\n\n")

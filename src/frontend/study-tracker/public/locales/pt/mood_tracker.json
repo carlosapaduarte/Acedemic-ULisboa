@@ -48,6 +48,12 @@
   "impact_acontecimentos_atuais": "Acontecimentos Atuais",
   "impact_outro": "Outro",
 
-  "mood_registered": "Estado emocional registado!",
-  "go_dashboard": "Ir para o Dashboard"
+  "mood_registered": "Humor registado!",
+  "go_dashboard": "Ir para o Dashboard",
+  "quote_1": "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
+  "quote_2": "Acredita que consegues e já percorreste metade do caminho.",
+  "quote_3": "Não contes os dias, faz com que os dias contem.",
+  "quote_4": "A persistência é o caminho do êxito.",
+  "quote_5": "A energia flui para onde vai a atenção.",
+  "quote_6": "Foca-te no progresso, não na perfeição."
 }

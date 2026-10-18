@@ -15,6 +15,8 @@ import {
   Line,
 } from "recharts";
 import styles from "./statistics.module.css";
+import { useTranslation } from "react-i18next";
+import { FaCircleCheck, FaClock, FaFire } from "react-icons/fa6";
 import {
   Task,
   TaskDistributionPerWeek,
@@ -32,6 +34,7 @@ const COLORS = [
 
 // --- 1. GRÁFICO: Tarefas Concluídas (Últimos 7 dias) ---
 export function TasksCompletedChart({ tasks }: { tasks: Task[] }) {
+  const { t } = useTranslation(["statistics"]);
   const data = useMemo(() => {
     if (!tasks || tasks.length === 0) return [];
 
@@ -72,7 +75,7 @@ export function TasksCompletedChart({ tasks }: { tasks: Task[] }) {
 
   return (
     <div className={styles.chartCard}>
-      <h3 className={styles.chartTitle}>✅ Tarefas Concluídas (Semana)</h3>
+      <h3 className={styles.chartTitle}><FaCircleCheck aria-hidden="true" /> {t("statistics:task_completed_chart_title")}</h3>
       <div style={{ width: "100%", height: 250, fontSize: "0.8rem" }}>
         <ResponsiveContainer>
           <BarChart data={data}>
@@ -89,6 +92,7 @@ export function TasksCompletedChart({ tasks }: { tasks: Task[] }) {
             />
             <Bar
               dataKey="tarefas"
+              name={t("statistics:tasks_completed_label")}
               fill="#4CAF50"
               radius={[4, 4, 0, 0]}
               barSize={30}
@@ -106,6 +110,7 @@ export function StudyTimePieChart({
 }: {
   distributionStats: TaskDistributionPerWeek[];
 }) {
+  const { t } = useTranslation(["statistics"]);
   const data = useMemo(() => {
     if (!distributionStats || distributionStats.length === 0) return [];
 
@@ -126,12 +131,12 @@ export function StudyTimePieChart({
 
   if (data.length === 0)
     return (
-      <div className={styles.noData}>Sem dados de estudo esta semana.</div>
+      <div className={styles.noData}>{t("statistics:no_study_data_week")}</div>
     );
 
   return (
     <div className={styles.chartCard}>
-      <h3 className={styles.chartTitle}>⏱️ Tempo por Disciplina</h3>
+      <h3 className={styles.chartTitle}><FaClock aria-hidden="true" /> {t("statistics:time_by_subject")}</h3>
       <div style={{ width: "100%", height: 250, fontSize: "0.8rem" }}>
         <ResponsiveContainer>
           <PieChart>
@@ -151,7 +156,7 @@ export function StudyTimePieChart({
                 />
               ))}
             </Pie>
-            <Tooltip formatter={(value: number) => [`${value} min`, "Tempo"]} />
+            <Tooltip formatter={(value: number) => [`${value} ${t("statistics:minute_short")}`, t("statistics:time_label")]} />
             <Legend verticalAlign="bottom" height={36} />
           </PieChart>
         </ResponsiveContainer>
@@ -166,6 +171,7 @@ export function FocusHistoryChart({
 }: {
   weekHistory: WeekTimeStudy[];
 }) {
+  const { t } = useTranslation(["statistics"]);
   const data = useMemo(() => {
     if (!weekHistory || weekHistory.length === 0) return [];
 
@@ -174,15 +180,15 @@ export function FocusHistoryChart({
       .sort((a, b) => a.year * 100 + a.week - (b.year * 100 + b.week))
       .slice(-5) // Últimas 5 semanas
       .map((w) => ({
-        name: `Sem ${w.week}`,
+        name: t("statistics:week_number", { week: w.week }),
         foco: Math.round(w.total / 60), // Converter para horas
         meta: Math.round(w.target / 60),
       }));
-  }, [weekHistory]);
+  }, [weekHistory, t]);
 
   return (
     <div className={styles.chartCard}>
-      <h3 className={styles.chartTitle}>🔥 Histórico de Foco (Horas)</h3>
+      <h3 className={styles.chartTitle}><FaFire aria-hidden="true" /> {t("statistics:focus_history_hours")}</h3>
       <div style={{ width: "100%", height: 250, fontSize: "0.8rem" }}>
         <ResponsiveContainer>
           <LineChart data={data}>
@@ -197,14 +203,14 @@ export function FocusHistoryChart({
               stroke="#3399FF"
               strokeWidth={3}
               activeDot={{ r: 6 }}
-              name="Realizado"
+              name={t("statistics:realized")}
             />
             <Line
               type="monotone"
               dataKey="meta"
               stroke="#E0E0E0"
               strokeDasharray="5 5"
-              name="Meta"
+              name={t("statistics:target")}
             />
           </LineChart>
         </ResponsiveContainer>

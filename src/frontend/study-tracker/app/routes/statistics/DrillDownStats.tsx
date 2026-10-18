@@ -12,6 +12,8 @@ import {
 import styles from "./statistics.module.css";
 import { service, Event, Tag } from "~/service/service";
 import { utils } from "~/utils";
+import { useTranslation } from "react-i18next";
+import { FaArrowLeft, FaMagnifyingGlass } from "react-icons/fa6";
 
 const UC_COLOR = "#8d6e63";
 const OTHER_COLORS = [
@@ -84,6 +86,7 @@ function expandEventsForCurrentWeek(
 }
 
 export function DrillDownStats() {
+  const { t } = useTranslation(["statistics"]);
   const [rawEvents, setRawEvents] = useState<Event[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -129,9 +132,9 @@ export function DrillDownStats() {
         const eventTagNames: string[] = [];
 
         event.tags.forEach((tagItem: any) => {
-          let tagName = "Desconhecido";
+          let tagName = t("unknown_tag");
           if (typeof tagItem === "object" && tagItem !== null) {
-            tagName = tagItem.name_pt || tagItem.name_en || "Sem Nome";
+            tagName = tagItem.name_pt || tagItem.name_en || t("unnamed_tag");
           } else {
             const found = tags.find(
               (t) =>
@@ -190,7 +193,7 @@ export function DrillDownStats() {
       otherData: formatData(otherMap),
       drillDownData: formatData(coOccurrenceMap),
     };
-  }, [rawEvents, tags, selectedTag]);
+  }, [rawEvents, tags, selectedTag, t]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -200,7 +203,7 @@ export function DrillDownStats() {
       return (
         <div className={styles.customTooltip}>
           <p className={styles.customTooltipLabel}>{label}</p>
-          <p style={{ color: "#666" }}>{h > 0 ? `${h}h ${m}m` : `${m} min`}</p>
+          <p style={{ color: "#666" }}>{h > 0 ? `${h}${t("hours_short")} ${m}${t("minutes_short")}` : `${m} ${t("minutes_short")}`}</p>
         </div>
       );
     }
@@ -211,8 +214,8 @@ export function DrillDownStats() {
     <div className={styles.statCardContainer}>
       <div className={styles.statTitle}>
         {selectedTag
-          ? `🔍 Detalhe: ${selectedTag}`
-          : "Distribuição de Tempo"}
+          ? <><FaMagnifyingGlass aria-hidden="true" /> {t("tag_detail", { tag: selectedTag })}</>
+          : t("distribution_time")}
       </div>
 
       {!selectedTag && (
@@ -224,7 +227,7 @@ export function DrillDownStats() {
             paddingLeft: "1rem",
           }}
         >
-          Onde gastaste o teu tempo esta semana
+          {t("where_time_this_week")}
         </p>
       )}
 
@@ -252,12 +255,12 @@ export function DrillDownStats() {
                 fontSize: "1rem",
               }}
             >
-              {"⬅ Voltar"}
+              <><FaArrowLeft aria-hidden="true" /> {t("back")}</>
             </button>
             <span
               style={{ fontSize: "0.8rem", color: "#666", fontStyle: "italic" }}
             >
-              {"Co-ocorrências com: "}
+              {t("co_occurrences_with")} {" "}
               <b>{selectedTag}</b>
             </span>
           </div>
@@ -310,9 +313,9 @@ export function DrillDownStats() {
                   color: "#999",
                 }}
               >
-                <p>Esta tag aparece sozinha nos eventos.</p>
+                <p>{t("tag_alone_events")}</p>
                 <p style={{ fontSize: "0.8rem" }}>
-                  (Não foi combinada com outras tags)
+                  {t("tag_not_combined")}
                 </p>
               </div>
             )}
@@ -322,7 +325,7 @@ export function DrillDownStats() {
         <div className={styles.tasksGrid}>
           {/* 1. GERAL (MOVIDO PARA A ESQUERDA) */}
           <div className={styles.chartWrapper}>
-            <div className={styles.chartTitleSmall}>{"Geral"}</div>
+            <div className={styles.chartTitleSmall}>{t("general")}</div>
             {otherData.length > 0 ? (
               <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
                 <ResponsiveContainer>
@@ -373,18 +376,18 @@ export function DrillDownStats() {
                     marginBottom: "5px",
                   }}
                 >
-                  (Clica na barra para ver detalhes)
+                  {t("click_bar_details")}
                 </div>
               </div>
             ) : (
               <div className={styles.noDataAvailableMessage}>
-                Sem registos gerais.
+                {t("no_general_records")}
               </div>
             )}
           </div>
 
           <div className={styles.chartWrapper}>
-            <div className={styles.chartTitleSmall}>{"Académico (UCs)"}</div>
+            <div className={styles.chartTitleSmall}>{t("academic_units")}</div>
             {ucData.length > 0 ? (
               <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
                 <ResponsiveContainer>
@@ -428,12 +431,12 @@ export function DrillDownStats() {
                     marginBottom: "5px",
                   }}
                 >
-                  (Clica na barra para ver detalhes)
+                  {t("click_bar_details")}
                 </div>
               </div>
             ) : (
               <div className={styles.noDataAvailableMessage}>
-                Sem dados de UCs.
+                {t("no_unit_data")}
               </div>
             )}
           </div>

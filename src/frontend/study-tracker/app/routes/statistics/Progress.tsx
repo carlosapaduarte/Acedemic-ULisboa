@@ -36,10 +36,12 @@ function ProgressIcon({ progress }: { progress: number }) {
 }
 
 function DailyProgressStatus({ status }: { status: DailyTasksProgress }) {
+    const { i18n } = useTranslation(["statistics"]);
+    const locale = i18n.resolvedLanguage?.toLowerCase().startsWith("en") ? "en-GB" : "pt-PT";
     return (
         <div className={styles.textAndIconContainer}>
             <ProgressIcon progress={status.progress} />
-            {status.date.getDate()} {status.date.toLocaleString("default", { month: "long" }).substring(0, 3).toUpperCase()}
+            {status.date.toLocaleDateString(locale, { day: "numeric", month: "short" }).replace(".", "").toUpperCase()}
         </div>
     );
 }
@@ -156,7 +158,7 @@ export function Progress() {
                 <div className={styles.statsContainerTitle}>
                     <img
                         src="icons/task_progress_icon.svg"
-                        alt="Task progress icon"
+                        alt={t("statistics:task_progress_icon_alt")}
                         className={styles.titleImg}
                     />
                     {t("statistics:progress_container_title")}

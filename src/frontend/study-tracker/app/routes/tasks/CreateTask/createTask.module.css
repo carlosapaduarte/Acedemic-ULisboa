@@ -40,6 +40,7 @@
 
 .newTaskFormContainer {
   composes: formContainer;
+  box-shadow: inset 0 -4px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .newTaskForm {
@@ -87,6 +88,8 @@
 }
 
 .formSectionTitle {
+  color: var(--text-color-2);
+  font-weight: 500;
 }
 
 .formInput,
@@ -186,26 +189,26 @@
   transition: all 0.2s;
 }
 
-.priorityButton:hover:not([aria-selected="true"]) {
+.priorityButton:hover:not([aria-pressed="true"]) {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.priorityButton[aria-selected="true"] {
+.priorityButton[aria-pressed="true"] {
   background-color: var(--color-2);
   color: var(--color-3);
 }
 
-.priorityButton[aria-selected="true"].lowPriority {
+.priorityButton[aria-pressed="true"].lowPriority {
   background-color: #4CAF50 !important;
   color: white !important;
 }
 
-.priorityButton[aria-selected="true"].mediumPriority {
+.priorityButton[aria-pressed="true"].mediumPriority {
   background-color: #FFC107 !important;
   color: #333 !important;
 }
 
-.priorityButton[aria-selected="true"].highPriority {
+.priorityButton[aria-pressed="true"].highPriority {
   background-color: #F44336 !important;
   color: white !important;
 }
@@ -379,25 +382,27 @@
 .microTaskContainer {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 1.5rem;
-  padding: 10px 15px;
-  background-color: rgba(255, 255, 255, 0.15);
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  border: none;
-  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: background-color 0.2s ease;
 }
 
 .microTaskContainer:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .hiddenCheckbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--color-1);
+  flex: 0 0 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 4px;
   background-color: transparent;
   cursor: pointer;
@@ -409,20 +414,27 @@
 }
 
 .hiddenCheckbox:checked {
-  background-color: var(--color-1);
+  background-color: var(--color-2);
+  border-color: var(--color-2);
 }
 
 .hiddenCheckbox:checked::after {
-  content: "✔";
-  font-size: 14px;
+  content: "✓";
+  font-size: 0.8rem;
   color: var(--color-3);
   font-weight: bold;
+}
+
+.hiddenCheckbox:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
 }
 
 .microTaskLabel {
   font-family: var(--font-family1);
   font-size: 1rem;
-  color: var(--color-2) !important; /* Texto Verde */
+  flex: 1;
+  color: var(--text-color-2) !important;
   cursor: pointer;
   font-weight: 600;
   user-select: none;
@@ -442,6 +454,22 @@
   cursor: help;
   margin-left: auto;
   transition: background-color 0.2s;
+}
+
+.microTaskInfoIcon {
+  margin-left: 0;
+  flex: 0 0 20px;
+}
+
+.slotsToWorkHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.slotsInfoIcon {
+  margin-left: 0;
+  flex: 0 0 20px;
 }
 
 /* O :focus e :active ativam o tooltip/ação também em touch screens (mobile) */

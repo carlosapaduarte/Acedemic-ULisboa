@@ -6,7 +6,7 @@ import { utils } from "~/utils";
 import { CurWeekDate, getWeekIntervalStr, NoDataYetAvailableMessage, SeeFullHistory, Spacer } from "./Commons";
 import { useTranslation } from "react-i18next";
 
-function BarChart({ weekStudyTimeHistory }: { weekStudyTimeHistory: WeekTimeStudy[] }) {
+function BarChart({ weekStudyTimeHistory, locale }: { weekStudyTimeHistory: WeekTimeStudy[]; locale: string }) {
     return (
         <div className={styles.focusWeeksContainer}>
             {
@@ -40,7 +40,7 @@ function BarChart({ weekStudyTimeHistory }: { weekStudyTimeHistory: WeekTimeStud
                             <div key={index} className={styles.focusWeekContainer}>
                                 <div className={styles.focusWeekLabel}>
                                     <span className={styles.containerHeaderDate}>
-                                        {getWeekIntervalStr(date)}
+                                        {getWeekIntervalStr(date, locale)}
                                     </span>
                                 </div>
                                 <div className={styles.focusWeekProgressBarContainer}>
@@ -58,7 +58,8 @@ function BarChart({ weekStudyTimeHistory }: { weekStudyTimeHistory: WeekTimeStud
 
 
 function HistoryStats({ weekStudyTimeHistory }: { weekStudyTimeHistory: WeekTimeStudy[] }) {
-    const { t } = useTranslation(["statistics"]);
+    const { t, i18n } = useTranslation(["statistics"]);
+    const locale = i18n.resolvedLanguage?.toLowerCase().startsWith("en") ? "en-GB" : "pt-PT";
     return (
         weekStudyTimeHistory.length != 0 ?
             <>
@@ -70,7 +71,7 @@ function HistoryStats({ weekStudyTimeHistory }: { weekStudyTimeHistory: WeekTime
                 </div>
 
                 <div>
-                    <BarChart weekStudyTimeHistory={weekStudyTimeHistory} />
+                    <BarChart weekStudyTimeHistory={weekStudyTimeHistory} locale={locale} />
                 </div>
             </>
             :
@@ -84,7 +85,7 @@ function CurWeekFocusStats({ weekStats }: { weekStats: WeekTimeStudy }) {
     function toHoursAndMinutesStr(totalMinutes: number): string {
         const hours = Math.trunc(totalMinutes / 60);
         const minutes = totalMinutes - hours * 60;
-        return `${hours} hours and ${minutes} minutes`;
+        return t("statistics:hours_and_minutes", { hours, minutes });
     }
 
     return (

@@ -10,6 +10,8 @@ import {
 import styles from "./statistics.module.css";
 import { TaskDistributionPerWeek } from "~/service/service";
 import { utils } from "~/utils";
+import { useTranslation } from "react-i18next";
+import { FaTags } from "react-icons/fa6";
 
 const COLORS = [
   "#FFAB91",
@@ -22,6 +24,7 @@ const COLORS = [
 ];
 
 export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
+  const { t } = useTranslation(["statistics"]);
   const data = useMemo(() => {
     const currentWeek = utils.getWeekNumber(new Date());
 
@@ -43,7 +46,7 @@ export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
 
   return (
     <div className={styles.statCardContainer}>
-      <div className={styles.statTitle}>🏷️ Distribuição por Tag (Eventos)</div>
+      <div className={styles.statTitle}><FaTags /> {t("tag_event_distribution")}</div>
 
       <div
         style={{
@@ -56,7 +59,7 @@ export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
           className={styles.chartTitleSmall}
           style={{ border: "none", marginBottom: "0" }}
         >
-          Onde gastaste o teu tempo esta semana
+          {t("time_spent_this_week")}
         </div>
 
         {data.length > 0 ? (
@@ -86,8 +89,8 @@ export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
                 </Pie>
                 <Tooltip
                   formatter={(value: number) => [
-                    `${Math.floor(value / 60)}h ${value % 60}m`,
-                    "Tempo",
+                    `${Math.floor(value / 60)}${t("hours_short")} ${value % 60}${t("minutes_short")}`,
+                    t("time_label"),
                   ]}
                   contentStyle={{
                     borderRadius: "8px",
@@ -105,7 +108,7 @@ export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
           </div>
         ) : (
           <div className={styles.noDataAvailableMessage}>
-            Sem eventos registados esta semana no calendário.
+            {t("no_events_this_week")}
           </div>
         )}
 
@@ -118,7 +121,7 @@ export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
             textAlign: "center",
           }}
         >
-          Estes dados vêm diretamente dos eventos do teu Calendário.
+          {t("event_source_note")}
         </div>
       </div>
     </div>
