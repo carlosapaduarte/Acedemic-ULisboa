@@ -11,7 +11,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IconContext } from "react-icons";
 import { AppBarContext } from "./AppBarProvider";
 import { useTranslation } from "react-i18next";
-import { FaXmark } from "react-icons/fa6";
+import { FaClock, FaMugHot, FaXmark } from "react-icons/fa6";
 import { useTutorialMenu } from "~/components/Tutorial/TutorialContext";
 
 function GlobalStatusWidgets() {
@@ -110,9 +110,12 @@ function GlobalStatusWidgets() {
 
   // Textos dinâmicos com traduções
   const widgetColor = currentState === "pause" ? "#F39C12" : "#4CAF50";
-  const widgetText = currentState === "pause" 
-    ? t("appbar:status_pause", "☕ Em Pausa:") 
-    : t("appbar:status_study", "⏱️ A Estudar:");
+  const widgetText = currentState === "pause"
+    ? t("appbar:status_pause", "Em pausa:")
+    : t("appbar:status_study", "A estudar:");
+  const widgetIcon = currentState === "pause"
+    ? <FaMugHot aria-hidden="true" />
+    : <FaClock aria-hidden="true" />;
 
   return (
     <>
@@ -153,7 +156,11 @@ function GlobalStatusWidgets() {
           onClick={() => navigate('/pomodoro')}
           style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 9999, backgroundColor: widgetColor, color: "white", padding: "10px 20px", borderRadius: "50px", fontWeight: "bold", boxShadow: "0 4px 10px rgba(0,0,0,0.3)", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", transition: "background-color 0.5s" }}
         >
-          {widgetText} {pomodoroTimeLeft}
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            {widgetIcon}
+            {widgetText}
+          </span>
+          {pomodoroTimeLeft}
         </div>
       )}
       

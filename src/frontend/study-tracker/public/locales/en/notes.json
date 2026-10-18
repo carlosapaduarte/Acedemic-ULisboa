@@ -17,5 +17,10 @@
     "save": "Save note",
     "saving": "Saving…",
     "saved": "Saved",
-    "save_error": "Could not save"
+    "save_error": "Could not save",
+    "new_note_title": "New Note",
+    "new_note_placeholder": "E.g. Lecture 1 summary",
+    "create_note": "Create",
+    "new_note_title_required": "The note title cannot be empty.",
+    "new_note_error": "Could not create note."
 }

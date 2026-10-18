@@ -1,0 +1,59 @@
+.infoPopoverRoot {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.infoPopover {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: min(18rem, calc(100vw - 2rem));
+  box-sizing: border-box;
+  padding: 0.75rem 2.25rem 0.75rem 0.9rem;
+  border: 1px solid var(--color-2);
+  border-radius: 0.5rem;
+  background: var(--color-3);
+  color: var(--text-color-2);
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.22);
+  line-height: 1.45;
+  white-space: normal;
+}
+
+.open {
+  display: block;
+}
+
+.infoPopoverText {
+  margin: 0;
+  color: inherit;
+  font-size: 0.875rem;
+}
+
+.infoPopoverClose {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-color-2);
+  cursor: pointer;
+}
+
+.infoPopoverClose:hover {
+  opacity: 0.75;
+}
+
+.infoPopoverClose:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
+}

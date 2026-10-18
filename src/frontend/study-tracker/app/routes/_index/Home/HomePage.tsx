@@ -12,6 +12,7 @@ import { MoodTrackerFlow } from "./MoodTracker/MoodTrackerFlow";
 import { useNavigate } from "@remix-run/react";
 import { service } from "~/service/service";
 import { utils } from "~/utils";
+import { getEventStyleProps } from "~/utils/eventColors";
 import Confetti from "react-confetti";
 
 import {
@@ -67,51 +68,6 @@ function useHomePage() {
 
     const yiq = (r * 299 + g * 587 + b * 114) / 1000;
     return yiq >= 128 ? "#000000" : "#ffffff";
-  };
-
-  const resolveEventStyle = (event: any, allTags: any[]) => {
-    const FALLBACK_COLOR = "#3399FF";
-
-    const eventColorUpper = event.color ? event.color.toUpperCase() : null;
-    const fallbackUpper = FALLBACK_COLOR.toUpperCase();
-
-    if (eventColorUpper && eventColorUpper !== fallbackUpper) {
-      return { background: event.color };
-    }
-
-    if (event.tags && event.tags.length > 0 && allTags.length > 0) {
-      const tagColors = event.tags
-        .map((tagRef: any) => {
-          const found = allTags.find((t) => {
-            if (typeof tagRef === "object") return t.id === tagRef.id;
-            const refStr = String(tagRef).toLowerCase().trim();
-            const tId = String(t.id).toLowerCase();
-            const tNamePt = (t.name_pt || "").toLowerCase();
-            const tNameEn = (t.name_en || "").toLowerCase();
-            const tName = (t.name || "").toLowerCase();
-
-            return (
-              tId === refStr ||
-              tNamePt === refStr ||
-              tNameEn === refStr ||
-              tName === refStr
-            );
-          });
-          return found ? found.color : null;
-        })
-        .filter((c: string | null) => c);
-
-      if (tagColors.length > 0) {
-        if (tagColors.length === 1) {
-          return { background: tagColors[0] };
-        }
-        return {
-          background: `linear-gradient(135deg, ${tagColors.join(", ")})`,
-        };
-      }
-    }
-
-    return { background: FALLBACK_COLOR };
   };
 
   useEffect(() => {
@@ -173,8 +129,10 @@ function useHomePage() {
             return minutesA - minutesB;
           })
           .map((ev: any) => {
-            const style = resolveEventStyle(ev, tags);
-            const textColor = getContrastColor(style.background);
+            const style = getEventStyleProps(ev, tags);
+            const background =
+              style.backgroundColor || style.backgroundImage || "#3399FF";
+            const textColor = getContrastColor(background);
 
             return {
               ...ev,

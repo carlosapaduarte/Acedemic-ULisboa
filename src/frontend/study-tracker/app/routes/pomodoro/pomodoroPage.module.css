@@ -253,10 +253,12 @@
   letter-spacing: 2px;
 }
 
-.statusText {
-  font-style: italic;
-  color: #ccc;
-  margin-bottom: 1.5rem;
+.pausedIndicator {
+  display: flex;
+  justify-content: center;
+  color: var(--color-2);
+  font-size: 1.25rem;
+  margin: 0.25rem 0 -0.5rem;
 }
 
 .controls {
@@ -315,31 +317,51 @@
 }
 
 .pomodoroDialog {
-  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem 2rem;
   background-color: var(--color-1);
-  color: var(--text-color-1);
+  color: var(--text-color-2);
   border-radius: 8px;
-  max-width: 450px;
+  max-width: 560px;
+  max-height: 90vh;
   width: 90%;
+  overflow: hidden;
   outline: none;
   border: 2px solid var(--color-3);
 }
 
-.pomodoroDialog p {
+.modalTitle {
+  margin: 0 2.5rem 0.25rem 0;
+  color: var(--text-color-2);
+  font-family: var(--font-family2);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.modalText,
+.modalWarningText {
   font-family: var(--font-family1);
   font-size: 1rem;
-  margin-bottom: 1.5rem;
+  color: var(--text-color-2);
+  margin: 0 0 0.5rem;
+}
+
+.modalWarningText {
+  opacity: 0.85;
+  font-size: 0.9rem;
 }
 
 .modalTaskList {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  max-height: 200px;
+  margin: 0.5rem 0 1.25rem;
+  max-height: 240px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--color-3) var(--color-1-light);
+  scrollbar-color: var(--color-2) var(--color-3);
+  padding: 0.15rem 0.35rem 0.15rem 0;
 }
 
 .modalTaskItem {
@@ -348,14 +370,38 @@
   gap: 0.75rem;
   font-family: var(--font-family1);
   font-size: 1rem;
-  color: var(--text-color-1);
+  color: var(--text-color-2);
   cursor: pointer;
+  padding: 0.6rem 0.65rem;
+  border-left: 2px solid var(--color-2);
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.modalTaskItem:hover {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .modalCheckbox {
   width: 1.25rem !important;
   height: 1.25rem !important;
   border-width: 2px !important;
+  flex: 0 0 1.25rem;
+}
+
+.modalTaskTime {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  color: var(--text-color-2);
+  opacity: 0.9;
+  font-size: 0.85rem;
+}
+
+.modalTaskTime svg {
+  flex: 0 0 auto;
+  color: var(--color-2);
 }
 
 .modalButtonContainer {
@@ -386,9 +432,74 @@
   color: var(--color-3) !important;
 }
 
+.modalButtonPrimary:focus-visible {
+  outline: 2px solid var(--color-3);
+  outline-offset: 2px;
+}
+
 .modalButtonSecondary {
   background-color: var(--color-2);
   color: var(--color-3) !important;
+}
+
+.taskSelectionRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.taskSelectionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 2.4rem;
+  box-sizing: border-box;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--color-3);
+  font-family: var(--font-family1);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.taskSelectionRow:hover {
+  border-color: var(--color-1);
+  background-color: transparent;
+}
+
+.taskSelectionSelected,
+.taskSelectionSelected:hover {
+  border-color: var(--color-1);
+  background-color: var(--color-2);
+  font-weight: 600;
+}
+
+.taskSelectionRow:focus-within {
+  outline: 2px solid var(--color-1);
+  outline-offset: 1px;
+}
+
+.taskSelectionCheckbox {
+  flex: 0 0 1.5rem;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  border-width: 2px !important;
+  padding: 0;
+  cursor: pointer;
+}
+
+.taskSelectionReadOnly {
+  cursor: default;
+}
+
+.taskSelectionReadOnly:hover {
+  border-color: transparent;
+  background-color: var(--color-2);
 }
 
 .microTaskToggle {

@@ -11,6 +11,7 @@ import {
   Modal,
 } from "react-aria-components";
 import { SlotToWork, ModalContent } from "~/routes/tasks/CreateTask/SlotToWork/SlotToWork";
+import { InfoPopover } from "~/components/InfoPopover/InfoPopover";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 import { SlotToWorkDto } from "~/service/output_dtos";
@@ -157,10 +158,7 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
     );
   };
 
-  const slotsInfoText = t(
-    "task:slots_to_work_info",
-    "Define sessões de trabalho dedicadas a esta tarefa para organizar o teu dia.",
-  );
+  const slotsInfoText = t("task:slots_to_work_info");
 
   return (
     <div className={styles.slotsToWorkSectionContainer}>
@@ -168,14 +166,11 @@ const SlotsToWorkSection = React.memo(function SlotsToWorkSection({
         <h2 className={styles.formSectionTitle} style={{ margin: 0 }}>
           {t("task:slots_to_work_label")}
         </h2>
-        <div
+        <InfoPopover
+          content={slotsInfoText}
+          buttonLabel={t("task:slots_to_work_info_label")}
           className={classNames(styles.infoIcon, styles.slotsInfoIcon)}
-          title={slotsInfoText}
-          aria-label={slotsInfoText}
-          role="note"
-        >
-          i
-        </div>
+        />
       </div>
       <div className={styles.slotsToWorkContainer}>
         {localSlots.map((slotWrapper, index) => (
@@ -386,10 +381,7 @@ export function CreateTaskForm({
   const { t } = useTranslation(["task"]);
   const microTaskCheckboxId = useId();
   
-  const microTaskInfoText = t(
-    "task:title_micro_task_info",
-    "Uma micro-tarefa é uma tarefa rápida que não requer planeamento de blocos de tempo."
-  );
+  const microTaskInfoText = t("task:title_micro_task_info");
 
   return (
     <form className={styles.newTaskForm}>
@@ -401,25 +393,18 @@ export function CreateTaskForm({
           checked={isMicroTask}
           onChange={(e) => setIsMicroTask(e.target.checked)}
         />
-        <label
-          className={styles.microTaskLabel}
-          htmlFor={microTaskCheckboxId}
-        >
-          {t("task:micro_task_label")}
-        </label>
-        <div
-          className={classNames(styles.infoIcon, styles.microTaskInfoIcon)}
-          title={microTaskInfoText}
-          aria-label={microTaskInfoText}
-          role="note"
-          onClick={() => {
-            if (window.matchMedia("(max-width: 768px)").matches) {
-              alert(microTaskInfoText);
-            }
-          }}
-          style={{ cursor: "pointer" }}
-        >
-          i
+        <div className={styles.microTaskLabelGroup}>
+          <label
+            className={styles.microTaskLabel}
+            htmlFor={microTaskCheckboxId}
+          >
+            {t("task:micro_task_label")}
+          </label>
+          <InfoPopover
+            content={microTaskInfoText}
+            buttonLabel={t("task:micro_task_info_label")}
+            className={classNames(styles.infoIcon, styles.microTaskInfoIcon)}
+          />
         </div>
       </div>
 

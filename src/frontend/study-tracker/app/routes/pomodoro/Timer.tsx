@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import useTimer from "react-timer-hook";
 import { utils } from "~/utils";
 import styles from "./pomodoroPage.module.css";
+import { FaPause } from "react-icons/fa6";
 
 export function Timer({
   title,
@@ -66,8 +67,16 @@ export function Timer({
         </div>
       )}
 
-      <p>{t("study:timer_title")}</p>
-      
+      {!isRunning && (
+        <span
+          className={styles.pausedIndicator}
+          role="img"
+          aria-label={t("study:timer_paused_accessible")}
+        >
+          <FaPause aria-hidden="true" />
+        </span>
+      )}
+
       <div className={styles.timerDisplay}>
         <span className={styles.timerText}>
           {hours.toString().padStart(2, "0")}
@@ -82,19 +91,20 @@ export function Timer({
         </span>
       </div>
       
-      <p className={styles.statusText}>
-        {isRunning ? t("study:timer_running") : t("study:timer_paused")}
-      </p>
-      
       <div className={styles.controls}>
-        <button className={styles.controlButton} onClick={pause}>
-          {t("study:timer_pause")}
-        </button>
-        <button className={styles.controlButton} onClick={resume}>
-          {t("study:timer_resume")}
+        <button
+          type="button"
+          className={styles.controlButton}
+          onClick={isRunning ? pause : resume}
+        >
+          {isRunning ? t("study:timer_pause") : t("study:timer_resume")}
         </button>
         <div className="tutorial-target-pomodoro-start">
-          <button className={styles.controlButton} onClick={onStopClickHandler}>
+          <button
+            type="button"
+            className={styles.controlButton}
+            onClick={onStopClickHandler}
+          >
             {t("study:timer_stop")}
           </button>
         </div>

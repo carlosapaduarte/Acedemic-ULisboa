@@ -325,6 +325,52 @@
   text-transform: uppercase;
 }
 
+.noteModalContent {
+  background: var(--color-3);
+  border-color: var(--color-1);
+  box-shadow: none;
+}
+
+.noteModalTitle {
+  color: var(--text-color-2);
+  font-weight: 700;
+}
+
+.noteModalContent .noteModalInput {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-1);
+  color: var(--text-color-2);
+  font-weight: 600;
+}
+
+.noteModalContent .noteModalInput::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+  opacity: 1;
+}
+
+.noteModalContent .noteModalInput:focus {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-2);
+  outline: 2px solid var(--color-2);
+  outline-offset: 1px;
+}
+
+.noteModalContent .errorText {
+  color: var(--text-color-2);
+}
+
+.noteModalButton:hover {
+  background-color: var(--color-2-hover);
+  transform: none;
+  box-shadow: none;
+}
+
+.noteModalButton:focus-visible,
+.noteModalContent .modalCloseButton:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
+}
+
 .modalInput {
   background-color: rgba(255, 255, 255, 0.6);
   border: 2px solid rgba(0, 0, 0, 0.1);

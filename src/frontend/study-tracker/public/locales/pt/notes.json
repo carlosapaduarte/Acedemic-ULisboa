@@ -17,5 +17,10 @@
     "save": "Guardar apontamento",
     "saving": "A guardar…",
     "saved": "Guardado",
-    "save_error": "Não foi possível guardar"
+    "save_error": "Não foi possível guardar",
+    "new_note_title": "Nova Nota",
+    "new_note_placeholder": "Ex.: Resumo da aula 1",
+    "create_note": "Criar",
+    "new_note_title_required": "O título da nota não pode estar vazio.",
+    "new_note_error": "Erro ao criar nota."
 }

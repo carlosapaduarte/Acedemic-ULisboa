@@ -192,7 +192,7 @@ function NotesPage() {
 
   const handleCreateFile = async () => {
     if (!newTextFileName.trim()) {
-      setFileError("O título da nota não pode estar vazio.");
+      setFileError(t("notes:new_note_title_required"));
       return;
     }
     setFileError("");
@@ -201,7 +201,7 @@ function NotesPage() {
       closeFileModal();
       loadData();
     } catch (e: any) {
-      setFileError(e.message || "Erro ao criar nota.");
+      setFileError(e.message || t("notes:new_note_error"));
     }
   };
 
@@ -563,19 +563,31 @@ function NotesPage() {
 
       {/* MODAL CRIAR NOTA (TXT) */}
       <Modal isOpen={isCreateFileOpen} onOpenChange={(isOpen) => !isOpen && closeFileModal()} className={styles.modalOverlay}>
-        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Nota">
+        <Dialog
+          className={`${styles.modalContent} ${styles.noteModalContent}`}
+          style={{ position: "relative" }}
+          aria-label={t("notes:new_note_title")}
+        >
           <button onClick={closeFileModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
             <FaXmark aria-hidden="true" />
           </button>
-          <h2 className={styles.modalTitle}>Nova Nota</h2>
+          <h2 className={`${styles.modalTitle} ${styles.noteModalTitle}`}>
+            {t("notes:new_note_title")}
+          </h2>
           <input
-            placeholder="Ex: Resumo Aula 1"
-            className={`${styles.modalInput} ${fileError ? styles.inputError : ''}`}
+            placeholder={t("notes:new_note_placeholder")}
+            className={`${styles.modalInput} ${styles.noteModalInput} ${fileError ? styles.inputError : ''}`}
             value={newTextFileName}
             onChange={(e) => { setNewTextFileName(e.target.value); setFileError(""); }}
           />
           {fileError && <p className={styles.errorText}>{fileError}</p>}
-          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateFile}>Criar</Button>
+          <Button
+            className={`${styles.primaryButton} ${styles.noteModalButton}`}
+            style={{ width: "100%", justifyContent: "center" }}
+            onPress={handleCreateFile}
+          >
+            {t("notes:create_note")}
+          </Button>
         </Dialog>
       </Modal>
 

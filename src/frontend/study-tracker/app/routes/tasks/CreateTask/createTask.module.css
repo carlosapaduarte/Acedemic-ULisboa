@@ -433,11 +433,18 @@
 .microTaskLabel {
   font-family: var(--font-family1);
   font-size: 1rem;
-  flex: 1;
+  flex: 0 1 auto;
   color: var(--text-color-2) !important;
   cursor: pointer;
   font-weight: 600;
   user-select: none;
+}
+
+.microTaskLabelGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
 }
 
 .infoIcon {
@@ -447,11 +454,13 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
+  border: 0;
+  padding: 0;
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
   font-size: 0.8rem;
   font-weight: bold;
-  cursor: help;
+  cursor: pointer;
   margin-left: auto;
   transition: background-color 0.2s;
 }
@@ -472,9 +481,13 @@
   flex: 0 0 20px;
 }
 
-/* O :focus e :active ativam o tooltip/ação também em touch screens (mobile) */
 .infoIcon:hover,
-.infoIcon:active,
-.infoIcon:focus {
+.infoIcon:active {
   background-color: rgba(255, 255, 255, 0.4);
+}
+
+.infoIcon:focus-visible {
+  background-color: rgba(255, 255, 255, 0.4);
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
 }

@@ -4,7 +4,6 @@ import { SelectTime } from "./TimeSelection";
 import { Timer } from "./Timer";
 import { Event, service, Task, Tag } from "~/service/service";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
-import { TaskList } from "~/routes/tasks/TaskList";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import styles from "./pomodoroPage.module.css";
 import classNames from "classnames";
@@ -12,7 +11,15 @@ import { useTranslation } from "react-i18next";
 import { useTaskList } from "~/routes/tasks/useTaskList";
 import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
-import { FaXmark } from "react-icons/fa6";
+import { FaClock, FaTriangleExclamation, FaXmark } from "react-icons/fa6";
+import {
+  getSelectableTaskEntries,
+  getSelectedTaskEntries,
+  getTrackedTaskIds,
+  getTotalPlannedMinutes,
+  toggleTaskSelection as toggleTaskSelectionById,
+  type TaskTreeEntry,
+} from "./taskSelection";
 
 function isDateToday(date: Date | undefined): boolean {
   if (!date) return false;
@@ -279,7 +286,7 @@ function useTimerSetup(
 
 function useAssociatedTasks(showMicroTasks: boolean) {
   const { t } = useTranslation("study");
-  const { tasks: availableTasks, refreshTasks } = useTaskList(true);
+  const { tasks: availableTasks, refreshTasks } = useTaskList(false);
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
 
   const [tasksForToday, otherTasks] = React.useMemo(() => {
@@ -299,14 +306,10 @@ function useAssociatedTasks(showMicroTasks: boolean) {
     return [today, others];
   }, [availableTasks, showMicroTasks]);
 
-  function toggleTaskSelection(task: Task) {
-    setSelectedTaskIds((prevIds) => {
-      if (prevIds.includes(task.id)) {
-        return prevIds.filter((id) => id !== task.id);
-      } else {
-        return [...prevIds, task.id];
-      }
-    });
+  function toggleTaskSelection(taskId: number) {
+    setSelectedTaskIds((prevIds) =>
+      toggleTaskSelectionById(availableTasks ?? [], prevIds, taskId),
+    );
   }
 
   function completeSelectedTasks(completedTaskIds: number[]) {
@@ -320,6 +323,7 @@ function useAssociatedTasks(showMicroTasks: boolean) {
   return {
     tasksForToday,
     otherTasks,
+    allAvailableTasks: availableTasks ?? [],
     selectedTaskIds,
     toggleTaskSelection,
     refreshTasks,
@@ -369,6 +373,7 @@ function useUpcomingEvents() {
 function AssociatedTaskListView({
   tasksForToday,
   otherTasks,
+  allTasks,
   selectedTaskIds,
   onTaskClick,
   showMicroTasks,
@@ -377,18 +382,19 @@ function AssociatedTaskListView({
 }: {
   tasksForToday: Task[];
   otherTasks: Task[];
+  allTasks: Task[];
   selectedTaskIds: number[];
-  onTaskClick: (task: Task) => void;
+  onTaskClick: (taskId: number) => void;
   showMicroTasks: boolean;
   onToggleMicroTasks: () => void;
   isReadOnly?: boolean;
 }) {
-  const { t } = useTranslation(["study"]);
+  const { t } = useTranslation(["study", "task"]);
 
   if (isReadOnly) {
-    const allTasks = [...tasksForToday, ...otherTasks];
-    const selectedTasks = allTasks.filter((t) =>
-      selectedTaskIds.includes(t.id),
+    const selectedTasks = getSelectedTaskEntries(
+      allTasks,
+      selectedTaskIds,
     );
 
     return (
@@ -397,14 +403,28 @@ function AssociatedTaskListView({
           {t("study:tasks_in_progress", "Tarefas em Curso")}
         </h2>
         {selectedTasks.length > 0 ? (
-          <TaskList
-            tasks={selectedTasks}
-            onTaskClick={() => {}}
-            onTaskStatusUpdated={() => {}}
-            selectedTaskIds={selectedTaskIds}
-            onSelectionToggle={() => {}}
-            textColor={"var(--color-3)"}
-          />
+          <div className={styles.taskSelectionRows}>
+            {selectedTasks.map(({ task, depth }) => (
+              <div
+                key={task.id}
+                className={classNames(
+                  styles.taskSelectionRow,
+                  styles.taskSelectionReadOnly,
+                  styles.taskSelectionSelected,
+                )}
+                style={{ paddingInlineStart: `${0.65 + depth * 1.25}rem` }}
+              >
+                <TaskCheckbox
+                  checked
+                  disabled
+                  ariaLabel={task.data.title}
+                  onClick={() => {}}
+                  className={styles.taskSelectionCheckbox}
+                />
+                <span>{task.data.title}</span>
+              </div>
+            ))}
+          </div>
         ) : (
           <p className={styles.noEventsText}>
             {t("study:no_task_selected", "Nenhuma tarefa selecionada.")}
@@ -432,24 +452,67 @@ function AssociatedTaskListView({
       <h2 className={styles.taskListTitle}>
         {t("study:tasks_for_today", "Prazo para Hoje")}
       </h2>
-      <TaskList
+      <TaskSelectionRows
         tasks={tasksForToday}
-        onTaskClick={() => {}}
-        onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
-        onSelectionToggle={onTaskClick}
+        onTaskToggle={onTaskClick}
       />
 
       <h2 className={classNames(styles.taskListTitle, styles.otherTasksTitle)}>
         {t("study:other_tasks", "Outras Tarefas")}
       </h2>
-      <TaskList
+      <TaskSelectionRows
         tasks={otherTasks}
-        onTaskClick={() => {}}
-        onTaskStatusUpdated={() => {}}
         selectedTaskIds={selectedTaskIds}
-        onSelectionToggle={onTaskClick}
+        onTaskToggle={onTaskClick}
       />
+    </div>
+  );
+}
+
+function TaskSelectionRows({
+  tasks,
+  selectedTaskIds,
+  onTaskToggle,
+}: {
+  tasks: Task[];
+  selectedTaskIds: number[];
+  onTaskToggle: (taskId: number) => void;
+}) {
+  const { t } = useTranslation(["study", "task"]);
+  const taskEntries = getSelectableTaskEntries(tasks);
+
+  if (taskEntries.length === 0) {
+    return (
+      <p className={styles.noEventsText}>
+        {t("task:no_tasks_associated", "Nenhuma tarefa para hoje")}
+      </p>
+    );
+  }
+
+  return (
+    <div className={styles.taskSelectionRows}>
+      {taskEntries.map(({ task, depth }) => {
+        const isSelected = selectedTaskIds.includes(task.id);
+
+        return (
+          <div
+            key={task.id}
+            className={classNames(styles.taskSelectionRow, {
+              [styles.taskSelectionSelected]: isSelected,
+            })}
+            style={{ paddingInlineStart: `${0.65 + depth * 1.25}rem` }}
+          >
+            <TaskCheckbox
+              checked={isSelected}
+              onClick={() => onTaskToggle(task.id)}
+              ariaLabel={task.data.title}
+              className={styles.taskSelectionCheckbox}
+            />
+            <span>{task.data.title}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -466,30 +529,18 @@ function ConfirmationModalContent({
   onCancel,
   onConfirm,
 }: {
-  tasks: Task[];
+  tasks: TaskTreeEntry[];
   onCancel: () => void;
   onConfirm: (completedTaskIds: number[]) => void;
 }) {
   const { t } = useTranslation(["study", "task"]);
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
 
-  useEffect(() => {
-    const preChecked = tasks
-      .filter((t) => {
-        const planned = t.data.planned_minutes || 0;
-        const tracked = t.data.tracked_minutes || 0;
-        return planned === 0 || tracked >= planned;
-      })
-      .map((t) => t.id);
-
-    setCheckedIds(preChecked);
-  }, [tasks]);
-
   function handleToggle(taskId: number) {
     setCheckedIds((prev) =>
       prev.includes(taskId)
         ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId],
+        : Array.from(new Set([...prev, taskId])),
     );
   }
 
@@ -514,25 +565,15 @@ function ConfirmationModalContent({
       </p>
 
       <div className={styles.modalTaskList}>
-        {tasks.map((task) => {
-          const planned = task.data.planned_minutes || 0;
+        {tasks.map(({ task, depth }) => {
+          const planned = getTotalPlannedMinutes(task);
           const tracked = task.data.tracked_minutes || 0;
 
-          let subtitle = "";
           let isExhausted = false;
 
           if (planned > 0) {
             if (tracked >= planned) {
-              subtitle = `⚠️ ${t(
-                "study:task_time_exhausted",
-                "Tempo esgotado! Já terminaste?",
-              )}`;
               isExhausted = true;
-            } else {
-              subtitle = `⏱️ ${t("study:task_time_progress", {
-                tracked: formatTime(tracked),
-                planned: formatTime(planned),
-              })}`;
             }
           }
 
@@ -540,26 +581,37 @@ function ConfirmationModalContent({
             <label
               key={task.id}
               className={styles.modalTaskItem}
-              style={{ alignItems: "flex-start" }}
+              style={{
+                alignItems: "flex-start",
+                paddingInlineStart: `${0.75 + depth * 1.25}rem`,
+              }}
             >
               <TaskCheckbox
                 checked={checkedIds.includes(task.id)}
                 onClick={() => handleToggle(task.id)}
                 className={styles.modalCheckbox}
+                ariaLabel={task.data.title}
               />
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <span style={{ fontWeight: isExhausted ? "bold" : "normal" }}>
                   {task.data.title}
                 </span>
-                {subtitle && (
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      color: isExhausted ? "#EF5350" : "var(--color-3)",
-                      opacity: 0.8,
-                    }}
-                  >
-                    {subtitle}
+                {planned > 0 && (
+                  <span className={styles.modalTaskTime}>
+                    {isExhausted ? (
+                      <FaTriangleExclamation aria-hidden="true" />
+                    ) : (
+                      <FaClock aria-hidden="true" />
+                    )}
+                    {isExhausted
+                      ? t(
+                          "study:task_time_exhausted",
+                          "Tempo esgotado! Já terminaste?",
+                        )
+                      : t("study:task_time_progress", {
+                          tracked: formatTime(tracked),
+                          planned: formatTime(planned),
+                        })}
                   </span>
                 )}
               </div>
@@ -778,12 +830,14 @@ function PomodoroPage() {
 
   const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [tasksToConfirm, setTasksToConfirm] = useState<Task[]>([]);
+  const [confirmationSessionKey, setConfirmationSessionKey] = useState(0);
+  const [tasksToConfirm, setTasksToConfirm] = useState<TaskTreeEntry[]>([]);
   const [showMicroTasks, setShowMicroTasks] = useState(true);
 
   const {
     tasksForToday,
     otherTasks,
+    allAvailableTasks,
     selectedTaskIds,
     toggleTaskSelection,
     refreshTasks,
@@ -818,23 +872,35 @@ function PomodoroPage() {
 
   const openConfirmationModal = (minutesCompleted: number) => {
     if (selectedTaskIds.length > 0 && minutesCompleted > 0) {
+      const trackedTaskIds = getTrackedTaskIds(
+        allAvailableTasks,
+        selectedTaskIds,
+      );
+      const trackedTaskIdSet = new Set(trackedTaskIds);
+
       service
-        .addTrackedTime(selectedTaskIds, minutesCompleted)
+        .addTrackedTime(trackedTaskIds, minutesCompleted)
         .then(() => console.log("✅ Serviço respondeu com sucesso!"))
         .catch((e) => console.error("❌ Erro no serviço:", e));
 
-      const allTasks = [...tasksForToday, ...otherTasks];
-      const selected = allTasks
-        .filter((t) => selectedTaskIds.includes(t.id))
-        .map((t) => ({
-          ...t,
+      const selected = getSelectedTaskEntries(
+        allAvailableTasks,
+        selectedTaskIds,
+      ).map((entry) => ({
+        ...entry,
+        task: {
+          ...entry.task,
           data: {
-            ...t.data,
-            tracked_minutes: (t.data.tracked_minutes || 0) + minutesCompleted,
+            ...entry.task.data,
+            tracked_minutes: trackedTaskIdSet.has(entry.task.id)
+              ? (entry.task.data.tracked_minutes || 0) + minutesCompleted
+              : entry.task.data.tracked_minutes || 0,
           },
-        }));
+        },
+      }));
 
       setTasksToConfirm(selected);
+      setConfirmationSessionKey((key) => key + 1);
       setIsConfirmModalOpen(true);
     } else {
       console.log(
@@ -935,6 +1001,7 @@ function PomodoroPage() {
           <AssociatedTaskListView
             tasksForToday={tasksForToday}
             otherTasks={otherTasks}
+            allTasks={allAvailableTasks}
             selectedTaskIds={selectedTaskIds}
             onTaskClick={toggleTaskSelection}
             showMicroTasks={showMicroTasks}
@@ -951,6 +1018,7 @@ function PomodoroPage() {
         className={styles.pomodoroOverlay}
       >
         <ConfirmationModalContent
+          key={confirmationSessionKey}
           tasks={tasksToConfirm}
           onCancel={() => {
             setIsConfirmModalOpen(false);

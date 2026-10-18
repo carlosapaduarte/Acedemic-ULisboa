@@ -17,6 +17,7 @@ import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { EventModal, EventData } from "./CreateEvent/EventModal";
 import { useTranslation } from "react-i18next";
 import { utils } from "~/utils";
+import { getEventStyleProps } from "~/utils/eventColors";
 import { getCalendarMessages } from "../../calendarUtils";
 moment.locale("pt");
 import { FaListCheck, FaFilter, FaCheck } from "react-icons/fa6";
@@ -58,21 +59,6 @@ try {
 } catch (e) {
   console.error("Erro ao inicializar DragAndDrop:", e);
 }
-
-const hexToRgba = (hex: string, alpha: number) => {
-  if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-    return hex;
-  }
-  let c = hex.substring(1).split("");
-  if (c.length === 3) {
-    c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-  }
-  const cStr = c.join("");
-  const r = parseInt(cStr.substring(0, 2), 16);
-  const g = parseInt(cStr.substring(2, 4), 16);
-  const b = parseInt(cStr.substring(4, 6), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
-};
 
 interface CalendarEventResource {
   id: number;
@@ -309,62 +295,6 @@ const EventWithTags = ({
       </div>
     </div>
   );
-};
-
-const getEventStyleProps = (
-  resource: CalendarEventResource | undefined,
-  allUserTags: Tag[],
-  isCompleted: boolean = false,
-): React.CSSProperties => {
-  const FALLBACK_COLOR = "#3399FF";
-  const BG_OPACITY = 0.6;
-
-  if (!resource) return { backgroundColor: FALLBACK_COLOR };
-
-  let baseColor = FALLBACK_COLOR;
-  let gradient: string | null = null;
-
-  //1º prioridade: cor personalizada definida no evento.
-  if (resource.color && resource.color !== FALLBACK_COLOR) {
-    baseColor = resource.color;
-  } else {
-    // 2º: Cor das Tags
-    const eventTags = resource.tags || [];
-
-    const tagColors = eventTags
-      .map((t: any) => {
-        // A. Se for objeto vindo do backend (pode ter .color)
-        if (typeof t === "object" && t !== null && t.color) {
-          return t.color;
-        }
-
-        // B. Se for ID ou string, procuramos na lista global
-        if (typeof t !== "object") {
-          const found = allUserTags.find(
-            (ut) => ut.id === t || ut.name_pt === t || ut.name_en === t,
-          );
-          return found?.color;
-        }
-        return null;
-      })
-      .filter((c): c is string => !!c);
-
-    if (tagColors.length > 0) {
-      baseColor = tagColors[0];
-      if (tagColors.length > 1) {
-        gradient = `linear-gradient(135deg, ${tagColors.join(",")})`;
-      }
-    }
-  }
-
-  if (isCompleted) {
-    return { backgroundColor: hexToRgba(baseColor, BG_OPACITY) };
-  } else {
-    if (gradient) {
-      return { backgroundImage: gradient };
-    }
-    return { backgroundColor: baseColor };
-  }
 };
 
 type EventsView = "allEvents" | "recurringEvents";
