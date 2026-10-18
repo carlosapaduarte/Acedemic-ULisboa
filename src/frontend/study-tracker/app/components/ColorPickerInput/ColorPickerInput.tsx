@@ -225,7 +225,8 @@ export function ColorPickerInput({
         <div
           style={{
             fontSize: "0.8rem",
-            color: "rgba(255,255,255,0.5)",
+            color: "var(--text-color-2)",
+            opacity: 0.75,
             fontStyle: "italic",
             marginTop: "5px",
           }}

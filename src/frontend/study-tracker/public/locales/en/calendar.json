@@ -8,7 +8,7 @@
 
   "new_event_modal_title": "New Event",
   "edit_event_modal_title": "Edit Event",
-  "display_only_recurring_events_button": "Display Only Recurring Events",
+  "display_only_recurring_events_button": "Only Recurring Events",
   "display_all_events_button": "Display All Events",
   "no_events_in_range": "No events in this range",
   "allDay": "All Day",

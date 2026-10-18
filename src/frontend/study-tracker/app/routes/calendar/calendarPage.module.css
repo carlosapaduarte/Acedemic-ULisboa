@@ -82,7 +82,7 @@
   cursor: pointer;
   border-radius: 4px;
   outline: none;
-  color: var(--text-color-1);
+  color: var(--text-color-2);
   font-family: var(--font-family1);
   display: flex;
   align-items: center;
@@ -91,13 +91,18 @@
 
   &[data-focused],
   &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.12);
   }
 
   &[data-selected] {
     background-color: var(--color-2);
-    color: var(--text-color-2);
+    color: var(--text-color-1);
     font-weight: 600;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
   }
 }
 

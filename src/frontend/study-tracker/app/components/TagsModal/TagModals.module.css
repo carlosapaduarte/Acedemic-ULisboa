@@ -16,6 +16,8 @@
 
 .mainFormModalTitleText {
   font-size: 1rem;
+  font-weight: 600;
+  padding-left:0px;
   margin-bottom: 0.5rem;
   color: var(--text-color-2);
 }
@@ -28,6 +30,7 @@
   background-color: var(--color-3);
   color: var(--text-color-2);
   padding: 2rem;
+  font-weight: 600;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   position: relative;
@@ -62,7 +65,7 @@
 
 .createTagTooltip input[type="text"] {
   background-color: var(--color-1);
-  color: var(--text-color-1);
+  color: var(--text-color-2);
   border: none;
   border-radius: 8px;
   padding: 10px 12px;
@@ -73,10 +76,20 @@
   outline: none;
 }
 
+.createTagTooltip input[type="text"]::placeholder {
+  color: rgba(0, 0, 0, 0.55);
+  opacity: 1;
+}
+
+.createTagTooltip input[type="text"]:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 1px;
+}
+
 .charCounter {
   text-align: right;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.75);
   margin-top: 4px;
 }
 
@@ -103,7 +116,7 @@
 
 .hexLabel {
   font-family: monospace;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 1rem;
   color: white;
   margin-left: 12px;
@@ -125,7 +138,7 @@
 
 .createBtn {
   background-color: var(--color-2);
-  color: white;
+  color: var(--color-3);
   border: none;
   border-radius: 8px;
   padding: 12px;
@@ -140,6 +153,11 @@
 
 .createBtn:hover {
   background-color: var(--color-2-hover);
+}
+
+.createBtn:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
 }
 
 .createBtn:disabled {
@@ -186,7 +204,7 @@
   gap: 10px;
   padding: 10px 15px;
   background-color: var(--color-1);
-  color: var(--text-color-1);
+  color: var(--text-color-2);
   border: 2px solid transparent;
   border-radius: 8px;
   cursor: pointer;
@@ -232,12 +250,12 @@
 }
 
 .textField label {
-  color: rgba(142, 119, 119, 0.95);
+  color: var(--text-color-2);
   font-size: 0.9rem;
   font-weight: 600;
 }
 .textField input {
-  background-color: var(--color-1);
+  background-color: var(--text-color-2);
   color: var(--text-color-1);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -250,7 +268,9 @@
 }
 
 .textField input:focus {
-  border-color: rgba(0, 0, 0, 0.3);
+  border-color: var(--color-2);
+  outline: 2px solid var(--color-2);
+  outline-offset: 1px;
 }
 
 /* BOTÕES DE AÇÃO (Guardar e Apagar) */
@@ -262,8 +282,8 @@
 }
 
 .saveButton {
-  background-color: #3e2723;
-  color: var(--color-1);
+  background-color: var(--color-2);
+  color: var(--text-color-1);
   border: none;
   border-radius: 8px;
   padding: 12px 24px;
@@ -273,7 +293,12 @@
 }
 
 .saveButton:hover:not(:disabled) {
-  opacity: 0.85;
+  background-color: var(--color-2-hover);
+}
+
+.saveButton:focus-visible {
+  outline: 2px solid var(--color-2);
+  outline-offset: 2px;
 }
 
 .deleteButton {
@@ -322,7 +347,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.75);
   font-style: italic;
   text-align: center;
 }

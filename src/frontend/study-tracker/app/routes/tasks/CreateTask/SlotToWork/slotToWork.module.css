@@ -42,6 +42,11 @@
       background-color: var(--color-2-hover);
     }
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-3);
+    outline-offset: 2px;
+  }
 }
 
 @keyframes slot-entering-zoom {
@@ -57,7 +62,7 @@
   width: 100%;
   height: 100%;
   padding: 0.25rem 0.5rem;
-  color: var(--text-color-2);
+  color: var(--text-color-1);
   font-size: 1rem;
   text-align: left;
   display: grid;
@@ -129,6 +134,12 @@
   margin-top: 0.25rem;
   font-size: 1rem;
   text-align: center;
+  color: var(--text-color-1);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-3);
+    outline-offset: 2px;
+  }
 }
 
 .inputError {

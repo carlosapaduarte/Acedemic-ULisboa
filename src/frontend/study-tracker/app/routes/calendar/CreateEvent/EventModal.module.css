@@ -37,7 +37,6 @@
   flex-wrap: wrap;
 }
 
-/* Botão Confirmar (Bege com texto magenta escuro) */
 .finishCreatingEventButton {
   composes: roundButton;
   width: 100%;
@@ -45,7 +44,7 @@
   margin-top: 1.5rem;
   font-size: 1.1rem;
   font-weight: bold;
-  background-color: var(--bg-color, #F5EBE1) !important;
+  background-color: var(--color-2) !important;
   color: var(--color-3) !important;
   border: none;
 }
@@ -88,7 +87,7 @@
   padding: 10px 12px;
   border: none !important;
   border-radius: 8px;
-  background-color: var(--bg-color, #F5EBE1) !important;
+  background-color: var(--color-3) !important;
   color: var(--color-3) !important;
   font-family: var(--font-family1), sans-serif;
   font-size: 1rem;
