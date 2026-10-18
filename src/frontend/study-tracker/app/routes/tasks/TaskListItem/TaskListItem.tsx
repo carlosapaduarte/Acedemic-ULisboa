@@ -4,6 +4,7 @@ import styles from "./taskListItem.module.css";
 import classNames from "classnames";
 import Confetti from "react-confetti";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
+import { useTranslation } from "react-i18next";
 import {
   FaBolt,
   FaExclamation,
@@ -57,6 +58,24 @@ function useTaskView(task: Task, onTaskStatusUpdated: (task: Task) => void) {
   return { internalTask, updateTaskStatus };
 }
 
+function getCalendarDate(value: Date): number {
+  return Date.UTC(value.getFullYear(), value.getMonth(), value.getDate());
+}
+
+function getDeadlineLabel(deadline: Date): { key: string; count?: number } {
+  const now = new Date();
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const dayDifference = Math.round((getCalendarDate(deadline) - today) / 86400000);
+
+  if (dayDifference === 0) return { key: "deadline_today" };
+  if (dayDifference === 1) return { key: "deadline_tomorrow" };
+  if (dayDifference > 1) return { key: "deadline_days_left", count: dayDifference };
+  if (dayDifference === -1) return { key: "deadline_yesterday" };
+  const daysAgo = Math.abs(dayDifference);
+  if (daysAgo === 1) return { key: "deadline_day_ago" };
+  return { key: "deadline_days_ago", count: daysAgo };
+}
+
 export function TaskListItem({
   taskToDisplay,
   onTaskClick,
@@ -74,6 +93,7 @@ export function TaskListItem({
   textColor?: string;
   onAddSubtask?: (parentId: number) => void;
 }) {
+  const { t } = useTranslation(["task"]);
   const { internalTask, updateTaskStatus } = useTaskView(
     taskToDisplay,
     onTaskStatusUpdated
@@ -97,6 +117,9 @@ export function TaskListItem({
     !isSelectionMode && internalTask.data.status == "completed";
 
   const isHighPriority = internalTask.data.priority === "high";
+  const deadlineLabel = internalTask.data.deadline
+    ? getDeadlineLabel(internalTask.data.deadline)
+    : undefined;
 
   const isUpcoming = () => {
     if (!internalTask.data.deadline) return false;
@@ -254,6 +277,14 @@ export function TaskListItem({
           </p>
         </button>
 
+        {internalTask.data.deadline && (
+          <span className={styles.deadlineDate}>
+            {deadlineLabel?.count
+              ? t(`task:${deadlineLabel.key}`, { count: deadlineLabel.count })
+              : deadlineLabel && t(`task:${deadlineLabel.key}`)}
+          </span>
+        )}
+
         {/* Botões de Ação (Subtarefa e Delete) */}
         {!isSelectionMode && (
           <div
@@ -268,14 +299,9 @@ export function TaskListItem({
                 }}
                 className={styles.actionButton}
                 title="Adicionar Subtarefa"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  opacity: 0.6,
-                }}
+                aria-label="Adicionar subtarefa"
               >
-                <FaPlus size={12} />
+                <FaPlus size={10} />
               </button>
             )}
 

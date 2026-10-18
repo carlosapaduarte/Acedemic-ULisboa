@@ -1,4 +1,8 @@
 /* --- DEFINIÇÕES GERAIS DO PAINEL ESQUERDO (TIMER) --- */
+.modalCloseButton {
+  composes: formCloseButton from "../../components/FormModal/formModal.module.css";
+}
+
 .pomodoroContainer {
   display: flex;
   flex-direction: column;

@@ -11,6 +11,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IconContext } from "react-icons";
 import { AppBarContext } from "./AppBarProvider";
 import { useTranslation } from "react-i18next";
+import { FaXmark } from "react-icons/fa6";
 import { useTutorialMenu } from "~/components/Tutorial/TutorialContext";
 
 function GlobalStatusWidgets() {
@@ -142,7 +143,7 @@ function GlobalStatusWidgets() {
             }}
             aria-label={t("appbar:hide_warning", "Esconder aviso")}
           >
-            ✕
+            <FaXmark aria-hidden="true" />
           </button>
         </div>
       )}

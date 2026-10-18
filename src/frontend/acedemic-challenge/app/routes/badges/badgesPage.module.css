@@ -131,6 +131,10 @@
     transition: all 0.3s ease-in-out;
 }
 
+.firstLevelContainer {
+    margin-top: clamp(1rem, 3vh, 2rem);
+}
+
 .levelHeader {
     font-size: 2rem;
     font-weight: bold;
@@ -211,9 +215,9 @@
 }
 
 .chipCompleted {
-    background-color: var(--badge-earned-secondary-color);
-    color: var(--text-color-2);
-    border-color: var(--badge-earned-primary-color);
+    background-color: var(--color-2);
+    color: var(--color-3);
+    border-color: var(--color-2);
 }
 
 .chipNotSelected {

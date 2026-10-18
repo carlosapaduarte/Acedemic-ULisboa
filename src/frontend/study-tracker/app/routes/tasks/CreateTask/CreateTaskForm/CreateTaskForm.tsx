@@ -236,20 +236,43 @@ const DeadlineSection = React.memo(function DeadlineSection({
 }) {
   const { t } = useTranslation(["task"]);
 
+  function formatLocalDate(value: Date): string {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, "0");
+    const day = String(value.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatLocalTime(value: Date): string {
+    const hours = String(value.getHours()).padStart(2, "0");
+    const minutes = String(value.getMinutes()).padStart(2, "0");
+    const seconds = value.getSeconds();
+    return seconds
+      ? `${hours}:${minutes}:${String(seconds).padStart(2, "0")}`
+      : `${hours}:${minutes}`;
+  }
+
   const [date, setDate] = useState<string>(
-    deadline?.toISOString().split("T")[0] ?? ""
+    deadline ? formatLocalDate(deadline) : ""
   );
   const [time, setTime] = useState<string>(
-    deadline?.toISOString().split("T")[1].split(".")[0] ?? ""
+    deadline ? formatLocalTime(deadline) : ""
   );
 
   useEffect(() => {
     if (date) {
-      const combinedDateTime = new Date(date);
-      if (time) {
-        const [hours, minutes] = time.split(":").map(Number);
-        combinedDateTime.setHours(hours, minutes);
-      }
+      const [year, month, day] = date.split("-").map(Number);
+      const [hours = 0, minutes = 0, seconds = 0] = time
+        .split(":")
+        .map(Number);
+      const combinedDateTime = new Date(
+        year,
+        month - 1,
+        day,
+        hours,
+        minutes,
+        seconds,
+      );
       setDeadline(combinedDateTime);
     } else {
       setDeadline(undefined);

@@ -22,6 +22,12 @@
   color: var(--color-1);
 }
 
+.createNewTaskButton:focus-visible {
+  outline: 3px solid var(--color-3);
+  outline-offset: 2px;
+  filter: brightness(1.08);
+}
+
 .newTaskModalContainer {
   composes: modalContainer;
   /* Fundo magenta mais escuro do modal */
@@ -149,17 +155,7 @@
 }
 
 .closeButton {
-  composes: roundButton formCloseButton;
-  background: transparent !important;
-  color: var(--color-2) !important;
-  border: none !important;
-  box-shadow: none !important;
-  font-size: 1.5rem;
-}
-
-.closeButton:hover {
-  color:var(--color-1) !important;
-  
+  composes: formCloseButton;
 }
 
 /* --- PRIORIDADE --- */

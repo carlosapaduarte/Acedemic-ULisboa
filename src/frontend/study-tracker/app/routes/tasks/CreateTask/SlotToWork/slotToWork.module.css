@@ -20,7 +20,7 @@
 }
 
 .closeButton {
-  composes: roundButton formCloseButton;
+  composes: formCloseButton;
 }
 
 .slotToWorkButton {

@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useTaskList } from "~/routes/tasks/useTaskList";
 import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
-import { RiCloseLine } from "react-icons/ri";
+import { FaXmark } from "react-icons/fa6";
 
 function isDateToday(date: Date | undefined): boolean {
   if (!date) return false;
@@ -498,9 +498,9 @@ function ConfirmationModalContent({
       <button 
         onClick={onCancel}
         className={styles.modalCloseButton}
-        aria-label="Fechar"
+        aria-label={t("task:close", "Fechar")}
       >
-        <RiCloseLine />
+        <FaXmark aria-hidden="true" />
       </button>
 
       <h3 className={styles.modalTitle}>

@@ -12,6 +12,7 @@ import { service, Tag } from "~/service/service";
 import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
 import styles from "./TagModals.module.css";
 import classNames from "classnames";
+import { FaXmark } from "react-icons/fa6";
 
 const PREDEFINED_TAG_NAMES = [
   "estudo",
@@ -169,11 +170,12 @@ export function EditTagModal({
         className={styles.editTagModalContainer}
       >
         <Button
-          className={classNames(styles.roundButton, styles.closeButton)}
+          className={classNames(styles.closeButton)}
           onPress={() => setIsOpen(false)}
           isDisabled={isSaving}
+          aria-label={t("task:close", "Fechar")}
         >
-          ✕
+          <FaXmark aria-hidden="true" />
         </Button>
         <h1 className={styles.mainFormModalTitleText}>
           {t("edit_tags_title")}

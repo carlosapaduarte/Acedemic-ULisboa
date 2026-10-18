@@ -1,3 +1,5 @@
+@import "../FormModal/formModal.module.css";
+
 /* -------- ESTILOS PARA O MODAL DE EDITAR TAGS -------- */
 .modalOverlay {
   position: fixed;
@@ -19,19 +21,7 @@
 }
 
 .closeButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: var(--color-2);
-  color: var(--text-color-2);
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.closeButton:hover {
-  background-color: var(--color-2-hover);
+  composes: formCloseButton;
 }
 
 .editTagModalContainer {
@@ -369,9 +359,4 @@
     padding: 15px;
   }
 
-  .closeButton {
-    padding: 0.4rem 0.8rem;
-    top: 0.5rem;
-    right: 0.5rem;
-  }
 }

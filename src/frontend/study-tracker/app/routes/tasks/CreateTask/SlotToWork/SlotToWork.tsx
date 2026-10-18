@@ -4,6 +4,7 @@ import styles from "./slotToWork.module.css";
 import classNames from "classnames";
 import { SecondModalContext } from "~/routes/tasks/CreateTask/SecondModalContext";
 import { useTranslation } from "react-i18next";
+import { FaXmark } from "react-icons/fa6";
 import { SlotToWorkDto } from "~/service/output_dtos";
 import { isTimeRangeInvalid } from "~/routes/tasks/CreateTask/slotValidation";
 
@@ -112,8 +113,9 @@ export function ModalContent({
           <Button
             className={classNames(styles.closeButton)}
             onPress={() => handleCancel(close)}
+            aria-label={t("task:cancel", "Cancelar")}
           >
-            {t("task:cancel", "Cancelar")}
+            <FaXmark aria-hidden="true" />
           </Button>
 
           <h1 className={styles.mainFormModalTitleText}>

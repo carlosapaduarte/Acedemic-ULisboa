@@ -15,6 +15,7 @@ import { hasInvalidSlotRanges } from "./slotValidation";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
 import calendarStyles from "~/routes/calendar/CreateEvent/EventModal.module.css";
+import { FaXmark } from "react-icons/fa6";
 
 function useCreateNewTask() {
   const [title, setTitle] = useState<string | undefined>(undefined);
@@ -179,8 +180,9 @@ const CreateTaskModal = React.memo(function CreateTaskModal({
               <Button
                 className={classNames(styles.closeButton)}
                 onPress={close}
+                aria-label={t("task:close", "Fechar")}
               >
-                ✕
+                <FaXmark aria-hidden="true" />
               </Button>
               <h1 className={styles.newTaskTitleText}>
                 {parentTaskId

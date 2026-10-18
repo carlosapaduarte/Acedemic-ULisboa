@@ -158,7 +158,7 @@ export default function BadgesPage() {
                 const isExpanded = expandedLevels.has(league.rank);
 
                 return (
-                    <div key={league.id} ref={(el) => (levelRefs.current[league.rank] = el)} className={classNames(styles.levelContainer, { [styles.levelLocked]: !isAccessible, "tutorial-target-level-container": index === 0, })}>
+                    <div key={league.id} ref={(el) => (levelRefs.current[league.rank] = el)} className={classNames(styles.levelContainer, { [styles.levelLocked]: !isAccessible, [styles.firstLevelContainer]: index === 0, "tutorial-target-level-container": index === 0, })}>
                         <div className={styles.levelHeaderContainer} onClick={() => toggleLevelExpansion(league.rank)}>
                             <h2 className={styles.levelHeader}>{league.name}</h2>
                             <div className={styles.headerRight}>

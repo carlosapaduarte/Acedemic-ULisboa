@@ -56,8 +56,7 @@ def update_task(
         user_id,
         task_id,
         Task.from_create_task_input_dto(dto.updated_task), 
-        SlotToWork.from_slot_to_work_input_dto(slots_to_work),
-        dto.previous_task_name
+        SlotToWork.from_slot_to_work_input_dto(slots_to_work)
     )
     
 @router.put("/users/me/tasks/{task_id}/status")

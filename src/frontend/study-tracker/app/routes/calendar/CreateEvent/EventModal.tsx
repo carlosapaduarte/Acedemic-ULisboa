@@ -11,6 +11,7 @@ import {
 } from "react-aria-components";
 import classNames from "classnames";
 import { FaCheckCircle } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
 import { service, Tag } from "../../../service/service";
 import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
 import { EditTagModal } from "../../../components/TagsModal/EditTagModal";
@@ -534,8 +535,9 @@ export function EventModal({
               <Button
                 className={styles.closeButton}
                 onPress={clearFormAndClose}
+                aria-label={t("calendar:close_button", "Fechar")}
               >
-                ✕
+                <FaXmark aria-hidden="true" />
               </Button>
 
               <h1 className={styles.newEventTitleText}>

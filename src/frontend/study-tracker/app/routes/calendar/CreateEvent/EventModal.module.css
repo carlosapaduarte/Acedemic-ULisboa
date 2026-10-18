@@ -115,26 +115,7 @@
 }
 
 .closeButton {
-  composes: roundButton formCloseButton;
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background-color: transparent !important;
-  color: var(--text-color-2) !important;
-  border: none !important;
-  font-size: 1.5rem;
-  font-weight: bold;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: none !important;
-}
-
-.closeButton:hover {
-  opacity: 0.8;
+  composes: formCloseButton;
 }
 
 .tagsSectionContainer {

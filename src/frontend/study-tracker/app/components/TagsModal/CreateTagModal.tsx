@@ -89,9 +89,10 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
     <div className={styles.createTagTooltip} style={{ position: "relative" }}>
       <button
         onClick={close} 
-        style={{ position: "absolute", top: "10px", right: "10px", background: "none", border: "none", cursor: "pointer", fontSize: "1.2rem", color: "#888" }}
+        className={styles.closeButton}
+        aria-label={t("task:close", "Fechar")}
       >
-        <FaXmark />
+        <FaXmark aria-hidden="true" />
       </button>
 
       {/* 1. NOME PT */}

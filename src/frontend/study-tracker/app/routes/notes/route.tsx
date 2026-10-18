@@ -543,8 +543,8 @@ function NotesPage() {
       {/* MODAL CRIAR PASTA */}
       <Modal isOpen={isCreateFolderOpen} onOpenChange={(isOpen) => !isOpen && closeFolderModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Pasta">
-          <button onClick={closeFolderModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
-            <FaXmark size={18} />
+          <button onClick={closeFolderModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+            <FaXmark aria-hidden="true" />
           </button>
           <h2 className={styles.modalTitle}>Nova Pasta</h2>
           <input
@@ -561,8 +561,8 @@ function NotesPage() {
       {/* MODAL CRIAR NOTA (TXT) */}
       <Modal isOpen={isCreateFileOpen} onOpenChange={(isOpen) => !isOpen && closeFileModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Nota">
-          <button onClick={closeFileModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
-            <FaXmark size={18} />
+          <button onClick={closeFileModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+            <FaXmark aria-hidden="true" />
           </button>
           <h2 className={styles.modalTitle}>Nova Nota</h2>
           <input
@@ -579,8 +579,8 @@ function NotesPage() {
       {/* MODAL CRIAR LINK */}
       <Modal isOpen={isLinkModalOpen} onOpenChange={(isOpen) => !isOpen && closeLinkModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Adicionar Link Externo">
-          <button onClick={closeLinkModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
-            <FaXmark size={18} />
+          <button onClick={closeLinkModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+            <FaXmark aria-hidden="true" />
           </button>
           <h2 className={styles.modalTitle}>Novo Link</h2>
           <input
@@ -603,8 +603,8 @@ function NotesPage() {
       {/* MODAL RENOMEAR */}
       <Modal isOpen={!!renameTarget} onOpenChange={(isOpen) => !isOpen && closeRenameModal()} className={styles.modalOverlay}>
         <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Renomear Item">
-          <button onClick={closeRenameModal} className={styles.iconButton} style={{ position: "absolute", top: "15px", right: "15px", opacity: 1 }}>
-            <FaXmark size={18} />
+          <button onClick={closeRenameModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+            <FaXmark aria-hidden="true" />
           </button>
           <h2 className={styles.modalTitle}>Renomear</h2>
           <input

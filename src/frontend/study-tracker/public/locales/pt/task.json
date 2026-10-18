@@ -52,5 +52,12 @@
   "title_micro_task_info": "Tarefas rápidas apenas com título, sem horários ou detalhes.",
   "micro_task_label": "Tarefa relâmpago",
   "no_ucs_text": "Nenhuma unidade curricular associada.",
-  "add_ucs_link": "Adicionar unidades curriculares"
+  "add_ucs_link": "Adicionar unidades curriculares",
+  "deadline_today": "Prazo: Hoje",
+  "deadline_tomorrow": "Prazo: Amanh\u00e3",
+  "deadline_day_left": "Falta 1 dia",
+  "deadline_days_left": "Faltam {{count}} dias",
+  "deadline_yesterday": "Prazo: Ontem",
+  "deadline_day_ago": "H\u00e1 1 dia",
+  "deadline_days_ago": "H\u00e1 {{count}} dias"
 }

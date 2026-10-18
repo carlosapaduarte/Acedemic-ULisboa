@@ -42,10 +42,25 @@
 
 .formCloseButton {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: 0.75rem;
+    right: 0.75rem;
     height: 2rem;
-    width: 5rem;
+    width: 2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    color: var(--text-color-2) !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.formCloseButton:hover {
+    opacity: 0.8;
 }
 
 .formSectionTitle {

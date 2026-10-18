@@ -7,6 +7,10 @@
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+.modalCloseButton {
+  composes: formCloseButton from "../../components/FormModal/formModal.module.css";
+}
+
 .header {
   display: flex;
   justify-content: space-between;

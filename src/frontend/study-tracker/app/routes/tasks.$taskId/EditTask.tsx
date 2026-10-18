@@ -12,6 +12,7 @@ import { CreateTaskInputDto, SlotToWorkDto } from "~/service/output_dtos";
 import { SecondModalContext } from "../tasks/CreateTask/SecondModalContext";
 import { hasInvalidSlotRanges } from "~/routes/tasks/CreateTask/slotValidation";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { FaXmark } from "react-icons/fa6";
 
 function useEditTask(task: Task) {
   const [title, setTitle] = useState<string | undefined>(undefined);
@@ -166,8 +167,12 @@ const EditTaskModal = React.memo(function EditTaskModal({
       <Dialog>
         {({ close }) => (
           <div className={styles.newTaskModalContainer}>
-            <Button className={classNames(styles.closeButton)} onPress={close}>
-              {t("task:close")}
+            <Button
+              className={classNames(styles.closeButton)}
+              onPress={close}
+              aria-label={t("task:close", "Fechar")}
+            >
+              <FaXmark aria-hidden="true" />
             </Button>
             <h1 className={styles.newTaskTitleText}>
               {t("task:edit_task_title")}

@@ -51,5 +51,12 @@
   "title_micro_task_info": "Quick tasks with just a title, no schedules or details.",
   "micro_task_label": "Lightning Task",
   "no_ucs_text": "No associated curricular unit.",
-  "add_ucs_link": "Add curricular units"
+  "add_ucs_link": "Add curricular units",
+  "deadline_today": "Due: Today",
+  "deadline_tomorrow": "Due: Tomorrow",
+  "deadline_day_left": "1 day left",
+  "deadline_days_left": "{{count}} days left",
+  "deadline_yesterday": "Due: Yesterday",
+  "deadline_day_ago": "1 day ago",
+  "deadline_days_ago": "{{count}} days ago"
 }
