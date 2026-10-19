@@ -9,6 +9,7 @@ import {
   Cell,
   CartesianGrid,
 } from "recharts";
+import type { TooltipPayload } from "recharts/types/state/tooltipSlice";
 import styles from "./statistics.module.css";
 import { service, Event, Tag } from "~/service/service";
 import { utils } from "~/utils";
@@ -25,6 +26,45 @@ const OTHER_COLORS = [
   "#FF8A65",
 ];
 
+type TagChartDatum = { key: string; name: string };
+type TagCursorProps = React.SVGProps<SVGRectElement> & {
+  payload?: TooltipPayload;
+  onSelectTag: (tagKey: string, tagType: "uc" | "other") => void;
+  tagType: "uc" | "other";
+  getAccessibleLabel: (name: string) => string;
+};
+
+function InteractiveTagCursor({
+  payload,
+  onSelectTag,
+  tagType,
+  getAccessibleLabel,
+  ...rectProps
+}: TagCursorProps) {
+  const datum = payload?.[0]?.payload as TagChartDatum | undefined;
+  if (!datum?.key) return null;
+
+  const handleKeyDown = (event: React.KeyboardEvent<SVGRectElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onSelectTag(datum.key, tagType);
+    }
+  };
+
+  return (
+    <rect
+      {...rectProps}
+      fill="rgba(0,0,0,0.05)"
+      pointerEvents="all"
+      role="button"
+      tabIndex={0}
+      aria-label={getAccessibleLabel(datum.name)}
+      onClick={() => onSelectTag(datum.key, tagType)}
+      onKeyDown={handleKeyDown}
+    />
+  );
+}
+
 function expandEventsForCurrentWeek(
   rawEvents: Event[],
   currentWeek: number,
@@ -37,7 +77,7 @@ function expandEventsForCurrentWeek(
     const evEnd = new Date(ev.endDate);
     const durationMs = evEnd.getTime() - evDate.getTime();
 
-    if (!ev.every_week && !ev.every_day) {
+    if (!ev.everyWeek && !ev.everyDay) {
       if (
         utils.getWeekNumber(evDate) === currentWeek &&
         evDate.getFullYear() === currentYear
@@ -59,12 +99,12 @@ function expandEventsForCurrentWeek(
 
       let occurs = false;
 
-      if (ev.recurrence_start && loopDate < new Date(ev.recurrence_start))
+      if (ev.recurrenceStart && loopDate < new Date(ev.recurrenceStart))
         continue;
-      if (ev.recurrence_end && loopDate > new Date(ev.recurrence_end)) continue;
+      if (ev.recurrenceEnd && loopDate > new Date(ev.recurrenceEnd)) continue;
 
-      if (ev.every_day) occurs = true;
-      if (ev.every_week && loopDate.getDay() === evDate.getDay()) occurs = true;
+      if (ev.everyDay) occurs = true;
+      if (ev.everyWeek && loopDate.getDay() === evDate.getDay()) occurs = true;
 
       if (occurs) {
         const newStart = new Date(loopDate);
@@ -91,7 +131,7 @@ export function DrillDownStats() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedTagKey, setSelectedTagKey] = useState<string | null>(null);
   const [selectedTagType, setSelectedTagType] = useState<"uc" | "other" | null>(
     null,
   );
@@ -117,9 +157,43 @@ export function DrillDownStats() {
       currentYear,
     );
 
-    const ucMap: Record<string, number> = {};
-    const otherMap: Record<string, number> = {};
-    const coOccurrenceMap: Record<string, number> = {};
+    const ucMap: Record<string, { name: string; value: number; color: string }> = {};
+    const otherMap: Record<string, { name: string; value: number; color: string }> = {};
+    const coOccurrenceMap: Record<string, { name: string; value: number }> = {};
+
+    const resolveTag = (tagItem: any) => {
+      const tag = tags.find((candidate) => {
+        if (typeof tagItem === "object" && tagItem !== null) {
+          if (tagItem.id !== undefined && tagItem.id !== null) {
+            return String(candidate.id) === String(tagItem.id);
+          }
+          return (
+            candidate.name_pt === tagItem.name_pt ||
+            candidate.name_en === tagItem.name_en ||
+            candidate.name_pt === tagItem.name ||
+            candidate.name_en === tagItem.name
+          );
+        }
+        return (
+          String(candidate.id) === String(tagItem) ||
+          candidate.name_pt === tagItem ||
+          candidate.name_en === tagItem
+        );
+      });
+      const name = tag
+        ? tag.name_pt || tag.name_en || t("unnamed_tag")
+        : typeof tagItem === "object" && tagItem !== null
+          ? tagItem.name_pt || tagItem.name_en || tagItem.name || t("unnamed_tag")
+          : String(tagItem || t("unknown_tag"));
+      const id = tag?.id ?? (typeof tagItem === "object" ? tagItem?.id : undefined);
+
+      return {
+        key: id !== undefined && id !== null ? `id:${id}` : `name:${name}`,
+        name,
+        isUc: tag?.is_uc ?? tagItem?.is_uc ?? false,
+        color: tag?.color || tagItem?.color || UC_COLOR,
+      };
+    };
 
     weeklyEvents.forEach((event) => {
       const duration = Math.round(
@@ -129,72 +203,77 @@ export function DrillDownStats() {
       );
 
       if (event.tags && event.tags.length > 0) {
-        const eventTagNames: string[] = [];
+        const eventTags = event.tags.map(resolveTag);
 
-        event.tags.forEach((tagItem: any) => {
-          let tagName = t("unknown_tag");
-          if (typeof tagItem === "object" && tagItem !== null) {
-            tagName = tagItem.name_pt || tagItem.name_en || t("unnamed_tag");
-          } else {
-            const found = tags.find(
-              (t) =>
-                t.name_pt === tagItem ||
-                t.name_en === tagItem ||
-                t.id === tagItem,
-            );
-            tagName = found ? found.name_pt || found.name_en : String(tagItem);
-          }
-          eventTagNames.push(tagName);
-        });
-
-        event.tags.forEach((tagItem: any, index: number) => {
-          let tagName = eventTagNames[index];
-          let isUc = false;
-
-          if (typeof tagItem === "object" && tagItem !== null) {
-            isUc = tagItem.is_uc;
-          } else {
-            const found = tags.find(
-              (t) =>
-                t.name_pt === tagItem ||
-                t.name_en === tagItem ||
-                t.id === tagItem,
-            );
-            if (found) isUc = found.is_uc;
-          }
-
-          // Drill Down Logic
-          if (selectedTag && eventTagNames.includes(selectedTag)) {
-            if (tagName !== selectedTag) {
-              coOccurrenceMap[tagName] =
-                (coOccurrenceMap[tagName] || 0) + duration;
+        eventTags.forEach((tag) => {
+          if (
+            selectedTagKey &&
+            eventTags.some((eventTag) => eventTag.key === selectedTagKey)
+          ) {
+            if (tag.key !== selectedTagKey) {
+              const current = coOccurrenceMap[tag.key] || {
+                name: tag.name,
+                value: 0,
+              };
+              coOccurrenceMap[tag.key] = {
+                ...current,
+                value: current.value + duration,
+              };
             }
           }
 
-          // Overview Logic
-          if (!selectedTag) {
-            if (isUc) {
-              ucMap[tagName] = (ucMap[tagName] || 0) + duration;
+          if (!selectedTagKey) {
+            if (tag.isUc) {
+              const current = ucMap[tag.key] || {
+                name: tag.name,
+                value: 0,
+                color: tag.color,
+              };
+              ucMap[tag.key] = { ...current, value: current.value + duration };
             } else {
-              otherMap[tagName] = (otherMap[tagName] || 0) + duration;
+              const current = otherMap[tag.key] || {
+                name: tag.name,
+                value: 0,
+                color: OTHER_COLORS[Object.keys(otherMap).length % OTHER_COLORS.length],
+              };
+              otherMap[tag.key] = { ...current, value: current.value + duration };
             }
           }
         });
       }
     });
 
-    const formatData = (map: Record<string, number>) =>
-      Object.keys(map)
-        .map((key) => ({ name: key, value: map[key] }))
+    const formatData = (
+      map: Record<string, { name: string; value: number; color: string }>,
+    ) =>
+      Object.entries(map)
+        .map(([key, entry]) => ({ key, ...entry }))
+        .sort((a, b) => b.value - a.value);
+
+    const formatCoOccurrences = () =>
+      Object.entries(coOccurrenceMap)
+        .map(([key, entry]) => ({ key, ...entry }))
         .sort((a, b) => b.value - a.value);
 
     return {
       ucData: formatData(ucMap),
       otherData: formatData(otherMap),
-      drillDownData: formatData(coOccurrenceMap),
+      drillDownData: formatCoOccurrences(),
     };
-  }, [rawEvents, tags, selectedTag, t]);
+  }, [rawEvents, tags, selectedTagKey, t]);
 
+  const selectedTagName = selectedTagKey
+    ? tags.find((tag) => selectedTagKey === `id:${tag.id}`)?.name_pt ||
+      tags.find((tag) => selectedTagKey === `id:${tag.id}`)?.name_en ||
+      selectedTagKey.replace(/^name:/, "")
+    : null;
+  const selectedTagColor = selectedTagKey
+    ? tags.find((tag) => selectedTagKey === `id:${tag.id}`)?.color || UC_COLOR
+    : UC_COLOR;
+  const selectTag = (tagKey: string, tagType: "uc" | "other") => {
+    setSelectedTagKey(tagKey);
+    setSelectedTagType(tagType);
+  };
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const min = payload[0].value;
@@ -213,12 +292,12 @@ export function DrillDownStats() {
   return (
     <div className={styles.statCardContainer}>
       <div className={styles.statTitle}>
-        {selectedTag
-          ? <><FaMagnifyingGlass aria-hidden="true" /> {t("tag_detail", { tag: selectedTag })}</>
+        {selectedTagName
+          ? <><FaMagnifyingGlass aria-hidden="true" /> {t("tag_detail", { tag: selectedTagName })}</>
           : t("distribution_time")}
       </div>
 
-      {!selectedTag && (
+      {!selectedTagKey && (
         <p
           style={{
             fontSize: "0.85rem",
@@ -231,7 +310,7 @@ export function DrillDownStats() {
         </p>
       )}
 
-      {selectedTag ? (
+      {selectedTagKey ? (
         <div style={{ padding: "1rem" }}>
           <div
             style={{
@@ -242,18 +321,12 @@ export function DrillDownStats() {
             }}
           >
             <button
-              onClick={() => setSelectedTag(null)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "var(--color-2)",
-                fontWeight: "bold",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                fontSize: "1rem",
+              type="button"
+              onClick={() => {
+                setSelectedTagKey(null);
+                setSelectedTagType(null);
               }}
+              className={styles.detailBackButton}
             >
               <><FaArrowLeft aria-hidden="true" /> {t("back")}</>
             </button>
@@ -261,11 +334,16 @@ export function DrillDownStats() {
               style={{ fontSize: "0.8rem", color: "#666", fontStyle: "italic" }}
             >
               {t("co_occurrences_with")} {" "}
-              <b>{selectedTag}</b>
+              <b>{selectedTagName}</b>
             </span>
           </div>
 
-          <div style={{ width: "100%", height: 300 }}>
+          <div
+            style={{
+              width: "100%",
+              height: Math.max(144, drillDownData.length * 44),
+            }}
+          >
             {drillDownData.length > 0 ? (
               <ResponsiveContainer>
                 <BarChart
@@ -292,11 +370,9 @@ export function DrillDownStats() {
                     {drillDownData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={
-                          selectedTagType === "uc"
-                            ? UC_COLOR
-                            : OTHER_COLORS[index % OTHER_COLORS.length]
-                        }
+                        fill={selectedTagType === "uc"
+                          ? selectedTagColor
+                          : OTHER_COLORS[index % OTHER_COLORS.length]}
                       />
                     ))}
                   </Bar>
@@ -327,7 +403,7 @@ export function DrillDownStats() {
           <div className={styles.chartWrapper}>
             <div className={styles.chartTitleSmall}>{t("general")}</div>
             {otherData.length > 0 ? (
-              <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
+                <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
                 <ResponsiveContainer>
                   <BarChart
                     layout="vertical"
@@ -344,7 +420,13 @@ export function DrillDownStats() {
                       tickLine={false}
                     />
                     <Tooltip
-                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                      cursor={
+                        <InteractiveTagCursor
+                          onSelectTag={selectTag}
+                          tagType="other"
+                          getAccessibleLabel={(name) => t("open_tag_details", { tag: name })}
+                        />
+                      }
                       content={<CustomTooltip />}
                     />
                     <Bar
@@ -353,14 +435,13 @@ export function DrillDownStats() {
                       barSize={20}
                       style={{ cursor: "pointer" }}
                       onClick={(entry) => {
-                        setSelectedTag(entry.name);
-                        setSelectedTagType("other");
+                        selectTag(String(entry.key), "other");
                       }}
                     >
                       {otherData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
-                          fill={OTHER_COLORS[index % OTHER_COLORS.length]}
+                          fill={entry.color}
                           style={{ cursor: "pointer" }}
                         />
                       ))}
@@ -378,7 +459,7 @@ export function DrillDownStats() {
                 >
                   {t("click_bar_details")}
                 </div>
-              </div>
+                </div>
             ) : (
               <div className={styles.noDataAvailableMessage}>
                 {t("no_general_records")}
@@ -389,7 +470,7 @@ export function DrillDownStats() {
           <div className={styles.chartWrapper}>
             <div className={styles.chartTitleSmall}>{t("academic_units")}</div>
             {ucData.length > 0 ? (
-              <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
+                <div style={{ width: "100%", height: 250, fontSize: "0.7rem" }}>
                 <ResponsiveContainer>
                   <BarChart
                     layout="vertical"
@@ -406,20 +487,32 @@ export function DrillDownStats() {
                       tickLine={false}
                     />
                     <Tooltip
-                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                      cursor={
+                        <InteractiveTagCursor
+                          onSelectTag={selectTag}
+                          tagType="uc"
+                          getAccessibleLabel={(name) => t("open_tag_details", { tag: name })}
+                        />
+                      }
                       content={<CustomTooltip />}
                     />
                     <Bar
                       dataKey="value"
                       radius={[0, 4, 4, 0]}
                       barSize={20}
-                      fill={UC_COLOR}
                       style={{ cursor: "pointer" }}
                       onClick={(entry) => {
-                        setSelectedTag(entry.name);
-                        setSelectedTagType("uc");
+                        selectTag(String(entry.key), "uc");
                       }}
-                    />
+                    >
+                      {ucData.map((entry) => (
+                        <Cell
+                          key={entry.key}
+                          fill={entry.color}
+                          style={{ cursor: "pointer" }}
+                        />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
                 <div
@@ -433,7 +526,7 @@ export function DrillDownStats() {
                 >
                   {t("click_bar_details")}
                 </div>
-              </div>
+                </div>
             ) : (
               <div className={styles.noDataAvailableMessage}>
                 {t("no_unit_data")}

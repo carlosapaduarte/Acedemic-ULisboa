@@ -2,6 +2,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 import { FaXmark } from "react-icons/fa6";
+import {
+  Button,
+  Dialog,
+  Popover,
+} from "react-aria-components";
 import styles from "./infoPopover.module.css";
 
 type OpenMode = "automatic" | "pinned" | "dismissed";
@@ -18,6 +23,7 @@ export function InfoPopover({
   const { t } = useTranslation(["task"]);
   const rootRef = useRef<HTMLSpanElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLElement>(null);
   const panelId = useId();
   const contentId = useId();
   const [openMode, setOpenMode] = useState<OpenMode>("automatic");
@@ -31,17 +37,23 @@ export function InfoPopover({
     if (!isOpen) return;
 
     const handleOutsidePointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        if (rootRef.current?.contains(document.activeElement)) {
-          buttonRef.current?.focus();
-        }
-        setOpenMode("dismissed");
+      const target = event.target as Node;
+      if (
+        rootRef.current?.contains(target) ||
+        popoverRef.current?.contains(target)
+      ) {
+        return;
       }
+
+      if (rootRef.current?.contains(document.activeElement)) {
+        buttonRef.current?.focus();
+      }
+      setOpenMode("dismissed");
     };
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setOpenMode("dismissed");
         buttonRef.current?.focus();
+        setOpenMode("dismissed");
       }
     };
 
@@ -52,6 +64,47 @@ export function InfoPopover({
       document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen]);
+
+  const dismiss = () => setOpenMode("dismissed");
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) {
+      setOpenMode((mode) => (mode === "dismissed" ? "automatic" : mode));
+    } else {
+      dismiss();
+    }
+  };
+
+  const handlePointerLeave = (relatedTarget: EventTarget | null) => {
+    const nextTarget = relatedTarget as Node | null;
+    if (
+      nextTarget &&
+      (rootRef.current?.contains(nextTarget) ||
+        popoverRef.current?.contains(nextTarget))
+    ) {
+      return;
+    }
+
+    setIsHovered(false);
+    setOpenMode((mode) =>
+      mode === "dismissed" && !hasFocus ? "automatic" : mode,
+    );
+  };
+
+  const handleBlur = (relatedTarget: EventTarget | null) => {
+    const nextTarget = relatedTarget as Node | null;
+    if (
+      nextTarget &&
+      (rootRef.current?.contains(nextTarget) ||
+        popoverRef.current?.contains(nextTarget))
+    ) {
+      return;
+    }
+
+    setHasFocus(false);
+    setOpenMode((mode) =>
+      mode === "dismissed" && !isHovered ? "automatic" : mode,
+    );
+  };
 
   return (
     <span
@@ -67,10 +120,7 @@ export function InfoPopover({
       }}
       onPointerLeave={(event) => {
         if (event.pointerType === "mouse") {
-          setIsHovered(false);
-          setOpenMode((mode) =>
-            mode === "dismissed" && !hasFocus ? "automatic" : mode,
-          );
+          handlePointerLeave(event.relatedTarget);
         }
       }}
       onFocusCapture={() => {
@@ -79,56 +129,70 @@ export function InfoPopover({
           mode === "dismissed" && !isHovered ? "automatic" : mode,
         );
       }}
-      onBlurCapture={(event) => {
-        const nextTarget = event.relatedTarget as Node | null;
-        if (nextTarget && rootRef.current?.contains(nextTarget)) return;
-
-        setHasFocus(false);
-        setOpenMode((mode) =>
-          mode === "dismissed" && !isHovered ? "automatic" : mode,
-        );
-      }}
+      onBlurCapture={(event) => handleBlur(event.relatedTarget)}
     >
-      <button
+      <Button
         ref={buttonRef}
-        type="button"
-        className={className}
+        className={classNames(styles.infoPopoverTrigger, className)}
         aria-label={buttonLabel}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={panelId}
-        aria-describedby={contentId}
-        onClick={() =>
+        onPress={() =>
           setOpenMode((mode) =>
             mode === "pinned" ? "dismissed" : "pinned",
           )
         }
       >
         i
-      </button>
-
-      <div
-        id={panelId}
-        role="dialog"
-        aria-label={buttonLabel}
-        className={classNames(styles.infoPopover, isOpen && styles.open)}
-        hidden={!isOpen}
+      </Button>
+      <Popover
+        ref={popoverRef}
+        triggerRef={buttonRef}
+        className={styles.infoPopover}
+        placement="bottom start"
+        offset={8}
+        shouldFlip
+        containerPadding={16}
+        isOpen={isOpen}
+        isNonModal
+        onOpenChange={handleOpenChange}
       >
-        <p id={contentId} className={styles.infoPopoverText}>
-          {content}
-        </p>
-        <button
-          type="button"
-          className={styles.infoPopoverClose}
-          aria-label={t("task:close")}
-          onClick={() => {
-            buttonRef.current?.focus();
-            setOpenMode("dismissed");
+        <div
+          className={styles.infoPopoverContent}
+          onPointerEnter={(event) => {
+            if (event.pointerType === "mouse") setIsHovered(true);
           }}
+          onPointerLeave={(event) => {
+            if (event.pointerType === "mouse") {
+              handlePointerLeave(event.relatedTarget);
+            }
+          }}
+          onFocusCapture={() => setHasFocus(true)}
+          onBlurCapture={(event) => handleBlur(event.relatedTarget)}
         >
-          <FaXmark aria-hidden="true" />
-        </button>
-      </div>
+          <Dialog
+            id={panelId}
+            aria-label={buttonLabel}
+            className={styles.infoPopoverDialog}
+          >
+            <p id={contentId} className={styles.infoPopoverText}>
+              {content}
+            </p>
+            <Button
+              type="button"
+              className={styles.infoPopoverClose}
+              aria-label={t("task:close")}
+              onPress={() => {
+                buttonRef.current?.focus();
+                dismiss();
+              }}
+            >
+              <FaXmark aria-hidden="true" />
+            </Button>
+          </Dialog>
+        </div>
+      </Popover>
     </span>
   );
 }

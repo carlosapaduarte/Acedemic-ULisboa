@@ -6,7 +6,7 @@ import {
   Views,
 } from "react-big-calendar";
 import moment from "moment";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Event, service, Tag, Task } from "~/service/service";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -301,6 +301,7 @@ type EventsView = "allEvents" | "recurringEvents";
 
 function useMyCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const latestRefreshRequest = useRef(0);
   const [userTags, setUserTags] = useState<Tag[]>([]);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
@@ -382,6 +383,7 @@ function useMyCalendar() {
   }, [i18n.language]);
 
   const refreshAllCalendarData = useCallback(async () => {
+    const requestId = ++latestRefreshRequest.current;
     try {
       const [eventsFromBackend, tagsFromBackend, tasksFromBackend] =
         await Promise.all([
@@ -389,6 +391,8 @@ function useMyCalendar() {
           service.fetchUserTags(),
           service.getTasks(false),
         ]);
+
+      if (requestId !== latestRefreshRequest.current) return;
 
       setUserTags(tagsFromBackend);
       setAllTasks(tasksFromBackend);
@@ -545,7 +549,7 @@ function useMyCalendar() {
           recurrenceStart: resource.recurrenceStart,
           recurrenceEnd: resource.recurrenceEnd,
         });
-        refreshAllCalendarData();
+        await refreshAllCalendarData();
       } catch (error) {
         console.error("Erro ao mover evento:", error);
         alert("Não foi possível mover o evento.");
@@ -587,7 +591,7 @@ function useMyCalendar() {
           recurrenceStart: resource.recurrenceStart,
           recurrenceEnd: resource.recurrenceEnd,
         });
-        refreshAllCalendarData();
+        await refreshAllCalendarData();
       } catch (error) {
         console.error("Erro ao redimensionar evento:", error);
       }

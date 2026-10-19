@@ -2,11 +2,12 @@ import classNames from "classnames";
 import styles from "./checkbox.module.css";
 
 export function TaskCheckbox(
-    { checked, onClick, className, ariaLabel = "Mark task as done", disabled = false }:
+    { checked, onClick, className, checkedClassName, ariaLabel = "Mark task as done", disabled = false }:
         {
             checked: boolean,
             onClick: () => void,
             className?: string,
+            checkedClassName?: string,
             ariaLabel?: string,
             disabled?: boolean
         }
@@ -19,6 +20,7 @@ export function TaskCheckbox(
                 className={classNames(
                     styles.checkBox,
                     checked && styles.checked,
+                    checked && checkedClassName,
                     className
                 )}
                 onClick={onClick}

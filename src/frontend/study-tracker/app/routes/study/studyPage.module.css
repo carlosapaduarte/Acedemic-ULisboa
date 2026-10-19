@@ -4,7 +4,8 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  height: 100%;
+  min-height: 100%;
+  height: auto;
   box-sizing: border-box;
 }
 
@@ -88,9 +89,10 @@
 @media (max-width: 768px) {
   .pageContainer {
     height: auto;
-    min-height: 100vh;
+    min-height: 100%;
     justify-content: flex-start;
-    padding-top: 4rem;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
   }
 
   .title {

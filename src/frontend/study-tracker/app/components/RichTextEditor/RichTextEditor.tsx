@@ -14,8 +14,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         type="button"
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={editor.isActive("bold") ? styles.isActive : ""}
-        aria-label={t("notes:bold", "Bold")}
-        title={t("notes:bold", "Bold")}
+        aria-label={t("notes:bold")}
+        title={t("notes:bold")}
       >
         <FaBold aria-hidden="true" />
       </button>
@@ -23,8 +23,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         type="button"
         onClick={() => editor.chain().focus().toggleItalic().run()}
         className={editor.isActive("italic") ? styles.isActive : ""}
-        aria-label={t("notes:italic", "Italic")}
-        title={t("notes:italic", "Italic")}
+        aria-label={t("notes:italic")}
+        title={t("notes:italic")}
       >
         <FaItalic aria-hidden="true" />
       </button>
@@ -32,8 +32,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         type="button"
         onClick={() => editor.chain().focus().toggleStrike().run()}
         className={editor.isActive("strike") ? styles.isActive : ""}
-        aria-label={t("notes:strike", "Strikethrough")}
-        title={t("notes:strike", "Strikethrough")}
+        aria-label={t("notes:strike")}
+        title={t("notes:strike")}
       >
         <FaStrikethrough aria-hidden="true" />
       </button>
@@ -41,8 +41,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         type="button"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={editor.isActive("heading", { level: 1 }) ? styles.isActive : ""}
-        aria-label={t("notes:heading_1", "Heading 1")}
-        title={t("notes:heading_1", "Heading 1")}
+        aria-label={t("notes:heading_1")}
+        title={t("notes:heading_1")}
       >
         H1
       </button>
@@ -50,8 +50,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         type="button"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={editor.isActive("heading", { level: 2 }) ? styles.isActive : ""}
-        aria-label={t("notes:heading_2", "Heading 2")}
-        title={t("notes:heading_2", "Heading 2")}
+        aria-label={t("notes:heading_2")}
+        title={t("notes:heading_2")}
       >
         H2
       </button>
@@ -59,8 +59,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         type="button"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={editor.isActive("bulletList") ? styles.isActive : ""}
-        aria-label={t("notes:bullets", "Bulleted list")}
-        title={t("notes:bullets", "Bulleted list")}
+        aria-label={t("notes:bullets")}
+        title={t("notes:bullets")}
       >
         <FaListUl aria-hidden="true" />
       </button>
@@ -68,8 +68,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
         type="button"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={editor.isActive("orderedList") ? styles.isActive : ""}
-        aria-label={t("notes:numbered", "Numbered list")}
-        title={t("notes:numbered", "Numbered list")}
+        aria-label={t("notes:numbered")}
+        title={t("notes:numbered")}
       >
         <FaListOl aria-hidden="true" />
       </button>

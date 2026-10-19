@@ -140,10 +140,11 @@ def get_user_task(user_id: int, task_id: int) -> Task:
         raise NotFoundException(user_id)
 
 def update_task_status(user_id: int, task_id: int, new_status: str):
-    study_tracker_repo.update_task_status(user_id, task_id, new_status)
+    updated_task_ids = study_tracker_repo.update_task_status(user_id, task_id, new_status)
 
     if new_status == "completed":
-        study_tracker_repo.deactivate_future_task_events(user_id, task_id)
+        for updated_task_id in updated_task_ids:
+            study_tracker_repo.deactivate_future_task_events(user_id, updated_task_id)
     else:
         study_tracker_repo.reactivate_inactive_task_events(user_id, task_id)
 

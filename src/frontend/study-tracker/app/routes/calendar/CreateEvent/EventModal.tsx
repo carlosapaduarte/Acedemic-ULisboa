@@ -43,7 +43,7 @@ export type RecurrenceType = "none" | "daily" | "weekly";
 interface EventModalProps {
   isModalOpen: boolean;
   setIsModalOpen: (isOpen: boolean) => void;
-  refreshUserEvents: () => void;
+  refreshUserEvents: () => Promise<void>;
   eventToEdit?: EventData | null;
   initialStartDate?: Date;
   initialEndDate?: Date;
@@ -498,7 +498,7 @@ export function EventModal({
       if (isEditMode && eventToEdit)
         await service.updateEvent(eventToEdit.id, eventPayload);
       else await service.createNewEvent(eventPayload);
-      refreshUserEvents();
+      await refreshUserEvents();
       clearFormAndClose();
     } catch (error) {
       console.error(error);
@@ -514,7 +514,7 @@ export function EventModal({
       setSaving(true);
       try {
         await service.deleteEvent(Number(eventToEdit.id));
-        refreshUserEvents();
+        await refreshUserEvents();
         clearFormAndClose();
       } catch (error) {
         alert(t("error_deleting_event"));

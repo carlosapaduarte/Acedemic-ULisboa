@@ -176,6 +176,29 @@
   width: 100%;
 }
 
+.detailBackButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-3);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.detailBackButton:hover {
+  color: var(--color-1);
+  text-decoration: underline;
+}
+
+.detailBackButton:focus-visible {
+  outline: 2px solid var(--color-3);
+  outline-offset: 3px;
+}
+
 .chartTitleSmall {
   font-size: 0.85rem;
   font-weight: bold;

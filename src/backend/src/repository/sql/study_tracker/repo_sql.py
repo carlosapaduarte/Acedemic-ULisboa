@@ -595,18 +595,37 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             
             StudyTrackerSqlRepo.create_task(self, user_id, task, task_id)
 
-    def update_task_status(self, user_id: int, task_id: int, new_status: str):
+    def update_task_status(self, user_id: int, task_id: int, new_status: str) -> list[int]:
         with Session(engine) as session:
             statement = select(STTaskModel).where(STTaskModel.user_id == user_id).where(STTaskModel.id == task_id)
             result = session.exec(statement)
             task_model: STTaskModel = result.one()
-            task_model.status = new_status
+
+            task_models = [task_model]
             if new_status == "completed":
-                task_model.completed_at = datetime.now(timezone.utc)
-            else:
-                task_model.completed_at = None
-            session.add(task_model)
+                # Completing a task cascades down its subtree; reopening does not.
+                frontier_ids = [task_id]
+                while frontier_ids:
+                    children = session.exec(
+                        select(STTaskModel).where(
+                            STTaskModel.user_id == user_id,
+                            STTaskModel.parent_task_id.in_(frontier_ids),
+                        )
+                    ).all()
+                    task_models.extend(children)
+                    frontier_ids = [child.id for child in children]
+
+            completed_at = datetime.now(timezone.utc) if new_status == "completed" else None
+            for model in task_models:
+                if new_status == "completed" and model.status == "completed":
+                    continue
+                model.status = new_status
+                model.completed_at = completed_at
+                session.add(model)
+
+            updated_task_ids = [model.id for model in task_models]
             session.commit()
+            return updated_task_ids
             
     def increment_task_tracked_time(self, user_id: int, task_ids: list[int], minutes: int):
         with Session(engine) as session:

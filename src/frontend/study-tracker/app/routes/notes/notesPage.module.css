@@ -271,7 +271,7 @@
   padding: 10px 12px;
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--color-3);
+  color: var(--text-color-2);
   cursor: pointer;
   border-radius: 4px;
   outline: none;
@@ -279,15 +279,23 @@
 }
 
 .actionMenuItem:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.actionMenuItem:focus-visible,
+.actionMenuItem[data-focused] {
+  outline: 2px solid var(--color-2);
+  outline-offset: -2px;
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .dangerItem {
-  color: #C62828;
+  color: var(--text-color-2);
+  background: var(--color-text-danger);
 }
 
 .dangerItem:hover {
-  background: rgba(198, 40, 40, 0.1);
+  background: color-mix(in srgb, var(--color-text-danger), black 12%);
 }
 
 /* MODAIS */
@@ -331,9 +339,44 @@
   box-shadow: none;
 }
 
+.actionModalContent {
+  box-sizing: border-box;
+  width: min(90vw, 450px);
+  padding: 2.5rem;
+  position: relative;
+}
+
 .noteModalTitle {
   color: var(--text-color-2);
   font-weight: 700;
+}
+
+.actionModalTitle {
+  padding-right: 2.25rem;
+  font-size: 1.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.modalFieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.modalFieldLabel {
+  color: var(--text-color-2);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.actionModalContent .modalInput {
+  margin-bottom: 0;
+}
+
+.actionModalContent .inputError {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--color-text-danger) !important;
 }
 
 .noteModalContent .noteModalInput {

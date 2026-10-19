@@ -36,10 +36,17 @@ export function getSelectedTaskEntries(
   );
 }
 
-function collectEligibleSubtreeIds(task: Task): number[] {
-  const ids = task.data.status === "completed" ? [] : [task.id];
+function collectEligibleSubtreeIds(
+  task: Task,
+  allowedTaskIds?: Set<number>,
+): number[] {
+  const isAllowed = !allowedTaskIds || allowedTaskIds.has(task.id);
+  const ids = task.data.status === "completed" || !isAllowed ? [] : [task.id];
   return task.subTasks.reduce(
-    (allIds, subTask) => [...allIds, ...collectEligibleSubtreeIds(subTask)],
+    (allIds, subTask) => [
+      ...allIds,
+      ...collectEligibleSubtreeIds(subTask, allowedTaskIds),
+    ],
     ids,
   );
 }
@@ -48,9 +55,13 @@ export function toggleTaskSelection(
   tasks: Task[],
   selectedTaskIds: number[],
   taskId: number,
+  allowedTaskIds?: number[],
 ): number[] {
+  const allowedIds = allowedTaskIds ? new Set(allowedTaskIds) : undefined;
   const selectableIds = new Set(
-    getSelectableTaskEntries(tasks).map(({ task }) => task.id),
+    getSelectableTaskEntries(tasks)
+      .map(({ task }) => task.id)
+      .filter((id) => !allowedIds || allowedIds.has(id)),
   );
   const selectedIds = new Set(
     selectedTaskIds.filter((id) => selectableIds.has(id)),
@@ -62,7 +73,7 @@ export function toggleTaskSelection(
     return Array.from(selectedIds);
   }
 
-  const affectedIds = collectEligibleSubtreeIds(clickedEntry.task);
+  const affectedIds = collectEligibleSubtreeIds(clickedEntry.task, allowedIds);
 
   if (selectedIds.has(taskId)) {
     affectedIds.forEach((id) => selectedIds.delete(id));
@@ -72,6 +83,20 @@ export function toggleTaskSelection(
   }
 
   return Array.from(selectedIds);
+}
+
+export function getTopmostSelectedTaskIds(
+  tasks: Task[],
+  selectedTaskIds: number[],
+): number[] {
+  const selectedIds = new Set(selectedTaskIds);
+  return getSelectableTaskEntries(tasks)
+    .filter(
+      ({ task, ancestorIds }) =>
+        selectedIds.has(task.id) &&
+        !ancestorIds.some((ancestorId) => selectedIds.has(ancestorId)),
+    )
+    .map(({ task }) => task.id);
 }
 
 export function getTrackedTaskIds(

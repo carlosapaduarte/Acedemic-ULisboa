@@ -77,7 +77,7 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def update_task_status(self, user_id: int, task_id: int, new_status: str):
+    def update_task_status(self, user_id: int, task_id: int, new_status: str) -> list[int]:
         pass
     
     @abstractmethod

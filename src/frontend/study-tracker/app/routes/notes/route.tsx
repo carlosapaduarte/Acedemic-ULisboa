@@ -32,6 +32,10 @@ import {
   MenuTrigger,
 } from "react-aria-components";
 
+export const handle = {
+  i18n: ["notes", "task"],
+};
+
 const validateAndFormatUrl = (url: string) => {
   let formattedUrl = url.trim();
   if (!/^https?:\/\//i.test(formattedUrl)) {
@@ -46,7 +50,7 @@ const validateAndFormatUrl = (url: string) => {
 };
 
 function NotesPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["notes", "task"]);
   const [isClient, setIsClient] = useState(false);
   const [rootFiles, setRootFiles] = useState<FileItem[]>([]);
   const [rootArchives, setRootArchives] = useState<ArchiveItem[]>([]);
@@ -69,12 +73,11 @@ function NotesPage() {
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const [newLinkName, setNewLinkName] = useState("");
   const [linkError, setLinkError] = useState("");
+  const [linkErrorField, setLinkErrorField] = useState<"title" | "url" | null>(null);
 
   const [editingFile, setEditingFile] = useState<FileItem | null>(null);
   const [textContent, setTextContent] = useState("");
-  const [saveStatus, setSaveStatus] = useState<
-    "Guardado" | "A guardar..." | "Erro"
-  >("Guardado");
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">("saved");
 
   // RENOMEAR
   const [renameTarget, setRenameTarget] = useState<{
@@ -140,12 +143,12 @@ function NotesPage() {
   // AUTO-SAVE DA NOTA
   useEffect(() => {
     if (!editingFile || !isClient) return;
-    setSaveStatus("A guardar...");
+    setSaveStatus("saving");
     const timer = setTimeout(() => {
       service
         .updateFileText(editingFile.id, textContent)
-        .then(() => setSaveStatus("Guardado"))
-        .catch(() => setSaveStatus("Erro"));
+        .then(() => setSaveStatus("saved"))
+        .catch(() => setSaveStatus("error"));
     }, 1500);
     return () => clearTimeout(timer);
   }, [editingFile?.id, isClient, textContent]);
@@ -154,13 +157,13 @@ function NotesPage() {
     startTransition(() => {
       setEditingFile(file);
       setTextContent(file.text || "");
-      setSaveStatus("Guardado");
+      setSaveStatus("saved");
     });
 
     try {
       const recent = JSON.parse(localStorage.getItem("recent_notes") || "[]");
       const updated = recent.filter((n: any) => n.id !== file.id);
-      const folderName = currentFolder ? currentFolder.name : "Raiz";
+      const folderName = currentFolder ? currentFolder.name : "";
 
       updated.unshift({
         id: file.id,
@@ -177,7 +180,7 @@ function NotesPage() {
 
   const handleCreateFolder = async () => {
     if (!newFolderName.trim()) {
-      setFolderError("O nome da pasta não pode estar vazio.");
+      setFolderError("folder_name_required");
       return;
     }
     setFolderError("");
@@ -186,13 +189,13 @@ function NotesPage() {
       closeFolderModal();
       loadData();
     } catch (e: any) {
-      setFolderError(e.message || "Erro ao criar pasta.");
+      setFolderError("create_folder_error");
     }
   };
 
   const handleCreateFile = async () => {
     if (!newTextFileName.trim()) {
-      setFileError(t("notes:new_note_title_required"));
+      setFileError("new_note_title_required");
       return;
     }
     setFileError("");
@@ -201,40 +204,45 @@ function NotesPage() {
       closeFileModal();
       loadData();
     } catch (e: any) {
-      setFileError(e.message || t("notes:new_note_error"));
+      setFileError("new_note_error");
     }
   };
 
   const handleCreateLink = async () => {
     if (!newLinkName.trim()) {
-      setLinkError("Por favor, insere um título para o link.");
+      setLinkError("link_title_required");
+      setLinkErrorField("title");
       return;
     }
     if (!newLinkUrl.trim()) {
-      setLinkError("A URL não pode estar vazia.");
+      setLinkError("link_url_required");
+      setLinkErrorField("url");
       return;
     }
 
     const validUrl = validateAndFormatUrl(newLinkUrl);
     if (!validUrl) {
-      setLinkError("Formato de URL inválido. Exemplo: www.google.com");
+      setLinkError("link_url_invalid");
+      setLinkErrorField("url");
       return;
     }
 
     setLinkError("");
+    setLinkErrorField(null);
     try {
       await service.createFile(currentFolder?.id || null, newLinkName.trim(), "link", validUrl);
       closeLinkModal();
       loadData();
     } catch (e: any) {
-      setLinkError(e.message || "Erro ao guardar o link.");
+      setLinkError("create_link_error");
+      setLinkErrorField(null);
     }
   };
 
   const handleRenameSubmit = async () => {
     if (!renameTarget) return;
     if (!renameValue.trim()) {
-      setRenameError("O nome não pode estar vazio.");
+      setRenameError("rename_name_required");
       return;
     }
     setRenameError("");
@@ -247,7 +255,7 @@ function NotesPage() {
       closeRenameModal();
       loadData();
     } catch (e) {
-      setRenameError("Erro ao renomear o item.");
+      setRenameError("rename_error");
     }
   };
 
@@ -268,6 +276,7 @@ function NotesPage() {
     setNewLinkUrl("");
     setNewLinkName("");
     setLinkError("");
+    setLinkErrorField(null);
   };
 
   const closeRenameModal = () => {
@@ -277,14 +286,14 @@ function NotesPage() {
   };
 
   const handleDeleteFile = async (id: number) => {
-    if (confirm("Apagar ficheiro?")) {
+    if (confirm(t("notes:delete_file_confirm"))) {
       await service.deleteFile(id);
       loadData();
     }
   };
 
   const handleDeleteFolder = async (id: number) => {
-    if (confirm("Apagar pasta e todo o seu conteúdo?")) {
+    if (confirm(t("notes:delete_folder_confirm"))) {
       await service.deleteArchive(id);
       loadData();
     }
@@ -396,14 +405,14 @@ function NotesPage() {
                 fontSize: "0.95rem"
               }}
             >
-              <FaArrowLeft /> Voltar
+              <FaArrowLeft aria-hidden="true" /> {t("notes:back")}
             </button>
             <h1 style={{ fontSize: "1.5rem", margin: 0, fontWeight: "800", textTransform: "uppercase" }}>
               {editingFile.name}
             </h1>
           </div>
           <span style={{ fontSize: "0.9rem", fontWeight: "700", opacity: 0.8 }}>
-            {saveStatus}
+            {t(`notes:${saveStatus === "error" ? "save_error" : saveStatus}`)}
           </span>
         </header>
         <div className={styles.editorWorkspace}>
@@ -419,11 +428,11 @@ function NotesPage() {
     <div className={styles.pageContainer}>
       <header className={styles.header}>
         <h1 className={styles.mainTitle}>
-          {t("notes:repository_title", "Apontamentos")}
+          {t("notes:repository_title")}
         </h1>
         <p className={styles.subTitle}>
           {folderPath.length === 0
-            ? "Raiz"
+            ? t("notes:root")
             : folderPath.length <= 2
             ? folderPath.map((f) => f.name).join(" > ")
             : `${folderPath[0].name} > ... > ${folderPath[folderPath.length - 1].name}`}
@@ -436,13 +445,13 @@ function NotesPage() {
             className={styles.backButton}
             onClick={() => setFolderPath((prev) => prev.slice(0, -1))}
           >
-            <FaArrowLeft /> Voltar
+            <FaArrowLeft aria-hidden="true" /> {t("notes:back")}
           </button>
         ) : (
           <div className={styles.searchBar}>
             <FaMagnifyingGlass className={styles.searchIcon} />
             <input
-              placeholder="Procurar..."
+              placeholder={t("notes:search_placeholder")}
               className={styles.searchInput}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -453,13 +462,13 @@ function NotesPage() {
         
         <div className={styles.actions}>
           <Button className={styles.secondaryButton} onPress={() => setIsCreateFolderOpen(true)}>
-            <FaFolderPlus /> Pasta
+            <FaFolderPlus aria-hidden="true" /> {t("notes:create_folder_button")}
           </Button>
           <Button className={styles.secondaryButton} onPress={() => setIsLinkModalOpen(true)}>
-            <FaCloudArrowUp /> Link
+            <FaCloudArrowUp aria-hidden="true" /> {t("notes:create_link_button")}
           </Button>
           <Button className={styles.primaryButton} onPress={() => setIsCreateFileOpen(true)}>
-            <FaFileCirclePlus /> Nota
+            <FaFileCirclePlus aria-hidden="true" /> {t("notes:create_note_button")}
           </Button>
         </div>
       </div>
@@ -471,25 +480,29 @@ function NotesPage() {
             .map((archive) => (
               <div key={archive.id} className={styles.folderCard} onClick={() => handleFolderClick(archive)}>
                 <div style={{ position: "absolute", top: "10px", right: "10px", display: "flex", gap: "8px" }}>
-                  <FaPen
-                    size={14}
+                  <button
+                    type="button"
                     className={styles.iconButton}
-                    style={{ padding: 0 }}
+                    aria-label={t("notes:rename_folder", { name: archive.name })}
                     onClick={(e) => {
                       e.stopPropagation();
                       setRenameTarget({ id: archive.id, type: "folder", currentName: archive.name });
                       setRenameValue(archive.name);
                     }}
-                  />
-                  <FaXmark
-                    size={16}
+                  >
+                    <FaPen size={14} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
                     className={styles.iconButton}
-                    style={{ padding: 0 }}
+                    aria-label={t("notes:delete_folder", { name: archive.name })}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteFolder(archive.id);
                     }}
-                  />
+                  >
+                    <FaXmark size={16} aria-hidden="true" />
+                  </button>
                 </div>
                 <FaFolder className={styles.folderIcon} />
                 <span className={styles.folderName}>{archive.name}</span>
@@ -516,8 +529,8 @@ function NotesPage() {
                 {getFileIcon(file)}
                 <span className={styles.fileName} style={{ flex: 1 }}>{file.name}</span>
                 <MenuTrigger>
-                  <Button className={styles.iconButton} style={{ opacity: 1, padding: "8px" }}>
-                    <FaEllipsisVertical />
+                  <Button className={styles.iconButton} style={{ opacity: 1, padding: "8px" }} aria-label={t("notes:file_actions", { name: file.name })}>
+                    <FaEllipsisVertical aria-hidden="true" />
                   </Button>
                   <Popover className={styles.popoverMenu}>
                     <Menu
@@ -530,10 +543,10 @@ function NotesPage() {
                       }}
                     >
                       <MenuItem id="rename" className={styles.actionMenuItem}>
-                        <FaPen /> Renomear
+                        <FaPen aria-hidden="true" /> {t("notes:rename")}
                       </MenuItem>
                       <MenuItem id="delete" className={`${styles.actionMenuItem} ${styles.dangerItem}`}>
-                        <FaTrash /> Apagar
+                        <FaTrash aria-hidden="true" /> {t("notes:delete")}
                       </MenuItem>
                     </Menu>
                   </Popover>
@@ -545,19 +558,24 @@ function NotesPage() {
 
       {/* MODAL CRIAR PASTA */}
       <Modal isOpen={isCreateFolderOpen} onOpenChange={(isOpen) => !isOpen && closeFolderModal()} className={styles.modalOverlay}>
-        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Criar Nova Pasta">
-          <button onClick={closeFolderModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+        <Dialog className={`${styles.modalContent} ${styles.noteModalContent} ${styles.actionModalContent}`} aria-label={t("notes:create_folder_aria")}>
+          <button onClick={closeFolderModal} className={styles.modalCloseButton} aria-label={t("task:close")}>
             <FaXmark aria-hidden="true" />
           </button>
-          <h2 className={styles.modalTitle}>Nova Pasta</h2>
-          <input
-            placeholder="Nome da pasta"
-            className={`${styles.modalInput} ${folderError ? styles.inputError : ''}`}
-            value={newFolderName}
-            onChange={(e) => { setNewFolderName(e.target.value); setFolderError(""); }}
-          />
-          {folderError && <p className={styles.errorText}>{folderError}</p>}
-          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateFolder}>Criar</Button>
+          <h2 className={`${styles.modalTitle} ${styles.noteModalTitle} ${styles.actionModalTitle}`}>{t("notes:new_folder_title")}</h2>
+          <div className={styles.modalFieldGroup}>
+            <label className={styles.modalFieldLabel} htmlFor="notes-folder-name">
+              {t("notes:folder_name_label")}
+            </label>
+            <input
+              id="notes-folder-name"
+              className={`${styles.modalInput} ${styles.noteModalInput} ${folderError ? styles.inputError : ''}`}
+              value={newFolderName}
+              onChange={(e) => { setNewFolderName(e.target.value); setFolderError(""); }}
+            />
+          </div>
+          {folderError && <p className={styles.errorText}>{t(`notes:${folderError}`)}</p>}
+          <Button className={`${styles.primaryButton} ${styles.noteModalButton}`} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateFolder}>{t("notes:create")}</Button>
         </Dialog>
       </Modal>
 
@@ -568,7 +586,7 @@ function NotesPage() {
           style={{ position: "relative" }}
           aria-label={t("notes:new_note_title")}
         >
-          <button onClick={closeFileModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+          <button onClick={closeFileModal} className={styles.modalCloseButton} aria-label={t("task:close")}>
             <FaXmark aria-hidden="true" />
           </button>
           <h2 className={`${styles.modalTitle} ${styles.noteModalTitle}`}>
@@ -580,7 +598,7 @@ function NotesPage() {
             value={newTextFileName}
             onChange={(e) => { setNewTextFileName(e.target.value); setFileError(""); }}
           />
-          {fileError && <p className={styles.errorText}>{fileError}</p>}
+          {fileError && <p className={styles.errorText}>{t(`notes:${fileError}`)}</p>}
           <Button
             className={`${styles.primaryButton} ${styles.noteModalButton}`}
             style={{ width: "100%", justifyContent: "center" }}
@@ -593,42 +611,60 @@ function NotesPage() {
 
       {/* MODAL CRIAR LINK */}
       <Modal isOpen={isLinkModalOpen} onOpenChange={(isOpen) => !isOpen && closeLinkModal()} className={styles.modalOverlay}>
-        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Adicionar Link Externo">
-          <button onClick={closeLinkModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+        <Dialog className={`${styles.modalContent} ${styles.noteModalContent} ${styles.actionModalContent}`} aria-label={t("notes:create_link_aria")}>
+          <button onClick={closeLinkModal} className={styles.modalCloseButton} aria-label={t("task:close")}>
             <FaXmark aria-hidden="true" />
           </button>
-          <h2 className={styles.modalTitle}>Novo Link</h2>
-          <input
-            placeholder="Título (ex: Slides Prática)"
-            className={`${styles.modalInput} ${linkError.includes("título") ? styles.inputError : ''}`}
-            value={newLinkName}
-            onChange={(e) => { setNewLinkName(e.target.value); setLinkError(""); }}
-          />
-          <input
-            placeholder="URL (ex: www.site.com/link)"
-            className={`${styles.modalInput} ${linkError.includes("URL") ? styles.inputError : ''}`}
-            value={newLinkUrl}
-            onChange={(e) => { setNewLinkUrl(e.target.value); setLinkError(""); }}
-          />
-          {linkError && <p className={styles.errorText}>{linkError}</p>}
-          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateLink}>Adicionar</Button>
+          <h2 className={`${styles.modalTitle} ${styles.noteModalTitle} ${styles.actionModalTitle}`}>{t("notes:new_link_title")}</h2>
+          <div className={styles.modalFieldGroup}>
+            <label className={styles.modalFieldLabel} htmlFor="notes-link-title">
+              {t("notes:link_title_label")}
+            </label>
+            <input
+              id="notes-link-title"
+              placeholder={t("notes:link_title_placeholder")}
+              className={`${styles.modalInput} ${styles.noteModalInput} ${linkErrorField === "title" ? styles.inputError : ''}`}
+              value={newLinkName}
+              onChange={(e) => { setNewLinkName(e.target.value); setLinkError(""); setLinkErrorField(null); }}
+            />
+          </div>
+          <div className={styles.modalFieldGroup}>
+            <label className={styles.modalFieldLabel} htmlFor="notes-link-url">
+              {t("notes:link_url_label")}
+            </label>
+            <input
+              id="notes-link-url"
+              placeholder={t("notes:link_url_placeholder")}
+              className={`${styles.modalInput} ${styles.noteModalInput} ${linkErrorField === "url" ? styles.inputError : ''}`}
+              value={newLinkUrl}
+              onChange={(e) => { setNewLinkUrl(e.target.value); setLinkError(""); setLinkErrorField(null); }}
+            />
+          </div>
+          {linkError && <p className={styles.errorText}>{t(`notes:${linkError}`)}</p>}
+          <Button className={`${styles.primaryButton} ${styles.noteModalButton}`} style={{ width: "100%", justifyContent: "center" }} onPress={handleCreateLink}>{t("notes:add")}</Button>
         </Dialog>
       </Modal>
 
       {/* MODAL RENOMEAR */}
       <Modal isOpen={!!renameTarget} onOpenChange={(isOpen) => !isOpen && closeRenameModal()} className={styles.modalOverlay}>
-        <Dialog className={styles.modalContent} style={{ position: "relative" }} aria-label="Renomear Item">
-          <button onClick={closeRenameModal} className={styles.modalCloseButton} aria-label={t("task:close", "Fechar")}>
+        <Dialog className={`${styles.modalContent} ${styles.noteModalContent} ${styles.actionModalContent}`} aria-label={t("notes:rename_item_aria")}>
+          <button onClick={closeRenameModal} className={styles.modalCloseButton} aria-label={t("task:close")}>
             <FaXmark aria-hidden="true" />
           </button>
-          <h2 className={styles.modalTitle}>Renomear</h2>
-          <input
-            className={`${styles.modalInput} ${renameError ? styles.inputError : ''}`}
-            value={renameValue}
-            onChange={(e) => { setRenameValue(e.target.value); setRenameError(""); }}
-          />
-          {renameError && <p className={styles.errorText}>{renameError}</p>}
-          <Button className={styles.primaryButton} style={{ width: "100%", justifyContent: "center" }} onPress={handleRenameSubmit}>Guardar</Button>
+          <h2 className={`${styles.modalTitle} ${styles.noteModalTitle} ${styles.actionModalTitle}`}>{t("notes:rename")}</h2>
+          <div className={styles.modalFieldGroup}>
+            <label className={styles.modalFieldLabel} htmlFor="notes-rename-name">
+              {t("notes:rename_name_label")}
+            </label>
+            <input
+              id="notes-rename-name"
+              className={`${styles.modalInput} ${styles.noteModalInput} ${renameError ? styles.inputError : ''}`}
+              value={renameValue}
+              onChange={(e) => { setRenameValue(e.target.value); setRenameError(""); }}
+            />
+          </div>
+          {renameError && <p className={styles.errorText}>{t(`notes:${renameError}`)}</p>}
+          <Button className={`${styles.primaryButton} ${styles.noteModalButton}`} style={{ width: "100%", justifyContent: "center" }} onPress={handleRenameSubmit}>{t("notes:save_action")}</Button>
         </Dialog>
       </Modal>
     </div>

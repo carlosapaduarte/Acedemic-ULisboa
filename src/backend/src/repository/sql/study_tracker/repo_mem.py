@@ -27,8 +27,8 @@ class StudyTrackerMemRepo(StudyTrackerRepo):
     def create_task(self, user_id: int, data: Task) -> int:
         pass
 
-    def update_task_status(self, user_id: int, task_id: int, new_status: str):
-        pass
+    def update_task_status(self, user_id: int, task_id: int, new_status: str) -> list[int]:
+        return [task_id]
 
     def deactivate_future_task_events(self, user_id: int, task_id: int):
         pass

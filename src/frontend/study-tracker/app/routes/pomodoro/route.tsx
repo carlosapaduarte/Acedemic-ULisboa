@@ -15,6 +15,7 @@ import { FaClock, FaTriangleExclamation, FaXmark } from "react-icons/fa6";
 import {
   getSelectableTaskEntries,
   getSelectedTaskEntries,
+  getTopmostSelectedTaskIds,
   getTrackedTaskIds,
   getTotalPlannedMinutes,
   toggleTaskSelection as toggleTaskSelectionById,
@@ -153,7 +154,6 @@ function useTimerSetup(
       }).catch((e) => console.log("Aviso de som:", e));
     }
 
-    service.startStudySession().catch((error) => setError(error));
   }
 
   function getElapsedMinutes() {
@@ -286,8 +286,18 @@ function useTimerSetup(
 
 function useAssociatedTasks(showMicroTasks: boolean) {
   const { t } = useTranslation("study");
-  const { tasks: availableTasks, refreshTasks } = useTaskList(false);
+  const {
+    tasks: availableTasks,
+    setTasks,
+    refreshTasks,
+  } = useTaskList(false);
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+
+  async function refreshTasksAndGet(): Promise<Task[]> {
+    const tasksUpdated = await service.getTasks(false);
+    setTasks(tasksUpdated);
+    return tasksUpdated;
+  }
 
   const [tasksForToday, otherTasks] = React.useMemo(() => {
     if (!availableTasks) return [[], []];
@@ -313,7 +323,11 @@ function useAssociatedTasks(showMicroTasks: boolean) {
   }
 
   function completeSelectedTasks(completedTaskIds: number[]) {
-    const tasksToComplete = completedTaskIds.map((id) =>
+    const topmostTaskIds = getTopmostSelectedTaskIds(
+      availableTasks ?? [],
+      completedTaskIds,
+    );
+    const tasksToComplete = topmostTaskIds.map((id) =>
       service.updateTaskStatus(id, "completed"),
     );
 
@@ -327,6 +341,7 @@ function useAssociatedTasks(showMicroTasks: boolean) {
     selectedTaskIds,
     toggleTaskSelection,
     refreshTasks,
+    refreshTasksAndGet,
     setSelectedTaskIds,
     completeSelectedTasks,
   };
@@ -526,22 +541,37 @@ function formatTime(minutes: number) {
 
 function ConfirmationModalContent({
   tasks,
+  taskTree,
   onCancel,
   onConfirm,
 }: {
   tasks: TaskTreeEntry[];
+  taskTree: Task[];
   onCancel: () => void;
-  onConfirm: (completedTaskIds: number[]) => void;
+  onConfirm: (completedTaskIds: number[]) => void | Promise<void>;
 }) {
   const { t } = useTranslation(["study", "task"]);
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
+  const [isSavingCompletion, setIsSavingCompletion] = useState(false);
 
   function handleToggle(taskId: number) {
     setCheckedIds((prev) =>
-      prev.includes(taskId)
-        ? prev.filter((id) => id !== taskId)
-        : Array.from(new Set([...prev, taskId])),
+      toggleTaskSelectionById(
+        taskTree,
+        prev,
+        taskId,
+        tasks.map(({ task }) => task.id),
+      ),
     );
+  }
+
+  async function handleConfirm() {
+    setIsSavingCompletion(true);
+    try {
+      await onConfirm(checkedIds);
+    } finally {
+      setIsSavingCompletion(false);
+    }
   }
 
   return (
@@ -550,6 +580,7 @@ function ConfirmationModalContent({
         onClick={onCancel}
         className={styles.modalCloseButton}
         aria-label={t("task:close", "Fechar")}
+        disabled={isSavingCompletion}
       >
         <FaXmark aria-hidden="true" />
       </button>
@@ -589,8 +620,13 @@ function ConfirmationModalContent({
               <TaskCheckbox
                 checked={checkedIds.includes(task.id)}
                 onClick={() => handleToggle(task.id)}
-                className={styles.modalCheckbox}
+                className={classNames(
+                  styles.modalCheckbox,
+                  styles.completionCheckbox,
+                )}
+                checkedClassName={styles.completionCheckboxChecked}
                 ariaLabel={task.data.title}
+                disabled={isSavingCompletion}
               />
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <span style={{ fontWeight: isExhausted ? "bold" : "normal" }}>
@@ -623,7 +659,8 @@ function ConfirmationModalContent({
       <div className={styles.modalButtonContainer}>
         <Button
           className={styles.modalButtonPrimary}
-          onPress={() => onConfirm(checkedIds)}
+          isDisabled={isSavingCompletion}
+          onPress={handleConfirm}
         >
           {t("study:confirm", "Confirmar")}
         </Button>
@@ -841,6 +878,7 @@ function PomodoroPage() {
     selectedTaskIds,
     toggleTaskSelection,
     refreshTasks,
+    refreshTasksAndGet,
     setSelectedTaskIds,
     completeSelectedTasks,
   } = useAssociatedTasks(showMicroTasks);
@@ -909,26 +947,30 @@ function PomodoroPage() {
     }
   };
 
-  const handleConfirmCompletion = (completedTaskIds: number[]) => {
+  const handleConfirmCompletion = async (completedTaskIds: number[]) => {
     service.logUserAction("tracker", "action", "add_manual_time");
-    
-    setIsConfirmModalOpen(false);
-    if (completedTaskIds.length === 0) {
-      refreshTasks();
-      setSelectedTaskIds([]);
-      return;
+
+    if (completedTaskIds.length > 0) {
+      try {
+        await completeSelectedTasks(completedTaskIds);
+      } catch (err) {
+        console.error("Erro ao completar tarefas", err);
+      }
     }
 
-    completeSelectedTasks(completedTaskIds)
-      .then(() => {
-        refreshTasks();
-        setSelectedTaskIds([]);
-      })
-      .catch((err) => {
-        console.error("Erro ao completar tarefas", err);
-        refreshTasks();
-        setSelectedTaskIds([]);
-      });
+    try {
+      const refreshedTasks = await refreshTasksAndGet();
+      const pendingTaskIds = new Set(
+        getSelectableTaskEntries(refreshedTasks).map(({ task }) => task.id),
+      );
+      setSelectedTaskIds((currentIds) =>
+        currentIds.filter((id) => pendingTaskIds.has(id)),
+      );
+    } catch (err) {
+      console.error("Erro ao atualizar tarefas após a sessão", err);
+    } finally {
+      setIsConfirmModalOpen(false);
+    }
   };
 
   const {
@@ -1020,6 +1062,7 @@ function PomodoroPage() {
         <ConfirmationModalContent
           key={confirmationSessionKey}
           tasks={tasksToConfirm}
+          taskTree={allAvailableTasks}
           onCancel={() => {
             setIsConfirmModalOpen(false);
             refreshTasks();
