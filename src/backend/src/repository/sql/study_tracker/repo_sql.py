@@ -1167,12 +1167,39 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             task_to_delete = session.exec(statement).first()
             if not task_to_delete:
                 raise NotFoundException(f"Task with id {task_id} not found for user {user_id}")
-            
-            tag_links_to_delete = session.exec(select(STTaskTagModel).where(STTaskTagModel.task_id == task_id).where(STTaskTagModel.user_id == user_id)).all()
+
+            tasks_to_delete = [task_to_delete]
+            pending_parent_ids = [task_id]
+            while pending_parent_ids:
+                child_tasks = session.exec(
+                    select(STTaskModel)
+                    .where(STTaskModel.user_id == user_id)
+                    .where(STTaskModel.parent_user_id == user_id)
+                    .where(STTaskModel.parent_task_id.in_(pending_parent_ids))
+                ).all()
+                tasks_to_delete.extend(child_tasks)
+                pending_parent_ids = [task.id for task in child_tasks]
+
+            task_ids = [task.id for task in tasks_to_delete]
+            events_to_delete = session.exec(
+                select(STEventModel)
+                .where(STEventModel.user_id == user_id)
+                .where(STEventModel.task_user_id == user_id)
+                .where(STEventModel.task_id.in_(task_ids))
+            ).all()
+            for event in events_to_delete:
+                session.delete(event)
+
+            tag_links_to_delete = session.exec(
+                select(STTaskTagModel)
+                .where(STTaskTagModel.user_id == user_id)
+                .where(STTaskTagModel.task_id.in_(task_ids))
+            ).all()
             for link in tag_links_to_delete:
                 session.delete(link)
 
-            session.delete(task_to_delete)
+            for task in reversed(tasks_to_delete):
+                session.delete(task)
             session.commit()
 
     def deactivate_future_task_events(self, user_id: int, task_id: int):
