@@ -13,8 +13,8 @@
     "select_avatar_initial_question": "Seleciona o teu avatar",
     "select_level_initial_question": "O quão eficaz têm sido os teus hábitos de estudo ultimamente?",
     "share_progress_question": "Queres compartilhar o teu progresso?",
-    "submit_selection_message": "Enviar seleção",
-    "usage_objectives_title": "Objetivos de Uso",
+    "avatar_required": "Por favor, seleciona um avatar primeiro!",
+    "avatar_selection_required": "Por favor, clica numa das imagens para escolheres o teu avatar!",
     "username_field_name": "Nome de utilizador",
     "yes_answer_option": "Sim",
 

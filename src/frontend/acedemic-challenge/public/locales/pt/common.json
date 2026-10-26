@@ -3,5 +3,9 @@
     "ulisboa_logo": "Logótipo da ULisboa",
     "sucesso_academico_ulisboa_logo": "Logótipo do Sucesso Académico na ULisboa",
     "loading": "A carregar...",
-    "saving": "A guardar..."
+    "saving": "A guardar...",
+    "confirmation_title": "Confirmar ação",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "new_badge": "Nova medalha: {{title}}"
 }

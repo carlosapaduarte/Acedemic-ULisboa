@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaXmark } from "react-icons/fa6";
 import { service, Tag } from "~/service/service";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import styles from "./TagModals.module.css";
 
 interface CreateTagModalProps {
@@ -33,6 +34,7 @@ function getColorDistance(color1: string, color2: string): number {
 
 export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
   const { t } = useTranslation(["task", "calendar"]);
+  const { notify } = useAppFeedback();
   const [namePt, setNamePt] = useState("");
   const [nameEn, setNameEn] = useState("");
   const [tagColor, setTagColor] = useState("#888888"); // Cor cinza default da imagem
@@ -79,7 +81,7 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
       close();
     } catch (err) {
       console.error(err);
-      alert(t("error_creating_tag", "Erro ao criar tag"));
+      notify({ type: "error", message: t("error_creating_tag", "Erro ao criar tag") });
     } finally {
       setIsSaving(false);
     }

@@ -1,0 +1,197 @@
+.notification {
+  position: fixed;
+  z-index: 2200;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 0.9rem 1rem;
+  border: 1px solid transparent;
+  border-left-width: 5px;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--color-3);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 16%);
+  font-family: var(--font-family1);
+}
+
+.notification p {
+  flex: 1;
+  margin: 0;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.notificationIcon {
+  flex: 0 0 auto;
+  font-size: 1.2rem;
+}
+
+.success {
+  border-color: var(--color-2);
+  border-left-color: var(--color-2);
+}
+
+.success .notificationIcon {
+  color: var(--color-3);
+}
+
+.error {
+  border-color: #b42318;
+  border-left-color: #b42318;
+}
+
+.error .notificationIcon {
+  color: #b42318;
+}
+
+.info {
+  border-color: var(--color-1);
+  border-left-color: var(--color-1);
+}
+
+.info .notificationIcon {
+  color: var(--color-1);
+}
+
+.closeButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.closeButton:hover {
+  background: rgb(0 0 0 / 7%);
+}
+
+.closeButton:focus-visible,
+.cancelButton:focus-visible,
+.confirmButton:focus-visible {
+  outline: 3px solid var(--color-1);
+  outline-offset: 2px;
+}
+
+.confirmOverlay {
+  position: fixed;
+  z-index: 2300;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 50%);
+}
+
+.confirmModal {
+  position: relative;
+  width: min(28rem, 100%);
+  padding: 1.75rem;
+  border-radius: 1rem;
+  background: var(--color-1);
+  color: var(--text-color-2);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 25%);
+}
+
+.confirmModal > [role="dialog"] {
+  position: relative;
+}
+
+.confirmModal h2 {
+  margin: 0 2.5rem 0.85rem 0;
+  color: var(--text-color-2);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.confirmModal p {
+  margin: 0;
+  color: var(--text-color-2);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.confirmModal .closeButton {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  color: var(--text-color-2);
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cancelButton,
+.confirmButton {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.cancelButton {
+  background: transparent;
+  color: var(--text-color-2);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 70%);
+}
+
+.cancelButton:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.confirmButton {
+  background: var(--color-2);
+  color: var(--color-3);
+}
+
+.confirmButton:hover {
+  filter: brightness(0.96);
+}
+
+.dangerButton {
+  background: #b42318;
+  color: #fff;
+}
+
+.dangerButton:hover {
+  background: #8f1b13;
+}
+
+@media (max-width: 480px) {
+  .notification {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: calc(100vw - 1.5rem);
+  }
+
+  .confirmModal {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .confirmActions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .confirmButton {
+    width: 100%;
+  }
+}

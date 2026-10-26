@@ -3,5 +3,9 @@
     "ulisboa_logo": "ULisboa Logo",
     "sucesso_academico_ulisboa_logo": "Sucesso Académico na ULisboa Logo",
     "loading": "Loading...",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "confirmation_title": "Confirm action",
+    "cancel": "Cancel",
+    "close": "Close",
+    "new_badge": "New badge: {{title}}"
 }

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import styles from "./taskPage.module.css";
 import classNames from "classnames";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import React, { memo, useEffect, useState } from "react";
 import { TaskList } from "~/routes/tasks/TaskList";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
@@ -234,7 +235,8 @@ const StatusSection = memo(function StatusSection({
 });
 
 function RenderPage() {
-  const { t } = useTranslation(["task"]);
+  const { t } = useTranslation(["task", "common"]);
+  const { confirmAction } = useAppFeedback();
   const { taskId } = useParams();
   const { tasks, refreshTasks } = useOutletContext<{
     tasks: Task[];
@@ -271,12 +273,13 @@ function RenderPage() {
 
   const handleDeleteTask = async () => {
     if (!task) return;
-    const confirmed = window.confirm(
-      t(
-        "task:confirm_delete_message",
-        `Tens a certeza que queres apagar a tarefa "${task.data.title}"?`
-      )
-    );
+    const confirmed = await confirmAction({
+      title: t("common:confirmation_title"),
+      message: t("task:confirm_delete_named", { title: task.data.title }),
+      cancelLabel: t("common:cancel"),
+      confirmLabel: t("task:delete_task"),
+      danger: true,
+    });
 
     if (confirmed) {
       try {

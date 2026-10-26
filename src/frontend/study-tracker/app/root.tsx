@@ -27,6 +27,7 @@ import { NotFoundPage } from "~/Pages/NotFoundPage";
 import { Footer } from "~/components/Footer/Footer";
 import { GlobalErrorContainer } from "./components/error/GlobalErrorContainer";
 import { GlobalErrorController } from "./components/error/GlobalErrorController";
+import { AppFeedbackHost } from "./components/error/AppFeedbackHost";
 import { useTranslation } from "react-i18next";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
@@ -173,6 +174,7 @@ export function App() {
           </main>
           <Footer aria-hidden={loading ? true : undefined} />
           <LoadingOverlay loading={loading} />
+          <AppFeedbackHost />
         </div>
       </TutorialProvider>
     </AppBarProvider>

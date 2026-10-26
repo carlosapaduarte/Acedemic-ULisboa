@@ -104,6 +104,36 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.moodInitial > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.moodInitial > svg {
+  flex: 0 0 auto;
+  color: var(--color-1);
+}
+
+.moodFace {
+  width: 72px;
+  height: 72px;
+  font-size: 72px;
+}
+
+@media (max-width: 480px) {
+  .moodInitial {
+    gap: 0.75rem;
+  }
+
+  .moodFace {
+    width: 56px;
+    height: 56px;
+    font-size: 56px;
+  }
 }
 
 .moodBtn {

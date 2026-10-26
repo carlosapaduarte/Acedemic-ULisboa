@@ -9,9 +9,6 @@ study_tracker_repo = StudyTrackerSqlRepo()
 
 FALLBACK_COLOR = "#3399FF"
 
-def update_user_study_tracker_use_goals(user_id: int, use_goals: set[int]):
-    study_tracker_repo.update_user_study_tracker_use_goals(user_id, use_goals)
-
 def update_study_tracker_app_planning_day(user_id: int, day: int, hour: int):
     study_tracker_repo.update_study_tracker_app_planning_day(user_id, day, hour)
     

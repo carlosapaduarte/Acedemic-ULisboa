@@ -2,9 +2,6 @@ from dataclasses import Field
 from typing import List, Optional
 from pydantic import BaseModel, model_validator
 
-class SetStudyTrackerAppUseGoalsInputDto(BaseModel):
-    uses: set[int]
-
 class UpdateStudyTrackerReceiveNotificationsPrefInputDto(BaseModel):
     receive: bool
 

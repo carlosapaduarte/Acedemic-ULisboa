@@ -1,3 +1,5 @@
 export function notifyNewBadge(title: string) {
-    alert(`🎉 Nova medalha: ${title}`);
+    window.dispatchEvent(
+        new CustomEvent("app:badge-notification", { detail: { title } }),
+    );
 }

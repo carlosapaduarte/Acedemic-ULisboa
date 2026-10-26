@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import { CurricularUnit, service } from "~/service/service";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import styles from "./curricularUnitsPage.module.css";
@@ -262,7 +263,8 @@ function CurricularUnitCard({
   cu: CurricularUnit;
   onRefresh: () => void;
 }) {
-  const { t } = useTranslation(["curricular_units"]);
+  const { t } = useTranslation(["curricular_units", "common"]);
+  const { confirmAction } = useAppFeedback();
   const [lockedGrades, setLockedGrades] = useState<number[]>([]);
   const [simulatedValues, setSimulatedValues] = useState<
     Record<number, number>
@@ -341,7 +343,14 @@ function CurricularUnitCard({
   };
 
   const handleDeleteUC = async () => {
-    if (confirm(t("curricular_units:confirm_delete_uc"))) {
+    const confirmed = await confirmAction({
+      title: t("common:confirmation_title"),
+      message: t("curricular_units:confirm_delete_uc"),
+      cancelLabel: t("common:cancel"),
+      confirmLabel: t("curricular_units:delete_uc_confirm_button"),
+      danger: true,
+    });
+    if (confirmed) {
       try {
         await service.deleteCurricularUnit(cu.name);
         onRefresh();

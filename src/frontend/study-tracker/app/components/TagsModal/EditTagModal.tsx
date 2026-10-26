@@ -10,6 +10,7 @@ import {
 } from "react-aria-components";
 import { service, Tag } from "~/service/service";
 import { ColorPickerInput } from "~/components/ColorPickerInput/ColorPickerInput";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import styles from "./TagModals.module.css";
 import classNames from "classnames";
 import { FaXmark } from "react-icons/fa6";
@@ -40,7 +41,8 @@ export function EditTagModal({
   setIsOpen,
   onTagsUpdate,
 }: EditTagModalProps) {
-  const { t, i18n } = useTranslation("calendar");
+  const { t, i18n } = useTranslation(["calendar", "common"]);
+  const { notify, confirmAction } = useAppFeedback();
 
   const [allUserTags, setAllUserTags] = useState<Tag[]>([]);
   const [tagToEdit, setTagToEdit] = useState<Tag | null>(null);
@@ -106,7 +108,7 @@ export function EditTagModal({
       setTagToEdit(null);
     } catch (error) {
       console.error("Erro ao atualizar a tag:", error);
-      alert(t("error_editing_tag"));
+      notify({ type: "error", message: t("error_editing_tag") });
     } finally {
       setIsSaving(false);
     }
@@ -119,20 +121,25 @@ export function EditTagModal({
         ? tagToEdit.name_en
         : tagToEdit?.name_pt;
 
-    if (
-      !tagToEdit ||
-      !window.confirm(t("tag_delete_confirmation", { tagName: displayName }))
-    )
-      return;
+    if (!tagToEdit) return;
+    const confirmed = await confirmAction({
+      title: t("common:confirmation_title"),
+      message: t("tag_delete_confirmation", { tagName: displayName }),
+      cancelLabel: t("common:cancel"),
+      confirmLabel: t("delete_button"),
+      danger: true,
+    });
+    if (!confirmed) return;
     setIsSaving(true);
     try {
       await service.deleteTag(Number(tagToEdit.id));
       onTagsUpdate();
       await fetchData();
       setTagToEdit(null);
+      notify({ type: "success", message: t("tag_deleted_successfully") });
     } catch (error) {
       console.error("Erro ao apagar a tag:", error);
-      alert(t("error_deleting_tag", { tagName: displayName }));
+      notify({ type: "error", message: t("error_deleting_tag", { tagName: displayName }) });
     } finally {
       setIsSaving(false);
     }

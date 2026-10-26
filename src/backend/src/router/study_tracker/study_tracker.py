@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, Response, Query
 from domain.study_tracker import DateInterval, Event, Grade, SlotToWork, Task, UnavailableScheduleBlock
 from router.commons.common import get_current_user_id
-from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, SetStudyTrackerAppUseGoalsInputDto, TrackTimeInputDto, UpdateArchiveInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
+from router.study_tracker.dtos.input_dtos import CreateArchiveInputDto, MarkTutorialAsSeenInputDto, CreateCurricularUnitInputDto, CreateDailyTags, CreateFileInputDto, CreateGradeInputDto, CreateTaskInputDto, CreateEventInputDto, CreateScheduleNotAvailableBlockInputDto, EditTaskInputDto, TrackTimeInputDto, UpdateArchiveInputDto, UpdateCurricularUnitInputDto, UpdateEventInputDto, UpdateFileInputDto, UpdateGradeValueDto, UpdateStudyTrackerReceiveNotificationsPrefInputDto, UpdateStudyTrackerWeekPlanningDayInputDto, UpdateTaskStatus, CreateMoodLogInputDto
 from router.study_tracker.dtos.output_dtos import ArchiveOutputDto, FileOutputDto, CurricularUnitOutputDto,MoodLogOutputDto, DailyEnergyStatusOutputDto, DailyTasksProgressOutputDto, EventOutputDto, UserTaskOutputDto, WeekTimeStudyOutputDto
 from service import study_tracker as study_tracker_service
 
@@ -210,13 +210,6 @@ def delete_event(
 ) -> Response:
     study_tracker_service.delete_event(user_id, event_id)
     return Response()
-@router.put("/users/me/use-goals")
-def update_app_use_goals(
-    user_id: Annotated[int, Depends(get_current_user_id)],
-    input_dto: SetStudyTrackerAppUseGoalsInputDto
-):
-    study_tracker_service.update_user_study_tracker_use_goals(user_id, input_dto.uses)
-
 @router.put("/users/me/receive-notifications-pref")
 def update_receive_notifications_pref(
     user_id: Annotated[int, Depends(get_current_user_id)],

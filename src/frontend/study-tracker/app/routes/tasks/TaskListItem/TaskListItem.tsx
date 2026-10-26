@@ -5,6 +5,7 @@ import classNames from "classnames";
 import Confetti from "react-confetti";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
 import { useTranslation } from "react-i18next";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import {
   FaBolt,
   FaExclamation,
@@ -93,7 +94,8 @@ export function TaskListItem({
   textColor?: string;
   onAddSubtask?: (parentId: number) => void;
 }) {
-  const { t } = useTranslation(["task"]);
+  const { t } = useTranslation(["task", "common"]);
+  const { notify, confirmAction } = useAppFeedback();
   const { internalTask, updateTaskStatus } = useTaskView(
     taskToDisplay,
     onTaskStatusUpdated
@@ -166,11 +168,14 @@ export function TaskListItem({
   );
 
   const handleDelete = async () => {
-    if (
-      window.confirm(
-        `Tens a certeza que queres apagar a tarefa "${internalTask.data.title}"?`
-      )
-    ) {
+    const confirmed = await confirmAction({
+      title: t("common:confirmation_title"),
+      message: t("task:confirm_delete_named", { title: internalTask.data.title }),
+      cancelLabel: t("common:cancel"),
+      confirmLabel: t("task:delete_task"),
+      danger: true,
+    });
+    if (confirmed) {
       // 🕵️‍♀️ Espião: Apagar Tarefa
       service.logUserAction("tracker", "action", "delete_task");
       try {
@@ -178,6 +183,7 @@ export function TaskListItem({
         onTaskStatusUpdated(internalTask);
       } catch (error) {
         console.error("Erro ao apagar tarefa:", error);
+        notify({ type: "error", message: t("task:delete_error") });
       }
     }
   };

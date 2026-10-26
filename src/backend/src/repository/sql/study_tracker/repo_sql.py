@@ -6,7 +6,7 @@ from domain.study_tracker import Archive, File, MoodLog, CurricularUnit, DailyEn
 from exception import NotFoundException
 from repository.sql.commons.repo_sql import CommonsSqlRepo
 from repository.sql.models import database
-from repository.sql.models.models import STMoodLogModel, DailyTagModel, STAppUseModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
+from repository.sql.models.models import STMoodLogModel, DailyTagModel, STArchiveModel, STCurricularUnitModel, STFileModel, STGradeModel, STScheduleBlockNotAvailableModel, STEventModel, STEventTagModel, STTaskModel, STTaskTagModel, STWeekDayPlanningModel, TagModel, UserModel, UserTagLink, WeekStudyTimeModel
 from datetime import datetime, date, timedelta, timezone
 from repository.sql.study_tracker.repo import StudyTrackerRepo
 from sqlalchemy.orm import selectinload
@@ -16,27 +16,6 @@ from utils import get_datetime_utc
 engine = database.get_engine()
 
 class StudyTrackerSqlRepo(StudyTrackerRepo):    
-    def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set[int]):
-        with Session(engine) as session:
-            # 1. Buscar todos os objetivos antigos deste utilizador
-            statement = select(STAppUseModel).where(STAppUseModel.user_id == user_id)
-            old_goals = session.exec(statement).all()
-            
-            # 2. Apagar os objetivos antigos explicitamente
-            for old_goal in old_goals:
-                session.delete(old_goal)
-            
-            # 3. Adicionar os novos objetivos
-            for use_goal in use_goals:
-                new_goal = STAppUseModel(
-                    goal_id=use_goal,
-                    user_id=user_id
-                )
-                session.add(new_goal)
-                
-            # 4. Guardar as alterações na base de dados
-            session.commit()
-
     def update_study_tracker_app_planning_day(self, user_id: int, day: int, hour: int):
         with Session(engine) as session:
             user_model: UserModel = CommonsSqlRepo.get_user_or_raise(session,user_id)

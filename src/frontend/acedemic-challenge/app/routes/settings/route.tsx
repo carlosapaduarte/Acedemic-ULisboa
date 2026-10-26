@@ -3,7 +3,8 @@ import { service, UserInfo } from "~/service/service";
 import { useTranslation } from "react-i18next";
 import styles from "./settingsPage.module.css";
 import classNames from "classnames";
-import { RiSave3Fill, RiCheckLine, RiMoonClearFill } from "react-icons/ri";
+import { RiSave3Fill, RiMoonClearFill } from "react-icons/ri";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 
 const CHALLENGE_LEVELS = [
   { id: 1, labelKey: "level_beginner" },
@@ -24,11 +25,11 @@ function createAvatars(): string[] {
 
 export default function SettingsPage() {
   const { t } = useTranslation(["common", "settings"]);
+  const { notify } = useAppFeedback();
 
   // ESTADOS DO FORMULÁRIO
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [user, setUser] = useState<UserInfo | null>(null);
 
   const [displayName, setDisplayName] = useState<string>("");
@@ -63,7 +64,6 @@ export default function SettingsPage() {
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
-    setSaveSuccess(false);
 
     try {
       const promises = [];
@@ -85,14 +85,13 @@ export default function SettingsPage() {
         });
       }
 
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
+      notify({ type: "success", message: t("settings:save_success") });
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
           : t("settings:save_error_unknown");
-      alert(t("settings:save_error", { message }));
+      notify({ type: "error", message: t("settings:save_error", { message }) });
     } finally {
       setSaving(false);
     }
@@ -193,17 +192,10 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className={classNames(
-            styles.saveButton,
-            saveSuccess && styles.saveSuccess,
-          )}
+          className={styles.saveButton}
         >
           {saving ? (
             t("common:saving")
-          ) : saveSuccess ? (
-            <>
-              <RiCheckLine /> {t("settings:save_success")}
-            </>
           ) : (
             <>
               <RiSave3Fill /> {t("settings:save_profile")}

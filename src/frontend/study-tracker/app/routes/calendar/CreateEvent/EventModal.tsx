@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import {
   Button,
   Dialog,
@@ -381,7 +382,8 @@ export function EventModal({
   initialStartDate = new Date(),
   initialEndDate = new Date(Date.now() + 60 * 60 * 1000),
 }: EventModalProps) {
-  const { t } = useTranslation("calendar");
+  const { t } = useTranslation(["calendar", "common"]);
+  const { notify, confirmAction } = useAppFeedback();
   const isEditMode = !!eventToEdit;
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState(new Date());
@@ -502,7 +504,7 @@ export function EventModal({
       clearFormAndClose();
     } catch (error) {
       console.error(error);
-      alert(t("error_saving_event"));
+      notify({ type: "error", message: t("event_save_error") });
     } finally {
       setSaving(false);
     }
@@ -510,14 +512,21 @@ export function EventModal({
 
   const handleDelete = async () => {
     if (!isEditMode || !eventToEdit) return;
-    if (window.confirm(t("confirm_delete_event"))) {
+    const confirmed = await confirmAction({
+      title: t("common:confirmation_title"),
+      message: t("confirm_delete_event"),
+      cancelLabel: t("common:cancel"),
+      confirmLabel: t("delete_button"),
+      danger: true,
+    });
+    if (confirmed) {
       setSaving(true);
       try {
         await service.deleteEvent(Number(eventToEdit.id));
         await refreshUserEvents();
         clearFormAndClose();
       } catch (error) {
-        alert(t("error_deleting_event"));
+        notify({ type: "error", message: t("event_delete_error") });
       } finally {
         setSaving(false);
       }

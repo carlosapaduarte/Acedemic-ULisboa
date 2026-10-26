@@ -37,10 +37,6 @@ class StudyTrackerRepo(ABC):
         pass
 
     @abstractmethod
-    def update_user_study_tracker_use_goals(self, user_id: int, use_goals: set[int]):
-        pass
-
-    @abstractmethod
     def update_receive_notifications_pref(self, user_id: int, receive: bool):
         pass
 

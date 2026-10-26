@@ -319,7 +319,7 @@ export default function HomePage() {
                   {t("log_mood")}
                 </button>
               </div>
-              <FaFaceSmile size={40} aria-hidden="true" />
+              <FaFaceSmile className={styles.moodFace} aria-hidden="true" />
             </div>
           ) : (
             <div className={styles.moodSuccessContainer}>

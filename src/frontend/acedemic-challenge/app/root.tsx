@@ -30,6 +30,7 @@ import { useChangeLanguage } from "remix-i18next/react";
 import { useTranslation } from "react-i18next";
 import { GlobalErrorContainer } from "~/components/error/GlobalErrorContainer";
 import { GlobalErrorController } from "~/components/error/GlobalErrorController";
+import { AppFeedbackHost } from "~/components/error/AppFeedbackHost";
 import { LoadingOverlay } from "~/components/LoadingScreen/LoadingScreen";
 import { AppBarProvider } from "~/components/AppBar/AppBarProvider";
 import { ChallengeTutorial } from "~/components/Tutorial/ChallengeTutorial";
@@ -147,6 +148,7 @@ export function App() {
                 </main>
                 <Footer aria-hidden={loading ? true : undefined} />
                 <LoadingOverlay loading={loading} />
+                <AppFeedbackHost />
             </div>
         </AppBarProvider>
     );

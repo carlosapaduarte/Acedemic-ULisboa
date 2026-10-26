@@ -207,22 +207,6 @@ async function fetchUserInfo(): Promise<UserInfo> {
   } else return Promise.reject(new Error("User info could not be obtained!"));
 }
 
-async function updateAppUseGoals(uses: Set<number>) {
-  const usesList = Array.from(uses);
-  const request = {
-    path: `study-tracker/users/me/use-goals`,
-    method: "PUT",
-    body: toJsonBody({ uses: usesList }),
-  };
-  const response: Response = await doFetch(request);
-
-  if (response.ok) {
-    const responseObject: UserInfo = await response.json();
-    return responseObject;
-  } else
-    return Promise.reject(new Error("App use goals could not be updated!"));
-}
-
 export enum BinaryAnswer {
   YES,
   NO,
@@ -1215,7 +1199,6 @@ export const service = {
   selectShareProgressState,
   selectAvatar,
   fetchUserInfoFromApi: fetchUserInfo,
-  updateAppUseGoals,
   updateReceiveNotificationsPreference,
   updateWeekPlanningDay,
   createNewEvent,

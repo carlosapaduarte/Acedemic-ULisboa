@@ -42,6 +42,7 @@
   "btn_delete": "Apagar Componente",
   "btn_delete_uc": "Apagar UC",
   "confirm_delete_uc": "Tem a certeza que deseja apagar esta UC e todas as suas avaliações?",
+  "delete_uc_confirm_button": "Apagar UC",
   "empty_grades": "Ainda sem avaliações lançadas.",
 
   "add_component_title": "Adicionar Componente de Avaliação",

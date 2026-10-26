@@ -3,7 +3,6 @@ import { PlanDaySelectionPage } from "~/routes/log-in/PlanDaySelectionPage/PlanD
 import { ShareProgressPage } from "./ShareProgressPage/ShareProgressPage";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import AvatarSelectionPage from "~/routes/log-in/AvatarSelectionPage/AvatarSelectionPage";
-import { AppUsagesSelectionPage } from "~/routes/log-in/AppUsagesSelectionPage/AppUsagesSelectionPage";
 import { ReceiveNotificationsSelectionPage } from "~/routes/log-in/ReceiveNotificationsSelectionPage/ReceiveNotificationsSelectionPage";
 
 import styles from "./login.module.css";
@@ -16,7 +15,6 @@ import { useTranslation } from "react-i18next";
 type Views =
     | "initial"
     | "authentication"
-    | "appUsagesSelection"
     | "receiveNotificationsSelection"
     | "planDaySelection"
     | "shareProgressSelection"
@@ -41,7 +39,7 @@ function CurrentView() {
             if (currentView === "initial" || currentView === "authentication") {
                 if (isSetup) {
                     // Utilizador novo: Inicia o processo de Onboarding!
-                    setCurrentView("appUsagesSelection");
+                    setCurrentView("receiveNotificationsSelection");
                 } else {
                     // Utilizador antigo: Vai direto para o Dashboard
                     navigate(`/`);
@@ -84,8 +82,6 @@ function CurrentView() {
                     </div>
                 </div>
             );
-        case "appUsagesSelection":
-            return <AppUsagesSelectionPage onProceed={() => setCurrentView("avatarSelection")} />;
         case "receiveNotificationsSelection":
             return <ReceiveNotificationsSelectionPage onProceed={() => setCurrentView("planDaySelection")} />;
         case "planDaySelection":

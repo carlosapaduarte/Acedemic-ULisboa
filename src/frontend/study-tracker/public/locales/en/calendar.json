@@ -89,5 +89,9 @@
   "saving_label": "Saving...",
   "tag_delete_confirmation": "Are you sure you want to delete the tag \"{{tagName}}\"?",
   "error_editing_tag": "An error occurred while editing the tag.",
-  "error_deleting_tag": "An error occurred while deleting the tag \"{{tagName}}\"."
+  "error_deleting_tag": "An error occurred while deleting the tag \"{{tagName}}\".",
+  "tag_deleted_successfully": "Tag deleted successfully.",
+  "event_save_error": "The event could not be saved.",
+  "event_delete_error": "The event could not be deleted.",
+  "event_move_error": "The event could not be moved."
 }

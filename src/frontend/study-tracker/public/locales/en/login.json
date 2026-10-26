@@ -11,8 +11,8 @@
     "select_avatar_initial_question": "Select your avatar",
     "select_level_initial_question": "How effective have been your study habits lately?",
     "share_progress_question": "Do you want to share your progress?",
-    "submit_selection_message": "Submit selection",
-    "usage_objectives_title": "Usage objectives",
+    "avatar_required": "Please select an avatar first!",
+    "avatar_selection_required": "Please click one of the images to choose your avatar!",
     "username_field_name": "Username",
     "yes_answer_option": "Yes",
 

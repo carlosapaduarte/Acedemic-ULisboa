@@ -89,5 +89,9 @@
   "saving_label": "A guardar...",
   "tag_delete_confirmation": "Tens a certeza que queres apagar a etiqueta \"{{tagName}}\"?",
   "error_editing_tag": "Ocorreu um erro ao editar a etiqueta",
-  "error_deleting_tag": "Ocorreu um erro ao apagar a etiqueta \"{{tagName}}\"."
+  "error_deleting_tag": "Ocorreu um erro ao apagar a etiqueta \"{{tagName}}\".",
+  "tag_deleted_successfully": "Etiqueta apagada com sucesso.",
+  "event_save_error": "Não foi possível guardar o evento.",
+  "event_delete_error": "Não foi possível apagar o evento.",
+  "event_move_error": "Não foi possível mover o evento."
 }

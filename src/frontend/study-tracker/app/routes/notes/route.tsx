@@ -2,6 +2,7 @@ import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { ArchiveItem, FileItem, service } from "~/service/service";
 import styles from "./notesPage.module.css";
 import { useTranslation } from "react-i18next";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import React, { useEffect, useState, startTransition } from "react";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
 
@@ -50,7 +51,8 @@ const validateAndFormatUrl = (url: string) => {
 };
 
 function NotesPage() {
-  const { t } = useTranslation(["notes", "task"]);
+  const { t } = useTranslation(["notes", "task", "common"]);
+  const { confirmAction, notify } = useAppFeedback();
   const [isClient, setIsClient] = useState(false);
   const [rootFiles, setRootFiles] = useState<FileItem[]>([]);
   const [rootArchives, setRootArchives] = useState<ArchiveItem[]>([]);
@@ -286,16 +288,36 @@ function NotesPage() {
   };
 
   const handleDeleteFile = async (id: number) => {
-    if (confirm(t("notes:delete_file_confirm"))) {
+    const confirmed = await confirmAction({
+      title: t("common:confirmation_title"),
+      message: t("notes:delete_file_confirm"),
+      cancelLabel: t("common:cancel"),
+      confirmLabel: t("notes:delete"),
+      danger: true,
+    });
+    if (!confirmed) return;
+    try {
       await service.deleteFile(id);
       loadData();
+    } catch {
+      notify({ type: "error", message: t("notes:delete_file_error") });
     }
   };
 
   const handleDeleteFolder = async (id: number) => {
-    if (confirm(t("notes:delete_folder_confirm"))) {
+    const confirmed = await confirmAction({
+      title: t("common:confirmation_title"),
+      message: t("notes:delete_folder_confirm"),
+      cancelLabel: t("common:cancel"),
+      confirmLabel: t("notes:delete"),
+      danger: true,
+    });
+    if (!confirmed) return;
+    try {
       await service.deleteArchive(id);
       loadData();
+    } catch {
+      notify({ type: "error", message: t("notes:delete_folder_error") });
     }
   };
 

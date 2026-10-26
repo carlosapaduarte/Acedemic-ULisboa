@@ -3,6 +3,7 @@ import { service } from "~/service/service";
 import React, { useEffect } from "react";
 import styles from "./avatarSelectionPage.module.css";
 import { useTranslation } from "react-i18next";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 
 function createAvatars(): string[] {
     const avatars: string[] = [];
@@ -14,12 +15,14 @@ function createAvatars(): string[] {
 
 function useAvatarSelection({ onComplete }: { onComplete: () => void }) {
     const setGlobalError = useSetGlobalError();
+    const { notify } = useAppFeedback();
+    const { t } = useTranslation(["login"]);
     const [selectedAvatar, setSelectedAvatar] = React.useState<number>(-1);
     const [avatars, setAvatars] = React.useState<string[]>([]);
 
     async function onConfirmClickHandler(avatarFilename: string) {
         if (!avatarFilename) {
-            alert("Por favor, seleciona um avatar primeiro!");
+            notify({ type: "info", message: t("login:avatar_required") });
             return;
         }
 
@@ -43,6 +46,7 @@ function useAvatarSelection({ onComplete }: { onComplete: () => void }) {
 
 function Title() {
     const { t } = useTranslation(["login"]);
+    const { notify } = useAppFeedback();
 
     return (
         <div className={styles.titleContainer}>
@@ -89,6 +93,7 @@ export default function AvatarSelectionPage({
             onComplete: onComplete,
         });
     const { t } = useTranslation(["login"]);
+    const { notify } = useAppFeedback();
 
     return (
         <div className={styles.avatarSelectionPageContainer}>
@@ -117,9 +122,10 @@ export default function AvatarSelectionPage({
                             ) {
                                 onConfirmClick(avatars[selectedAvatar]);
                             } else {
-                                alert(
-                                    "Por favor, clica numa das imagens para escolheres o teu avatar!",
-                                );
+                                notify({
+                                    type: "info",
+                                    message: t("login:avatar_selection_required"),
+                                });
                             }
                         }}
                     >

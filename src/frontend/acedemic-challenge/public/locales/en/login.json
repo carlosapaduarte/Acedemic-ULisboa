@@ -20,8 +20,8 @@
     "register_button_title": "Register",
 
     "share_progress_question": "Do you want to share your progress?",
-    "submit_selection_message": "Submit selection",
-    "usage_objectives_title": "Usage objectives",
+    "avatar_required": "Please select an avatar first.",
+    "avatar_selection_required": "Please choose an avatar from the list.",
     "username_field_name": "Username",
     "yes_answer_option": "Yes",
 

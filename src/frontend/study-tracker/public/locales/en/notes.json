@@ -59,5 +59,7 @@
     "rename_name_required": "The name cannot be empty.",
     "rename_error": "Could not rename the item.",
     "delete_file_confirm": "Delete file?",
-    "delete_folder_confirm": "Delete folder and all its contents?"
+    "delete_folder_confirm": "Delete folder and all its contents?",
+    "delete_file_error": "The file could not be deleted.",
+    "delete_folder_error": "The folder could not be deleted."
 }

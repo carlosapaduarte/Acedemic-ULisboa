@@ -59,5 +59,7 @@
     "rename_name_required": "O nome não pode estar vazio.",
     "rename_error": "Erro ao renomear o item.",
     "delete_file_confirm": "Apagar ficheiro?",
-    "delete_folder_confirm": "Apagar pasta e todo o seu conteúdo?"
+    "delete_folder_confirm": "Apagar pasta e todo o seu conteúdo?",
+    "delete_file_error": "Não foi possível apagar o ficheiro.",
+    "delete_folder_error": "Não foi possível apagar a pasta."
 }

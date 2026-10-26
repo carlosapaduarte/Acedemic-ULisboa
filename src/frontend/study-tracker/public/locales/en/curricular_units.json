@@ -42,6 +42,7 @@
   "btn_delete": "Delete Component",
   "btn_delete_uc": "Delete Course",
   "confirm_delete_uc": "Are you sure you want to delete this course and all its evaluations?",
+  "delete_uc_confirm_button": "Delete course",
   "empty_grades": "No evaluations added yet.",
 
   "add_component_title": "Add Evaluation Component",

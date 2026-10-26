@@ -16,6 +16,7 @@ import styles from "./calendarPage.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
 import { EventModal, EventData } from "./CreateEvent/EventModal";
 import { useTranslation } from "react-i18next";
+import { useAppFeedback } from "~/components/error/GlobalErrorContainer";
 import { utils } from "~/utils";
 import { getEventStyleProps } from "~/utils/eventColors";
 import { getCalendarMessages } from "../../calendarUtils";
@@ -305,7 +306,8 @@ function useMyCalendar() {
   const [userTags, setUserTags] = useState<Tag[]>([]);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [calendarView, setCalendarView] = useState<View>(Views.WEEK);
-  const { i18n } = useTranslation(["calendar"]);
+  const { t, i18n } = useTranslation(["calendar"]);
+  const { notify } = useAppFeedback();
   const [displayedDates, setDisplayedDates] = useState<Date[]>(() => {
     const startOfWeek = moment().startOf("week").toDate();
     const dates = [];
@@ -552,10 +554,10 @@ function useMyCalendar() {
         await refreshAllCalendarData();
       } catch (error) {
         console.error("Erro ao mover evento:", error);
-        alert("Não foi possível mover o evento.");
+        notify({ type: "error", message: t("event_move_error") });
       }
     },
-    [refreshAllCalendarData],
+    [refreshAllCalendarData, notify, t],
   );
 
   const onEventResize = useCallback(

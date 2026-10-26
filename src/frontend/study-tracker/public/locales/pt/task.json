@@ -2,6 +2,8 @@
   "add_slot_to_work": "Adicionar espaço de trabalho",
   "add_sub_task": "Adicionar subtarefa",
   "delete_task": "Apagar",
+  "confirm_delete_named": "Tens a certeza que queres apagar a tarefa \"{{title}}\"?",
+  "delete_error": "Não foi possível apagar a tarefa.",
   "close": "Fechar",
   "confirm": "Confirmar",
   "create_event_label": "Criar evento associado",
