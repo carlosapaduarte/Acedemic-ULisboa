@@ -87,7 +87,7 @@ export function SelectTime({
         </div>
 
         <div className={styles.timeInputGroup}>
-          <label className={styles.timeLabel}>{t("study:select_cycles", "Número de Ciclos")}</label>
+          <label className={styles.timeLabel}>{t("study:select_cycles")}</label>
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", justifyContent: "center" }}>
             <button type="button" style={btnStyle} onClick={() => setCycles(Math.max(1, Number(cycles) - 1))}>-</button>
             <input

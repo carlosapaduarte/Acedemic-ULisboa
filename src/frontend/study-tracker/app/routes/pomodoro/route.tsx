@@ -11,7 +11,12 @@ import { useTranslation } from "react-i18next";
 import { useTaskList } from "~/routes/tasks/useTaskList";
 import { Modal, Dialog, Button } from "react-aria-components";
 import { TaskCheckbox } from "~/components/Checkbox/TaskCheckbox";
-import { FaClock, FaTriangleExclamation, FaXmark } from "react-icons/fa6";
+import {
+  FaClock,
+  FaListCheck,
+  FaTriangleExclamation,
+  FaXmark,
+} from "react-icons/fa6";
 import {
   getSelectableTaskEntries,
   getSelectedTaskEntries,
@@ -82,7 +87,8 @@ function useTimerSetup(
     return null;
   });
 
-  const [motivationalMessage, setMotivationalMessage] = useState<string | null>(null);
+  const [motivationalMessageIndex, setMotivationalMessageIndex] = useState<number | null>(null);
+  const lastFinishedTimerKey = useRef<number | null>(null);
 
   const [studyDuration, setStudyDuration] = useState<number>(25);
   const [pauseDuration, setPauseDuration] = useState<number>(5);
@@ -114,13 +120,13 @@ function useTimerSetup(
   }, []);
 
   useEffect(() => {
-    if (motivationalMessage) {
+    if (motivationalMessageIndex !== null) {
       const timer = setTimeout(() => {
-        setMotivationalMessage(null);
+        setMotivationalMessageIndex(null);
       }, 30000);
       return () => clearTimeout(timer);
     }
-  }, [motivationalMessage]);
+  }, [motivationalMessageIndex]);
 
   function onTimeSelected(studyMins: number, pauseMins: number, cycles: number) {
     const now = new Date();
@@ -144,7 +150,8 @@ function useTimerSetup(
 
     setTimerStopDate(newStop);
     setSessionStartTime(now); 
-    setMotivationalMessage(null);
+    setMotivationalMessageIndex(null);
+    lastFinishedTimerKey.current = null;
 
     if (audioRef.current) {
       audioRef.current.volume = 0;
@@ -168,19 +175,25 @@ function useTimerSetup(
       localStorage.removeItem("active_pomodoro_end");
       localStorage.removeItem("active_pomodoro_start");
       localStorage.removeItem("pomodoro_state");
+      localStorage.removeItem("pomodoro_final_cycle");
       window.dispatchEvent(new window.Event("storage"));
     }
   }
 
   function onStopClick() {
+    const timerKey = timerStopDate?.getTime() ?? activeBlock?.endDate.getTime() ?? null;
+    if (timerKey !== null) lastFinishedTimerKey.current = timerKey;
     const elapsed = getElapsedMinutes();
     service.finishStudySession().catch((error) => setError(error));
 
     onSessionEnd(elapsed);
+    if (timerStopDate) {
+      localStorage.setItem("streak_deadline", (Date.now() + 5 * 60000).toString());
+    }
 
     setTimerStopDate(undefined);
     setSessionStartTime(null);
-    setMotivationalMessage(null);
+    setMotivationalMessageIndex(null);
     setCurrentCycle(1);
     setIsStudyPhase(true);
 
@@ -197,6 +210,10 @@ function useTimerSetup(
   }
 
   function onTimerFinish() {
+    const timerKey = timerStopDate?.getTime() ?? activeBlock?.endDate.getTime() ?? null;
+    if (timerKey !== null && lastFinishedTimerKey.current === timerKey) return;
+    if (timerKey !== null) lastFinishedTimerKey.current = timerKey;
+
     if (audioRef.current) {
       audioRef.current.currentTime = 1.0;
       audioRef.current.play().catch((e) => console.error("Erro ao tocar:", e));
@@ -214,12 +231,15 @@ function useTimerSetup(
       setSessionStartTime(null);
 
       const messages = t("study:motivational_messages", { returnObjects: true }) as string[];
-      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-      setMotivationalMessage(randomMsg);
+      setMotivationalMessageIndex(Math.floor(Math.random() * messages.length));
       
       if (typeof window !== "undefined") {
         window.localStorage.setItem("active_pomodoro_end", nextStop.getTime().toString());
         window.localStorage.setItem("pomodoro_state", "pause");
+        window.localStorage.setItem(
+          "pomodoro_final_cycle",
+          (currentCycle >= totalCycles).toString(),
+        );
         window.dispatchEvent(new window.Event("storage")); 
       }
       
@@ -233,12 +253,13 @@ function useTimerSetup(
         
         setTimerStopDate(nextStop);
         setSessionStartTime(now);
-        setMotivationalMessage(null);
+        setMotivationalMessageIndex(null);
         
         if (typeof window !== "undefined") {
           window.localStorage.setItem("active_pomodoro_end", nextStop.getTime().toString());
           window.localStorage.setItem("pomodoro_state", "study");
           window.localStorage.setItem("active_pomodoro_start", now.getTime().toString());
+          window.localStorage.removeItem("pomodoro_final_cycle");
           window.dispatchEvent(new window.Event("storage")); 
         }
         
@@ -246,7 +267,7 @@ function useTimerSetup(
       } else {
         setTimerStopDate(undefined);
         setSessionStartTime(null);
-        setMotivationalMessage(null);
+        setMotivationalMessageIndex(null);
         setCurrentCycle(1);
         setIsStudyPhase(true);
         
@@ -270,6 +291,14 @@ function useTimerSetup(
     }
     service.startStudySession().catch((error) => setError(error));
   }
+
+  const motivationalMessages = t("study:motivational_messages", {
+    returnObjects: true,
+  }) as string[];
+  const motivationalMessage =
+    motivationalMessageIndex === null
+      ? null
+      : motivationalMessages[motivationalMessageIndex];
 
   return {
     timerStopDate,
@@ -461,7 +490,8 @@ function AssociatedTaskListView({
       </label>
 
       <h3 className={styles.instructionTitle}>
-        SELECIONE AS TAREFAS EM QUE QUER TRABALHAR
+        <FaListCheck aria-hidden="true" />
+        <span>{t("study:select_tasks_instruction")}</span>
       </h3>
 
       <h2 className={styles.taskListTitle}>
@@ -499,8 +529,8 @@ function TaskSelectionRows({
 
   if (taskEntries.length === 0) {
     return (
-      <p className={styles.noEventsText}>
-        {t("task:no_tasks_associated", "Nenhuma tarefa para hoje")}
+      <p className={classNames(styles.noEventsText, styles.taskEmptyState)}>
+        <span>{t("task:no_tasks_associated", "Nenhuma tarefa para hoje")}</span>
       </p>
     );
   }
@@ -828,7 +858,6 @@ function TimerView({
     >
       {motivationalMessage && (
         <div className={styles.motivationPopup}>
-          <span style={{ fontSize: "1.2rem" }}>🎉</span>
           <span>{motivationalMessage}</span>
         </div>
       )}

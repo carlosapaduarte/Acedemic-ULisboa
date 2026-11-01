@@ -71,11 +71,15 @@ function GlobalStatusWidgets() {
               setPomodoroTimeLeft("00:00");
             }
           } else if (state === "pause") {
-            // Acabou tudo, iniciar a Streak!
+            const isFinalCycle =
+              localStorage.getItem("pomodoro_final_cycle") === "true";
             localStorage.removeItem("active_pomodoro_end");
             localStorage.removeItem("active_pause_end");
             localStorage.removeItem("pomodoro_state");
-            localStorage.setItem("streak_deadline", (now + 5 * 60000).toString());
+            localStorage.removeItem("pomodoro_final_cycle");
+            if (isFinalCycle) {
+              localStorage.setItem("streak_deadline", (now + 5 * 60000).toString());
+            }
             setPomodoroTimeLeft(null);
           }
         }

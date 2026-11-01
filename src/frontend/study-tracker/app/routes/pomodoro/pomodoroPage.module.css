@@ -14,16 +14,14 @@
   background-color: var(--color-3);
   color: var(--text-color-2);
   --edge-size: 0.5rem;
-  clip-path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
+  clip-path: polygon(var(--edge-size) 0,
+      calc(100% - var(--edge-size)) 0,
+      100% var(--edge-size),
+      100% calc(100% - var(--edge-size)),
+      calc(100% - var(--edge-size)) 100%,
+      var(--edge-size) 100%,
+      0 calc(100% - var(--edge-size)),
+      0 var(--edge-size));
   flex-basis: 400px;
   flex-shrink: 0;
   grid-column: 2;
@@ -31,16 +29,14 @@
 
 .taskListContainer,
 .eventsContainer {
-  --path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
+  --path: polygon(var(--edge-size) 0,
+      calc(100% - var(--edge-size)) 0,
+      100% var(--edge-size),
+      100% calc(100% - var(--edge-size)),
+      calc(100% - var(--edge-size)) 100%,
+      var(--edge-size) 100%,
+      0 calc(100% - var(--edge-size)),
+      0 var(--edge-size));
 }
 
 /* --- ESTRUTURA DAS CAIXAS DE EVENTOS E TAREFAS --- */
@@ -72,7 +68,7 @@
   content: "";
   position: absolute;
   inset: 3px;
-  background-color: var(--bg-color); 
+  background-color: var(--bg-color);
   clip-path: var(--path);
   z-index: -1;
 }
@@ -86,6 +82,10 @@
 }
 
 .instructionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-family: var(--font-family2);
   font-size: 1.1rem;
   text-transform: uppercase;
@@ -215,6 +215,7 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
 .timeInput[type="number"] {
   -moz-appearance: textfield;
 }
@@ -239,11 +240,15 @@
 }
 
 .timerDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 1.5rem 2rem;
   border-radius: 10px;
   border: 2px solid var(--color-2);
   margin: 1rem 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .timerText {
@@ -251,6 +256,14 @@
   font-size: 4rem;
   color: var(--text-color-2);
   letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.taskEmptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .pausedIndicator {
@@ -268,7 +281,7 @@
   width: 100%;
 }
 
-.controls > div.tutorial-target-pomodoro-start {
+.controls>div.tutorial-target-pomodoro-start {
   flex: 1;
 }
 
@@ -404,7 +417,6 @@
 }
 
 .completionCheckboxChecked {
-  background-color: var(--color-2) !important;
   border-color: var(--color-2) !important;
 }
 
@@ -456,10 +468,6 @@
   outline-offset: 2px;
 }
 
-.modalButtonSecondary {
-  background-color: var(--color-2);
-  color: var(--color-3) !important;
-}
 
 .taskSelectionRows {
   display: flex;
@@ -494,7 +502,6 @@
 .taskSelectionSelected,
 .taskSelectionSelected:hover {
   border-color: var(--color-1);
-  background-color: var(--color-2);
   font-weight: 600;
 }
 
@@ -563,7 +570,8 @@
   .pomodoroLayout {
     display: flex !important;
     flex-direction: column !important;
-    align-items: stretch !important; /* 💡 O SEGREDO MÁGICO: Obriga TODAS as caixas a esticar até às pontas do ecrã! */
+    align-items: stretch !important;
+    /* 💡 O SEGREDO MÁGICO: Obriga TODAS as caixas a esticar até às pontas do ecrã! */
     gap: 1.5rem;
     padding: 0 1rem;
     width: 100%;
@@ -571,9 +579,17 @@
   }
 
   /* 💡 Reordenar pela posição no HTML */
-  .pomodoroLayout > :nth-child(1) { order: 3 !important; } 
-  .pomodoroLayout > :nth-child(2) { order: 1 !important; } 
-  .pomodoroLayout > :nth-child(3) { order: 2 !important; } 
+  .pomodoroLayout> :nth-child(1) {
+    order: 3 !important;
+  }
+
+  .pomodoroLayout> :nth-child(2) {
+    order: 1 !important;
+  }
+
+  .pomodoroLayout> :nth-child(3) {
+    order: 2 !important;
+  }
 
   /* Garantir que os wrappers invisíveis do tutorial acompanham a largura */
   #tour-timer,
@@ -585,12 +601,13 @@
   }
 
   /* 💡 AQUI AS CAIXAS ESTICAM (O ESPAÇO ROSA DESAPARECE) */
-  .pomodoroContainer, 
+  .pomodoroContainer,
   .eventsContainer,
   .taskListContainer {
     width: 100% !important;
     max-width: 100% !important;
-    flex-basis: auto !important; /* Remove o bloqueio de 400px do Desktop */
+    flex-basis: auto !important;
+    /* Remove o bloqueio de 400px do Desktop */
     box-sizing: border-box !important;
   }
 
@@ -616,11 +633,12 @@
     width: 100%;
   }
 
-  .controls > div.tutorial-target-pomodoro-start {
+  .controls>div.tutorial-target-pomodoro-start {
     width: 100%;
   }
 
-  .controlButton, .confirmButton {
+  .controlButton,
+  .confirmButton {
     width: 100% !important;
   }
 }
@@ -630,6 +648,7 @@
   .timerText {
     font-size: 2.5rem;
   }
+
   .timeInput {
     font-size: 1.2rem;
   }

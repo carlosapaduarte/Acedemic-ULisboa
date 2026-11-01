@@ -51,6 +51,7 @@
   "personal": "Pessoal",
   "study": "Estudo",
   "available_tasks": "Tarefas Disponíveis",
+  "no_tasks_associated": "Nenhuma tarefa para hoje",
   "micro_tasks_list_title": "Tarefas Relâmpago",
   "title_micro_task_info": "Uma tarefa relâmpago é uma tarefa rápida que pode ser registada apenas com um título, sem necessidade de definir sessões de trabalho, prazo, prioridade ou outros detalhes de planeamento.",
   "micro_task_label": "Tarefa relâmpago",

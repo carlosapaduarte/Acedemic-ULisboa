@@ -63,7 +63,7 @@ export function Timer({
       
       {currentCycle && totalCycles && (
         <div style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: 'var(--text-color-2)', opacity: 0.8 }}>
-          {t("study:cycle_count", `Ciclo ${currentCycle} de ${totalCycles}`)}
+          {t("study:cycle_count", { current: currentCycle, total: totalCycles })}
         </div>
       )}
 

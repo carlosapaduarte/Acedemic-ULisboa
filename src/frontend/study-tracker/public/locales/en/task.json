@@ -51,6 +51,7 @@
   "personal": "Personal",
   "study": "Study",
   "available_tasks": "Available Tasks",
+  "no_tasks_associated": "No tasks for today",
   "micro_tasks_list_title": "Lightning Tasks",
   "title_micro_task_info": "A lightning task is a quick task that can be recorded with just a title, without needing to define work sessions, a deadline, priority, or other planning details.",
   "micro_task_label": "Lightning Task",

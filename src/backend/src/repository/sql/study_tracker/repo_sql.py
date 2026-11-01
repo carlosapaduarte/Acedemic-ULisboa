@@ -544,6 +544,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 session.delete(tag)
             session.flush()
 
+            task_tag_ids: set[int] = set()
             for tag_id_str in task.tags:
                 try:
                     tag_obj = self.get_tag_by_id(session, int(tag_id_str))
@@ -555,6 +556,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 if tag_obj is None:
                     continue
 
+                task_tag_ids.add(tag_obj.id)
                 session.add(
                     STTaskTagModel(
                         tag_id=tag_obj.id,
@@ -571,6 +573,31 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
                 if not user_link:
                     session.add(
                         UserTagLink(user_id=user_id, tag_id=tag_obj.id, is_custom=True)
+                    )
+
+            linked_events = session.exec(
+                select(STEventModel)
+                .where(STEventModel.user_id == user_id)
+                .where(STEventModel.task_user_id == user_id)
+                .where(STEventModel.task_id == task_id)
+            ).all()
+            for event in linked_events:
+                event_tag_links = session.exec(
+                    select(STEventTagModel)
+                    .where(STEventTagModel.user_id == user_id)
+                    .where(STEventTagModel.event_id == event.id)
+                ).all()
+                existing_tag_ids = {link.tag_id for link in event_tag_links}
+                for link in event_tag_links:
+                    if link.tag_id not in task_tag_ids:
+                        session.delete(link)
+                for tag_id in task_tag_ids - existing_tag_ids:
+                    session.add(
+                        STEventTagModel(
+                            user_id=user_id,
+                            tag_id=tag_id,
+                            event_id=event.id,
+                        )
                     )
 
             session.commit()
