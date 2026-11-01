@@ -7,5 +7,10 @@
     "confirmation_title": "Confirmar ação",
     "cancel": "Cancelar",
     "close": "Fechar",
-    "new_badge": "Nova medalha: {{title}}"
+    "new_badge": "Nova medalha: {{title}}",
+    "partners_logo": "Logótipos dos parceiros",
+    "user_avatar": "Avatar do utilizador",
+    "loading_screen": "Ecrã de carregamento - Acedemic Challenge",
+    "medal": "Medalha",
+    "trophy": "Troféu"
 }

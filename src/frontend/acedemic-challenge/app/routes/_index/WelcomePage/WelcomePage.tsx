@@ -28,7 +28,7 @@ function InfoPage1({ handleOnNextClick }: {
         <>
             {/*<div className={styles.infoPageTextContent}>*/}
                 <div className={styles.studyImageContainer}>
-                    <img src="study.png" alt="A girl using her tablet"
+                    <img src="study.png" alt={t("welcome_page:image_1_alt")}
                          className={styles.studyImage} />
                 </div>
                 <h1 className={styles.titleHeading}>
@@ -69,7 +69,7 @@ function InfoPage2({ handleOnNextClick, handleOnPreviousClick }: {
                     {t("welcome_page:info_page_2_description")}
                 </p>
                 <div className={styles.studyImageContainer}>
-                    <img src="study2.png" alt="A boy writing in a paper"
+                    <img src="study2.png" alt={t("welcome_page:image_2_alt")}
                          className={styles.studyImage} />
                 </div>
             {/*</div>*/}

@@ -65,7 +65,10 @@ export default function BadgesPage() {
     const [confettiSource, setConfettiSource] = useState<{ x: number; y: number; } | null>(null);
     const levelRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-    const currentLang = i18n.language?.startsWith("en") ? "en" : "pt";
+    const currentLang =
+        i18n.resolvedLanguage?.startsWith("en") || i18n.language?.startsWith("en")
+            ? "en"
+            : "pt";
 
     useEffect(() => {
         service.logUserAction("challenge", "page_view", "badges");
@@ -160,7 +163,9 @@ export default function BadgesPage() {
                 return (
                     <div key={league.id} ref={(el) => (levelRefs.current[league.rank] = el)} className={classNames(styles.levelContainer, { [styles.levelLocked]: !isAccessible, [styles.firstLevelContainer]: index === 0, "tutorial-target-level-container": index === 0, })}>
                         <div className={styles.levelHeaderContainer} onClick={() => toggleLevelExpansion(league.rank)}>
-                            <h2 className={styles.levelHeader}>{league.name}</h2>
+                            <h2 className={styles.levelHeader}>
+                                {t(`badges:${league.code}_name`, { defaultValue: league.name })}
+                            </h2>
                             <div className={styles.headerRight}>
                                 <span className={styles.badgeCounter}>🏆 {earnedCount} / {totalCount}</span>
                                 <div className={classNames({ [styles.chipAnimate]: animatingLevel === league.rank, })}>
@@ -188,14 +193,18 @@ export default function BadgesPage() {
                                         <li key={badge.id} className={classNames(styles.badgeItem, { [styles.badgeEarned]: badge.has_earned, [styles.badgeLocked]: !badge.has_earned, "tutorial-target-badge-item": index === 0 && badgeIndex === 0, })}>
                                             <img
                                                 src={`/challenge/badges/${badge.code}_${currentLang}.png`}
-                                                alt={badge.title}
+                                                alt={t(`badges:${badge.code}_title`, { defaultValue: badge.title })}
                                                 className={classNames(styles.badgeImage, {
                                                     [styles.badgeImageLocked]: !badge.has_earned,
                                                 })}
                                             />
-                                            <h3 className={styles.badgeTitle}>{badge.title}</h3>
+                                            <h3 className={styles.badgeTitle}>
+                                                {t(`badges:${badge.code}_title`, { defaultValue: badge.title })}
+                                            </h3>
                                             
-                                            <p className={styles.badgeDescription}>{badge.description}</p>
+                                            <p className={styles.badgeDescription}>
+                                                {t(`badges:${badge.code}_desc`, { defaultValue: badge.description })}
+                                            </p>
                                         </li>
                                     ))}
                                 </ul>

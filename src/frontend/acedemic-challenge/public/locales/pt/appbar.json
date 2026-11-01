@@ -8,5 +8,12 @@
 
     "nav_bar_challenges": "Desafios",
     "nav_bar_calendar": "Calendário",
-    "nav_bar_badges": "Medalhas"
+    "nav_bar_badges": "Medalhas",
+    "already_in_tracker": "Já está no Study Tracker",
+    "switch_to_tracker": "Mudar para o Study Tracker",
+    "already_in_challenge": "Já está no Acedemic Challenge",
+    "switch_to_challenge": "Mudar para o Acedemic Challenge",
+    "acedemic_home": "Página inicial Acedemic",
+    "contact_support": "Contactar o suporte",
+    "logout": "Terminar sessão"
 }

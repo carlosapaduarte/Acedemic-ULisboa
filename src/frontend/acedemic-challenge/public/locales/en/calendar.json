@@ -19,6 +19,9 @@
     "prev_month_but": "Previous Month",
     "see_more_button_text": "Click to see more",
     "today": "Today",
+    "loading": "Loading challenges and calendar...",
+    "award_on_day": "Award earned on this day",
+    "see_more_button_text": "Click to see more",
     "weekdays": {
         "friday": "Fri",
         "monday": "Mon",

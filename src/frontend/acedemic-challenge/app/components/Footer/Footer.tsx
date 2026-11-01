@@ -22,7 +22,7 @@ export function Footer({
       />
 
       <div className={styles.middleSide}>
-        <img src={"./logos_parceiros_branco.png"} alt="Parceiros" />
+        <img src={"./logos_parceiros_branco.png"} alt={t("common:partners_logo")} />
       </div>
 
       <img

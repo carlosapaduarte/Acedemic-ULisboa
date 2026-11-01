@@ -78,9 +78,25 @@ def create_task(user_id: int, task: Task, slotsToWork: list[SlotToWork]) -> int:
         
     return new_task_id
 
-def update_task(user_id: int, task_id: int, updated_task: Task, slotsToWork: list[SlotToWork]):
+def update_task(
+    user_id: int,
+    task_id: int,
+    updated_task: Task,
+    slotsToWork: list[SlotToWork] | None = None,
+):
+    if slotsToWork is None:
+        existing_task = study_tracker_repo.get_task(user_id, task_id)
+        updated_task.planned_minutes = existing_task.planned_minutes
+
     study_tracker_repo.update_task(user_id, task_id, updated_task)
-    for slot in slotsToWork:
+
+    if slotsToWork is None:
+        return
+
+    new_slots = study_tracker_repo.update_task_work_sessions(
+        user_id, task_id, slotsToWork
+    )
+    for slot in new_slots:
         create_event_from_task(user_id, updated_task, slot, task_id)
 
 def get_user_daily_tasks_progress(user_id: int, year: int, week: int) -> list[tuple[date, float]]:

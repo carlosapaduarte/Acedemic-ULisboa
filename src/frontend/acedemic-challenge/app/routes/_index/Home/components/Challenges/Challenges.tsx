@@ -94,7 +94,7 @@ export default function Challenges({
                             challenges[0].user_answer && (
                                 <blockquote className={styles.userAnswerQuote}>
                                     <p>
-                                        <strong>A sua resposta:</strong> "
+                                        <strong>{t("dashboard:user_answer")}</strong>{" "}
                                         {challenges[0].user_answer}"
                                     </p>
                                 </blockquote>
@@ -213,8 +213,7 @@ export default function Challenges({
                                                             >
                                                                 <p>
                                                                     <strong>
-                                                                        A sua
-                                                                        resposta:
+                                                                        {t("dashboard:user_answer")}
                                                                     </strong>{" "}
                                                                     "
                                                                     {

@@ -7,6 +7,9 @@
   "error_prefix": "Erro:",
   "error_loading": "Falha ao carregar o perfil de gamificação.",
   "locked_alt": "Nível Bloqueado",
+  "popup_level_complete": "NÍVEL CONCLUÍDO!",
+  "popup_new_badge": "NOVA MEDALHA DESBLOQUEADA!",
+  "popup_continue": "Continuar",
 
   "level_0_name": "Início",
   "level_1_name": "Iniciado",

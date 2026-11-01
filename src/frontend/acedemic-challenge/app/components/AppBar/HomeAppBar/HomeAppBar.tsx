@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@remix-run/react";
 import { service, UserInfo } from "~/service/service";
+import { t } from "i18next";
 
 /**
  * Determines initial quote to be displayed to user, based on current time of day.
  */
 function getHelloQuote(): string {
-    const { t } = useTranslation(["hello_quote"]);
+    const { t } = useTranslation(["hello_quote", "login", "common"]);
 
     const hourOfDay = new Date().getHours();
     switch (true) {
@@ -87,17 +88,12 @@ export function GreetingsContainer() {
                             {typeof userInfo.currentChallengeLevel ===
                                 "number" && (
                                 <p className={styles.levelText}>
-                                    {userInfo.currentChallengeLevel === 1 &&
-                                        "Iniciado"}
-                                    {userInfo.currentChallengeLevel === 2 &&
-                                        "Intermédio"}
-                                    {userInfo.currentChallengeLevel === 3 &&
-                                        "Avançado"}
+                                        {t(`login:level_${userInfo.currentChallengeLevel}_title`)}
                                 </p>
                             )}
                         </>
                     ) : (
-                        <span>Loading...</span>
+                        <span>{t("common:loading")}</span>
                     )}
                 </h4>
             </div>
@@ -108,7 +104,7 @@ export function GreetingsContainer() {
                             src={`./avatars/${userInfo.avatarFilename.split("/").pop()}`}
                             width={92}
                             height={92}
-                            alt="User Avatar"
+                            alt={t("common:user_avatar")}
                             style={{ objectFit: "cover", borderRadius: "50%" }}
                         />
                     )}

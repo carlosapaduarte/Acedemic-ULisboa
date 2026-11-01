@@ -1,14 +1,22 @@
-
 .challengeWrapper {
     height: 100%;
     display: flex;
 }
 
 .dayContentContainer {
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: start;
     overflow: hidden;
+}
+
+@media (min-width: 900px) {
+
+    .dayContentContainer,
+    .dayContentContainer+.buttonsContainer {
+        max-width: 68rem;
+    }
 }
 
 .dayContentScrollWrapper {

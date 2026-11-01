@@ -7,6 +7,9 @@
   "error_prefix": "Error:",
   "error_loading": "Failed to load gamification profile.",
   "locked_alt": "Level Locked",
+  "popup_level_complete": "LEVEL COMPLETED!",
+  "popup_new_badge": "NEW BADGE UNLOCKED!",
+  "popup_continue": "Continue",
 
   "level_0_name": "Start",
   "level_1_name": "Beginner",

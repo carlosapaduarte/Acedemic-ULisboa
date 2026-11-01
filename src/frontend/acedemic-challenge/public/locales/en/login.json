@@ -28,6 +28,10 @@
     "password_rules_title": "Password must contain:",
     "rule_length": "At least 6 characters",
     "password_rule_min_length": "Password must be at least {{count}} characters.",
+    "quiz_intro": "10 questions will be displayed.",
+    "quiz_question": "Question {{number}}",
+    "confirm_answers": "Confirm answers",
+    "starting_session": "Signing in to Acedemic Challenge...",
 
     "challenge_title": "ACEdemic Challenge",
     "challenge_subtitle": "Unleash your potential. Enter the arena to unlock achievements and elevate your academic journey.",

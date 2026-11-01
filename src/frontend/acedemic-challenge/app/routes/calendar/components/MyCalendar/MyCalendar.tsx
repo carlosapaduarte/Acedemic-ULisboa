@@ -188,6 +188,7 @@ function Day({
     completed: boolean;
     hasAward: boolean;
 }) {
+    const { t } = useTranslation(["calendar"]);
     const isCurrentMonth = day.currentMonth;
 
     const isToday = utils.sameDay(day.date, new Date());
@@ -220,7 +221,7 @@ function Day({
                     <img
                         src={`${APP_BASE_PATH}icons/trophy.svg`} // Crie este ícone em /public/icons/
                         className={styles.awardIcon}
-                        alt="Medalha ganha neste dia"
+                        alt={t("calendar:award_on_day")}
                     />
                 )}
             </button>

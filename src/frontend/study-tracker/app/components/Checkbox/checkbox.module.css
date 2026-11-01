@@ -25,11 +25,11 @@
   background-size: contain;
   background-image: url("/tracker-checkmark.png");
   clip-path: inset(0 100% 0 0);
-  filter: brightness(0) saturate(100%) invert(48%) sepia(74%) saturate(2971%) hue-rotate(304deg) brightness(101%) contrast(102%);
+  filter: brightness(0) saturate(100%) invert(85%) sepia(46%) saturate(417%) hue-rotate(26deg) brightness(105%) contrast(98%);
   transition: clip-path 0.5s ease;
 }
 
 .checkBox.checked::after {
-    /* Reveal from left to right */
-    clip-path: inset(0 0 0 0);
+  /* Reveal from left to right */
+  clip-path: inset(0 0 0 0);
 }

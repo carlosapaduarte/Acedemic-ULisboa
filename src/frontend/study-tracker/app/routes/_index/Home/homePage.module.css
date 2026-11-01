@@ -84,7 +84,7 @@
   font-family: var(--font-family2);
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--color-3); 
+  color: var(--color-3);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -108,7 +108,7 @@
   height: 100%;
 }
 
-.moodInitial > div {
+.moodInitial>div {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -118,7 +118,14 @@
   text-align: center;
 }
 
-.moodInitial > svg {
+.moodCardTitle {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  margin: 0;
+}
+
+.moodInitial>svg {
   flex: 0 0 auto;
   color: var(--color-1);
 }
@@ -218,7 +225,7 @@
 .timeBox {
   font-family: var(--font-family2);
   font-weight: 700;
-  color: inherit; 
+  color: inherit;
   min-width: 45px;
 }
 
@@ -280,6 +287,7 @@
 }
 
 @media (hover: hover) {
+
   .accessCard:hover .cardTitle,
   .accessCard:hover .cardTitle svg,
   .accessCard:hover svg {
@@ -339,6 +347,7 @@
   font-size: 0.9rem;
   outline: none;
 }
+
 .noteArea::placeholder {
   color: rgba(0, 0, 0, 0.4);
 }
@@ -363,7 +372,7 @@
 .noteTitle {
   font-weight: 600;
   font-size: 0.9rem;
-  color: white; 
+  color: white;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -371,7 +380,7 @@
 
 .noteDetail {
   font-size: 0.8rem;
-  color: var(--color-2); 
+  color: var(--color-2);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;

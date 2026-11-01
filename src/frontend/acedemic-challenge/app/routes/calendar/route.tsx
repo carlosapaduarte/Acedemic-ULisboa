@@ -46,21 +46,20 @@ function MainContent() {
         currentBatch,
     } = useCalendar();
     const { badgeHistory } = useContext(ChallengesContext);
-    const { t } = useTranslation(["dashboard"]);
+    const { t } = useTranslation(["dashboard", "calendar"]);
 
     return (
         <div className={`${styles.mainContent}`}>
             {reachedBatchDays == undefined ||
             unreachedBatchDays == undefined ? (
                 <h1 className={`${styles.loadingTextContainer}`}>
-                    {`Loading Challenges and Calendar...`}
+                    {t("calendar:loading")}
                 </h1>
             ) : (
                 <>
                     <div
-                        className="tutorial-target-calendar-grid"
+                        className={`${styles.calendarColumn} tutorial-target-calendar-grid`}
                         style={{
-                            flex: 1,
                             width: "100%",
                             display: "flex",
                             flexDirection: "column",

@@ -308,8 +308,10 @@ export default function HomePage() {
           {!isMoodLogged ? (
             <div className={styles.moodInitial}>
               <div>
-                <h3 className={styles.cardTitle}>{t("mood_tracker")}</h3>
-                <p style={{ marginTop: "8px", marginBottom: "1rem" }}>
+                <h3 className={`${styles.cardTitle} ${styles.moodCardTitle}`}>
+                  {t("mood_tracker")}
+                </h3>
+                <p style={{ marginTop: "2rem", marginBottom: "1rem" }}>
                   {t("mood_prompt")}
                 </p>
                 <button

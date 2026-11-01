@@ -18,6 +18,9 @@
     "no_challenges_title": "Não há desafios para este dia...",
     "prev_month_but": "Anterior",
     "today": "Hoje",
+    "loading": "A carregar desafios e calendário...",
+    "award_on_day": "Medalha ganha neste dia",
+    "see_more_button_text": "Ver mais",
     "weekdays": {
         "friday": "Sex",
         "monday": "Seg",

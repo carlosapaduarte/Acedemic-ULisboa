@@ -10,10 +10,10 @@ import {
 import { useAppFeedback, useAppFeedbackState } from "./GlobalErrorContainer";
 import styles from "./AppFeedbackHost.module.css";
 
-type BadgeNotificationEvent = CustomEvent<{ title: string }>;
+type BadgeNotificationEvent = CustomEvent<{ code?: string; title: string }>;
 
 export function AppFeedbackHost() {
-    const { t } = useTranslation(["common"]);
+    const { t } = useTranslation(["common", "badges"]);
     const { notify } = useAppFeedback();
     const {
         notification,
@@ -26,8 +26,11 @@ export function AppFeedbackHost() {
 
     useEffect(() => {
         const onBadgeNotification = (event: Event) => {
-            const { title } = (event as BadgeNotificationEvent).detail;
-            notify({ type: "success", message: t("common:new_badge", { title }) });
+            const { code, title } = (event as BadgeNotificationEvent).detail;
+            const translatedTitle = code
+                ? t(`badges:${code}_title`, { defaultValue: title })
+                : title;
+            notify({ type: "success", message: t("common:new_badge", { title: translatedTitle }) });
         };
         window.addEventListener("app:badge-notification", onBadgeNotification);
         return () => window.removeEventListener("app:badge-notification", onBadgeNotification);

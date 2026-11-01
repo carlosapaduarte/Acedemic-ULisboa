@@ -521,58 +521,113 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
     
     def update_task(self, user_id: int, task_id: int, task: Task):
         with Session(engine) as session:
-            
+            statement = select(STTaskModel)\
+                .where(STTaskModel.user_id == user_id)\
+                .where(STTaskModel.id == task_id)
+            task_model = session.exec(statement).first()
+            if task_model is None:
+                raise NotFoundException(f"Task with id {task_id} not found for user {user_id}")
+
+            task_model.title = task.title
+            task_model.description = task.description
+            task_model.deadline = task.deadline
+            task_model.priority = task.priority
+            task_model.status = task.status
+            task_model.is_micro_task = task.is_micro_task
+            task_model.planned_minutes = task.planned_minutes
+            session.add(task_model)
+
             statement = select(STTaskTagModel)\
                 .where(STTaskTagModel.user_id == user_id)\
                 .where(STTaskTagModel.task_id == task_id)
-                
-            result = session.exec(statement)
-            child_tasks_models = result.all()
-            
-            # Delete existent tags
-            for tag in child_tasks_models:
+            for tag in session.exec(statement).all():
                 session.delete(tag)
-            session.commit()
-            
-            statement = select(STTaskModel)\
-                .where(STTaskModel.user_id == user_id)\
-                .where(STTaskModel.id == task_id)
-            
-            result = session.exec(statement)
-            task_model: STTaskModel = result.one()
-            
-            statement_events = select(STEventModel).where(
-                STEventModel.user_id == user_id,
-                STEventModel.task_id == task_id
-            )
-            
-            events_to_delete = session.exec(statement_events).all()
-            for event in events_to_delete:
-                session.delete(event)
-            session.commit()
-            
-            statement = select(STTaskModel)\
-                .where(STTaskModel.user_id == user_id)\
-                .where(STTaskModel.parent_task_id == task_id)
-            
-            result = session.exec(statement)
-            child_tasks_models = result.all()
-            
-            for child in child_tasks_models:
-                session.delete(child)
+            session.flush()
+
+            for tag_id_str in task.tags:
+                try:
+                    tag_obj = self.get_tag_by_id(session, int(tag_id_str))
+                    if tag_obj is None:
+                        tag_obj = self.get_tag_by_name(session, str(tag_id_str).lower())
+                except (ValueError, TypeError):
+                    tag_obj = self.get_tag_by_name(session, str(tag_id_str).lower())
+
+                if tag_obj is None:
+                    continue
+
+                session.add(
+                    STTaskTagModel(
+                        tag_id=tag_obj.id,
+                        task_id=task_id,
+                        user_id=user_id,
+                    )
+                )
+                user_link = session.exec(
+                    select(UserTagLink).where(
+                        UserTagLink.user_id == user_id,
+                        UserTagLink.tag_id == tag_obj.id,
+                    )
+                ).first()
+                if not user_link:
+                    session.add(
+                        UserTagLink(user_id=user_id, tag_id=tag_obj.id, is_custom=True)
+                    )
+
             session.commit()
 
-            statement = select(STTaskModel)\
-                .where(STTaskModel.user_id == user_id)\
+    def update_task_work_sessions(
+        self, user_id: int, task_id: int, slots_to_work: list[SlotToWork]
+    ) -> list[SlotToWork]:
+        with Session(engine) as session:
+            existing_events = session.exec(
+                select(STEventModel)
+                .where(STEventModel.user_id == user_id)
+                .where(STEventModel.task_user_id == user_id)
+                .where(STEventModel.task_id == task_id)
+            ).all()
+            unmatched_events = list(existing_events)
+            new_slots: list[SlotToWork] = []
+
+            for slot in slots_to_work:
+                matching_event = next(
+                    (
+                        event
+                        for event in unmatched_events
+                        if event.start_date == slot.start_time
+                        and event.end_date == slot.end_time
+                    ),
+                    None,
+                )
+                if matching_event is not None:
+                    unmatched_events.remove(matching_event)
+                    continue
+
+                if unmatched_events:
+                    event = unmatched_events.pop(0)
+                    event.start_date = slot.start_time
+                    event.end_date = slot.end_time
+                    session.add(event)
+                else:
+                    new_slots.append(slot)
+
+            for event in unmatched_events:
+                event.task_id = None
+                event.task_user_id = None
+                session.add(event)
+
+            task = session.exec(
+                select(STTaskModel)
+                .where(STTaskModel.user_id == user_id)
                 .where(STTaskModel.id == task_id)
-            
-            result = session.exec(statement)
-            task_model = result.one()
-            
-            session.delete(task_model)
+            ).one()
+            task.planned_minutes = sum(
+                int((slot.end_time - slot.start_time).total_seconds() / 60)
+                for slot in slots_to_work
+            )
+            session.add(task)
             session.commit()
-            
-            StudyTrackerSqlRepo.create_task(self, user_id, task, task_id)
+
+            return new_slots
 
     def update_task_status(self, user_id: int, task_id: int, new_status: str) -> list[int]:
         with Session(engine) as session:
@@ -1168,38 +1223,38 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             if not task_to_delete:
                 raise NotFoundException(f"Task with id {task_id} not found for user {user_id}")
 
-            tasks_to_delete = [task_to_delete]
-            pending_parent_ids = [task_id]
-            while pending_parent_ids:
-                child_tasks = session.exec(
-                    select(STTaskModel)
-                    .where(STTaskModel.user_id == user_id)
-                    .where(STTaskModel.parent_user_id == user_id)
-                    .where(STTaskModel.parent_task_id.in_(pending_parent_ids))
-                ).all()
-                tasks_to_delete.extend(child_tasks)
-                pending_parent_ids = [task.id for task in child_tasks]
-
-            task_ids = [task.id for task in tasks_to_delete]
-            events_to_delete = session.exec(
+            linked_events = session.exec(
                 select(STEventModel)
                 .where(STEventModel.user_id == user_id)
                 .where(STEventModel.task_user_id == user_id)
-                .where(STEventModel.task_id.in_(task_ids))
+                .where(STEventModel.task_id == task_id)
             ).all()
-            for event in events_to_delete:
-                session.delete(event)
+            for event in linked_events:
+                event.task_id = None
+                event.task_user_id = None
+                session.add(event)
+
+            child_tasks = session.exec(
+                select(STTaskModel)
+                .where(STTaskModel.user_id == user_id)
+                .where(STTaskModel.parent_user_id == user_id)
+                .where(STTaskModel.parent_task_id == task_id)
+            ).all()
+            for child_task in child_tasks:
+                child_task.parent_task_id = None
+                child_task.parent_user_id = None
+                session.add(child_task)
 
             tag_links_to_delete = session.exec(
                 select(STTaskTagModel)
                 .where(STTaskTagModel.user_id == user_id)
-                .where(STTaskTagModel.task_id.in_(task_ids))
+                .where(STTaskTagModel.task_id == task_id)
             ).all()
             for link in tag_links_to_delete:
                 session.delete(link)
 
-            for task in reversed(tasks_to_delete):
-                session.delete(task)
+            session.flush()
+            session.delete(task_to_delete)
             session.commit()
 
     def deactivate_future_task_events(self, user_id: int, task_id: int):

@@ -25,9 +25,11 @@ function useEditTask(task: Task) {
   const [originalTaskTitle, setOriginalTaskTitle] = useState<string>("");
 
   const [slotsToWork, setSlotsToWork] = useState<SlotToWorkDto[]>([]);
+  const [slotsLoaded, setSlotsLoaded] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [isEditTagModalOpen, setIsEditTagModalOpen] = useState(false);
+  const setGlobalError = useSetGlobalError();
 
   const refreshTags = async () => {
     try {
@@ -39,20 +41,46 @@ function useEditTask(task: Task) {
   };
 
   useEffect(() => {
+    let active = true;
     if (task) {
       setTitle(task.data.title);
       setDescription(task.data.description);
       setDeadline(task.data.deadline);
       setPriority(task.data.priority);
       setStatus(task.data.status);
+      setSlotsLoaded(false);
       setSlotsToWork([]);
       setSelectedTags(task.data.tags || []);
       setIsMicroTask(task.data.is_micro_task);
       setOriginalTaskTitle(task.data.title);
       setSubTasks([]);
       refreshTags();
+      service
+        .getAllUserEvents()
+        .then((events) => {
+          if (!active) return;
+          setSlotsToWork(
+            events
+              .filter((event) => event.task_id === task.id)
+              .map((event) => ({
+                start: event.startDate,
+                end: event.endDate,
+              })),
+          );
+          setSlotsLoaded(true);
+        })
+        .catch((error) => {
+          if (active) {
+            setGlobalError(
+              error instanceof Error ? error : new Error(String(error)),
+            );
+          }
+        });
     }
-  }, [task]);
+    return () => {
+      active = false;
+    };
+  }, [task, setGlobalError]);
 
   function clearFields() {
     setTitle(undefined);
@@ -62,6 +90,7 @@ function useEditTask(task: Task) {
     setStatus(undefined);
     setSubTasks([]);
     setSlotsToWork([]);
+    setSlotsLoaded(false);
     setSelectedTags([]);
     setIsMicroTask(false);
     setOriginalTaskTitle("");
@@ -80,6 +109,7 @@ function useEditTask(task: Task) {
     setStatus,
     slotsToWork,
     setSlotsToWork,
+    slotsLoaded,
     selectedTags,
     setSelectedTags,
     subTasks,
@@ -115,6 +145,7 @@ const EditTaskModal = React.memo(function EditTaskModal({
     status,
     slotsToWork,
     setSlotsToWork,
+    slotsLoaded,
     selectedTags,
     setSelectedTags,
     subTasks,
@@ -133,7 +164,7 @@ const EditTaskModal = React.memo(function EditTaskModal({
   const [isSaving, setIsSaving] = useState(false);
 
   const finishCreatingTaskButtonDisabled =
-    !title || !priority || hasInvalidSlotRanges(slotsToWork);
+    !title || !priority || !slotsLoaded || hasInvalidSlotRanges(slotsToWork);
 
   async function handleConfirm(
     newTaskInfo: CreateTaskInputDto,

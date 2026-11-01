@@ -15,6 +15,9 @@
     "not_on_batch_message": "Ainda não está num conjunto de 21 desafios, selecione um nível para começar um novo!",
     "reflection_placeholder": "Escreva aqui a sua reflexão...",
     "skip_button": "Saltar",
+    "loading": "A carregar...",
+    "user_answer": "A tua resposta:",
+    "challenge_accessible_label": "Desafio {{day}} - {{title}} - {{status}}",
     "save_and_complete_button": "Guardar",
     "level1": {
         "challenge0": {

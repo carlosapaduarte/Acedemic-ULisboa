@@ -48,7 +48,7 @@ def update_task(
     task_id: int,
     dto: EditTaskInputDto
 ):
-    slots_to_work = []
+    slots_to_work = None
     if dto.updated_task.slotsToWork is not None:
         slots_to_work = dto.updated_task.slotsToWork
     

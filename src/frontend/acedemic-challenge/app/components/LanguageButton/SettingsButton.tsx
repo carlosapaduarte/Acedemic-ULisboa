@@ -12,6 +12,7 @@ import { service } from "~/service/service";
 
 function Dropdown({ trigger }: { trigger: JSX.Element }) {
     const logout = useLogOut();
+    const { t } = useTranslation(["appbar"]);
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
 
@@ -50,7 +51,7 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                                     navigate("/settings");
                                 }}
                             >
-                                Definições
+                                {t("appbar:settings")}
                             </a>
                         </DropdownMenu.Item>
                     )}
@@ -58,12 +59,12 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                     <DropdownMenu.Item className={dropdownStyles.Item}>
                         <a
                             href="/"
-                            aria-label={"Acedemic Home"}
+                                aria-label={t("appbar:acedemic_home")}
                             className={classNames(
                                 dropdownStyles.acedemicHomeItem,
                             )}
                         >
-                            Acedemic Home
+                            {t("appbar:acedemic_home")}
                         </a>
                     </DropdownMenu.Item>
 
@@ -80,7 +81,7 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                                 cursor: "pointer",
                             }}
                         >
-                            <span>Contactar Suporte</span>
+                            <span>{t("appbar:contact_support")}</span>
                         </a>
                     </DropdownMenu.Item>
 
@@ -90,7 +91,7 @@ function Dropdown({ trigger }: { trigger: JSX.Element }) {
                             className={dropdownStyles.Item}
                             onClick={() => startTransition(logout)}
                         >
-                            Logout
+                            {t("appbar:logout")}
                         </DropdownMenu.Item>
                     )}
 

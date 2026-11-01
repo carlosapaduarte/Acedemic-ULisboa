@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useSearchParams } from "@remix-run/react";
+import { useTranslation } from "react-i18next";
 // Importa o teu AppBar correto se existir no Challenge, ou remove esta linha
 // import { useAppBar } from "~/components/AppBar/AppBarProvider"; 
 
 export default function SSOCallback() {
+  const { t } = useTranslation(["login"]);
   // useAppBar("clean");
   const [searchParams] = useSearchParams();
 
@@ -46,7 +48,7 @@ export default function SSOCallback() {
   return (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100vh" }}>
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4" style={{ borderBottomColor: 'transparent', borderRadius: '50%', border: '4px solid #2563eb', borderTopColor: 'transparent', width: '40px', height: '40px', animation: 'spin 1s linear infinite' }}></div>
-      <h2>A iniciar sessão no ACEdemic Challenge... 🔐</h2>
+      <h2>{t("login:starting_session")}</h2>
     </div>
   );
 }

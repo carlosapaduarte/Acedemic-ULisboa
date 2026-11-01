@@ -1,8 +1,10 @@
 import React from "react";
 
 import styles from "./progressBar.module.css";
+import { useTranslation } from "react-i18next";
 
 export function ProgressBar({ progress }: { progress: number }) {
+    const { t } = useTranslation(["common"]);
     return (
         <div className={styles.progressBarContainer}>
             <div className={styles.progressBar}>
@@ -15,7 +17,7 @@ export function ProgressBar({ progress }: { progress: number }) {
                     </div>
                 </div>
                 <img src="icons/trophy_icon.svg"
-                     alt="Trophy Icon"
+                     alt={t("common:trophy")}
                      className={styles.progressBarTrophyIcon} />
             </div>
         </div>

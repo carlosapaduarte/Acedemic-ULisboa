@@ -7,5 +7,10 @@
     "confirmation_title": "Confirm action",
     "cancel": "Cancel",
     "close": "Close",
-    "new_badge": "New badge: {{title}}"
+    "new_badge": "New badge: {{title}}",
+    "partners_logo": "Partner logos",
+    "user_avatar": "User avatar",
+    "loading_screen": "Loading screen - Acedemic Challenge",
+    "medal": "Medal",
+    "trophy": "Trophy"
 }

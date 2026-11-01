@@ -36,7 +36,11 @@ function ChallengeBoxButton(
             {
                 reached ?
                     <div className={`${styles.challengeContainer}`}
-                         aria-label={`Challenge ${batchDayNumber} - ${challengeTitle} - ${completed ? "completed" : "incomplete"}`}
+                         aria-label={t("dashboard:challenge_accessible_label", {
+                             day: batchDayNumber,
+                             title: challengeTitle,
+                             status: t(completed ? "dashboard:challenge_completed" : "dashboard:challenge_incomplete"),
+                         })}
                     >
                         <p className={`${styles.challengeTitle}`}>
                             {batchDayNumber} - {challengeTitle}
@@ -202,7 +206,7 @@ export const Level1And2ChallengeListItem = forwardRef(function ChallengeListItem
                     )}>
                         <div className={styles.challengeBoxButton}>
                             <p className={styles.challengeTitle}>
-                                Loading...
+                                {t("dashboard:loading")}
                             </p>
                         </div>
                     </div>

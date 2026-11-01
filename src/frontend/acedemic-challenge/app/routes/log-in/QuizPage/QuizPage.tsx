@@ -3,6 +3,7 @@ import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { LevelType } from "~/routes/log-in/SelectLevelPage/SelectLevelPage";
 import { service } from "~/service/service";
 import { Button } from "~/components/Button/Button";
+import { useTranslation } from "react-i18next";
 
 export default function QuizPage({
                                      userId,
@@ -15,48 +16,36 @@ export default function QuizPage({
     // Then, it will calculate a score based on the answers
     // Not fully implemented yet because the requirements are not yet fully decided
 
+    const { t } = useTranslation(["login"]);
     const { onAnswerClick, computeLevel } = useQuizPage({ userId, onLevelSelected });
 
     return (
         <div>
-            <h1>10 questions to be displayed...</h1>
+            <h1>{t("login:quiz_intro")}</h1>
             <br />
-            {quizQuestions.map((question, questionNumber) => {
+            {Array.from({ length: 10 }, (_, questionNumber) => {
                 return (
                     <div key={questionNumber}>
-                        {question}{" "}
+                        {t("login:quiz_question", { number: questionNumber + 1 })}{" "}
                         <Button variant={"round"}
                                 onClick={() => onAnswerClick(questionNumber, true)}
                         >
-                            Sim!
+                            {t("login:yes_answer_option")}
                         </Button>
                         <Button variant={"round"}
                                 onClick={() => onAnswerClick(questionNumber, false)}
                         >
-                            Não!
+                            {t("login:no_answer_option")}
                         </Button>
                         <br />
                     </div>
                 );
             })}
             <br />
-            <button onClick={() => computeLevel()}>Confirmar respostas!</button>
+            <button onClick={() => computeLevel()}>{t("login:confirm_answers")}</button>
         </div>
     );
 }
-
-const quizQuestions = [
-    "Question 1",
-    "Question 2",
-    "Question 3",
-    "Question 4",
-    "Question 5",
-    "Question 6",
-    "Question 7",
-    "Question 8",
-    "Question 9",
-    "Question 10"
-];
 
 function useQuizPage(
     {

@@ -58,7 +58,7 @@ function AppSwitcher() {
       >
         <img 
           src="assets/logos/logo_tracker.png"
-          alt="Tracker" 
+          alt={t("appbar:switch_to_tracker")}
           className={classNames(
             styles.switcherLogo, 
             styles.trackerLogo,
@@ -74,7 +74,7 @@ function AppSwitcher() {
       >
         <img 
           src="assets/logos/medal_icon.svg" 
-          alt="Challenge" 
+          alt={t("appbar:switch_to_challenge")}
           className={classNames(
             styles.switcherLogo, 
             styles.challengeLogo,
@@ -122,7 +122,7 @@ export function AppBar({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean 
                            e.preventDefault();
                            navigate("/");
                        }}>
-                        <img src="icons/home_icon.svg" alt="Home Icon" />
+                        <img src="icons/home_icon.svg" alt={t("appbar:home")} />
                     </a>
                 </div>
             )}

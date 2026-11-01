@@ -8,5 +8,12 @@
 
     "nav_bar_challenges": "Challenges",
     "nav_bar_calendar": "Calendar",
-    "nav_bar_badges": "Badges"
+    "nav_bar_badges": "Badges",
+    "already_in_tracker": "You are already in Study Tracker",
+    "switch_to_tracker": "Switch to Study Tracker",
+    "already_in_challenge": "You are already in Acedemic Challenge",
+    "switch_to_challenge": "Switch to Acedemic Challenge",
+    "acedemic_home": "Acedemic Home",
+    "contact_support": "Contact support",
+    "logout": "Log out"
 }
