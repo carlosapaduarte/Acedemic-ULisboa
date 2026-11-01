@@ -17,6 +17,19 @@ export interface Tag {
   is_uc: boolean;
 }
 
+export type CreateTagInput = {
+  name_pt?: string;
+  name_en?: string;
+  color: string;
+  is_uc?: boolean;
+};
+
+export type UpdateTagInput = {
+  name_pt?: string;
+  name_en?: string;
+  color?: string;
+};
+
 export type FileItem = {
   id: number;
   name: string;
@@ -1010,11 +1023,19 @@ export type TaskDistributionPerWeek = {
 
 export type DailyEnergyStatus = {
   date: Date;
-  level: number;
+  level: number | null;
+  label: string;
+  emotions: string[];
+  impacts: string[];
 };
 type DailyEnergyStatusDto = {
-  date: number;
-  level: number;
+  date: number | string;
+  date_log?: number | string;
+  value?: number;
+  level?: number;
+  label?: string;
+  emotions?: string[];
+  impacts?: string[];
 };
 
 async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
@@ -1027,9 +1048,9 @@ async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
     const response: Response = await doFetch(request);
 
     if (response.ok) {
-      const data = await response.json();
+      const data: DailyEnergyStatusDto[] = await response.json();
 
-      return data.map((item: any) => {
+      return data.map((item) => {
         const rawDate = item.date_log || item.date;
         let dateObj: Date;
 
@@ -1046,10 +1067,10 @@ async function fetchEnergyHistory(): Promise<DailyEnergyStatus[]> {
 
         return {
           date: dateObj,
-          level: val,
-          label: item.label || "",
-          emotions: item.emotions || [],
-          impacts: item.impacts || [],
+          level: val ?? null,
+          label: item.label ?? "",
+          emotions: item.emotions ?? [],
+          impacts: item.impacts ?? [],
         };
       });
     } else {
@@ -1266,11 +1287,7 @@ export const service = {
     }
   },
 
-  async createTag(tagData: {
-    name: string;
-    color: string;
-    description?: string;
-  }): Promise<Tag> {
+  async createTag(tagData: CreateTagInput): Promise<Tag> {
     const request = {
       path: `commons/users/me/tags`,
       method: "POST",
@@ -1300,7 +1317,7 @@ export const service = {
 
   async updateTag(
     tagId: string | number,
-    tagData: { name: string; color: string; description?: string },
+    tagData: UpdateTagInput,
   ): Promise<Tag> {
     const request = {
       path: `commons/users/me/tags/${tagId}`,

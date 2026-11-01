@@ -13,6 +13,8 @@ import { SecondModalContext } from "../tasks/CreateTask/SecondModalContext";
 import { hasInvalidSlotRanges } from "~/routes/tasks/CreateTask/slotValidation";
 import { useSetGlobalError } from "~/components/error/GlobalErrorContainer";
 import { FaXmark } from "react-icons/fa6";
+import { CreateTagModal } from "~/components/TagsModal/CreateTagModal";
+import calendarStyles from "~/routes/calendar/CreateEvent/EventModal.module.css";
 
 function useEditTask(task: Task) {
   const [title, setTitle] = useState<string | undefined>(undefined);
@@ -162,6 +164,7 @@ const EditTaskModal = React.memo(function EditTaskModal({
   const { t } = useTranslation(["task"]);
   const setGlobalError = useSetGlobalError();
   const [isSaving, setIsSaving] = useState(false);
+  const [isCreateTagModalOpen, setIsCreateTagModalOpen] = useState(false);
 
   const finishCreatingTaskButtonDisabled =
     !title || !priority || !slotsLoaded || hasInvalidSlotRanges(slotsToWork);
@@ -194,6 +197,7 @@ const EditTaskModal = React.memo(function EditTaskModal({
   }
 
   return (
+    <>
     <Modal>
       <Dialog>
         {({ close }) => (
@@ -221,6 +225,7 @@ const EditTaskModal = React.memo(function EditTaskModal({
                 availableTags={availableTags}
                 refreshTags={refreshTags}
                 setIsEditTagModalOpen={setIsEditTagModalOpen}
+                setIsCreateTagModalOpen={setIsCreateTagModalOpen}
                 title={title}
                 setTitle={setTitle}
                 priority={priority}
@@ -257,6 +262,18 @@ const EditTaskModal = React.memo(function EditTaskModal({
         )}
       </Dialog>
     </Modal>
+    <Modal
+      isOpen={isCreateTagModalOpen}
+      onOpenChange={setIsCreateTagModalOpen}
+      className={calendarStyles.createTagModal}
+    >
+      <Dialog aria-label={t("task:add_new_tag")}>
+        {({ close }) => (
+          <CreateTagModal onTagCreated={refreshTags} close={close} />
+        )}
+      </Dialog>
+    </Modal>
+    </>
   );
 });
 

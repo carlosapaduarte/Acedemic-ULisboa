@@ -195,17 +195,11 @@ export function EditTagModal({
                 <p>{t("loading_tags")}...</p>
               ) : (
                 allUserTags.map((tag) => {
-                  let displayName: string | undefined | null;
-
-                  if (tag.name && PREDEFINED_TAG_NAMES.includes(tag.name)) {
-                    displayName = t(`tags:${tag.name}`);
-                  } else {
-                    const lang = i18n.language.toLowerCase();
-                    displayName =
-                      lang.startsWith("en") && tag.name_en
-                        ? tag.name_en
-                        : tag.name_pt;
-                  }
+                  const lang = i18n.language.toLowerCase();
+                  const displayName =
+                    lang.startsWith("en") && tag.name_en
+                      ? tag.name_en
+                      : tag.name_pt;
 
                   return (
                     <div

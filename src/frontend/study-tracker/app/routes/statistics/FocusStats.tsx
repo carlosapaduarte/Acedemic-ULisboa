@@ -307,8 +307,8 @@ export function FocusStats() {
                     borderRadius: "8px",
                     border: `2px solid ${COLORS.axis}`,
                   }}
-                  formatter={(value: number) => [
-                    `${value} ${t("statistics:minute_short")}`,
+                  formatter={(value) => [
+                    `${value ?? 0} ${t("statistics:minute_short")}`,
                     t("statistics:focus_container_title"),
                   ]}
                 />

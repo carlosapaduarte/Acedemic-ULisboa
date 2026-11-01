@@ -22,6 +22,14 @@ function getMoodConfig(level: number | null) {
   );
 }
 
+export function getEnergyIconByEnergyLevel(level: number): string {
+  return getMoodConfig(level)?.iconUrl ?? "";
+}
+
+export function levelToStr(level: number): string {
+  return getMoodConfig(level)?.labelKey ?? "neutral";
+}
+
 const IMPACT_KEYS: Record<string, string> = {
   Estudo: "study", Trabalho: "work", Família: "family", Amigos: "friends",
   Saúde: "health", Sono: "sleep", Dinheiro: "money", Tempo: "time",
@@ -122,8 +130,8 @@ function fillMissingDays(history: DailyEnergyStatus[]): DailyEnergyStatus[] {
     } else {
       timeline.push({
         date: new Date(current),
-        level: null as any,
-          label: "no_record",
+        level: null,
+        label: "no_record",
         emotions: [],
         impacts: [],
       });
@@ -208,8 +216,8 @@ export function EnergyStats() {
                 <div
                   style={{
                     fontSize: isLastItem ? "0.8rem" : "0.65rem",
+                    color: isLastItem ? "var(--color-3)" : "#888",
                     fontWeight: "bold",
-                    color: isLastItem ? "var(--color-2)" : "#888",
                     whiteSpace: "nowrap",
                     textTransform: "uppercase",
                   }}
@@ -229,15 +237,6 @@ export function EnergyStats() {
         </div>
       )}
 
-      <div
-        style={{
-          width: "100%",
-          height: "1px",
-          background: "#eee",
-          margin: "1.5rem 0",
-        }}
-      />
-
       {/* --- PADRÕES DE AUTORREGULAÇÃO --- */}
       <div>
         <div className={styles.historyTitle}>{t("performance_patterns")}</div>
@@ -247,9 +246,8 @@ export function EnergyStats() {
             {/* 1. Facilitadores */}
             <div
               className={styles.insightCard}
-              style={{ borderLeftColor: "#4CAF50" }}
             >
-              <div className={styles.insightTitle} style={{ color: "#2E7D32" }}>
+              <div className={styles.insightTitle}>
                 {t("efficacy_source")}
               </div>
               <div className={styles.insightContent}>
@@ -272,7 +270,7 @@ export function EnergyStats() {
                   </>
                 ) : (
                   <span style={{ fontSize: "0.8rem", color: "#888" }}>
-                    {t("awaiting_positive_data")}
+                    <FaWandMagicSparkles /> {t("awaiting_positive_data")}
                   </span>
                 )}
               </div>

@@ -3,6 +3,7 @@
     "confirm_new_note": "Submit",
     "current_challenge": "Today's Challenges",
     "day": "Day",
+    "day_title": "Day {{day}} - {{title}}",
     "challenge_completed": "Challenge Complete!",
     "challenge_incomplete": "Challenge Incomplete",
     "challenge_locked": "Challenge Locked",
@@ -16,7 +17,6 @@
     "reflection_placeholder": "Write here your reflection...",
     "skip_button": "Skip",
     "loading": "Loading...",
-    "user_answer": "Your answer:",
     "challenge_accessible_label": "Challenge {{day}} - {{title}} - {{status}}",
     "save_and_complete_button": "Save",
     "level1": {

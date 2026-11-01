@@ -75,7 +75,7 @@ export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
                   fill="#8884d8"
                   dataKey="value"
                   label={({ name, percent }) =>
-                    percent > 0.1
+                    percent !== undefined && percent > 0.1
                       ? `${name} ${(percent * 100).toFixed(0)}%`
                       : ""
                   }
@@ -88,10 +88,13 @@ export function TagsStats({ stats }: { stats: TaskDistributionPerWeek[] }) {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number) => [
-                    `${Math.floor(value / 60)}${t("hours_short")} ${value % 60}${t("minutes_short")}`,
-                    t("time_label"),
-                  ]}
+                  formatter={(value) => {
+                    const minutes = typeof value === "number" ? value : 0;
+                    return [
+                      `${Math.floor(minutes / 60)}${t("hours_short")} ${minutes % 60}${t("minutes_short")}`,
+                      t("time_label"),
+                    ];
+                  }}
                   contentStyle={{
                     borderRadius: "8px",
                     border: "2px solid var(--color-2)",

@@ -5,6 +5,8 @@ import {
   View,
   Views,
 } from "react-big-calendar";
+import * as DnDModule from "react-big-calendar/lib/addons/dragAndDrop";
+import type { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
 import moment from "moment";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Event, service, Tag, Task } from "~/service/service";
@@ -31,8 +33,6 @@ import {
   type Selection,
 } from "react-aria-components";
 
-import * as DnDModule from "react-big-calendar/lib/addons/dragAndDrop";
-
 const getContrastColor = (hexColor: string) => {
   if (!hexColor || !hexColor.startsWith("#")) {
     const match = hexColor.match(/#[a-fA-F0-9]{6}/);
@@ -49,21 +49,21 @@ const getContrastColor = (hexColor: string) => {
   return yiq >= 128 ? "#000000" : "#ffffff";
 };
 
-let DnDCalendar = Calendar;
-try {
-  // @ts-ignore
-  const withDragAndDrop = DnDModule.default || DnDModule;
-  if (typeof withDragAndDrop === "function") {
-    // @ts-ignore
-    DnDCalendar = withDragAndDrop(Calendar);
-  }
-} catch (e) {
-  console.error("Erro ao inicializar DragAndDrop:", e);
-}
+type CalendarEventTag =
+  | string
+  | {
+      id?: string | number;
+      name_pt?: string;
+      name_en?: string;
+      name?: string;
+      color?: string;
+      user_id?: number;
+      is_uc?: boolean;
+    };
 
 interface CalendarEventResource {
   id: number;
-  tags?: string[];
+  tags?: CalendarEventTag[];
   everyWeek?: boolean;
   everyDay?: boolean;
   color?: string;
@@ -78,6 +78,57 @@ interface CalendarEventResource {
   isActive?: boolean;
   parentTaskCompleted?: boolean;
   readOnlyPastCompleted?: boolean;
+}
+
+type DragAndDropFactory = typeof DnDModule.default;
+
+function resolveDragAndDropFactory(moduleValue: unknown): DragAndDropFactory {
+  if (typeof moduleValue === "function") {
+    return moduleValue as DragAndDropFactory;
+  }
+  if (
+    typeof moduleValue === "object" &&
+    moduleValue !== null &&
+    "default" in moduleValue &&
+    typeof moduleValue.default === "function"
+  ) {
+    return moduleValue.default as DragAndDropFactory;
+  }
+  throw new TypeError("Invalid react-big-calendar drag-and-drop export");
+}
+
+const withDragAndDrop = resolveDragAndDropFactory(DnDModule.default);
+const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar);
+
+function toCalendarDate(value: string | Date): Date {
+  return value instanceof Date ? value : new Date(value);
+}
+
+function getCalendarEventTitle(event: CalendarEvent): string {
+  return typeof event.title === "string" ? event.title : "";
+}
+
+function isTag(tag: CalendarEventTag): tag is Tag {
+  return (
+    typeof tag === "object" &&
+    tag !== null &&
+    typeof tag.id === "string" &&
+    typeof tag.name_pt === "string" &&
+    typeof tag.user_id === "number" &&
+    typeof tag.is_uc === "boolean"
+  );
+}
+
+function getEventTagIds(tags: CalendarEventTag[]): string[] {
+  return tags
+    .map((tag) => {
+      if (typeof tag === "object" && tag !== null) {
+        const value = tag.id || tag.name_pt || tag.name_en || tag.name;
+        return value ? String(value) : null;
+      }
+      return String(tag);
+    })
+    .filter((tag): tag is string => tag !== null && tag !== "null" && tag !== "");
 }
 
 const EventWithTags = ({
@@ -106,14 +157,15 @@ const EventWithTags = ({
   }
 
   const getTagNames = () => {
-    if (!event.resource?.tags || allUserTags.length === 0) return [];
+    const resource = event.resource as CalendarEventResource | undefined;
+    if (!resource?.tags || allUserTags.length === 0) return [];
 
-    return event.resource.tags!.map((tagItem: any) => {
+    return resource.tags.map((tagItem: CalendarEventTag) => {
       let foundTag: Tag | undefined;
 
       if (typeof tagItem === "object" && tagItem !== null) {
         foundTag = allUserTags.find((t) => t.id === tagItem.id);
-        if (!foundTag) foundTag = tagItem as Tag;
+        if (!foundTag && isTag(tagItem)) foundTag = tagItem;
       } else {
         foundTag = allUserTags.find(
           (tag: Tag) =>
@@ -125,7 +177,12 @@ const EventWithTags = ({
 
       if (!foundTag) {
         if (typeof tagItem === "object") {
-          return tagItem.name_pt || tagItem.name_en || tagItem.name || "Tag";
+          return (
+            tagItem.name_pt ||
+            tagItem.name_en ||
+            ("name" in tagItem ? tagItem.name : undefined) ||
+            "Tag"
+          );
         }
         return String(tagItem);
       }
@@ -260,7 +317,7 @@ const EventWithTags = ({
       )}
 
       <div style={innerWrapperStyle}>
-        <div style={titleStyle} title={event.title}>
+        <div style={titleStyle} title={getCalendarEventTitle(event) || undefined}>
           {event.title}
         </div>
 
@@ -519,7 +576,7 @@ function useMyCalendar() {
   }, [displayedDates, refreshAllCalendarData]);
 
   const onEventDrop = useCallback(
-    async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
+    async ({ event, start, end }: EventInteractionArgs<CalendarEvent>) => {
       try {
         const resource = event.resource as CalendarEventResource;
         if (resource.readOnlyPastCompleted) {
@@ -528,20 +585,12 @@ function useMyCalendar() {
 
         const rawTags = resource.tags || [];
 
-        const cleanTagIds = rawTags
-          .map((t: any) => {
-            if (typeof t === "object" && t !== null) {
-              const val = t.id || t.name_pt || t.name_en || t.name;
-              return val ? String(val) : null;
-            }
-            return String(t);
-          })
-          .filter((t: any) => t !== null && t !== "null" && t !== "");
+        const cleanTagIds = getEventTagIds(rawTags);
 
         await service.updateEvent(resource.id, {
-          title: event.title,
-          startDate: start,
-          endDate: end,
+          title: getCalendarEventTitle(event),
+          startDate: toCalendarDate(start),
+          endDate: toCalendarDate(end),
           tags: cleanTagIds,
           everyWeek: resource.everyWeek || false,
           everyDay: resource.everyDay || false,
@@ -561,7 +610,7 @@ function useMyCalendar() {
   );
 
   const onEventResize = useCallback(
-    async ({ event, start, end }: { event: any; start: Date; end: Date }) => {
+    async ({ event, start, end }: EventInteractionArgs<CalendarEvent>) => {
       try {
         const resource = event.resource as CalendarEventResource;
         if (resource.readOnlyPastCompleted) {
@@ -570,20 +619,12 @@ function useMyCalendar() {
 
         const rawTags = resource.tags || [];
 
-        const cleanTagIds = rawTags
-          .map((t: any) => {
-            if (typeof t === "object" && t !== null) {
-              const val = t.id || t.name_pt || t.name_en || t.name;
-              return val ? String(val) : null;
-            }
-            return String(t);
-          })
-          .filter((t: any) => t !== null && t !== "null" && t !== "");
+        const cleanTagIds = getEventTagIds(rawTags);
 
         await service.updateEvent(resource.id, {
-          title: event.title,
-          startDate: start,
-          endDate: end,
+          title: getCalendarEventTitle(event),
+          startDate: toCalendarDate(start),
+          endDate: toCalendarDate(end),
           tags: cleanTagIds,
           everyWeek: resource.everyWeek || false,
           everyDay: resource.everyDay || false,
@@ -774,10 +815,16 @@ function MyCalendar() {
     const res = event.resource as CalendarEventResource;
     setEventToEdit({
       id: res.id,
-      title: event.title,
+      title: getCalendarEventTitle(event),
       start: event.start as Date,
       end: event.end as Date,
-      tags: res.tags || [],
+      tags: (res.tags || []).map((tag) =>
+        typeof tag === "string"
+          ? tag
+          : isTag(tag)
+            ? tag
+            : String(tag.id || tag.name_pt || tag.name_en || tag.name || ""),
+      ),
       notes: res.notes || "",
       color: res.color,
       everyDay: res.everyDay,

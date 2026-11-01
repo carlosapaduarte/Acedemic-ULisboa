@@ -161,7 +161,7 @@ export function ColorPickerInput({
           }`}
           isDisabled={isColorSaved}
           onPress={handleSaveColor}
-          title={t("save_color", "Guardar cor")}
+          aria-label={t("save_color", "Guardar cor")}
         >
           <RiAddFill />
         </Button>
@@ -170,7 +170,7 @@ export function ColorPickerInput({
           <Button
             className={styles.actionButton}
             onPress={clearColor}
-            title={t("clear_color", "Limpar cor")}
+            aria-label={t("clear_color", "Limpar cor")}
           >
             <RiCloseLine />
           </Button>

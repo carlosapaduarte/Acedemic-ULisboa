@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Archive, File, service } from "~/service/service";
+import { ArchiveItem, FileItem, service } from "~/service/service";
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import { InConstructionPage } from "~/Pages/InConstruction";
@@ -8,7 +8,7 @@ function useCreateArchiveView(onArchiveCreated: () => void) {
     const [name, setName] = useState("");
 
     function createArchive() {
-        service.createArchive(name)
+        service.createArchive(name, null)
             .then(onArchiveCreated);
     }
 
@@ -34,21 +34,21 @@ function CreateArchiveView({ onArchiveCreated }: { onArchiveCreated: () => void 
     );
 }
 
-function useCreateFileView(archiveName: string, onFileCreated: () => void) {
+function useCreateFileView(archive: ArchiveItem, onFileCreated: () => void) {
     const [name, setName] = useState("");
 
     function createFile() {
-        service.createFile(archiveName, name)
+        service.createFile(archive.id, name, "txt")
             .then(onFileCreated);
     }
 
     return { name, setName, createFile };
 }
 
-function CreateFileView({ archiveName, onFileCreated }: { archiveName: string, onFileCreated: () => void }) {
+function CreateFileView({ archive, onFileCreated }: { archive: ArchiveItem, onFileCreated: () => void }) {
     const { t } = useTranslation(["notes"]);
 
-    const { name, setName, createFile } = useCreateFileView(archiveName, onFileCreated);
+    const { name, setName, createFile } = useCreateFileView(archive, onFileCreated);
 
     return (
         <div>
@@ -64,18 +64,20 @@ function CreateFileView({ archiveName, onFileCreated }: { archiveName: string, o
     );
 }
 
-function useArchiveView(initialArchive: Archive) {
+function useArchiveView(initialArchive: ArchiveItem) {
     const [archive, setArchive] = useState(initialArchive);
 
     function refreshArchive() {
-        service.getArchive(archive.name)
-            .then((archive: Archive) => setArchive(archive));
+        service.getArchives().then((archives) => {
+            const refreshedArchive = archives.find((item) => item.id === archive.id);
+            if (refreshedArchive) setArchive(refreshedArchive);
+        });
     }
 
     return { archive, refreshArchive };
 }
 
-function ArchiveView({ initialArchive }: { initialArchive: Archive }) {
+function ArchiveView({ initialArchive }: { initialArchive: ArchiveItem }) {
     const { t } = useTranslation(["notes"]);
 
     const navigate = useNavigate();
@@ -90,8 +92,8 @@ function ArchiveView({ initialArchive }: { initialArchive: Archive }) {
                 {t("notes:archive_name")} {archive.name}
             </span>
             <br />
-            <CreateFileView archiveName={archive.name} onFileCreated={refreshArchive} />
-            {archive.files.map((file: File, index: number) =>
+            <CreateFileView archive={archive} onFileCreated={refreshArchive} />
+            {archive.files.map((file: FileItem, index: number) =>
                 <div key={index}>
                     <h1>{t("notes:file_name")} {file.name}</h1>
                     <button onClick={() => navigate(`/archives/${archive.name}/files/${file.name}`)}>
@@ -104,11 +106,11 @@ function ArchiveView({ initialArchive }: { initialArchive: Archive }) {
 }
 
 function useArchiveListView() {
-    const [archives, setArchives] = useState<Archive[]>([]);
+    const [archives, setArchives] = useState<ArchiveItem[]>([]);
 
     function refreshArchives() {
         service.getArchives()
-            .then((value: Archive[]) => setArchives(value));
+            .then((value: ArchiveItem[]) => setArchives(value));
     }
 
     useEffect(() => {
@@ -124,7 +126,7 @@ function ArchiveListView() {
     return (
         <div>
             <CreateArchiveView onArchiveCreated={refreshArchives} />
-            {archives.map((archive: Archive, index: number) =>
+            {archives.map((archive: ArchiveItem, index: number) =>
                 <div key={index}>
                     <ArchiveView initialArchive={archive} />
                     <br />

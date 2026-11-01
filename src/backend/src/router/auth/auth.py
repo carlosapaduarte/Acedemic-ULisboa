@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Request, HTTPException, status, Depends
+from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import RedirectResponse, Response
 from sqlalchemy.orm import Session
 from datetime import timedelta
 import os
-import datetime
-import re
 from repository.sql.models.database import predefined_global_tag_names
 from repository.sql.models.database import get_session
 from service.auth.saml_service import init_saml_auth, prepare_request
@@ -20,6 +18,8 @@ router = APIRouter(
 
 @router.get("/login", summary="Iniciar Login ULisboa (SAML)")
 async def saml_login(request: Request, target: str = "tracker"):
+    if target not in {"tracker", "challenge"}:
+        raise HTTPException(status_code=400, detail="Destino de aplicação inválido")
     try:
         auth = await init_saml_auth(request)
         return RedirectResponse(auth.login(return_to=target))
@@ -50,30 +50,12 @@ async def saml_callback(request: Request, db: Session = Depends(get_session)):
         if not fenix_id:
             raise HTTPException(status_code=400, detail="ID Fénix não encontrado")
 
-        # ==========================================================
-        # 🚨 WHITELIST
-        # ==========================================================
-        target_app = req['post_data'].get('RelayState', 'tracker')
-        try:
-            from router.auth.whitelist import TRACKER_ALLOWED, CHALLENGE_ALLOWED
-        except ImportError:
-            TRACKER_ALLOWED = set()
-            CHALLENGE_ALLOWED = set()
-
-        safe_email = email.lower() if email else ""
-        is_allowed = False
-        if target_app == 'tracker' and safe_email in TRACKER_ALLOWED:
-            is_allowed = True
-        elif target_app == 'challenge' and safe_email in CHALLENGE_ALLOWED:
-            is_allowed = True
-
-        if not is_allowed:
-            frontend_url = os.getenv("FRONTEND_URL", "https://acedemic.studentlife.ulisboa.pt")
-            if target_app == 'tracker':
-                redirect_url = f"{frontend_url}/tracker/tracker-reservado"
-            else:
-                redirect_url = f"{frontend_url}/challenge/challenge-reservado"
-            return RedirectResponse(url=redirect_url, status_code=303)
+        requested_target = req['post_data'].get('RelayState', 'tracker')
+        target_app = (
+            requested_target
+            if requested_target in {"tracker", "challenge"}
+            else "tracker"
+        )
 
         user = CommonsSqlRepo.get_user_by_fenix_id(db, fenix_id)
         is_new_user = False
@@ -151,22 +133,3 @@ async def metadata(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/dev-login", summary="Login Falso para Desenvolvimento Local")
-async def dev_login(request: Request, target: str = "tracker", db: Session = Depends(get_session)):
-    env = os.getenv("ENVIRONMENT", "production").lower()
-    if env != "development":
-        raise HTTPException(status_code=404, detail="Not Found")
-
-    test_email = "fc58620@alunos.ciencias.ulisboa.pt" 
-    test_fenix_id = "fc58620"
-    user = CommonsSqlRepo.get_user_by_fenix_id(db, test_fenix_id)
-    
-    if not user:
-        username = test_email.split('@')[0]
-        new_user_model = CommonsSqlRepo.create_user_from_saml(db, username, test_fenix_id, test_email)
-        user = CommonsSqlRepo.get_user_by_id(db, new_user_model.id)
-    
-    access_token = create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    frontend_url = "http://localhost:5273/tracker" if target == "tracker" else "http://localhost:5173/challenge"
-    
-    return RedirectResponse(url=f"{frontend_url}/sso-callback?token={access_token}&target={target}", status_code=303)

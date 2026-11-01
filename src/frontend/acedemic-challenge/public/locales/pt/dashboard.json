@@ -3,6 +3,7 @@
     "confirm_new_note": "Adicionar Nota",
     "current_challenge": "Desafios Para Hoje",
     "day": "Dia",
+    "day_title": "Dia {{day}} - {{title}}",
     "challenge_completed": "Desafio Completo!",
     "challenge_incomplete": "Desafio Incompleto",
     "challenge_locked": "Desafio Bloqueado",
@@ -16,7 +17,6 @@
     "reflection_placeholder": "Escreva aqui a sua reflexão...",
     "skip_button": "Saltar",
     "loading": "A carregar...",
-    "user_answer": "A tua resposta:",
     "challenge_accessible_label": "Desafio {{day}} - {{title}} - {{status}}",
     "save_and_complete_button": "Guardar",
     "level1": {

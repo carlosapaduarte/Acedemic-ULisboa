@@ -22,7 +22,10 @@ function useHowMuchEnergyQuestionPage(onQuestionSubmitted: () => void) {
           const lastEnergyDayStatus =
             energyHistoryDaysStatus[energyHistoryDaysStatus.length - 1];
           const today = new Date();
-          if (utils.sameDay(today, lastEnergyDayStatus.date)) {
+          if (
+            lastEnergyDayStatus.level !== null &&
+            utils.sameDay(today, lastEnergyDayStatus.date)
+          ) {
             setLevel(lastEnergyDayStatus.level);
           }
         }

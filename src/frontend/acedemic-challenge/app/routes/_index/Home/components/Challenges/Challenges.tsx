@@ -71,12 +71,12 @@ export default function Challenges({
                 >
                     <div className={styles.challengeContentScrollWrapper}>
                         <h1 className={styles.currentDayText}>
-                            {t("dashboard:day")} {currentDayNumber}
+                            {t("dashboard:day_title", {
+                                day: currentDayNumber,
+                                title: challenges[0].title,
+                            })}
                         </h1>
                         <div className={styles.challengeTitleContainer}>
-                            <h2 className={styles.challengeTitle}>
-                                {challenges[0].title}
-                            </h2>
                             {challenges[0].completionDate != null ? (
                                 <div className={styles.challengeCompleteTag}>
                                     {t("dashboard:challenge_completed")}
@@ -94,8 +94,7 @@ export default function Challenges({
                             challenges[0].user_answer && (
                                 <blockquote className={styles.userAnswerQuote}>
                                     <p>
-                                        <strong>{t("dashboard:user_answer")}</strong>{" "}
-                                        {challenges[0].user_answer}"
+                                        <strong>{challenges[0].reflection_prompt}</strong>: {challenges[0].user_answer}
                                     </p>
                                 </blockquote>
                             )}
@@ -144,12 +143,9 @@ export default function Challenges({
                                 overflow: "auto",
                             }}
                         >
-                            <h1 className={styles.currentDayText}>
-                                {t("dashboard:day")} {currentDayNumber}
-                            </h1>
                             <div className={styles.dayContentContainer}>
                                 <div className={styles.dayContentScrollWrapper}>
-                                    {challenges.map((challenge: Challenge) => {
+                                    {challenges.map((challenge: Challenge, index) => {
                                         return (
                                             <div
                                                 key={challenge.id}
@@ -172,7 +168,12 @@ export default function Challenges({
                                                                 styles.challengeTitle
                                                             }
                                                         >
-                                                            {challenge.title}
+                                                            {index === 0
+                                                                ? t("dashboard:day_title", {
+                                                                      day: currentDayNumber,
+                                                                      title: challenge.title,
+                                                                  })
+                                                                : challenge.title}
                                                         </h2>
                                                         {challenge.completionDate !=
                                                         null ? (
@@ -213,13 +214,8 @@ export default function Challenges({
                                                             >
                                                                 <p>
                                                                     <strong>
-                                                                        {t("dashboard:user_answer")}
-                                                                    </strong>{" "}
-                                                                    "
-                                                                    {
-                                                                        challenge.user_answer
-                                                                    }
-                                                                    "
+                                                                        {challenge.reflection_prompt}
+                                                                    </strong>: {challenge.user_answer}
                                                                 </p>
                                                             </blockquote>
                                                         )}

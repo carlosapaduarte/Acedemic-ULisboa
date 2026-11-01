@@ -1,7 +1,8 @@
 /* --- GERAIS DA PÁGINA --- */
 .pageTitleDiv {
   display: flex;
-  justify-content: center; /* 💡 Centra o título horizontalmente */
+  justify-content: center;
+  /* 💡 Centra o título horizontalmente */
   margin-bottom: 1em;
 }
 
@@ -22,17 +23,19 @@
   margin: 0 1rem;
   padding: 1rem;
   box-sizing: border-box;
-  background-color: transparent; 
-  margin-bottom: 3.5rem; 
-  position: relative; 
-  border: none; /* 💡 Removemos a borda para não haver buracos */
+  background-color: transparent;
+  margin-bottom: 3.5rem;
+  position: relative;
+  border: none;
+  /* 💡 Removemos a borda para não haver buracos */
 }
 
 @media (min-width: 600px) {
+
   .statsContainer,
   .statCardContainer {
     margin: 0 3rem;
-    margin-bottom: 3.5rem; 
+    margin-bottom: 3.5rem;
   }
 }
 
@@ -45,18 +48,16 @@
   background-color: var(--color-3);
   z-index: -2;
   pointer-events: none;
-  
+
   --edge-size: 1rem;
-  clip-path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
+  clip-path: polygon(var(--edge-size) 0,
+      calc(100% - var(--edge-size)) 0,
+      100% var(--edge-size),
+      100% calc(100% - var(--edge-size)),
+      calc(100% - var(--edge-size)) 100%,
+      var(--edge-size) 100%,
+      0 calc(100% - var(--edge-size)),
+      0 var(--edge-size));
 }
 
 /* 2. O interior da caixa que cria a ilusão da espessura de 3px */
@@ -64,29 +65,31 @@
 .statCardContainer::after {
   content: "";
   position: absolute;
-  inset: 3px; /* 💡 Isto define a espessura da tua linha */
-  background-color: var(--bg-color); /* A cor base da tua app */
+  inset: 3px;
+  /* 💡 Isto define a espessura da tua linha */
+  background-color: var(--bg-color);
+  /* A cor base da tua app */
   z-index: -1;
   pointer-events: none;
-  
-  --edge-size: calc(1rem - 2px); /* Ajuste milimétrico para o recorte de dentro */
-  clip-path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
+
+  --edge-size: calc(1rem - 2px);
+  /* Ajuste milimétrico para o recorte de dentro */
+  clip-path: polygon(var(--edge-size) 0,
+      calc(100% - var(--edge-size)) 0,
+      100% var(--edge-size),
+      100% calc(100% - var(--edge-size)),
+      calc(100% - var(--edge-size)) 100%,
+      var(--edge-size) 100%,
+      0 calc(100% - var(--edge-size)),
+      0 var(--edge-size));
 }
 
 @media (min-width: 600px) {
+
   .statsContainer,
   .statCardContainer {
     margin: 0 3rem;
-    margin-bottom: 3.5rem; 
+    margin-bottom: 3.5rem;
     padding-top: 3rem;
   }
 }
@@ -101,39 +104,37 @@
   position: absolute;
   top: -20px;
   left: 20px;
-  z-index: 1; /* 💡 Garante que fica por cima de tudo */
+  z-index: 1;
 
   background-color: var(--color-2);
-  color: var(--color-3); 
+  color: var(--color-3);
   font-weight: bolder;
   text-transform: uppercase;
   font-family: var(--font-family2);
   font-size: 1rem;
 
   --edge-size: 0.5rem;
-  clip-path: polygon(
-    var(--edge-size) 0,
-    calc(100% - var(--edge-size)) 0,
-    100% var(--edge-size),
-    100% calc(100% - var(--edge-size)),
-    calc(100% - var(--edge-size)) 100%,
-    var(--edge-size) 100%,
-    0 calc(100% - var(--edge-size)),
-    0 var(--edge-size)
-  );
+  clip-path: polygon(var(--edge-size) 0,
+      calc(100% - var(--edge-size)) 0,
+      100% var(--edge-size),
+      100% calc(100% - var(--edge-size)),
+      calc(100% - var(--edge-size)) 100%,
+      var(--edge-size) 100%,
+      0 calc(100% - var(--edge-size)),
+      0 var(--edge-size));
 }
 
 .statTitle img,
 .statsContainerTitle .titleImg {
   height: 1.2em;
   width: 1.2em;
-  filter: brightness(0) invert(1); 
+  filter: brightness(0) invert(1);
 }
 
 /* --- DATAS E CABEÇALHOS INTERNOS --- */
 .statsContainerTitleAndDateDiv {
   display: flex;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   margin-bottom: 1.5rem;
   margin-top: 0.5rem;
 }
@@ -157,14 +158,14 @@
 /* --- GRID PARA OS GRÁFICOS DE TAREFAS --- */
 .tasksGrid {
   display: grid;
-  grid-template-columns: 1fr; 
+  grid-template-columns: 1fr;
   gap: 2rem;
   margin-top: 1rem;
 }
 
 @media (min-width: 900px) {
   .tasksGrid {
-    grid-template-columns: 60% 40%; 
+    grid-template-columns: 60% 40%;
     align-items: start;
   }
 }
@@ -216,7 +217,7 @@
 .energyScrollContainer {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap; 
+  flex-wrap: nowrap;
   overflow-x: auto;
   padding: 1rem 0.5rem;
   gap: 1.5rem;
@@ -237,36 +238,6 @@
 .todayItem {
   transform: scale(1.2);
   margin: 0 10px;
-}
-
-.energyIcon {
-  width: 35px;
-  height: 35px;
-  object-fit: contain;
-  filter: grayscale(40%) opacity(0.8);
-  cursor: default;
-  transition: all 0.3s ease;
-}
-
-.energyIconToday {
-  composes: energyIcon;
-  width: 56px;
-  height: 56px;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
-}
-
-.energyDate {
-  font-size: 0.65rem;
-  font-weight: bold;
-  color: #888;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-
-.energyDateToday {
-  composes: energyDate;
-  font-size: 0.8rem;
-  color: var(--color-3);
 }
 
 .noDataAvailableMessage {
@@ -306,7 +277,7 @@
 }
 
 .insightCard {
-  background: rgba(255, 255, 255, 0.5); 
+  background: rgba(255, 255, 255, 0.5);
   padding: 1rem;
   border-radius: 12px;
   border-left: 5px solid #ccc;
@@ -314,9 +285,11 @@
   flex-direction: column;
   gap: 0.5rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border-left-color: var(--color-3);
 }
 
 .insightTitle {
+  color: red;
   font-size: 0.8rem;
   text-transform: uppercase;
   font-weight: bold;
@@ -332,24 +305,7 @@
 }
 
 /* --- VARIANTES DOS INSIGHTS --- */
-.insightCardFacilitator {
-  composes: insightCard;
-  border-left-color: var(--color-2);
-}
 
-.insightTitleFacilitator {
-  composes: insightTitle;
-  color: #2E7D32;
-}
-
-.facilitatorTag {
-  color: var(--color-2);
-  background: #e8f5e9;
-  padding: 2px 8px;
-  border-radius: 4px;
-  display: inline-block;
-  margin-top: 4px;
-}
 
 .insightCardBarrier {
   composes: insightCard;
@@ -370,44 +326,6 @@
   padding: 8px;
   border-radius: 6px;
   text-transform: none;
-}
-
-.insightCardResilience {
-  composes: insightCard;
-  border-left-color: #2196F3;
-  grid-column: 1 / -1;
-}
-
-.insightTitleResilience {
-  composes: insightTitle;
-  color: #1565C0;
-}
-
-.resilienceContentWrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.resilienceExplanation {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.awaitingDataText {
-  font-size: 0.8rem;
-  color: #888;
-}
-
-.continueLoggingMessage {
-  margin-top: 15px;
-  font-size: 0.9rem;
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 8px;
 }
 
 /* --- GRÁFICO CIRCULAR (CUSTOM LEGEND) --- */
@@ -445,7 +363,7 @@
 
 .summaryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
   margin: 0 1rem 2rem 1rem;
 }
@@ -483,7 +401,7 @@
   content: "";
   position: absolute;
   inset: 2px;
-  background-color: var(--bg-color); 
+  background-color: var(--bg-color);
   z-index: -1;
   --edge-size: calc(0.8rem - 2px);
   clip-path: polygon(var(--edge-size) 0, calc(100% - var(--edge-size)) 0, 100% var(--edge-size), 100% calc(100% - var(--edge-size)), calc(100% - var(--edge-size)) 100%, var(--edge-size) 100%, 0 calc(100% - var(--edge-size)), 0 var(--edge-size));

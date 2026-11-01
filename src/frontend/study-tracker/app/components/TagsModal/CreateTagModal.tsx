@@ -76,7 +76,7 @@ export function CreateTagModal({ onTagCreated, close }: CreateTagModalProps) {
         name_en: nameEn.trim() || undefined,
         color: tagColor,
         is_uc: false,
-      } as any);
+      });
       onTagCreated?.(createdTag);
       close();
     } catch (err) {

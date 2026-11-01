@@ -39,7 +39,7 @@ function Legend({ stats }: { stats: TaskDistributionPerWeek[] }) {
     );
 }
 
-const frequency = (d) => d.frequency;
+const frequency = (d: LetterFrequency) => d.frequency;
 
 const defaultMargin = { top: 0, right: 0, bottom: 0, left: 0 };
 
@@ -62,7 +62,7 @@ function Chart({ stats }: { stats: TaskDistributionPerWeek[] }) {
     const centerX = innerWidth / 2;
     const top = centerY + margin.top;
     const left = centerX + margin.left;
-    const pieSortValues = (a, b) => b - a;
+    const pieSortValues = (a: number, b: number) => b - a;
 
     let total = 0;
     stats.forEach((stat: TaskDistributionPerWeek) => total += stat.time);
@@ -98,7 +98,7 @@ function Chart({ stats }: { stats: TaskDistributionPerWeek[] }) {
                                 const arcFill = getLetterFrequencyColor(letter);
                                 return (
                                     <g key={`arc-${letter}-${index}`}>
-                                        <path d={arcPath} fill={arcFill} />
+                                        <path d={arcPath ?? undefined} fill={arcFill} />
                                         {hasSpaceForLabel && (
                                             <text
                                                 x={centroidX}

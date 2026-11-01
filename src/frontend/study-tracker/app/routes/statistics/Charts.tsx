@@ -156,7 +156,7 @@ export function StudyTimePieChart({
                 />
               ))}
             </Pie>
-            <Tooltip formatter={(value: number) => [`${value} ${t("statistics:minute_short")}`, t("statistics:time_label")]} />
+            <Tooltip formatter={(value) => [`${value ?? 0} ${t("statistics:minute_short")}`, t("statistics:time_label")]} />
             <Legend verticalAlign="bottom" height={36} />
           </PieChart>
         </ResponsiveContainer>
