@@ -44,11 +44,17 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
   const { barData, pieData, totalCompleted, activeDays, priorities } =
     useMemo(() => {
       // 1. Preparar últimos 7 dias
+      const endExclusive = new Date();
+      endExclusive.setHours(0, 0, 0, 0);
+      endExclusive.setDate(endExclusive.getDate() + 1);
+      const startInclusive = new Date(endExclusive);
+      startInclusive.setDate(startInclusive.getDate() - 7);
+
       const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        return d;
-      }).reverse();
+        const date = new Date(startInclusive);
+        date.setDate(startInclusive.getDate() + i);
+        return date;
+      });
 
       const groupedBar: Record<string, number> = {};
       last7Days.forEach((d) => {
@@ -75,12 +81,7 @@ export function TasksStats({ tasks }: { tasks: Task[] }) {
 
         if (status === "completed" && completedAt) {
           const date = new Date(completedAt);
-          // Verifica se está no range dos 7 dias
-          const dayDiff = Math.floor(
-            (new Date().getTime() - date.getTime()) / (1000 * 3600 * 24),
-          );
-
-          if (dayDiff < 7 && dayDiff >= 0) {
+          if (date >= startInclusive && date < endExclusive) {
             const key = `${date.getDate()} ${date
               .toLocaleString(locale, { month: "short" })
               .replace(".", "")}`;

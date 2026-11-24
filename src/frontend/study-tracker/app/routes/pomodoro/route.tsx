@@ -146,7 +146,6 @@ function useTimerSetup(
       window.dispatchEvent(new window.Event("storage")); 
     }
 
-    service.logUserAction("tracker", "action", "start_pomodoro");
 
     setTimerStopDate(newStop);
     setSessionStartTime(now); 
@@ -977,7 +976,6 @@ function PomodoroPage() {
   };
 
   const handleConfirmCompletion = async (completedTaskIds: number[]) => {
-    service.logUserAction("tracker", "action", "add_manual_time");
 
     if (completedTaskIds.length > 0) {
       try {

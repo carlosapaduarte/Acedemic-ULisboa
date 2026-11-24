@@ -12,8 +12,8 @@ function BarChart({ weekStudyTimeHistory, locale }: { weekStudyTimeHistory: Week
             {
                 weekStudyTimeHistory
                     .sort((week1: WeekTimeStudy, week2: WeekTimeStudy) => { // sorts by increasing year and week
-                        const year1 = week1.week;
-                        const year2 = week2.week;
+                        const year1 = week1.year;
+                        const year2 = week2.year;
 
                         if (year1 < year2)
                             return -1;
@@ -30,7 +30,9 @@ function BarChart({ weekStudyTimeHistory, locale }: { weekStudyTimeHistory: Week
                     .map((weekData, index) => {
                         const date = utils.getDateFromWeekNumber(weekData.year, weekData.week);
                         const weekStudyTimeTarget = weekData.target;
-                        let percentageFocusDone = weekData.total / weekStudyTimeTarget * 100;
+                        let percentageFocusDone = weekStudyTimeTarget && weekStudyTimeTarget > 0
+                            ? weekData.total / weekStudyTimeTarget * 100
+                            : 0;
 
                         // To avoid bar overflow
                         if (percentageFocusDone > 100)
@@ -124,8 +126,10 @@ function useFocusStats() {
     function getCurrentWeekStudyTime(): WeekTimeStudy | undefined {
         const today = new Date();
         const currentWeekNumber = utils.getWeekNumber(today);
+        const weekThursday = new Date(today);
+        weekThursday.setDate(today.getDate() + 3 - ((today.getDay() + 6) % 7));
         return weekStudyTimeHistory?.find((value: WeekTimeStudy) =>
-            value.year == today.getFullYear() && value.week == currentWeekNumber
+            value.year === weekThursday.getFullYear() && value.week === currentWeekNumber
         );
     }
 

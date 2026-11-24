@@ -31,7 +31,6 @@ class UserModel(SQLModel, table=True):
     study_session_time: datetime | None
 
     user_batches: list["BatchModel"] = Relationship(back_populates="user")
-    user_st_app_uses: list["STAppUseModel"] = Relationship(back_populates="user")
     st_planning_day: "STWeekDayPlanningModel" = Relationship(back_populates="user")
     st_events: list["STEventModel"] = Relationship(back_populates="user")
     schedule_unavailable_blocks: list["STScheduleBlockNotAvailableModel"] = Relationship(back_populates="user")
@@ -265,12 +264,6 @@ class ChallengeModel(SQLModel, table=True):
             ['batch_day.id', 'batch_day.batch_id', 'batch_day.user_id']
         ),
     )
-
-class STAppUseModel(SQLModel, table=True):
-    __tablename__ = "st_app_use_model"
-    goal_id: int = Field(primary_key=True)
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
-    user: UserModel = Relationship(back_populates="user_st_app_uses")
 
 class STWeekDayPlanningModel(SQLModel, table=True):
     __tablename__ = "st_week_day_planning"
@@ -514,13 +507,3 @@ class STMoodLogModel(SQLModel, table=True):
     
     user: UserModel = Relationship(back_populates="mood_logs")
 
-class AccessLog(SQLModel, table=True):
-    __tablename__ = "access_log"
-    
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id", index=True)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    app_targeted: str  # Ex: "tracker" ou "challenge"
-    user_agent: str    # Vai guardar a info do browser/telemóvel
-    action_type: str   # Ex: "page_view", "intent", "action"
-    action_detail: str # Ex: "calendar", "open_mood_modal", "save_mood"

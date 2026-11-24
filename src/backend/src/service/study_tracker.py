@@ -294,9 +294,9 @@ def finish_study_session(user_id: int):
     
     study_session_duration_min = elapsed_minutes(start_time, now)
     
-    cur_week_number = now.isocalendar()[1]
+    iso_year, cur_week_number, _ = now.isocalendar()
     week_and_year = WeekAndYear(
-        year=now.year,
+        year=iso_year,
         week=cur_week_number
     )
     

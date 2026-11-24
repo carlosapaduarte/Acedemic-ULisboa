@@ -225,6 +225,7 @@ class WeekTimeStudyOutputDto(BaseModel):
     week: int
     total: int
     averageBySession: float
+    nOfSessions: int
     target: float | None
     
     @staticmethod
@@ -237,6 +238,7 @@ class WeekTimeStudyOutputDto(BaseModel):
                     week=record.week_and_year.week,    
                     total=record.total,
                     averageBySession=record.average_by_session,
+                    nOfSessions=record.n_of_sessions,
                     target=record.target
                 )
             )

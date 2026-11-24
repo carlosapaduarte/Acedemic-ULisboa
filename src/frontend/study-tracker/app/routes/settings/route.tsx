@@ -64,11 +64,11 @@ export default function SettingsPage() {
           <div className={styles.profileCard}>
             <div className={styles.infoRow}>
               <span className={styles.label}>{t("settings:display_name", "Nome de Exibição:")}</span>
-              <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={styles.nameInput} />
+              <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={styles.input} />
             </div>
             <div className={styles.infoRow}>
               <span className={styles.label}>{t("settings:email", "E-mail:")}</span>
-              <span className={styles.value_text}>{user?.institutional_email}</span>
+              <span className={styles.value}>{user?.institutional_email}</span>
             </div>
           </div>
         </section>
@@ -86,11 +86,11 @@ export default function SettingsPage() {
         </section>
 
         {/* SISTEMA */}
-        <section className={styles.section} style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px" }}>
+        <section className={classNames(styles.section, styles.systemSection)}>
           <h2>{t("settings:system_title", "Sistema")}</h2>
-          <div className={styles.toggleRow} style={{ opacity: 0.6, marginBottom: "1rem" }}>
-            <span><RiMoonClearFill /> {t("settings:dark_mode", "Modo Noturno (Em breve)")}</span>
-            <label className={styles.switch}><input type="checkbox" disabled /><span className={styles.slider}></span></label>
+          <div className={styles.systemFeature}>
+            <RiMoonClearFill aria-hidden="true" />
+            <span>{t("settings:dark_mode", "Modo Noturno (Em breve)")}</span>
           </div>
           <button onClick={() => window.location.reload()} className={styles.dangerButton}><RiRestartLine /> {t("settings:repeat_tutorial", "Repetir Tutorial")}</button>
         </section>

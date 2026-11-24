@@ -71,10 +71,6 @@ export default function BadgesPage() {
             : "pt";
 
     useEffect(() => {
-        service.logUserAction("challenge", "page_view", "badges");
-    }, []);
-
-    useEffect(() => {
         const fetchProfile = async () => {
             try {
                 setLoading(true);

@@ -3,7 +3,6 @@ import React from "react";
 import { Level1And2ChallengeListItem } from "~/routes/challenges/Level1And2ChallengesList/Level1And2ChallengeListItem";
 import { Batch } from "~/service/service";
 import { BatchDay, Challenge } from "~/challenges/types";
-import { service } from "~/service/service";
 
 export function Level1And2ChallengesList(
     {
@@ -63,8 +62,6 @@ export function Level1And2ChallengesList(
                         if (!batchDays || !batch) {
                             return;
                         }
-                        // 🕵️‍♀️ Espião: Completar desafio de Nível 1 ou 2
-                        service.logUserAction("challenge", "action", "finish_lvl1or2_challenge");
                         onMarkCompleteClickHandler(batchDays[index].challenges[0], batchDays[index], batch);
                     }}
                     onNoteAddClick={(notesText) => {

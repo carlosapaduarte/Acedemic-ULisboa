@@ -736,11 +736,6 @@ function MyCalendar() {
     new Set([]),
   );
 
-  // 🕵️‍♀️ Espião: Visualizar Calendário
-  useEffect(() => {
-      service.logUserAction("tracker", "page_view", "calendar_full");
-  }, []);
-
   const filteredEvents = React.useMemo(() => {
     if (selectedFilters === "all" || selectedFilters.size === 0) {
       return events;

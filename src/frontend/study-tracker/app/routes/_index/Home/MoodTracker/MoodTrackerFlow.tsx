@@ -160,12 +160,10 @@ export const MoodTrackerFlow = ({ onComplete, onClose }: MoodStepProps) => {
   };
 
   useEffect(() => {
-    service.logUserAction("tracker", "intent", "open_mood_modal");
   }, []);
 
   const saveData = async () => {
     setSaving(true);
-    service.logUserAction("tracker", "action", "save_mood");
 
     try {
       const payload = {

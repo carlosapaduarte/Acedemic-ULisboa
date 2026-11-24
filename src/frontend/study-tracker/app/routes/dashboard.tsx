@@ -21,12 +21,6 @@ function get_welcome_message() {
     }
 }
 
-function WeekGoal() {
-    return (
-        <p><b>Don't forget to do "week-goal" this week!</b></p>
-    );
-}
-
 function useDailyEvents() {
     const [events, setEvents] = useState<Event[] | undefined>(undefined);
 
@@ -76,7 +70,6 @@ export default function Dashboard() {
             <h1>Dashboard</h1>
             <img src="test.webp" alt="Avatar" />
             <p>{get_welcome_message()}</p>
-            <WeekGoal />
             <DailyEvents />
             <WeekSchedule />
             <WeekStats />

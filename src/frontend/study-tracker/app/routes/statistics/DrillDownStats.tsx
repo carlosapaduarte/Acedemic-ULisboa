@@ -16,7 +16,6 @@ import { utils } from "~/utils";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaMagnifyingGlass } from "react-icons/fa6";
 
-const UC_COLOR = "#8d6e63";
 const OTHER_COLORS = [
   "#81C784",
   "#64B5F6",
@@ -29,15 +28,13 @@ const OTHER_COLORS = [
 type TagChartDatum = { key: string; name: string };
 type TagCursorProps = React.SVGProps<SVGRectElement> & {
   payload?: TooltipPayload;
-  onSelectTag: (tagKey: string, tagType: "uc" | "other") => void;
-  tagType: "uc" | "other";
+  onSelectTag: (tagKey: string) => void;
   getAccessibleLabel: (name: string) => string;
 };
 
 function InteractiveTagCursor({
   payload,
   onSelectTag,
-  tagType,
   getAccessibleLabel,
   ...rectProps
 }: TagCursorProps) {
@@ -47,7 +44,7 @@ function InteractiveTagCursor({
   const handleKeyDown = (event: React.KeyboardEvent<SVGRectElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onSelectTag(datum.key, tagType);
+      onSelectTag(datum.key);
     }
   };
 
@@ -59,7 +56,7 @@ function InteractiveTagCursor({
       role="button"
       tabIndex={0}
       aria-label={getAccessibleLabel(datum.name)}
-      onClick={() => onSelectTag(datum.key, tagType)}
+      onClick={() => onSelectTag(datum.key)}
       onKeyDown={handleKeyDown}
     />
   );
@@ -132,9 +129,6 @@ export function DrillDownStats() {
   const [loading, setLoading] = useState(true);
 
   const [selectedTagKey, setSelectedTagKey] = useState<string | null>(null);
-  const [selectedTagType, setSelectedTagType] = useState<"uc" | "other" | null>(
-    null,
-  );
 
   useEffect(() => {
     Promise.all([service.getAllUserEvents(), service.fetchUserTags()])
@@ -159,19 +153,35 @@ export function DrillDownStats() {
 
     const ucMap: Record<string, { name: string; value: number; color: string }> = {};
     const otherMap: Record<string, { name: string; value: number; color: string }> = {};
-    const coOccurrenceMap: Record<string, { name: string; value: number }> = {};
+    const coOccurrenceMap: Record<
+      string,
+      { name: string; value: number; color: string }
+    > = {};
 
-    const resolveTag = (tagItem: any) => {
+    const resolveTag = (
+      tagItem:
+        | string
+        | {
+            id?: string | number;
+            name?: string;
+            name_pt?: string;
+            name_en?: string;
+            color?: string;
+            is_uc?: boolean;
+          },
+    ) => {
+      const tagReference =
+        typeof tagItem === "object" && tagItem !== null ? tagItem : undefined;
       const tag = tags.find((candidate) => {
-        if (typeof tagItem === "object" && tagItem !== null) {
-          if (tagItem.id !== undefined && tagItem.id !== null) {
-            return String(candidate.id) === String(tagItem.id);
+        if (tagReference) {
+          if (tagReference.id !== undefined && tagReference.id !== null) {
+            return String(candidate.id) === String(tagReference.id);
           }
           return (
-            candidate.name_pt === tagItem.name_pt ||
-            candidate.name_en === tagItem.name_en ||
-            candidate.name_pt === tagItem.name ||
-            candidate.name_en === tagItem.name
+            candidate.name_pt === tagReference.name_pt ||
+            candidate.name_en === tagReference.name_en ||
+            candidate.name_pt === tagReference.name ||
+            candidate.name_en === tagReference.name
           );
         }
         return (
@@ -182,16 +192,28 @@ export function DrillDownStats() {
       });
       const name = tag
         ? tag.name_pt || tag.name_en || t("unnamed_tag")
-        : typeof tagItem === "object" && tagItem !== null
-          ? tagItem.name_pt || tagItem.name_en || tagItem.name || t("unnamed_tag")
+        : tagReference
+          ? tagReference.name_pt || tagReference.name_en || tagReference.name || t("unnamed_tag")
           : String(tagItem || t("unknown_tag"));
-      const id = tag?.id ?? (typeof tagItem === "object" ? tagItem?.id : undefined);
+      const id = tag?.id ?? tagReference?.id;
+      const key =
+        id !== undefined && id !== null
+          ? `id:${id}`
+          : `name:${name.trim().toLocaleLowerCase()}`;
 
       return {
-        key: id !== undefined && id !== null ? `id:${id}` : `name:${name}`,
+        key,
         name,
-        isUc: tag?.is_uc ?? tagItem?.is_uc ?? false,
-        color: tag?.color || tagItem?.color || UC_COLOR,
+        isUc: tag?.is_uc ?? tagReference?.is_uc ?? false,
+        color:
+          tag?.color ||
+          tagReference?.color ||
+          OTHER_COLORS[
+            Array.from(key).reduce(
+              (hash, character) => (hash * 31 + character.charCodeAt(0)) >>> 0,
+              0,
+            ) % OTHER_COLORS.length
+          ],
       };
     };
 
@@ -214,6 +236,7 @@ export function DrillDownStats() {
               const current = coOccurrenceMap[tag.key] || {
                 name: tag.name,
                 value: 0,
+                color: tag.color,
               };
               coOccurrenceMap[tag.key] = {
                 ...current,
@@ -234,7 +257,7 @@ export function DrillDownStats() {
               const current = otherMap[tag.key] || {
                 name: tag.name,
                 value: 0,
-                color: OTHER_COLORS[Object.keys(otherMap).length % OTHER_COLORS.length],
+                color: tag.color,
               };
               otherMap[tag.key] = { ...current, value: current.value + duration };
             }
@@ -267,12 +290,8 @@ export function DrillDownStats() {
       tags.find((tag) => selectedTagKey === `id:${tag.id}`)?.name_en ||
       selectedTagKey.replace(/^name:/, "")
     : null;
-  const selectedTagColor = selectedTagKey
-    ? tags.find((tag) => selectedTagKey === `id:${tag.id}`)?.color || UC_COLOR
-    : UC_COLOR;
-  const selectTag = (tagKey: string, tagType: "uc" | "other") => {
+  const selectTag = (tagKey: string) => {
     setSelectedTagKey(tagKey);
-    setSelectedTagType(tagType);
   };
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -324,7 +343,6 @@ export function DrillDownStats() {
               type="button"
               onClick={() => {
                 setSelectedTagKey(null);
-                setSelectedTagType(null);
               }}
               className={styles.detailBackButton}
             >
@@ -370,9 +388,7 @@ export function DrillDownStats() {
                     {drillDownData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={selectedTagType === "uc"
-                          ? selectedTagColor
-                          : OTHER_COLORS[index % OTHER_COLORS.length]}
+                        fill={entry.color}
                       />
                     ))}
                   </Bar>
@@ -423,7 +439,6 @@ export function DrillDownStats() {
                       cursor={
                         <InteractiveTagCursor
                           onSelectTag={selectTag}
-                          tagType="other"
                           getAccessibleLabel={(name) => t("open_tag_details", { tag: name })}
                         />
                       }
@@ -435,7 +450,7 @@ export function DrillDownStats() {
                       barSize={20}
                       style={{ cursor: "pointer" }}
                       onClick={(entry) => {
-                        selectTag(String(entry.key), "other");
+                        selectTag(String(entry.key));
                       }}
                     >
                       {otherData.map((entry, index) => (
@@ -490,7 +505,6 @@ export function DrillDownStats() {
                       cursor={
                         <InteractiveTagCursor
                           onSelectTag={selectTag}
-                          tagType="uc"
                           getAccessibleLabel={(name) => t("open_tag_details", { tag: name })}
                         />
                       }
@@ -502,7 +516,7 @@ export function DrillDownStats() {
                       barSize={20}
                       style={{ cursor: "pointer" }}
                       onClick={(entry) => {
-                        selectTag(String(entry.key), "uc");
+                        selectTag(String(entry.key));
                       }}
                     >
                       {ucData.map((entry) => (

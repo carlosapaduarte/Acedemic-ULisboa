@@ -22,7 +22,6 @@ class UserOutputDto(BaseModel):
     batches: list = []
     custom_colors: List[str] = [] 
     tutorial_progress: List[str] = []
-    use_goals: List[int] = []
     displayName: str | None = None
     fullName: str | None = None
     affiliation: List[str] = []

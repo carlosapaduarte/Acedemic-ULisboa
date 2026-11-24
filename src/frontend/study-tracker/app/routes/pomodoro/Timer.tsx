@@ -78,15 +78,15 @@ export function Timer({
       )}
 
       <div className={styles.timerDisplay}>
-        <span className={styles.timerText}>
+        <span className={`${styles.timerText} ${styles.timerDigit}`}>
           {hours.toString().padStart(2, "0")}
         </span>
-        <span className={styles.timerText}>:</span>
-        <span className={styles.timerText}>
+        <span className={`${styles.timerText} ${styles.timerSeparator}`}>:</span>
+        <span className={`${styles.timerText} ${styles.timerDigit}`}>
           {minutes.toString().padStart(2, "0")}
         </span>
-        <span className={styles.timerText}>:</span>
-        <span className={styles.timerText}>
+        <span className={`${styles.timerText} ${styles.timerSeparator}`}>:</span>
+        <span className={`${styles.timerText} ${styles.timerDigit}`}>
           {seconds.toString().padStart(2, "0")}
         </span>
       </div>

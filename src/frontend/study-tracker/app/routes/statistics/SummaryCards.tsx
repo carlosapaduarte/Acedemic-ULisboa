@@ -3,7 +3,8 @@ import styles from "./statistics.module.css";
 import {
   Task,
   DailyEnergyStatus,
-  TaskDistributionPerWeek,
+  Event,
+  WeekTimeStudy,
 } from "~/service/service";
 import { utils } from "~/utils";
 import { useTranslation } from "react-i18next";
@@ -11,21 +12,66 @@ import { useTranslation } from "react-i18next";
 interface SummaryProps {
   tasks: Task[];
   moodHistory: DailyEnergyStatus[];
-  focusStats: TaskDistributionPerWeek[];
+  weeklyStudyTime: WeekTimeStudy[];
+  events: Event[];
 }
 
-export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
+function getCurrentWeekRange(date: Date) {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+
+  const thursday = new Date(start);
+  thursday.setDate(thursday.getDate() + 3);
+
+  return {
+    start,
+    end,
+    year: thursday.getFullYear(),
+    week: utils.getWeekNumber(date),
+  };
+}
+
+function countEventsThisWeek(events: Event[], weekStart: Date, weekEnd: Date) {
+  let count = 0;
+
+  for (const event of events) {
+    if (!event.isActive) continue;
+
+    if (!event.everyDay && !event.everyWeek) {
+      const start = new Date(event.startDate);
+      if (start >= weekStart && start < weekEnd) count++;
+      continue;
+    }
+
+    const templateStart = new Date(event.startDate);
+    const recurrenceStart = event.recurrenceStart ?? templateStart;
+    for (let occurrence = new Date(weekStart); occurrence < weekEnd; occurrence.setDate(occurrence.getDate() + 1)) {
+      const dayStart = new Date(occurrence);
+      const dayEnd = new Date(occurrence);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      if (dayEnd < recurrenceStart) continue;
+      if (event.recurrenceEnd && dayStart > new Date(event.recurrenceEnd)) continue;
+
+      if (event.everyDay || occurrence.getDay() === templateStart.getDay()) count++;
+    }
+  }
+
+  return count;
+}
+
+export function SummaryCards({ tasks, moodHistory, weeklyStudyTime, events }: SummaryProps) {
   const { t } = useTranslation(["statistics"]);
   const stats = useMemo(() => {
-    // Obter data de hoje para referência
     const today = new Date();
-    const currentWeek = utils.getWeekNumber(today);
-    const currentYear = today.getFullYear();
+    const { start, end, year, week } = getCurrentWeekRange(today);
 
-    // 1. Tempo de Foco (Semana Atual)
-    const weeklyFocusMinutes = focusStats
-      .filter((s) => s.week === currentWeek)
-      .reduce((acc, curr) => acc + curr.time, 0);
+    const weeklyFocusMinutes =
+      weeklyStudyTime.find((record) => record.year === year && record.week === week)?.total ?? 0;
 
     const hours = Math.floor(weeklyFocusMinutes / 60);
     const mins = weeklyFocusMinutes % 60;
@@ -33,46 +79,28 @@ export function SummaryCards({ tasks, moodHistory, focusStats }: SummaryProps) {
       ? t("statistics:time_hours_minutes_short", { hours, minutes: mins })
       : t("statistics:time_minutes_short", { minutes: mins });
 
-    // 2. Tarefas Completas (APENAS ESTA SEMANA)
     const tasksDone = tasks.filter((t) => {
       const data = t.data || (t as any);
-
-      // Verificar se está concluída
       const isCompleted = data.status === "completed";
-
-      // Verificar data de conclusão
       const completedAtStr = data.completed_at;
 
       if (!isCompleted || !completedAtStr) return false;
 
       const completedDate = new Date(completedAtStr);
-
-      // A tarefa conta se:
-      // a) A semana da conclusão for igual à semana atual
-      // b) O ano for o mesmo (para evitar bugs na mesma semana de anos diferentes)
-      return (
-        utils.getWeekNumber(completedDate) === currentWeek &&
-        completedDate.getFullYear() === currentYear
-      );
+      return completedDate >= start && completedDate < end;
     }).length;
 
-    // 3. REGISTOS DE HUMOR (Esta Semana)
     const logsCount = moodHistory.filter((m) => {
       if (m.level === null) return false;
 
       const logDate = new Date(m.date);
-      // Garante semana e ano
-      return (
-        utils.getWeekNumber(logDate) === currentWeek &&
-        logDate.getFullYear() === currentYear
-      );
+      return logDate >= start && logDate < end;
     }).length;
 
-    // 4. Blocos/Eventos (Esta Semana)
-    const eventsCount = focusStats.filter((s) => s.week === currentWeek).length;
+    const eventsCount = countEventsThisWeek(events, start, end);
 
     return { focusText, tasksDone, logsCount, eventsCount };
-  }, [tasks, moodHistory, focusStats, t]);
+  }, [tasks, moodHistory, weeklyStudyTime, events, t]);
 
   return (
     <div className={styles.summaryGrid}>

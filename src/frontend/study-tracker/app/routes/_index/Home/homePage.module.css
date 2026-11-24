@@ -55,7 +55,15 @@
 
 .card {
   background-color: #fff;
-  border-radius: 12px;
+  --edge-size: 0.8rem;
+  clip-path: polygon(var(--edge-size) 0,
+      calc(100% - var(--edge-size)) 0,
+      100% var(--edge-size),
+      100% calc(100% - var(--edge-size)),
+      calc(100% - var(--edge-size)) 100%,
+      var(--edge-size) 100%,
+      0 calc(100% - var(--edge-size)),
+      0 var(--edge-size));
   padding: 1.5rem;
   border: 1px solid rgba(89, 46, 37, 0.1);
   display: flex;

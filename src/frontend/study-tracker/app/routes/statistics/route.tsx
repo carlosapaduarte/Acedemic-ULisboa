@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import {
   service,
   Task,
-  TaskDistributionPerWeek,
   DailyEnergyStatus,
+  Event,
+  WeekTimeStudy,
 } from "~/service/service";
 import styles from "./statistics.module.css";
 import { RequireAuthn } from "~/components/auth/RequireAuthn";
@@ -18,26 +19,24 @@ export default function Statistics() {
   const { t } = useTranslation(["statistics"]);
 
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [distStats, setDistStats] = useState<TaskDistributionPerWeek[]>([]);
   const [moodHistory, setMoodHistory] = useState<DailyEnergyStatus[]>([]);
+  const [weeklyStudyTime, setWeeklyStudyTime] = useState<WeekTimeStudy[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
 
-  // 🕵️‍♀️ Espião: Entrar na página de estatísticas
-  useEffect(() => {
-      service.logUserAction("tracker", "page_view", "statistics");
-  }, []);
-  
   useEffect(() => {
     async function loadData() {
       try {
-        const [allTasks, dist, moodData] = await Promise.all([
+        const [allTasks, moodData, studyTime, allEvents] = await Promise.all([
           service.getTasks(false),
-          service.getTaskDistributionStats(),
           service.fetchEnergyHistory(),
+          service.getStudyTimeByWeek(),
+          service.getAllUserEvents(),
         ]);
 
         setTasks(allTasks);
-        setDistStats(dist);
         setMoodHistory(moodData);
+        setWeeklyStudyTime(studyTime);
+        setEvents(allEvents);
       } catch (error) {
         console.error("Erro ao carregar estatísticas:", error);
       }
@@ -57,7 +56,8 @@ export default function Statistics() {
         <SummaryCards
           tasks={tasks}
           moodHistory={moodHistory}
-          focusStats={distStats}
+          weeklyStudyTime={weeklyStudyTime}
+          events={events}
         />
       </div>
 
@@ -74,7 +74,7 @@ export default function Statistics() {
 
         {/* 3. FOCUS STATS (Pomodoro) */}
         <div className="tutorial-target-stats-focus" style={{ width: "100%" }}>
-          <FocusStats />
+          <FocusStats weeklyStudyTime={weeklyStudyTime} />
         </div>
 
         {/* 4. DRILL DOWN */}

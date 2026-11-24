@@ -243,6 +243,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: max-content;
+  min-width: calc(8ch + 4rem + 4px);
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-family2);
+  font-size: 4rem;
+  line-height: 1;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 1.5rem 2rem;
   border-radius: 10px;
@@ -253,10 +260,23 @@
 
 .timerText {
   font-family: var(--font-family2);
-  font-size: 4rem;
+  font-size: inherit;
   color: var(--text-color-2);
   letter-spacing: 2px;
   font-variant-numeric: tabular-nums;
+}
+
+.timerDigit {
+  display: inline-block;
+  flex: 0 0 2ch;
+  width: 2ch;
+  text-align: center;
+}
+
+.timerSeparator {
+  flex: 0 0 0.5ch;
+  width: 0.5ch;
+  text-align: center;
 }
 
 .taskEmptyState {
@@ -622,8 +642,10 @@
     padding: 1.5rem 1rem !important;
   }
 
-  .timerText {
+  .timerDisplay {
     font-size: 3rem;
+    min-width: min(calc(8ch + 2rem + 4px), 100%);
+    padding: 1rem;
   }
 
   /* Botões empilhados (Pausar, Continuar, Parar) */
@@ -645,8 +667,9 @@
 
 /* Telemóveis pequenos */
 @media (max-width: 480px) {
-  .timerText {
+  .timerDisplay {
     font-size: 2.5rem;
+    min-width: min(calc(8ch + 2rem + 4px), 100%);
   }
 
   .timeInput {

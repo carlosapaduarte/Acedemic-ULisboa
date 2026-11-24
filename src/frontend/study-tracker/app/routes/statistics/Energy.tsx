@@ -256,6 +256,7 @@ export function EnergyStats() {
                     {t("more_capable_context")} {" "}
                     <br />
                     <span
+                      className={styles.insightImpactLabel}
                       style={{
                         color: "#4CAF50",
                         background: "#e8f5e9",
@@ -265,12 +266,14 @@ export function EnergyStats() {
                         marginTop: "4px",
                       }}
                     >
-                      <FaWandMagicSparkles /> {t(`impact_${IMPACT_KEYS[insights.facilitator] || "other"}`)}
+                      <FaWandMagicSparkles aria-hidden="true" />
+                      <span>{t(`impact_${IMPACT_KEYS[insights.facilitator] || "other"}`)}</span>
                     </span>
                   </>
                 ) : (
-                  <span style={{ fontSize: "0.8rem", color: "#888" }}>
-                    <FaWandMagicSparkles /> {t("awaiting_positive_data")}
+                  <span className={styles.insightImpactLabel} style={{ fontSize: "0.8rem", color: "#888" }}>
+                    <FaWandMagicSparkles aria-hidden="true" />
+                    <span>{t("awaiting_positive_data")}</span>
                   </span>
                 )}
               </div>

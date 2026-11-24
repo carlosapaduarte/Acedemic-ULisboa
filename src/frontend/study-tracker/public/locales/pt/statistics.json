@@ -49,6 +49,7 @@
   "weekly_metrics": "Métricas da Semana",
   "daily_volume": "Volume Diário",
   "average_per_session": "Média / Sessão",
+  "sessions_completed_week": "Sessões concluídas esta semana",
   "consecutive_cycles": "Ciclos Seguidos",
   "shortest_session": "Sessão mais curta",
   "longest_session": "Sessão mais longa",

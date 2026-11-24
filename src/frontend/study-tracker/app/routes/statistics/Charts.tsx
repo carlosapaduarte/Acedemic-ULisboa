@@ -182,7 +182,7 @@ export function FocusHistoryChart({
       .map((w) => ({
         name: t("statistics:week_number", { week: w.week }),
         foco: Math.round(w.total / 60), // Converter para horas
-        meta: Math.round(w.target / 60),
+        meta: w.target === null ? null : Math.round(w.target / 60),
       }));
   }, [weekHistory, t]);
 

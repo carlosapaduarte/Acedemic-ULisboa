@@ -80,11 +80,6 @@ export function ChallengesPage() {
         fetchUserInfo
     } = useChallengesPage();
 
-    // 🕵️‍♀️ O espião da Página do Challenge Principal/Ligas
-    useEffect(() => {
-        service.logUserAction("challenge", "page_view", "leagues_overview");
-    }, []);
-    
     return (
         <div className={`${styles.challengesPage}`}>
             <div className={`${styles.mainContent}`}>

@@ -1217,7 +1217,7 @@ class StudyTrackerSqlRepo(StudyTrackerRepo):
             if week_study_time_model is None:
                 raise # TODO!
             else:
-                if week_study_time_model.average_by_session == 0:
+                if week_study_time_model.n_of_sessions == 0:
                     new_average = study_session_time    
                 else:
                     new_average = ((week_study_time_model.average_by_session * week_study_time_model.n_of_sessions) + study_session_time) / (week_study_time_model.n_of_sessions + 1)

@@ -355,6 +355,7 @@ class WeekTimeStudy():
     week_and_year: WeekAndYear
     total: int
     average_by_session: float
+    n_of_sessions: int
     target: int | None
 
     def __init__(
@@ -362,11 +363,13 @@ class WeekTimeStudy():
         week_and_year: WeekAndYear,
         total: int,
         average_by_session: float,
+        n_of_sessions: int,
         target: int | None
     ) -> None:
         self.week_and_year=week_and_year
         self.total=total
         self.average_by_session=average_by_session
+        self.n_of_sessions=n_of_sessions
         self.target=target
 
     @staticmethod
@@ -380,6 +383,7 @@ class WeekTimeStudy():
                 ),
                 total=model.total,
                 average_by_session=model.average_by_session,
+                n_of_sessions=model.n_of_sessions,
                 target=None
             ))
 

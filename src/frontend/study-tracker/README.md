@@ -19,7 +19,6 @@
 #### 2.1 Dashboard
 
 - Overview of tasks, weekly schedules, and progress statistics.
-- Quick access to reminders for set goals and daily tasks.
 
 #### 2.2 Calendar
 
